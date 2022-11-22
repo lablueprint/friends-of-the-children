@@ -3,7 +3,7 @@ import React from 'react';
 function MessageWall() {
   return (
     <div>
-      Message Wall test!
+      Message Wall! :D
     </div>
   );
 }
