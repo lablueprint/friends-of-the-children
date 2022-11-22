@@ -4,14 +4,18 @@ import './App.css';
 import {
   Example,
   Default,
+  MessageWall,
+  Modules,
 } from './pages';
 
 function App() {
   return (
     <div className="App">
       <Routes>
+        <Route path="/message-wall" element={(<MessageWall />)} />
         <Route path="/example" element={(<Example />)} />
         <Route path="/" element={(<Default />)} />
+        <Route path="/modules" element={(<Modules />)} />
       </Routes>
     </div>
   );
