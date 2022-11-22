@@ -8,9 +8,13 @@ import {
   Modules,
 } from './pages';
 
+import NavBar from './components/NavBar';
+
 function App() {
   return (
+
     <div className="App">
+      <NavBar />
       <Routes>
         <Route path="/message-wall" element={(<MessageWall />)} />
         <Route path="/example" element={(<Example />)} />
