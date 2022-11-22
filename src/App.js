@@ -6,6 +6,7 @@ import {
   Default,
   MessageWall,
   Modules,
+  Calendar,
 } from './pages';
 
 import NavBar from './components/NavBar';
@@ -20,6 +21,7 @@ function App() {
         <Route path="/example" element={(<Example />)} />
         <Route path="/" element={(<Default />)} />
         <Route path="/modules" element={(<Modules />)} />
+        <Route path="/calendar" element={(<Calendar />)} />
       </Routes>
     </div>
   );
