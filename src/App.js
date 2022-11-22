@@ -5,6 +5,7 @@ import {
   Example,
   Default,
   MessageWall,
+  Modules,
 } from './pages';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/message-wall" element={(<MessageWall />)} />
         <Route path="/example" element={(<Example />)} />
         <Route path="/" element={(<Default />)} />
+        <Route path="/modules" element={(<Modules />)} />
       </Routes>
     </div>
   );
