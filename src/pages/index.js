@@ -6,7 +6,6 @@ import Signup from './Signup';
 import Modules from './Modules';
 
 export {
- 
   Example, Default, Login, MessageWall, Modules,
-Signup,
+  Signup,
 };
