@@ -15,10 +15,13 @@ function Login() {
           <br />
           <input type="text" id="password" name="password" />
         </label>
-        <br />
-        <input type="submit" value="Log in" />
+        <label htmlFor="Submit">
+          <br />
+          <input type="submit" id="password" name="password" />
+        </label>
       </form>
     </div>
+
   );
 }
 
