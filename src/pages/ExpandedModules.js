@@ -19,7 +19,7 @@ const firebaseConfig = {
 // load firebase:
 firebase.initializeApp(firebaseConfig);
 
-function Modules() {
+function ExpandedModules() {
   const [modules, setModules] = useState([]);
 
   useEffect(() => {
@@ -41,13 +41,14 @@ function Modules() {
       <div>
         <Module
           title={module.title}
-          // body={module.body}
-          // attachment={module.attachments}
+          body={module.body}
+          attachment={module.attachments}
         />
-        {/* <onclick ExpandedModules(module.id) */}
       </div>
     </div>
   ));
 }
 
-export default Modules;
+export default ExpandedModules;
+
+// ExpandedModules.proptype = id
