@@ -14,13 +14,10 @@ function MessageWall() {
     target: ['mentor', 'caregiver'],
   };
   const submitData = () => {
-    db.collection('messages').doc().set(data)
-      .then(() => {
-        console.log('Document successfully written!');
-      })
-      .catch((error) => {
-        console.error('Error writing document: ', error);
-      });
+    db.collection('messages').doc(title).set(data);
+    setTitle('');
+    setBody('');
+    setServiceArea('');
   };
   const isAdmin = true;
   if (isAdmin) {
