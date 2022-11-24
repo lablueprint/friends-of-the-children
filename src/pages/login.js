@@ -15,6 +15,8 @@ function Login() {
           <br />
           <input type="text" id="password" name="password" />
         </label>
+        <br />
+        <input type="submit" value="Log in" />
       </form>
     </div>
   );
