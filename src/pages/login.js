@@ -4,13 +4,16 @@ function Login() {
   return (
     <div>
       <form>
-        <label htmlFor="fname">First name:</label>
-        <br />
-        <input type="text" id="fname" name="fname" />
-        <br />
-        <label htmlFor="lname">Last name:</label>
-        <br />
-        <input type="text" id="lname" name="lname" />
+        <label htmlFor="username">
+          Username:
+          <br />
+          <input type="text" id="username" name="username" />
+        </label>
+        <label htmlFor="password">
+          Password:
+          <br />
+          <input type="text" id="password" name="password" />
+        </label>
       </form>
     </div>
   );
