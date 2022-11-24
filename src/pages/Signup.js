@@ -35,10 +35,10 @@ function Signup() {
           <br />
           <input type="text" id="signinform" name="ServiceArea" />
         </label>
-        <label htmlFor="cars">
+        <label htmlFor="Role">
           Choose a role:
           <br />
-          <select id="cars" name="cars">
+          <select id="signinform" name="Role">
             <option value="Caregiver">Caregiver</option>
             <option value="Mentor">Mentor</option>
           </select>
