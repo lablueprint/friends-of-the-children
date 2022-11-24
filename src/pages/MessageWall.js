@@ -23,6 +23,7 @@ function MessageWall() {
   if (isAdmin) {
     return (
       <div>
+        <h3>Message Wall</h3>
         <form>
           <div>
             <label htmlFor="title">
