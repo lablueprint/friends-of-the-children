@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import styles from '../styles/Example.module.css';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -31,7 +32,7 @@ function Example() {
 
   return profiles.map((profile) => (
     <div key={profile.id}>
-      <div>
+      <div className={styles.exampleText}>
         {profile.firstName}
       </div>
       <div>
