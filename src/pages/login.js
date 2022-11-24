@@ -9,6 +9,7 @@ function Login() {
           <br />
           <input type="text" id="username" name="username" />
         </label>
+        <br />
         <label htmlFor="password">
           Password:
           <br />
