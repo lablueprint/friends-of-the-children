@@ -9,7 +9,7 @@ function NavBar() {
       {!loggedIn
         ? (
           <div className="login-buttons d-flex align-items-center justify-content-center gap-3 py-2">
-            <Link to="/loggin" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Log In </Link>
+            <Link to="/login" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Log In </Link>
             <Link to="/signup" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Sign Up</Link>
           </div>
         )
