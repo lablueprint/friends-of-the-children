@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-// const [password, setPassword] = useState('');
-
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
