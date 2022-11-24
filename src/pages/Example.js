@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
+import styles from '../styles/Example.module.css';
 
 function Example() {
   const [profiles, setProfiles] = useState([]);
@@ -19,7 +20,7 @@ function Example() {
 
   return profiles.map((profile) => (
     <div key={profile.id}>
-      <div>
+      <div className={styles.exampleText}>
         {profile.firstName}
       </div>
       <div>
