@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { app, db } from './firebase';
+import Message from '../components/Message';
 
 function MessageWall() {
   const [title, setTitle] = useState();
@@ -10,6 +11,7 @@ function MessageWall() {
   const target = [];
   const pinned = false;
   const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
+  const messages = [];
 
   if (mentor) {
     target.push('mentor');
@@ -31,8 +33,8 @@ function MessageWall() {
     setTitle('');
     setBody('');
     setServiceArea('');
+    messages.push(<Message title={title} />);
   };
-
   const isAdmin = true;
   if (isAdmin) {
     return (
