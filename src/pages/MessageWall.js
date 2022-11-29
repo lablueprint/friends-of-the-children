@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { db } from './firebase';
+import { app, db } from './firebase';
 
 function MessageWall() {
   const [title, setTitle] = useState();
@@ -7,18 +7,25 @@ function MessageWall() {
   const [serviceArea, setServiceArea] = useState();
   const [mentor, setMentor] = useState();
   const [caregiver, setCaregiver] = useState();
+  const pinned = false;
+  const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
+
   const data = {
     title,
     body,
     serviceArea: [serviceArea],
     target: ['mentor', 'caregiver'],
+    pinned,
+    date: myTimestamp,
   };
+
   const submitData = () => {
     db.collection('messages').doc(title).set(data);
     setTitle('');
     setBody('');
     setServiceArea('');
   };
+
   const isAdmin = true;
   if (isAdmin) {
     return (
