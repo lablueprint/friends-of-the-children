@@ -8,7 +8,7 @@ function ExpandedModule({
   attachments,
 }) {
   return (
-    <div key={card.id} className={styles.card}>
+    <div className={styles.card}>
       <h1>{title}</h1>
       <p>{body}</p>
       <div>{attachments}</div>
