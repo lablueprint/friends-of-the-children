@@ -7,14 +7,21 @@ function MessageWall() {
   const [serviceArea, setServiceArea] = useState();
   const [mentor, setMentor] = useState();
   const [caregiver, setCaregiver] = useState();
+  const target = [];
   const pinned = false;
   const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
 
+  if (mentor) {
+    target.push('mentor');
+  }
+  if (caregiver) {
+    target.push('caregiver');
+  }
   const data = {
     title,
     body,
     serviceArea: [serviceArea],
-    target: ['mentor', 'caregiver'],
+    target,
     pinned,
     date: myTimestamp,
   };
