@@ -7,22 +7,23 @@ function Modules() {
 
   useEffect(() => {
     db.collection('modules').get().then((sc) => {
-      const module = [];
+      const card = [];
       sc.forEach((doc) => {
         const data = doc.data();
         data.id = doc.id;
-        module.push(data);
+        card.push(data);
       });
-      setModules(module);
+      setModules(card);
     });
   }, []);
 
-  return modules.map((module) => (
-    <div key={module.id}>
+  return modules.map((card) => (
+    <div key={card.id}>
       <Module
-        title={module.title}
-        // body={module.body}
-        // attachments={module.attachments}
+        title={card.title}
+        <Link to="/expandedonboarding" onClick={() => <ExpandedModule title={card.title} body={card.body} attachments={card.attachments}/>} />
+        // body={card.body}
+        // attachments={card.attachments}
       />
     </div>
   ));
