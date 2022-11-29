@@ -20,6 +20,7 @@ function Login() {
             name="username"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
+            required
           />
         </label>
         <br />
@@ -32,6 +33,7 @@ function Login() {
             name="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            required
           />
         </label>
         <label htmlFor="Submit">
