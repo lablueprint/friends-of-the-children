@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-.module{
-    border-style: solid;
-=======
-.module {
+.card {
     border: solid;
->>>>>>> dcc34ec708d5bfc36d3fff99333a44ef3bfeb7ff
 }

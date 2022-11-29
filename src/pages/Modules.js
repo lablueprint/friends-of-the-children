@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import Module from '../components/Module';
@@ -22,8 +23,8 @@ function Modules() {
       <Module
         title={card.title}
         <Link to="/expandedonboarding" onClick={() => <ExpandedModule title={card.title} body={card.body} attachments={card.attachments}/>} />
-        // body={card.body}
-        // attachments={card.attachments}
+        {/* // body={card.body} */}
+        {/* // attachments={card.attachments} */}
       />
     </div>
   ));
