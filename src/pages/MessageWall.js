@@ -29,7 +29,7 @@ function MessageWall() {
   };
 
   const submitData = () => {
-    db.collection('messages').doc(title).set(data);
+    db.collection('messages').doc().set(data);
     setTitle('');
     setBody('');
     setServiceArea('');
