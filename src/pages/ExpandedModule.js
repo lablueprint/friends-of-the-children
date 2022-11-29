@@ -1,12 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { React } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from '../styles/Modules.module.css';
 
-function ExpandedModule({
-  title,
-  body,
-  attachments,
-}) {
+function ExpandedModule() {
+  const location = useLocation();
+  const { title, body, attachments } = location.state;
   return (
     <div className={styles.card}>
       <h1>{title}</h1>
@@ -17,9 +15,3 @@ function ExpandedModule({
 }
 
 export default ExpandedModule;
-
-ExpandedModule.propTypes = {
-  title: PropTypes.string.isRequired,
-  body: PropTypes.string.isRequired,
-  attachments: PropTypes.string.isRequired,
-};

@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { db } from './firebase';
 import Module from '../components/Module';
 
@@ -20,12 +20,11 @@ function Modules() {
 
   return modules.map((card) => (
     <div key={card.id}>
-      <Module
-        title={card.title}
-        <Link to="/expandedonboarding" onClick={() => <ExpandedModule title={card.title} body={card.body} attachments={card.attachments}/>} />
-        {/* // body={card.body} */}
-        {/* // attachments={card.attachments} */}
-      />
+      <Link to="/expandedmodule" state={{ title: card.title, body: card.body, attachment: card.attachments }}>
+        <Module
+          title={card.title}
+        />
+      </Link>
     </div>
   ));
 }
