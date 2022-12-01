@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { app, db } from './firebase';
 import Message from '../components/Message';
 
@@ -8,10 +8,10 @@ function MessageWall() {
   const [serviceArea, setServiceArea] = useState();
   const [mentor, setMentor] = useState();
   const [caregiver, setCaregiver] = useState();
+  const [messages, setMessages] = useState([]);
   const target = [];
   const pinned = false;
   const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
-  const messages = [];
 
   if (mentor) {
     target.push('mentor');
@@ -28,18 +28,45 @@ function MessageWall() {
     date: myTimestamp,
   };
 
+  useEffect(() => {
+    db.collection('messages').get().then((sc) => {
+      const message = [];
+      sc.forEach((doc) => {
+        const dat = doc.data();
+        dat.id = doc.id;
+        message.push(dat);
+      });
+      setMessages(message);
+    });
+  }, []);
+
+  messages.sort((a, b) => {
+    if (a.date < b.date) {
+      return -1;
+    }
+    if (a.date > b.date) {
+      return 1;
+    }
+    return 0;
+  });
+
   const submitData = () => {
     db.collection('messages').doc().set(data);
     setTitle('');
     setBody('');
     setServiceArea('');
-    messages.push(<Message title={title} />);
   };
+
   const isAdmin = true;
   if (isAdmin) {
     return (
       <div>
         <h3>Message Wall</h3>
+        {
+          messages.map((message) => (
+            <Message title={message.title} body={message.body} />
+          ))
+        }
         <form>
           <div>
             <label htmlFor="title">

@@ -1,0 +1,8 @@
+.message{
+    width: 200px;
+    margin: auto;
+    margin-bottom: 10px;
+    background-color: aquamarine;
+    border: solid;
+    border-radius: 20px;
+}
