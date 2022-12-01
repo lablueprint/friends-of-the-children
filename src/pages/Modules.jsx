@@ -6,7 +6,7 @@ import Module from '../components/Module';
 function Modules() {
   const [modules, setModules] = useState([]);
 
-  useEffect(() => {
+  const getModules = () => {
     db.collection('modules').get().then((sc) => {
       const card = [];
       sc.forEach((doc) => {
@@ -16,11 +16,13 @@ function Modules() {
       });
       setModules(card);
     });
-  }, []);
+  };
+
+  useEffect(getModules, []);
 
   return modules.map((card) => (
     <div key={card.id}>
-      <Link to="/expandedmodule" state={{ title: card.title, body: card.body, attachments: card.attachments }}>
+      <Link to="/expanded-module" state={{ title: card.title, body: card.body, attachments: card.attachments }}>
         <Module
           title={card.title}
         />

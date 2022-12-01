@@ -5,6 +5,7 @@ import styles from '../styles/Modules.module.css';
 function ExpandedModule() {
   const location = useLocation();
   const { title, body, attachments } = location.state;
+
   return (
     <div className={styles.card}>
       <Link to="/modules" className={styles.backButton}>

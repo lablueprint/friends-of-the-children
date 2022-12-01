@@ -3,11 +3,11 @@ import { app, db } from './firebase';
 import Message from '../components/Message';
 
 function MessageWall() {
-  const [title, setTitle] = useState();
-  const [body, setBody] = useState();
-  const [serviceArea, setServiceArea] = useState();
-  const [mentor, setMentor] = useState();
-  const [caregiver, setCaregiver] = useState();
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [serviceArea, setServiceArea] = useState('');
+  const [mentor, setMentor] = useState(false);
+  const [caregiver, setCaregiver] = useState(false);
   const [messages, setMessages] = useState([]);
   const target = [];
   const pinned = false;
