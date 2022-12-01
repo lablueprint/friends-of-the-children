@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 import { db } from './firebase';
 
 function Signup() {
@@ -13,20 +13,22 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const hashPassword = () => { // hash does not work, useState error probably
-    const saltRounds = 10;
-    bcrypt.hash(password, saltRounds, (err, hash) => {
-      if (err) {
-        setErrorMessage('Invalid Hash');
-      }
-      setPassword(hash);
-    });
-  };
+  // const hashPassword = (pass) => { // hash does not work, useState error probably
+  //   const salt = '';
+  //   bcrypt.hash(pass, salt, (err, hash) => {
+  //     if (err) {
+  //       setErrorMessage('Invalid Hash');
+  //     }
+  //     console.log('hashing');
+  //     setPassword(hash);
+  //   });
+  // };
+
   const onSubmit = () => {
     if (password !== confirmPassword) {
       setErrorMessage(errorMessage, 'Passwords must match!');
     }
-    hashPassword();
+    // hashPassword(password);
     console.log(password);
     console.log('submitted');
     const data = {
@@ -38,7 +40,7 @@ function Signup() {
       username,
       password,
     };
-    console.log(db);
+    console.log(data);
     db.collection('profiles').doc().set(data);
     setFirstName('');
     setLastName('');
@@ -47,6 +49,7 @@ function Signup() {
     setRole('Caregiver');
     setUsername('');
     setPassword('');
+    setConfirmPassword('');
   };
 
   const SigninForm = (
@@ -96,15 +99,14 @@ function Signup() {
           <input type="text" name="ConfirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
         </label>
         <br />
-        <input type="submit" value="Submit" onClick={onSubmit} />
+        <button type="button" onClick={onSubmit}>Submit</button>
       </div>
     </form>
-
   );
 
   return (
     <div>
-      { SigninForm }
+      {SigninForm}
     </div>
 
   );
