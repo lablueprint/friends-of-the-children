@@ -1,10 +1,16 @@
 import Example from './Example';
 import Default from './Default';
+import Login from './Login';
 import MessageWall from './MessageWall';
+import Signup from './Signup';
 import Modules from './Modules';
 import Calendar from './Calendar';
 import ExpandedModule from './ExpandedModule';
 
 export {
-  Example, Default, MessageWall, Modules, Calendar, ExpandedModule,
+  Example, Default,
+  Login, Signup,
+  MessageWall,
+  Modules, ExpandedModule,
+  Calendar,
 };
