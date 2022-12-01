@@ -23,5 +23,6 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error', // part of react hooks
     'react-hooks/exhaustive-deps': 'warn', // part of react hooks
     'max-len': 'off', // disables line length check
+    'no-console': 'off', // disables no console statements
   },
 };
