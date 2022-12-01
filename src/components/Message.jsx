@@ -19,7 +19,7 @@ function Message(props) {
         {' '}
         {body}
       </p>
-      <button type="button">pin</button>
+      <button type="button">pin 📌</button>
       {/* <p>{date}</p> */}
     </div>
   );
