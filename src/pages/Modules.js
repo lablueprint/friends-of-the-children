@@ -20,7 +20,7 @@ function Modules() {
 
   return modules.map((card) => (
     <div key={card.id}>
-      <Link to="/expandedmodule" state={{ title: card.title, body: card.body, attachments: card.attachment }}>
+      <Link to="/expandedmodule" state={{ title: card.title, body: card.body, attachments: card.attachments }}>
         <Module
           title={card.title}
         />

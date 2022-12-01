@@ -1,5 +1,5 @@
 import { React } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import styles from '../styles/Modules.module.css';
 
 function ExpandedModule() {
@@ -7,8 +7,11 @@ function ExpandedModule() {
   const { title, body, attachments } = location.state;
   return (
     <div className={styles.card}>
-      <h1>{title}</h1>
-      <p>{body}</p>
+      <Link to="/modules" className={styles.backButton}>
+        Back
+      </Link>
+      <div className={styles.title}>{title}</div>
+      <div className={styles.body}>{body}</div>
       <div>{attachments}</div>
     </div>
   );
