@@ -64,7 +64,7 @@ function MessageWall() {
         <h3>Message Wall</h3>
         {
           messages.map((message) => (
-            <Message title={message.title} body={message.body} />
+            <Message title={message.title} body={message.body} pinned={pinned} />
           ))
         }
         <form>
