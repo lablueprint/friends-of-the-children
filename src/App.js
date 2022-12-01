@@ -4,7 +4,9 @@ import './App.css';
 import {
   Example,
   Default,
+  Login,
   MessageWall,
+  Signup,
   Modules,
   Calendar,
 } from './pages';
@@ -16,9 +18,11 @@ function App() {
     <div className="App">
       <NavBar />
       <Routes>
+        <Route path="/" element={(<Default />)} />
         <Route path="/message-wall" element={(<MessageWall />)} />
         <Route path="/example" element={(<Example />)} />
-        <Route path="/" element={(<Default />)} />
+        <Route path="/login" element={(<Login />)} />
+        <Route path="/signup" element={(<Signup />)} />
         <Route path="/modules" element={(<Modules />)} />
         <Route path="/calendar" element={(<Calendar />)} />
       </Routes>
