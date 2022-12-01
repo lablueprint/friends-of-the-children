@@ -8,7 +8,7 @@ function Module({
   // attachments,
 }) {
   return (
-    <div className={styles.module}>
+    <div className={styles.card}>
       <h1>{title}</h1>
       {/* <p>{body}</p>
       <div>{attachments}</div> */}

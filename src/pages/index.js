@@ -5,8 +5,12 @@ import MessageWall from './MessageWall';
 import Signup from './Signup';
 import Modules from './Modules';
 import Calendar from './Calendar';
+import ExpandedModule from './ExpandedModule';
 
 export {
-  Example, Default, Login, MessageWall, Modules,
-  Signup, Calendar,
+  Example, Default,
+  Login, Signup,
+  MessageWall,
+  Modules, ExpandedModule,
+  Calendar,
 };
