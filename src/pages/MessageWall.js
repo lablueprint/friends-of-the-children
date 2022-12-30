@@ -28,7 +28,7 @@ function MessageWall() {
     date: myTimestamp,
   };
 
-  useEffect(() => {
+  const getMessages = () => {
     db.collection('messages').get().then((sc) => {
       const message = [];
       sc.forEach((doc) => {
@@ -38,7 +38,12 @@ function MessageWall() {
       });
       setMessages(message);
     });
-  }, []);
+  };
+
+  useEffect(
+    () => { getMessages(); },
+    [],
+  );
 
   messages.sort((a, b) => {
     if (a.date < b.date) {
@@ -55,6 +60,7 @@ function MessageWall() {
     setTitle('');
     setBody('');
     setServiceArea('');
+    getMessages();
   };
 
   const isAdmin = true;
