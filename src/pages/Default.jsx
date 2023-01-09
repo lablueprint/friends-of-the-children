@@ -1,7 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import logo from '../logo.svg';
 
-function Default() {
+function Default(profile) {
+  // remove later
+  console.log(profile);
+
   return (
     <header className="App-header">
       <img src={logo} className="App-logo" alt="logo" />
@@ -23,5 +27,17 @@ function Default() {
     </header>
   );
 }
+
+Default.propTypes = {
+  profile: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    serviceArea: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default Default;

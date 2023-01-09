@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { app, db } from './firebase';
 import Message from '../components/Message';
 
-function MessageWall() {
+function MessageWall(profile) {
+  // remove later
+  console.log(profile);
+
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [serviceArea, setServiceArea] = useState('');
@@ -70,7 +74,7 @@ function MessageWall() {
         <h3>Message Wall</h3>
         {
           messages.map((message) => (
-            <Message title={message.title} body={message.body} pinned={pinned} />
+            <Message key={message.id} title={message.title} body={message.body} pinned={pinned} />
           ))
         }
         <form>
@@ -110,4 +114,17 @@ function MessageWall() {
     );
   }
 }
+
+MessageWall.propTypes = {
+  profile: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    serviceArea: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
 export default MessageWall;

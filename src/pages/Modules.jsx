@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { db } from './firebase';
 import Module from '../components/Module';
 
-function Modules() {
+function Modules(profile) {
+  // remove later
+  console.log(profile);
+
   const [modules, setModules] = useState([]);
 
   const getModules = () => {
@@ -30,5 +34,17 @@ function Modules() {
     </div>
   ));
 }
+
+Modules.propTypes = {
+  profile: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    serviceArea: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default Modules;
