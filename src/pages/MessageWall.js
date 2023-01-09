@@ -10,7 +10,6 @@ function MessageWall() {
   const [caregiver, setCaregiver] = useState();
   const [messages, setMessages] = useState([]);
   const target = [];
-  const pinned = false;
   const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
 
   if (mentor) {
@@ -24,7 +23,7 @@ function MessageWall() {
     body,
     serviceArea: [serviceArea],
     target,
-    pinned,
+    pinned: false,
     date: myTimestamp,
   };
 
@@ -70,7 +69,7 @@ function MessageWall() {
         <h3>Message Wall</h3>
         {
           messages.map((message) => (
-            <Message title={message.title} body={message.body} pinned={pinned} />
+            <Message id={message.id} title={message.title} body={message.body} />
           ))
         }
         <form>
