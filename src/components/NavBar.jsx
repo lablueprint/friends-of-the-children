@@ -19,7 +19,6 @@ function NavBar() {
             <Link to="/message-wall" className="btn btn-info"> Message Wall </Link>
             <Link to="/" className="btn btn-danger" onClick={() => setLoggedIn(false)}> Log Out </Link>
           </div>
-
         )}
     </div>
   );

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { app, db } from './firebase';
 import Message from '../components/Message';
 
-function MessageWall() {
-  const [title, setTitle] = useState();
-  const [body, setBody] = useState();
-  const [serviceArea, setServiceArea] = useState();
-  const [mentor, setMentor] = useState();
-  const [caregiver, setCaregiver] = useState();
+function MessageWall(profile) {
+  // remove later
+  console.log(profile);
+
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [serviceArea, setServiceArea] = useState('');
+  const [mentor, setMentor] = useState(false);
+  const [caregiver, setCaregiver] = useState(false);
   const [messages, setMessages] = useState([]);
   const target = [];
   const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
@@ -69,7 +73,7 @@ function MessageWall() {
         <h3>Message Wall</h3>
         {
           messages.map((message) => (
-            <Message id={message.id} title={message.title} body={message.body} />
+            <Message key={message.id} id={message.id} title={message.title} body={message.body} />
           ))
         }
         <form>
@@ -109,4 +113,17 @@ function MessageWall() {
     );
   }
 }
+
+MessageWall.propTypes = {
+  profile: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    serviceArea: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
 export default MessageWall;

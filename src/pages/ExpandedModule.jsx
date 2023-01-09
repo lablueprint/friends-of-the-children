@@ -1,10 +1,15 @@
 import { React } from 'react';
+import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
 import styles from '../styles/Modules.module.css';
 
-function ExpandedModule() {
+function ExpandedModule(profile) {
+  // remove later
+  console.log(profile);
+
   const location = useLocation();
   const { title, body, attachments } = location.state;
+
   return (
     <div className={styles.card}>
       <Link to="/modules" className={styles.backButton}>
@@ -16,5 +21,17 @@ function ExpandedModule() {
     </div>
   );
 }
+
+ExpandedModule.propTypes = {
+  profile: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    serviceArea: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default ExpandedModule;
