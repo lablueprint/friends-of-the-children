@@ -6,3 +6,7 @@
     border: solid;
     border-radius: 20px;
 }
+button{
+    border-radius: 50px;
+    margin: 5px;
+}
