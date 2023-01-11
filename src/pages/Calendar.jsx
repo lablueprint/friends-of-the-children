@@ -17,7 +17,6 @@ Calendar.propTypes = {
     firstName: PropTypes.string.isRequired,
     lastName: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
-    password: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
