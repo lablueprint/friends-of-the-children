@@ -1,30 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styles from '../styles/Messages.module.css';
 import { db } from '../pages/firebase';
 
 function Message(props) {
   const { id, title, body } = props;
-  let pinned;
+  const [pinned, setPinned] = useState(false);
   const [pinDesc, setDesc] = useState('📌 PIN');
   const messageRef = db.collection('messages').doc(id);
 
-  const setPinned = () => {
+  // getPinned: get pin status from fb (in useEffect)
+  const getPinned = () => {
+    console.log('got pineed');
     messageRef.get().then((snap) => {
       if (snap.exists) {
-        const data = snap.data();
-        pinned = data.pinned;
-        messageRef.set({
-          pinned: !pinned,
-        }, { merge: true });
-        pinned = !pinned;
-        if (pinned) setDesc('❗️📌 UNPIN');
-        else setDesc('📌 PIN');
-      } else {
-        console.log('Document does not exist');
+        setPinned(snap.data().pinned);
       }
+      if (snap.data().pinned) setDesc('❗️📌 UNPIN');
+      else setDesc('📌 PIN');
     });
   };
+
+  // changePinned: change local pin status, then push it to fb
+  const changePinned = () => {
+    // push to fb
+    messageRef.set({
+      pinned: !pinned,
+    }, { merge: true });
+    if (!pinned) setDesc('❗️📌 UNPIN');
+    else setDesc('📌 PIN');
+    // change local pin status
+    setPinned(!pinned);
+  };
+
+  useEffect(
+    () => { getPinned(); },
+    [],
+  );
 
   return (
     <div className={styles.message}>
@@ -38,7 +50,7 @@ function Message(props) {
         {' '}
         {body}
       </p>
-      <button type="button" onClick={(setPinned)}>{pinDesc}</button>
+      <button type="button" onClick={(changePinned)}>{pinDesc}</button>
     </div>
   );
 }

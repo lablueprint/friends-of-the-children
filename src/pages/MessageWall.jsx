@@ -49,6 +49,9 @@ function MessageWall(profile) {
   );
 
   messages.sort((a, b) => {
+    // if (a.pinned === true) {
+    //   return -1;
+    // }
     if (a.date < b.date) {
       return -1;
     }
