@@ -49,9 +49,6 @@ function MessageWall(profile) {
   );
 
   messages.sort((a, b) => {
-    // if (a.pinned === true) {
-    //   return -1;
-    // }
     if (a.date < b.date) {
       return -1;
     }
@@ -60,6 +57,20 @@ function MessageWall(profile) {
     }
     return 0;
   });
+
+  const updateMessages = () => {
+    getMessages(messages);
+    messages.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;
+      }
+      if (a.date > b.date) {
+        return 1;
+      }
+      return 0;
+    });
+    console.log('hi');
+  };
 
   const submitData = () => {
     db.collection('messages').doc().set(data);
@@ -73,11 +84,13 @@ function MessageWall(profile) {
   if (isAdmin) {
     return (
       <div>
+        {console.log(messages)}
         <h3>Message Wall</h3>
         {
-          messages.map((message) => (
-            <Message key={message.id} id={message.id} title={message.title} body={message.body} />
-          ))
+          messages.filter((message) => (message.pinned === true)).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+        }
+        {
+          messages.filter((message) => (message.pinned === false)).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
         }
         <form>
           <div>

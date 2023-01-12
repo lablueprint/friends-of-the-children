@@ -4,14 +4,15 @@ import styles from '../styles/Messages.module.css';
 import { db } from '../pages/firebase';
 
 function Message(props) {
-  const { id, title, body } = props;
+  const {
+    id, title, body, updateMessages,
+  } = props;
   const [pinned, setPinned] = useState(false);
   const [pinDesc, setDesc] = useState('📌 PIN');
   const messageRef = db.collection('messages').doc(id);
 
   // getPinned: get pin status from fb (in useEffect)
   const getPinned = () => {
-    console.log('got pineed');
     messageRef.get().then((snap) => {
       if (snap.exists) {
         setPinned(snap.data().pinned);
@@ -31,6 +32,7 @@ function Message(props) {
     else setDesc('📌 PIN');
     // change local pin status
     setPinned(!pinned);
+    updateMessages();
   };
 
   useEffect(
@@ -59,5 +61,6 @@ Message.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
+  updateMessages: PropTypes.func.isRequired,
 };
 export default Message;
