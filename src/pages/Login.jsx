@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import bcrypt from 'bcryptjs';
 // import { doc, getDoc } from 'firebase/firestore';
+import bcrypt from 'bcryptjs';
 import { db } from './firebase';
 
 // import firebase from 'firebase/app';
@@ -27,6 +28,26 @@ function Login() {
         });
       });
   };
+
+  useEffect(() => {
+    // console.log(profile.username);
+    // console.log('here');
+
+    // check the hash password only if profile is not empty
+    if (profile !== null) {
+      bcrypt.hash(password, 10)
+        .then((hashedPassword) => {
+          console.log('here', hashedPassword);
+          console.log('there', profile.password);
+          if (hashedPassword === profile.password) {
+            console.log('valid credentials');
+          } else {
+            console.log('invalid credentials');
+          }
+        });
+    }
+  // eslint-disable-next-line
+  }, [profile]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -67,7 +88,6 @@ function Login() {
     //     console.log('failed', err);
     //   });
     getUsers(username);
-    console.log(profile);
     setUsername('');
     setPassword('');
   };
