@@ -44,7 +44,7 @@ function Signup() {
           username,
           password: hashedPassword,
         };
-        db.collection('profiles').doc().set({ data });
+        db.collection('profiles').doc().set(data);
       });
 
     // reset forms

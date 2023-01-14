@@ -15,7 +15,11 @@ function Login() {
       .where('username', '==', usernameSearch)
       .get()
       .then((sc) => {
-        console.log(sc);
+        // TODO: check that there is only one user with usernameSearch
+        sc.forEach((doc) => {
+          // console.log(doc.id);
+          console.log(doc.data());
+        });
       });
   };
 
@@ -57,9 +61,8 @@ function Login() {
     //   .catch((err) => {
     //     console.log('failed', err);
     //   });
-
-    // console.log('hello');
-    getUsers('asdf');
+    console.log(username);
+    getUsers(username);
     setUsername('');
     setPassword('');
   };
