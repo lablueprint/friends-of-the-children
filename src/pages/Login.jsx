@@ -9,6 +9,8 @@ import { db } from './firebase';
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [profile, setProfile] = useState('');
+  // const profile = useRef();
 
   const getUsers = (usernameSearch) => {
     db.collection('profiles')
@@ -18,7 +20,10 @@ function Login() {
         // TODO: check that there is only one user with usernameSearch
         sc.forEach((doc) => {
           // console.log(doc.id);
-          console.log(doc.data());
+          const data = doc.data();
+          data.id = doc.id;
+          setProfile(data);
+          // console.log(doc.data());
         });
       });
   };
@@ -61,8 +66,8 @@ function Login() {
     //   .catch((err) => {
     //     console.log('failed', err);
     //   });
-    console.log(username);
     getUsers(username);
+    console.log(profile);
     setUsername('');
     setPassword('');
   };
