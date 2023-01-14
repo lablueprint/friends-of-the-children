@@ -7,7 +7,6 @@ import Module from '../components/Module';
 function Modules(profile) {
   // remove later
   console.log(profile);
-
   const [modules, setModules] = useState([]);
 
   const getModules = () => {
@@ -16,7 +15,9 @@ function Modules(profile) {
       sc.forEach((doc) => {
         const data = doc.data();
         data.id = doc.id;
-        card.push(data);
+        if (data.parent == null) {
+          card.push(data);
+        }
       });
       setModules(card);
     });
@@ -26,7 +27,10 @@ function Modules(profile) {
 
   return modules.map((card) => (
     <div key={card.id}>
-      <Link to="/expanded-module" state={{ title: card.title, body: card.body, attachments: card.attachments }}>
+      <Link
+        to="/expanded-module"
+        state={{ id: card.id }}
+      >
         <Module
           title={card.title}
         />
@@ -45,5 +49,4 @@ Modules.propTypes = {
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,
 };
-
 export default Modules;
