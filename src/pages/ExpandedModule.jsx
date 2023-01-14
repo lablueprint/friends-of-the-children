@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
 import styles from '../styles/Modules.module.css';
-import ChildModules from './ChildModules';
+import ChildModule from './ChildModule';
 import { db } from './firebase';
 
 function ExpandedModule(profile) {
@@ -46,7 +46,7 @@ function ExpandedModule(profile) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <ChildModules title={title} body={body} attachments={attachments} titles={titles} child={children} />
+        <ChildModule title={title} body={body} attachments={attachments} titles={titles} child={children} />
       </div>
     );
   }
@@ -56,7 +56,7 @@ function ExpandedModule(profile) {
       <Link to="/modules">
         Back
       </Link>
-      <ChildModules title={title} body={body} attachments={attachments} titles={titles} child={children} />
+      <ChildModule title={title} body={body} attachments={attachments} titles={titles} child={children} />
     </div>
   );
 }

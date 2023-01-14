@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 
-function ChildModules(props) {
+function ChildModule(props) {
   const {
     title, body, attachments, titles, child,
   } = props;
@@ -28,11 +28,11 @@ function ChildModules(props) {
   );
 }
 
-ChildModules.propTypes = {
+ChildModule.propTypes = {
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   attachments: PropTypes.string.isRequired,
   titles: PropTypes.arrayOf.isRequired,
   child: PropTypes.arrayOf.isRequired,
 };
-export default ChildModules;
+export default ChildModule;
