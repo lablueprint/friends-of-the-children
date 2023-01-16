@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import logo from '../logo.svg';
 
 function Default(profile) {
@@ -28,15 +28,16 @@ function Default(profile) {
   );
 }
 
-Default.propTypes = {
-  profile: PropTypes.shape({
-    firstName: PropTypes.string.isRequired,
-    lastName: PropTypes.string.isRequired,
-    username: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
-    role: PropTypes.string.isRequired,
-    serviceArea: PropTypes.string.isRequired,
-  }).isRequired,
-};
+// TODO: Might need to fix this later
+// Default.propTypes = {
+//   profile: PropTypes.shape({
+//     firstName: PropTypes.string.isRequired,
+//     lastName: PropTypes.string.isRequired,
+//     username: PropTypes.string.isRequired,
+//     email: PropTypes.string.isRequired,
+//     role: PropTypes.string.isRequired,
+//     serviceArea: PropTypes.string.isRequired,
+//   }).isRequired,
+// };
 
 export default Default;

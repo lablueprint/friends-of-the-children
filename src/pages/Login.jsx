@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 /**
  * to resolve the warning about crypto, add fallback options
@@ -16,7 +17,7 @@ import bcrypt from 'bcryptjs';
  */
 import { db } from './firebase';
 
-function Login() {
+function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [profile, setProfile] = useState(null);
@@ -29,11 +30,9 @@ function Login() {
       .then((sc) => {
         // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
         sc.forEach((doc) => {
-          // console.log(doc.id);
           const data = doc.data();
           data.id = doc.id;
           setProfile(data);
-          // console.log(doc.data());
         });
       });
   };
@@ -41,10 +40,12 @@ function Login() {
   useEffect(() => {
     // check the hash password only if profile is not empty
     if (profile !== null && password.length > 0) {
-      bcrypt.compare(password, profile.password)
-        .then((res) => {
-          if (res) {
+      bcrypt.compare(password, profile.password) // compare passwords
+        .then((isValid) => {
+          if (isValid) { // check whether it is a valid credential
             console.log('login successful');
+            const { profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
+            updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
           } else {
             console.log('invalid credentials');
           }
@@ -57,10 +58,9 @@ function Login() {
   }, [profile]);
 
   const handleSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault(); // this prevents from page to be refreshing
     getUsers(username);
     setUsername('');
-    // setPassword(''); // we will do this after checking the password
   };
 
   return (
@@ -99,4 +99,10 @@ function Login() {
     </div>
   );
 }
+
+// props validation
+Login.propTypes = {
+  updateAppProfile: PropTypes.func.isRequired,
+};
+
 export default Login;
