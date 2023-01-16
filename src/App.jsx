@@ -28,7 +28,8 @@ function App() {
   const [profile, setProfile] = useState(null);
 
   // this functions props allow us to change the state in app.jsx from children components
-  // Note: consider using "Context" for consistencyb throughout the app
+  // Note: consider using "Context" for consistency throughout the app,
+  // and might alse need cookies so that user stays logged after refreshing the page
   const updateProfile = (newProfile) => {
     setProfile(newProfile);
   };
