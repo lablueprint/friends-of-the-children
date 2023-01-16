@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
-// import bcrypt from 'bcryptjs';
-// import { doc, getDoc } from 'firebase/firestore';
 import bcrypt from 'bcryptjs';
-import { db } from './firebase';
+/**
+ * to resolve the warning about crypto, add fallback options
+ * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
+ * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
+ * from line 305 to line 309 should look like
 
-// import firebase from 'firebase/app';
-// import 'firebase/firestore';
+  ...
+
+    resolve: {
+      fallback: {
+        "crypto": false
+      },
+  ...
+ */
+import { db } from './firebase';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [profile, setProfile] = useState('');
+  const [profile, setProfile] = useState(null);
   // const profile = useRef();
 
   const getUsers = (usernameSearch) => {
@@ -18,7 +27,7 @@ function Login() {
       .where('username', '==', usernameSearch)
       .get()
       .then((sc) => {
-        // TODO: check that there is only one user with usernameSearch
+        // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
         sc.forEach((doc) => {
           // console.log(doc.id);
           const data = doc.data();
@@ -30,66 +39,28 @@ function Login() {
   };
 
   useEffect(() => {
-    // console.log(profile.username);
-    // console.log('here');
-
     // check the hash password only if profile is not empty
-    if (profile !== null) {
-      bcrypt.hash(password, 10)
-        .then((hashedPassword) => {
-          console.log('here', hashedPassword);
-          console.log('there', profile.password);
-          if (hashedPassword === profile.password) {
-            console.log('valid credentials');
+    if (profile !== null && password.length > 0) {
+      bcrypt.compare(password, profile.password)
+        .then((res) => {
+          if (res) {
+            console.log('login successful');
           } else {
             console.log('invalid credentials');
           }
-        });
+        })
+        .catch(); // do error checking here if necessary
+      setProfile(null);
+      setPassword('');
     }
   // eslint-disable-next-line
   }, [profile]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // console.log(username);
-    // console.log(password);
-
-    // search for the username and compare hashed passwords to log in
-    // bcrypt.hash(password, 10) // asychronous hashing function
-    //   .then((hashedps) => {
-    //     db.collection('users').doc().set({ username, hashedps });
-    //   });
-
-    // const docRef = doc(db, "cities", "SF");
-    // getDoc(docRef).then(
-    //   () =>
-    // );
-
-    // if (docSnap.exists()) {
-    //   console.log("Document data:", docSnap.data());
-    // } else {
-    //   // doc.data() will be undefined in this case
-    //   console.log("No such document!");
-    // }
-
-    // console.log('herehrer');œ
-    // const searchUsers = (usernameSearch) => db
-    //   .collection('profiles')
-    //   .where('username', '==', usernameSearch)
-    //   .get()
-    //   .then((snapshot) => snapshot.docs.map((doc) => doc.data()));
-
-    // searchUsers(username)
-    //   .then((users) => {
-    //     console.log('here');
-    //     console.log(users);
-    //   })
-    //   .catch((err) => {
-    //     console.log('failed', err);
-    //   });
     getUsers(username);
     setUsername('');
-    setPassword('');
+    // setPassword(''); // we will do this after checking the password
   };
 
   return (
