@@ -3,29 +3,40 @@ import PropTypes from 'prop-types';
 import { app, db } from './firebase';
 import Message from '../components/Message';
 
-function MessageWall(profile) {
+function MessageWall({ profile }) {
+  // get a profile from db
+  // store serviceArea and role
+  // when getMessage is called, filter messages based on serviceArea and Role
+  // changed ifAdmin to adminState that is true when role is Admin
+
   // remove later
   console.log(profile);
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const [serviceArea, setServiceArea] = useState('');
+  const [msgserviceArea, setmsgServiceArea] = useState('');
   const [mentor, setMentor] = useState(false);
   const [caregiver, setCaregiver] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [isAdmin, setIsadmin] = useState(false);
   const target = [];
   const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
 
+  const { role, serviceArea } = profile;
+  console.log(role);
   if (mentor) {
     target.push('mentor');
   }
   if (caregiver) {
     target.push('caregiver');
   }
+  if (role === 'Admin') {
+    setIsadmin(true);
+  }
   const data = {
     title,
     body,
-    serviceArea: [serviceArea],
+    msgserviceArea: [msgserviceArea],
     target,
     pinned: false,
     date: myTimestamp,
@@ -43,12 +54,19 @@ function MessageWall(profile) {
     });
   };
 
+  // const checkMessages = () => {
+  //   messages.filter((message) => message.msgserviceArea === serviceArea && message.target[0] === role);
+  // };
+
   useEffect(
     () => { getMessages(); },
     [],
   );
 
   messages.sort((a, b) => {
+    // if (a.pinned === true) {
+    //   return -1;
+    // }
     if (a.date < b.date) {
       return -1;
     }
@@ -58,6 +76,7 @@ function MessageWall(profile) {
     return 0;
   });
 
+  // this is used to re-render the page when a msg gets pinned (not necessarily sort anything, since that's done right before)
   const updateMessages = () => {
     getMessages(messages);
     messages.sort((a, b) => {
@@ -71,20 +90,17 @@ function MessageWall(profile) {
     });
     console.log('hi');
   };
-
   const submitData = () => {
     db.collection('messages').doc().set(data);
     setTitle('');
     setBody('');
-    setServiceArea('');
+    setmsgServiceArea('');
     getMessages();
   };
 
-  const isAdmin = true;
-  if (isAdmin) {
+  if (isAdmin === true) {
     return (
       <div>
-        {console.log(messages)}
         <h3>Message Wall</h3>
         {
           messages.filter((message) => (message.pinned === true)).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
@@ -106,9 +122,9 @@ function MessageWall(profile) {
             </label>
           </div>
           <div>
-            <label htmlFor="serviceArea">
+            <label htmlFor="msgserviceArea">
               Service Area:
-              <input type="text" id="serviceArea" name="serviceArea" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+              <input type="text" id="msgserviceArea" name="msgserviceArea" value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
             </label>
           </div>
           <div>
@@ -128,6 +144,17 @@ function MessageWall(profile) {
       </div>
     );
   }
+  return (
+    <div>
+      <h3>Message Wall</h3>
+      {
+      messages.filter((message) => (message.pinned === true && message.msgserviceArea === serviceArea && message.target[0] === role.toLowerCase())).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+    }
+      {
+      messages.filter((message) => (message.pinned === false && message.msgserviceArea === serviceArea && message.target[0] === role.toLowerCase())).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+    }
+    </div>
+  );
 }
 
 MessageWall.propTypes = {
