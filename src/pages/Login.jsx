@@ -44,7 +44,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         .then((isValid) => {
           if (isValid) { // check whether it is a valid credential
             console.log('login successful');
-            const { profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
+            const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
             updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
           } else {
             console.log('invalid credentials');
