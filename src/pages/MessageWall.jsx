@@ -71,7 +71,6 @@ function MessageWall(profile) {
     return (
       <div>
         <h3>Message Wall</h3>
-        {console.log(messages)}
         {
           messages.map((message) => (
             <Message key={message.id} id={message.id} title={message.title} body={message.body} />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { db } from './firebase';
-import Module from '../components/Module';
+import styles from '../styles/Modules.module.css';
 
 function Modules(profile) {
   // remove later
@@ -31,9 +31,9 @@ function Modules(profile) {
         to="/expanded-module"
         state={{ id: card.id }}
       >
-        <Module
-          title={card.title}
-        />
+        <div className={styles.card}>
+          <h1>{card.title}</h1>
+        </div>
       </Link>
     </div>
   ));
