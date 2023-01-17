@@ -8,17 +8,16 @@ function Message(props) {
     id, title, body, updateMessages,
   } = props;
   const [pinned, setPinned] = useState(false);
-  const [pinDesc, setDesc] = useState('📌 PIN');
+  // const [pinDesc, setDesc] = useState('📌 PIN');
   const messageRef = db.collection('messages').doc(id);
 
   // getPinned: get pin status from fb (in useEffect)
   const getPinned = () => {
+    console.log('got pinned');
     messageRef.get().then((snap) => {
       if (snap.exists) {
         setPinned(snap.data().pinned);
       }
-      if (snap.data().pinned) setDesc('❗️📌 UNPIN');
-      else setDesc('📌 PIN');
     });
   };
 
@@ -27,23 +26,23 @@ function Message(props) {
     // push to fb
     messageRef.set({
       pinned: !pinned,
-    }, { merge: true });
-    console.log('pin pushed');
-    if (!pinned) setDesc('❗️📌 UNPIN');
-    else setDesc('📌 PIN');
-    // change local pin status
-    setPinned(!pinned);
-    console.log('changed pin status');
-    updateMessages();
+    }, { merge: true }).then(() => {
+      console.log('pin pushed');
+      // if (!pinned) setDesc('❗️📌 UNPIN');
+      // else setDesc('📌 PIN');
+      // change local pin status
+      setPinned(!pinned);
+      console.log('changed pin status');
+      updateMessages();
+    });
   };
 
-  useEffect(
-    () => { getPinned(); },
-    [],
-  );
+  useEffect(getPinned, []);
+  // () => { getPinned(); },
+  // [],
 
   return (
-    <div className={styles.message}>
+    <div className={pinned ? styles.pinnedmessage : styles.message}>
       <h5>
         Title:
         {' '}
@@ -54,7 +53,8 @@ function Message(props) {
         {' '}
         {body}
       </p>
-      <button type="button" onClick={(changePinned)}>{pinDesc}</button>
+      {/* <button type="button" onClick={(changePinned)}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button> */}
+      <button type="button" className={pinned ? styles.pinnedbutton : styles.button} onClick={(changePinned)}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button>
     </div>
   );
 }
