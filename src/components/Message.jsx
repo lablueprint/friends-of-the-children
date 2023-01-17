@@ -28,10 +28,12 @@ function Message(props) {
     messageRef.set({
       pinned: !pinned,
     }, { merge: true });
+    console.log('pin pushed');
     if (!pinned) setDesc('❗️📌 UNPIN');
     else setDesc('📌 PIN');
     // change local pin status
     setPinned(!pinned);
+    console.log('changed pin status');
     updateMessages();
   };
 
