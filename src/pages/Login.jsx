@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 /**
@@ -6,9 +7,7 @@ import bcrypt from 'bcryptjs';
  * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
  * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
  * from line 305 to line 309 should look like
-
   ...
-
     resolve: {
       fallback: {
         "crypto": false
@@ -21,6 +20,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [profile, setProfile] = useState(null);
+  const navigate = useNavigate();
   // const profile = useRef();
 
   const getUsers = (usernameSearch) => {
@@ -46,6 +46,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
             console.log('login successful');
             const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
             updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
+            navigate('/modules');
           } else {
             console.log('invalid credentials');
           }
