@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 import { db } from './firebase';
 import styles from '../styles/Modules.module.css';
 
-function Modules(profile) {
+function Modules({ profile }) {
   // remove later
   console.log(profile);
   const [modules, setModules] = useState([]);
+  const { role } = profile;
+  const currRole = role.toLowerCase();
 
   const getModules = () => {
     db.collection('modules').get().then((sc) => {
@@ -15,7 +17,7 @@ function Modules(profile) {
       sc.forEach((doc) => {
         const data = doc.data();
         data.id = doc.id;
-        if (data.parent == null) {
+        if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
           card.push(data);
         }
       });
