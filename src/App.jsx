@@ -20,8 +20,8 @@ function App() {
     firstName: 'Bob',
     lastName: 'Smith',
     password: 'asdf',
-    role: 'Mentor',
-    serviceArea: 'av',
+    role: 'Caregiver',
+    serviceArea: 'ms',
     username: 'asdf',
   };
 
