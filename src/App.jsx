@@ -10,6 +10,7 @@ import {
   Modules,
   Calendar,
   ExpandedModule,
+  NotFound,
 } from './pages';
 
 import NavBar from './components/NavBar';
@@ -58,6 +59,8 @@ function App() {
             <Route path="/" element={(<Default />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup />)} />
+            <Route path="*" element={(<NotFound />)} />
+
           </Routes>
         </div>
       )

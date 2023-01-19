@@ -6,6 +6,7 @@ import Signup from './Signup';
 import Modules from './Modules';
 import Calendar from './Calendar';
 import ExpandedModule from './ExpandedModule';
+import NotFound from './NotFound';
 
 export {
   Example, Default,
@@ -13,4 +14,5 @@ export {
   MessageWall,
   Modules, ExpandedModule,
   Calendar,
+  NotFound,
 };
