@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { db } from './firebase';
-import Module from '../components/Module';
+import styles from '../styles/Modules.module.css';
 
-function Modules(profile) {
+function Modules({ profile }) {
   // remove later
   console.log(profile);
-
   const [modules, setModules] = useState([]);
+  const { role } = profile;
+  const currRole = role.toLowerCase();
 
   const getModules = () => {
     db.collection('modules').get().then((sc) => {
@@ -16,7 +17,9 @@ function Modules(profile) {
       sc.forEach((doc) => {
         const data = doc.data();
         data.id = doc.id;
-        card.push(data);
+        if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
+          card.push(data);
+        }
       });
       setModules(card);
     });
@@ -26,10 +29,13 @@ function Modules(profile) {
 
   return modules.map((card) => (
     <div key={card.id}>
-      <Link to="/expanded-module" state={{ title: card.title, body: card.body, attachments: card.attachments }}>
-        <Module
-          title={card.title}
-        />
+      <Link
+        to="/expanded-module"
+        state={{ id: card.id }}
+      >
+        <div className={styles.card}>
+          <h1>{card.title}</h1>
+        </div>
       </Link>
     </div>
   ));
@@ -45,5 +51,4 @@ Modules.propTypes = {
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,
 };
-
 export default Modules;
