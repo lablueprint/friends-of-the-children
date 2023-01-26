@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import bcrypt from 'bcryptjs';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { db } from './firebase';
 
 function Signup() {
@@ -12,6 +13,42 @@ function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
+
+  const provider = new GoogleAuthProvider();
+
+  function signUpWithGoogle() {
+    const auth = getAuth();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log('SC');
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        console.log('credential: ', credential);
+        const token = credential.accessToken;
+        console.log(token);
+        // The signed-in user info.
+        const { user: googleUser } = result;
+        console.log(googleUser);
+        setGoogleLoggedIn(true);
+        setEmail(googleUser.email);
+        setUsername(googleUser.displayName);
+      // ...
+      }).catch((error) => {
+      // Handle Errors here.
+        const errorCode = error.code;
+        console.log(errorCode);
+
+        const googleErrorMessage = error.message;
+        console.log(googleErrorMessage);
+
+        // The email of the user's account used.
+        // const { email } = error.customData;
+        // The AuthCredential type that was used.
+        // const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+      });
+  }
 
   // const hashPassword = (pass) => { // hash does not work, useState error probably
   //   const salt = '';
@@ -33,19 +70,31 @@ function Signup() {
     // console.log('submitted');
 
     // console.log(data);
-    bcrypt.hash(password, 10) // asychronous hashing function
-      .then((hashedPassword) => {
-        const data = {
-          firstName,
-          lastName,
-          email,
-          serviceArea,
-          role,
-          username,
-          password: hashedPassword,
-        };
-        db.collection('profiles').doc().set(data);
-      });
+    if (!googleLoggedIn) {
+      bcrypt.hash(password, 10) // asychronous hashing function
+        .then((hashedPassword) => {
+          const data = {
+            firstName,
+            lastName,
+            email,
+            serviceArea,
+            role,
+            username,
+            password: hashedPassword,
+          };
+          db.collection('profiles').doc().set(data);
+        });
+    } else {
+      const data = {
+        firstName,
+        lastName,
+        email,
+        serviceArea,
+        role,
+        username,
+      };
+      db.collection('profiles').doc().set(data);
+    }
 
     // reset forms
     setFirstName('');
@@ -94,18 +143,32 @@ function Signup() {
           Username:
           <input type="text" name="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
         </label>
-        <label htmlFor="Password">
-          <br />
-          Password:
-          <input type="password" name="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </label>
-        <label htmlFor="ConfirmPassword">
-          <br />
-          Confirm Password:
-          <input type="password" name="ConfirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-        </label>
-        <br />
+
+        {!googleLoggedIn
+          ? (
+            <>
+              <label htmlFor="Password">
+                <br />
+                Password:
+                <input type="password" name="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </label>
+              <label htmlFor="ConfirmPassword">
+                <br />
+                Confirm Password:
+                <input type="password" name="ConfirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              </label>
+              <br />
+            </>
+          )
+          : <p />}
+
         <button type="button" onClick={onSubmit}>Submit</button>
+        {!googleLoggedIn
+          ? (
+            <button type="button" onClick={signUpWithGoogle}>Google Auth</button>
+          )
+          : <p />}
+
       </div>
     </form>
   );
