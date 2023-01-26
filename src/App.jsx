@@ -59,13 +59,7 @@ function App() {
             <Route path="/" element={(<Default />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup />)} />
-<<<<<<< HEAD
             <Route path="*" element={(<NotFound />)} />
-
-=======
-
-            <Route path="*" element={(<NotFound />)} />
->>>>>>> 7b36c7e (added 404 page)
           </Routes>
         </div>
       )
