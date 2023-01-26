@@ -55,7 +55,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
       setProfile(null);
       setPassword('');
     }
-  // eslint-disable-next-line
   }, [profile]);
 
   const handleSubmit = (event) => {
