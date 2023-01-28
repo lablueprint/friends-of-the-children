@@ -9,20 +9,30 @@ function Modules({ profile }) {
   const [body, setBody] = useState('');
   const [serviceArea, setServiceArea] = useState('');
   // const [modRoles, setmodRoles] = useState(() => new Set());
-  // remove later
-  console.log(profile);
+  const [mentor, setMentor] = useState(false);
+  const [caregiver, setCaregiver] = useState(false);
+  const roles = [];
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
-  const roles = new Set();
+
+  if (mentor) {
+    roles.push('mentor');
+  }
+  if (caregiver) {
+    roles.push('caregiver');
+  }
+
   const getModules = () => {
     db.collection('modules').get().then((sc) => {
       const card = [];
       sc.forEach((doc) => {
         const data = doc.data();
-        data.id = doc.id;
-        if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
-          card.push(data);
+        if (data && data.role) {
+          data.id = doc.id;
+          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
+            card.push(data);
+          }
         }
       });
       setModules(card);
@@ -34,6 +44,7 @@ function Modules({ profile }) {
       title,
       body,
       serviceArea,
+      role: roles,
     };
     db.collection('modules').doc().set(data);
   };
@@ -62,9 +73,9 @@ function Modules({ profile }) {
         <input type="text" value={body} onChange={(e) => setBody(e.target.value)} />
         Choose a role:
         Caregiver
-        <input type="checkbox" id="caregiver" name="caregiver" onChange={roles.add('caregiver')} />
+        <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
         Mentor
-        <input type="checkbox" id="mentor" name="mentor" onChange={roles.add('mentor')} />
+        <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
         Service Area:
         <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
         {/* Caregiver
