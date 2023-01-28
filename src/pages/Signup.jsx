@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import { db } from './firebase';
 
 function Signup() {
@@ -29,19 +29,25 @@ function Signup() {
       setErrorMessage(errorMessage, 'Passwords must match!');
     }
     // hashPassword(password);
-    console.log(password);
-    console.log('submitted');
-    const data = {
-      firstName,
-      lastName,
-      email,
-      serviceArea,
-      role,
-      username,
-      password,
-    };
-    console.log(data);
-    db.collection('profiles').doc().set(data);
+    // console.log(password);
+    // console.log('submitted');
+
+    // console.log(data);
+    bcrypt.hash(password, 10) // asychronous hashing function
+      .then((hashedPassword) => {
+        const data = {
+          firstName,
+          lastName,
+          email,
+          serviceArea,
+          role,
+          username,
+          password: hashedPassword,
+        };
+        db.collection('profiles').doc().set(data);
+      });
+
+    // reset forms
     setFirstName('');
     setLastName('');
     setEmail('');
@@ -91,12 +97,12 @@ function Signup() {
         <label htmlFor="Password">
           <br />
           Password:
-          <input type="text" name="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <input type="password" name="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </label>
         <label htmlFor="ConfirmPassword">
           <br />
           Confirm Password:
-          <input type="text" name="ConfirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+          <input type="password" name="ConfirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
         </label>
         <br />
         <button type="button" onClick={onSubmit}>Submit</button>
