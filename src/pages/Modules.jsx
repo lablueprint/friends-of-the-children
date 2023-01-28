@@ -5,12 +5,16 @@ import { db } from './firebase';
 import styles from '../styles/Modules.module.css';
 
 function Modules({ profile }) {
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [serviceArea, setServiceArea] = useState('');
+  // const [modRoles, setmodRoles] = useState(() => new Set());
   // remove later
   console.log(profile);
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
-
+  const roles = new Set();
   const getModules = () => {
     db.collection('modules').get().then((sc) => {
       const card = [];
@@ -25,20 +29,52 @@ function Modules({ profile }) {
     });
   };
 
+  const submitForm = () => {
+    const data = {
+      title,
+      body,
+      serviceArea,
+    };
+    db.collection('modules').doc().set(data);
+  };
+
   useEffect(getModules, []);
 
-  return modules.map((card) => (
-    <div key={card.id}>
-      <Link
-        to="/expanded-module"
-        state={{ id: card.id }}
-      >
-        <div className={styles.card}>
-          <h1>{card.title}</h1>
+  return (
+    <div>
+      {modules.map((card) => (
+        <div key={card.id}>
+          <Link
+            to="/expanded-module"
+            state={{ id: card.id }}
+          >
+            <div className={styles.card}>
+              <h1>{card.title}</h1>
+            </div>
+          </Link>
         </div>
-      </Link>
+      ))}
+      <form action="post">
+        <h1>Form</h1>
+        Title:
+        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+        Body:
+        <input type="text" value={body} onChange={(e) => setBody(e.target.value)} />
+        Choose a role:
+        Caregiver
+        <input type="checkbox" id="caregiver" name="caregiver" onChange={roles.add('caregiver')} />
+        Mentor
+        <input type="checkbox" id="mentor" name="mentor" onChange={roles.add('mentor')} />
+        Service Area:
+        <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+        {/* Caregiver
+        <input type="checkbox" />
+        Mentor
+        <input type="checkbox" /> */}
+        <button type="button" onClick={submitForm}>Submit</button>
+      </form>
     </div>
-  ));
+  );
 }
 
 Modules.propTypes = {

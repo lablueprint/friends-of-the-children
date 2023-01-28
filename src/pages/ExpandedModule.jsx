@@ -52,6 +52,7 @@ function ExpandedModule({ profile }) {
           Back
         </Link>
         <Module title={title} body={body} attachments={attachments} child={children} />
+        {currRole === 'admin' ? <button type="submit">Upload Module</button> : <div />}
       </div>
     );
   }
@@ -62,6 +63,7 @@ function ExpandedModule({ profile }) {
         Back
       </Link>
       <Module title={title} body={body} attachments={attachments} child={children} />
+      {currRole === 'admin' ? <button type="submit">Upload Module</button> : <div />}
     </div>
   );
 }
