@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function Calendar(profile) {
+function Calendar({ profile }) {
   // remove later
   console.log(profile);
 

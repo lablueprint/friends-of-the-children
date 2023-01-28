@@ -5,8 +5,6 @@ import { db } from './firebase';
 import styles from '../styles/Modules.module.css';
 
 function Modules({ profile }) {
-  // remove later
-  console.log(profile);
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
@@ -16,16 +14,18 @@ function Modules({ profile }) {
       const card = [];
       sc.forEach((doc) => {
         const data = doc.data();
-        data.id = doc.id;
-        if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
-          card.push(data);
+        if (data && data.role) {
+          data.id = doc.id;
+          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
+            card.push(data);
+          }
         }
       });
       setModules(card);
     });
   };
 
-  useEffect(getModules, []);
+  useEffect(getModules, [currRole]);
 
   return modules.map((card) => (
     <div key={card.id}>
