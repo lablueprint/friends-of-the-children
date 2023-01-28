@@ -15,7 +15,7 @@
     "editor.suggestSelection": "first",
     "eslint.workingDirectories": [{"mode": "auto"}],
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-    "workbench.colorTheme": "Night Owl Light",
+    "workbench.colorTheme": "Atom One Dark",
     "workbench.editorAssociations": {
         "*.ipynb": "jupyter.notebook.ipynb"
     },

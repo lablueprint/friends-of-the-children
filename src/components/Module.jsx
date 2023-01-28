@@ -5,7 +5,7 @@ import styles from '../styles/Modules.module.css';
 
 function Module(props) {
   const {
-    title, body, attachments, titles, child,
+    title, body, attachments, child,
   } = props;
 
   return (
@@ -14,11 +14,10 @@ function Module(props) {
       <div className={styles.body}>{body}</div>
       <div className={styles.attachments}>{attachments}</div>
       {
-        child.length === titles.length && child.length !== 0
-        && child.map((kid, i) => (
-          <Link to="/expanded-module" state={{ id: kid }}>
+        child.map((kid) => (
+          <Link to="/expanded-module" state={{ id: kid.id }}>
             <div className={styles.card}>
-              <h1>{titles[i]}</h1>
+              <h1>{kid.title}</h1>
             </div>
           </Link>
         ))
@@ -31,7 +30,6 @@ Module.propTypes = {
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   attachments: PropTypes.string.isRequired,
-  titles: PropTypes.arrayOf.isRequired,
   child: PropTypes.arrayOf.isRequired,
 };
 export default Module;

@@ -5,9 +5,8 @@ import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { db } from './firebase';
 
-function ExpandedModule(profile) {
-  // remove later
-  console.log(profile);
+function ExpandedModule({ profile }) {
+  const { role } = profile;
   const location = useLocation();
   const { id } = location.state;
   const [title, setTitle] = useState();
@@ -15,30 +14,34 @@ function ExpandedModule(profile) {
   const [attachments, setAttachments] = useState();
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
-  const [titles, setTitles] = useState([]);
-
-  const getTitles = () => {
-    setTitles([]);
-    for (let i = 0; i < children.length; i += 1) {
-      db.collection('modules').doc(children[i]).get().then((sc) => {
-        setTitles((prev) => [...prev, sc.data().title]);
-      });
-    }
-  };
+  const currRole = role.toLowerCase();
 
   const getModule = () => {
+    setChildren([]);
     db.collection('modules').doc(id).get().then((sc) => {
       const data = sc.data();
       setTitle(data.title);
       setBody(data.body);
       setAttachments(data.attachments);
       setParent(data.parent);
-      setChildren(data.children);
+      // filter the children by role
+      const tempChildren = [];
+      data.children.forEach((child) => {
+        db.collection('modules').doc(child).get().then((snap) => {
+          const childData = snap.data();
+          if (currRole === 'admin' || childData.role.includes(currRole)) {
+            const friend = {
+              id: child, title: childData.title, role: childData.role,
+            };
+            tempChildren.push(friend);
+          }
+          setChildren(tempChildren);
+        });
+      });
     });
   };
 
-  useEffect(getModule, [id]);
-  useEffect(getTitles, [children]);
+  useEffect(getModule, [id, currRole]);
 
   if (parent != null) {
     return (
@@ -46,7 +49,7 @@ function ExpandedModule(profile) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} titles={titles} child={children} />
+        <Module title={title} body={body} attachments={attachments} child={children} />
       </div>
     );
   }
@@ -56,7 +59,7 @@ function ExpandedModule(profile) {
       <Link to="/modules">
         Back
       </Link>
-      <Module title={title} body={body} attachments={attachments} titles={titles} child={children} />
+      <Module title={title} body={body} attachments={attachments} child={children} />
     </div>
   );
 }
