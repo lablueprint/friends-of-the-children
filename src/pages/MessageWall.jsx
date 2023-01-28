@@ -9,16 +9,12 @@ function MessageWall({ profile }) {
   // when getMessage is called, filter messages based on serviceArea and Role
   // changed ifAdmin to adminState that is true when role is Admin
 
-  // remove later
-  console.log(profile);
-
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [msgserviceArea, setmsgServiceArea] = useState('');
   const [mentor, setMentor] = useState(false);
   const [caregiver, setCaregiver] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [isAdmin, setIsadmin] = useState(true);
   const target = [];
   const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
 
@@ -52,21 +48,12 @@ function MessageWall({ profile }) {
     });
   };
 
-  // const checkMessages = () => {
-  //   messages.filter((message) => message.msgserviceArea === serviceArea && message.target[0] === role);
-  // };
-
-  useEffect(() => {
-    if (role !== 'Admin') {
-      setIsadmin(false);
-    }
-    getMessages();
-  }, [role]);
+  useEffect(
+    getMessages,
+    [],
+  );
 
   messages.sort((a, b) => {
-    // if (a.pinned === true) {
-    //   return -1;
-    // }
     if (a.date < b.date) {
       return -1;
     }
@@ -91,6 +78,7 @@ function MessageWall({ profile }) {
     });
     console.log('hi');
   };
+
   const submitData = () => {
     db.collection('messages').doc().set(data);
     setTitle('');
@@ -99,16 +87,19 @@ function MessageWall({ profile }) {
     getMessages();
   };
 
-  if (isAdmin) {
+  if (role === 'Admin') {
     return (
       <div>
-        {console.log(messages)}
         <h3>Message Wall</h3>
         {
-          messages.filter((message) => (message.pinned === true)).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+          messages.filter((message) => (message.pinned === true)).map(
+            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
+          )
         }
         {
-          messages.filter((message) => (message.pinned === false)).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+          messages.filter((message) => (message.pinned === false)).map(
+            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
+          )
         }
         <form>
           <div>
@@ -148,13 +139,22 @@ function MessageWall({ profile }) {
   }
   return (
     <div>
-      {console.log(messages)}
       <h3>Message Wall</h3>
       {
-      messages.filter((message) => (message.pinned === true && message.serviceArea.includes(serviceArea.toLowerCase()) && (message.target.includes(role.toLowerCase())))).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+      messages.filter(
+        (message) => (message.pinned === true && message.serviceArea.includes(serviceArea.toLowerCase())
+        && (message.target.includes(role.toLowerCase()))),
+      ).map(
+        (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
+      )
     }
       {
-      messages.filter((message) => (message.pinned === false && message.serviceArea.includes(serviceArea.toLowerCase()) && (message.target.includes(role.toLowerCase())))).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+      messages.filter(
+        (message) => (message.pinned === false && message.serviceArea.includes(serviceArea.toLowerCase())
+        && (message.target.includes(role.toLowerCase()))),
+      ).map(
+        (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
+      )
     }
     </div>
   );
