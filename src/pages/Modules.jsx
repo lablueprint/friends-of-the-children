@@ -71,7 +71,7 @@ function Modules({ profile }) {
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
         Body:
         <input type="text" value={body} onChange={(e) => setBody(e.target.value)} />
-        Choose a role:
+        Choose a role!!
         Caregiver
         <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
         Mentor
