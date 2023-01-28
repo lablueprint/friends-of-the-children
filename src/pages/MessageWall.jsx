@@ -151,10 +151,10 @@ function MessageWall({ profile }) {
       {console.log(messages)}
       <h3>Message Wall</h3>
       {
-      messages.filter((message) => (message.pinned === true && message.serviceArea[0] === serviceArea.toLowerCase() && (message.target[0] === role.toLowerCase() || (message.target.length > 1 && message.target[1] === role.toLowerCase())))).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+      messages.filter((message) => (message.pinned === true && message.serviceArea.includes(serviceArea.toLowerCase()) && (message.target.includes(role.toLowerCase())))).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
     }
       {
-      messages.filter((message) => (message.pinned === false && message.serviceArea[0] === serviceArea.toLowerCase() && (message.target[0] === role.toLowerCase() || (message.target.length > 1 && message.target[1] === role.toLowerCase())))).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
+      messages.filter((message) => (message.pinned === false && message.serviceArea.includes(serviceArea.toLowerCase()) && (message.target.includes(role.toLowerCase())))).map((message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />)
     }
     </div>
   );
