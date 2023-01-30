@@ -8,7 +8,6 @@ function Message(props) {
     id, title, body, updateMessages,
   } = props;
   const [pinned, setPinned] = useState(false);
-  // const [pinDesc, setDesc] = useState('📌 PIN');
   const messageRef = db.collection('messages').doc(id);
 
   // getPinned: get pin status from fb (in useEffect)
@@ -28,8 +27,6 @@ function Message(props) {
       pinned: !pinned,
     }, { merge: true }).then(() => {
       console.log('pin pushed');
-      // if (!pinned) setDesc('❗️📌 UNPIN');
-      // else setDesc('📌 PIN');
       // change local pin status
       setPinned(!pinned);
       console.log('changed pin status');
@@ -37,9 +34,7 @@ function Message(props) {
     });
   };
 
-  useEffect(getPinned, []);
-  // () => { getPinned(); },
-  // [],
+  useEffect(getPinned, [messageRef]);
 
   return (
     <div className={pinned ? styles.pinnedmessage : styles.message}>
@@ -53,7 +48,6 @@ function Message(props) {
         {' '}
         {body}
       </p>
-      {/* <button type="button" onClick={(changePinned)}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button> */}
       <button type="button" className={pinned ? styles.pinnedbutton : styles.button} onClick={(changePinned)}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button>
     </div>
   );

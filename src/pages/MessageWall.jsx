@@ -16,10 +16,10 @@ function MessageWall({ profile }) {
   const [caregiver, setCaregiver] = useState(false);
   const [messages, setMessages] = useState([]);
   const target = [];
-  const myTimestamp = app.firebase.firestore.Timestamp.fromDate(new Date());
 
   const { role, serviceArea } = profile;
   console.log(role);
+
   if (mentor) {
     target.push('mentor');
   }
@@ -33,7 +33,7 @@ function MessageWall({ profile }) {
     serviceArea: [msgserviceArea],
     target,
     pinned: false,
-    date: myTimestamp,
+    date: app.firebase.firestore.Timestamp.fromDate(new Date()),
   };
 
   const getMessages = () => {
@@ -76,7 +76,6 @@ function MessageWall({ profile }) {
       }
       return 0;
     });
-    console.log('hi');
   };
 
   const submitData = () => {
@@ -87,7 +86,7 @@ function MessageWall({ profile }) {
     getMessages();
   };
 
-  if (role === 'Admin') {
+  if (role.toLowerCase() === 'admin') {
     return (
       <div>
         <h3>Message Wall</h3>
@@ -142,16 +141,16 @@ function MessageWall({ profile }) {
       <h3>Message Wall</h3>
       {
       messages.filter(
-        (message) => (message.pinned === true && message.serviceArea.includes(serviceArea.toLowerCase())
-        && (message.target.includes(role.toLowerCase()))),
+        (message) => (message.pinned === true && (message.serviceArea.includes(serviceArea.toLowerCase())
+        && message.target.includes(role.toLowerCase()))),
       ).map(
         (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
       )
     }
       {
       messages.filter(
-        (message) => (message.pinned === false && message.serviceArea.includes(serviceArea.toLowerCase())
-        && (message.target.includes(role.toLowerCase()))),
+        (message) => (message.pinned === false && (message.serviceArea.includes(serviceArea.toLowerCase())
+        && message.target.includes(role.toLowerCase()))),
       ).map(
         (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
       )

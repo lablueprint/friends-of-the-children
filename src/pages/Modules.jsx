@@ -25,7 +25,7 @@ function Modules({ profile }) {
     });
   };
 
-  useEffect(getModules, []);
+  useEffect(getModules, [currRole]);
 
   return modules.map((card) => (
     <div key={card.id}>
