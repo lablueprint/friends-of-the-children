@@ -4,11 +4,6 @@ import { app, db } from './firebase';
 import Message from '../components/Message';
 
 function MessageWall({ profile }) {
-  // get a profile from db
-  // store serviceArea and role
-  // when getMessage is called, filter messages based on serviceArea and Role
-  // changed ifAdmin to adminState that is true when role is Admin
-
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [msgserviceArea, setmsgServiceArea] = useState('');
@@ -18,23 +13,6 @@ function MessageWall({ profile }) {
   const target = [];
 
   const { role, serviceArea } = profile;
-  console.log(role);
-
-  if (mentor) {
-    target.push('mentor');
-  }
-  if (caregiver) {
-    target.push('caregiver');
-  }
-
-  const data = {
-    title,
-    body,
-    serviceArea: [msgserviceArea],
-    target,
-    pinned: false,
-    date: app.firebase.firestore.Timestamp.fromDate(new Date()),
-  };
 
   const getMessages = () => {
     db.collection('messages').get().then((sc) => {
@@ -44,6 +22,18 @@ function MessageWall({ profile }) {
         dat.id = doc.id;
         message.push(dat);
       });
+
+      // sort in reverse chronological order (i.e. newest at first)
+      message.sort((a, b) => {
+        if (a.date < b.date) {
+          return -1;
+        }
+        if (a.date > b.date) {
+          return 1;
+        }
+        return 0;
+      });
+
       setMessages(message);
     });
   };
@@ -53,32 +43,38 @@ function MessageWall({ profile }) {
     [],
   );
 
-  messages.sort((a, b) => {
-    if (a.date < b.date) {
-      return -1;
-    }
-    if (a.date > b.date) {
-      return 1;
-    }
-    return 0;
-  });
+  const updatePinned = (id, pinned) => {
+    // deep copy for useState to work properly
+    // see https://www.coletiv.com/blog/dangers-of-using-objects-in-useState-and-useEffect-ReactJS-hooks/ for more context
+    const tempMessages = [...messages];
 
-  // this is used to re-render the page when a msg gets pinned (not necessarily sort anything, since that's done right before)
-  const updateMessages = () => {
-    getMessages(messages);
-    console.log(messages);
-    messages.sort((a, b) => {
-      if (a.date < b.date) {
-        return -1;
-      }
-      if (a.date > b.date) {
-        return 1;
-      }
-      return 0;
-    });
+    // change local variable, then push to firebase
+    /* eslint no-param-reassign: ["error", { "props": false }] */
+    tempMessages.find((message) => (message.id === id)).pinned = pinned;
+    setMessages(tempMessages);
+
+    db.collection('messages').doc(id).set({
+      pinned,
+    }, { merge: true });
   };
 
   const submitData = () => {
+    if (mentor) {
+      target.push('mentor');
+    }
+    if (caregiver) {
+      target.push('caregiver');
+    }
+
+    const data = {
+      title,
+      body,
+      serviceArea: [msgserviceArea],
+      target,
+      pinned: false,
+      date: app.firebase.firestore.Timestamp.fromDate(new Date()),
+    };
+
     db.collection('messages').doc().set(data);
     setTitle('');
     setBody('');
@@ -86,76 +82,75 @@ function MessageWall({ profile }) {
     getMessages();
   };
 
-  if (role.toLowerCase() === 'admin') {
-    return (
+  const messageForm = (
+    <form>
+      <div>
+        <label htmlFor="title">
+          Title:
+          <input type="text" id="title" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        </label>
+      </div>
+      <div>
+        <label htmlFor="body">
+          Body:
+          <input type="text" id="body" name="body" value={body} onChange={(e) => setBody(e.target.value)} />
+        </label>
+      </div>
+      <div>
+        <label htmlFor="msgserviceArea">
+          Service Area:
+          <input type="text" id="msgserviceArea" name="msgserviceArea" value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
+        </label>
+      </div>
+      <div>
+        <label htmlFor="mentor">
+          Mentor
+          <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
+        </label>
+      </div>
+      <div>
+        <label htmlFor="caregiver">
+          Caregiver
+          <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
+        </label>
+      </div>
+      <button type="button" onClick={submitData}>Submit</button>
+    </form>
+  );
+
+  return (
+    role.toLowerCase() === 'admin' ? (
       <div>
         <h3>Message Wall</h3>
         {
-          messages.filter((message) => (message.pinned === true)).map(
-            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
+          messages.filter((message) => (message.pinned)).map(
+            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
           )
         }
         {
-          messages.filter((message) => (message.pinned === false)).map(
-            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
+          messages.filter((message) => (!message.pinned)).map(
+            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
           )
         }
-        <form>
-          <div>
-            <label htmlFor="title">
-              Title:
-              <input type="text" id="title" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
-            </label>
-          </div>
-          <div>
-            <label htmlFor="body">
-              Body:
-              <input type="text" id="body" name="body" value={body} onChange={(e) => setBody(e.target.value)} />
-            </label>
-          </div>
-          <div>
-            <label htmlFor="msgserviceArea">
-              Service Area:
-              <input type="text" id="msgserviceArea" name="msgserviceArea" value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
-            </label>
-          </div>
-          <div>
-            <label htmlFor="mentor">
-              Mentor
-              <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
-            </label>
-          </div>
-          <div>
-            <label htmlFor="caregiver">
-              Caregiver
-              <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
-            </label>
-          </div>
-          <button type="button" onClick={submitData}>Submit</button>
-        </form>
+        {messageForm}
       </div>
-    );
-  }
-  return (
-    <div>
-      <h3>Message Wall</h3>
-      {
-      messages.filter(
-        (message) => (message.pinned === true && (message.serviceArea.includes(serviceArea.toLowerCase())
+    ) : (
+      <div>
+        <h3>Message Wall</h3>
+        {messages.filter(
+          (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
         && message.target.includes(role.toLowerCase()))),
-      ).map(
-        (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
-      )
-    }
-      {
-      messages.filter(
-        (message) => (message.pinned === false && (message.serviceArea.includes(serviceArea.toLowerCase())
+        ).map(
+          (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
+        )}
+        {messages.filter(
+          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
         && message.target.includes(role.toLowerCase()))),
-      ).map(
-        (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} updateMessages={updateMessages} />,
-      )
-    }
-    </div>
+        ).map(
+          (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
+        )}
+      </div>
+    )
   );
 }
 
