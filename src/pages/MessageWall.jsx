@@ -4,11 +4,6 @@ import { app, db } from './firebase';
 import Message from '../components/Message';
 
 function MessageWall({ profile }) {
-  // get a profile from db
-  // store serviceArea and role
-  // when getMessage is called, filter messages based on serviceArea and Role
-  // changed ifAdmin to adminState that is true when role is Admin
-
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [msgserviceArea, setmsgServiceArea] = useState('');
@@ -18,7 +13,6 @@ function MessageWall({ profile }) {
   const target = [];
 
   const { role, serviceArea } = profile;
-  console.log(role);
 
   const getMessages = () => {
     db.collection('messages').get().then((sc) => {
@@ -50,7 +44,10 @@ function MessageWall({ profile }) {
   );
 
   const updatePinned = (id, pinned) => {
-    const tempMessages = messages;
+    // deep copy for useState to work properly
+    // see https://www.coletiv.com/blog/dangers-of-using-objects-in-useState-and-useEffect-ReactJS-hooks/ for more context
+    const tempMessages = [...messages];
+
     // change local variable, then push to firebase
     /* eslint no-param-reassign: ["error", { "props": false }] */
     tempMessages.find((message) => (message.id === id)).pinned = pinned;
@@ -59,9 +56,6 @@ function MessageWall({ profile }) {
     db.collection('messages').doc(id).set({
       pinned,
     }, { merge: true });
-
-    // theoretically should not need this call
-    getMessages();
   };
 
   const submitData = () => {
@@ -127,8 +121,6 @@ function MessageWall({ profile }) {
   return (
     role.toLowerCase() === 'admin' ? (
       <div>
-        {console.log('rerender')}
-        {console.log(messages)}
         <h3>Message Wall</h3>
         {
           messages.filter((message) => (message.pinned)).map(

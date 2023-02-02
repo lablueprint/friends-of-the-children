@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from '../styles/Messages.module.css';
-// import { db } from '../pages/firebase';
 
 function Message(props) {
   const {
@@ -10,7 +9,6 @@ function Message(props) {
 
   const update = () => {
     updatePinned(id, !pinned);
-    console.log('pressed');
   };
 
   return (
