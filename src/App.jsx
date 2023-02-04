@@ -45,7 +45,7 @@ function App() {
             <Route path="/message-wall" element={(<MessageWall profile={profile} />)} />
             <Route path="/example" element={(<Example profile={profile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
-            <Route path="/signup" element={(<Signup profile={profile} />)} />
+            <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
             <Route path="/modules" element={(<Modules profile={profile} />)} />
             <Route path="/expanded-module" element={(<ExpandedModule profile={profile} />)} />
             <Route path="/calendar" element={(<Calendar profile={profile} />)} />
@@ -58,7 +58,7 @@ function App() {
           <Routes>
             <Route path="/" element={(<Default />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
-            <Route path="/signup" element={(<Signup />)} />
+            <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
             <Route path="*" element={(<NotFound />)} />
 
           </Routes>
