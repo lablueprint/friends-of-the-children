@@ -28,6 +28,8 @@ function App() {
 
   const [profile, setProfile] = useState(null);
 
+  // const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
+
   // this functions props allow us to change the state in app.jsx from children components
   // Note: consider using "Context" for consistency throughout the app,
   // and might alse need cookies so that user stays logged after refreshing the page

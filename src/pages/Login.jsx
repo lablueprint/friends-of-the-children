@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
@@ -21,6 +21,7 @@ import { db } from './firebase';
 function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  // const [email, setEmail] = useState('');
   const [profile, setProfile] = useState(null);
   // const [userIsGoogleLoggedIn, setuserIsGoogleLoggedIn] = useState(false);
 
@@ -37,30 +38,73 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         sc.forEach((doc) => {
           const data = doc.data();
           data.id = doc.id;
+          // console.log(data);
           setProfile(data);
         });
-        if (profile != null) {
-          bcrypt.compare(password, profile.password) // compare passwords
-            .then((isValid) => {
-              if (isValid) { // check whether it is a valid credential
-                console.log('login successful');
-                const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
-                updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
-                navigate('/modules');
-              } else {
-                console.log('invalid credentials');
-              }
-            })
-            .catch(); // do error checking here if necessary
-          setProfile(null);
-          setPassword('');
-        }
+        // if (data != null) {
+        //   bcrypt.compare(password, data.password) // compare passwords
+        //     .then((isValid) => {
+        //       if (isValid) { // check whether it is a valid credential
+        //         console.log('login successful');
+        //         const { password: profilePassword, ...userProfile } = data; // peform destruction to get profile w/o password
+        //         updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
+        //         navigate('/modules');
+        //       } else {
+        //         console.log('invalid credentials');
+        //       }
+        //     })
+        //     .catch(); // do error checking here if necessary
+        //   setPassword('');
+        // }
       });
-
-    console.log(profile);
   };
 
+  useEffect(() => {
+    console.log(profile);
+    console.log(password);
+    // check the hash password only if profile is not empty
+    if (profile !== null) {
+      console.log(true);
+      if (!profile.google) {
+        bcrypt.compare(password, profile.password) // compare passwords
+          .then((isValid) => {
+            if (isValid) { // check whether it is a valid credential
+              console.log('login successful');
+              updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+              navigate('/modules');
+              // console.log(profile);
+              // console.log(profile.password);
+            } else {
+              console.log('invalid credentials');
+            }
+          })
+          .catch(); // do error checking here if necessary
+      } else {
+        updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+        navigate('/modules');
+      }
+      setProfile(null);
+      setPassword('');
+      setUsername('');
+    }
+  }, [profile]);
+
   const provider = new GoogleAuthProvider();
+
+  const getGoogleAccount = (userEmail) => {
+    db.collection('profiles')
+      .where('email', '==', userEmail)
+      .get()
+      .then((sc) => {
+        // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
+        sc.forEach((doc) => {
+          const data = doc.data();
+          data.id = doc.id;
+          // console.log(data);
+          setProfile(data);
+        });
+      });
+  };
 
   function signInWithGoogle() {
     const auth = getAuth();
@@ -75,8 +119,10 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         // The signed-in user info.
         const { user: googleUser } = result;
         console.log(googleUser);
+
         // setGoogleLoggedIn(true);
         // setEmail(googleUser.email);
+        getGoogleAccount(googleUser.email);
         // setUsername(googleUser.displayName);
       // ...
       }).catch((error) => {
@@ -95,33 +141,12 @@ function Login({ updateAppProfile }) { // deconstruct the function props
       });
   }
 
-  // useEffect(() => {
-  //   console.log('true');
-  //   // check the hash password only if profile is not empty
-  //   if (profile !== null && password.length > 0) {
-  //     bcrypt.compare(password, profile.password) // compare passwords
-  //       .then((isValid) => {
-  //         if (isValid) { // check whether it is a valid credential
-  //           console.log('login successful');
-  //           const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
-  //           updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
-  //           navigate('/modules');
-  //         } else {
-  //           console.log('invalid credentials');
-  //         }
-  //       })
-  //       .catch(); // do error checking here if necessary
-  //     setProfile(null);
-  //     setPassword('');
-  //   }
-  // }, [profile]);
-
   const handleSubmit = (event) => {
     console.log('called');
     event.preventDefault(); // this prevents from page to be refreshing
     getUsers(username);
-    setUsername('');
-    setPassword('');
+    // setUsername('');
+    // setPassword('');
   };
 
   return (
