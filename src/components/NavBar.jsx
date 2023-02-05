@@ -19,6 +19,7 @@ function NavBar({ profile, updateAppProfile }) {
         )
         : (
           <div className="login-buttons d-flex align-items-center justify-content-center gap-3 py-2">
+            <Link to="/profile" className="btn btn-info"> Profile </Link>
             <Link to="/modules" className="btn btn-info"> Modules </Link>
             <Link to="/calendar" className="btn btn-info"> Calendar </Link>
             <Link to="/message-wall" className="btn btn-info"> Message Wall </Link>
