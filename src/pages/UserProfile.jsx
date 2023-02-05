@@ -43,7 +43,7 @@ function UserProfile({ profile, updateAppProfile }) {
         {' '}
         <TextField
           id="email"
-          label="Read Only"
+          label="Email"
           defaultValue={profile.email}
           value={updatedProfile.email}
           InputProps={{
@@ -59,8 +59,8 @@ function UserProfile({ profile, updateAppProfile }) {
         First Name:
         {' '}
         <TextField
-          id="filled-read-only-input"
-          label="Read Only"
+          id="firstName"
+          label="First Name"
           defaultValue={profile.firstName}
           value={updatedProfile.firstName}
           InputProps={{
@@ -76,8 +76,8 @@ function UserProfile({ profile, updateAppProfile }) {
         Last Name:
         {' '}
         <TextField
-          id="filled-read-only-input"
-          label="Read Only"
+          id="lastName"
+          label="Last Name"
           defaultValue={profile.lastName}
           value={updatedProfile.lastName}
           InputProps={{
@@ -93,8 +93,8 @@ function UserProfile({ profile, updateAppProfile }) {
         Role:
         {' '}
         <TextField
-          id="filled-read-only-input"
-          label="Read Only"
+          id="role"
+          label="Role"
           defaultValue={profile.role}
           value={updatedProfile.role}
           InputProps={{
@@ -110,8 +110,8 @@ function UserProfile({ profile, updateAppProfile }) {
         Username:
         {' '}
         <TextField
-          id="filled-read-only-input"
-          label="Read Only"
+          id="username"
+          label="Username"
           defaultValue={profile.username}
           value={updatedProfile.username}
           InputProps={{
