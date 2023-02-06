@@ -8,7 +8,6 @@ function Modules({ profile }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [serviceArea, setServiceArea] = useState('');
-  // const [modRoles, setmodRoles] = useState(() => new Set());
   const [mentor, setMentor] = useState(false);
   const [caregiver, setCaregiver] = useState(false);
   const roles = [];
@@ -45,12 +44,57 @@ function Modules({ profile }) {
       body,
       serviceArea,
       role: roles,
+      children: [],
+      parent: null,
     };
     db.collection('modules').doc().set(data);
+
+    setTitle('');
+    setBody('');
+    setServiceArea('');
+    setCaregiver(false);
+    setMentor(false);
   };
 
-  useEffect(getModules, []);
+  useEffect(getModules, [submitForm]);
 
+  if (currRole === 'admin') {
+    return (
+      <div>
+        {modules.map((card) => (
+          <div key={card.id}>
+            <Link
+              to="/expanded-module"
+              state={{ id: card.id }}
+            >
+              <div className={styles.card}>
+                <h1>{card.title}</h1>
+              </div>
+            </Link>
+          </div>
+        ))}
+        <form action="post">
+          <h1>Upload Module</h1>
+          Title:
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+          Body:
+          <input type="text" value={body} onChange={(e) => setBody(e.target.value)} />
+          Choose a role!!
+          Caregiver
+          <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
+          Mentor
+          <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
+          Service Area:
+          <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+          {/* Caregiver
+        <input type="checkbox" />
+        Mentor
+        <input type="checkbox" /> */}
+          <button type="button" onClick={submitForm}>Submit</button>
+        </form>
+      </div>
+    );
+  }
   return (
     <div>
       {modules.map((card) => (
@@ -65,25 +109,6 @@ function Modules({ profile }) {
           </Link>
         </div>
       ))}
-      <form action="post">
-        <h1>Form</h1>
-        Title:
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-        Body:
-        <input type="text" value={body} onChange={(e) => setBody(e.target.value)} />
-        Choose a role!!
-        Caregiver
-        <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
-        Mentor
-        <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
-        Service Area:
-        <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
-        {/* Caregiver
-        <input type="checkbox" />
-        Mentor
-        <input type="checkbox" /> */}
-        <button type="button" onClick={submitForm}>Submit</button>
-      </form>
     </div>
   );
 }
