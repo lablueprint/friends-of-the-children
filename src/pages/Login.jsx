@@ -87,7 +87,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
       setPassword('');
       setUsername('');
     }
-  }, [profile]);
+  }, [profile, navigate, password, updateAppProfile]);
 
   const provider = new GoogleAuthProvider();
 

@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import {
   Example,
-  Default,
   Login,
   MessageWall,
   Signup,
@@ -11,21 +10,12 @@ import {
   Calendar,
   ExpandedModule,
   NotFound,
+  UserProfile,
 } from './pages';
 
 import NavBar from './components/NavBar';
 
 function App() {
-  // const profile = {
-  //   email: 'test@google.com',
-  //   firstName: 'Bob',
-  //   lastName: 'Smith',
-  //   password: 'asdf',
-  //   role: 'Caregiver',
-  //   serviceArea: '',
-  //   username: 'asdf',
-  // };
-
   const [profile, setProfile] = useState(null);
 
   // const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
@@ -43,7 +33,8 @@ function App() {
         <div className="App">
           <NavBar profile={profile} updateAppProfile={updateProfile} />
           <Routes>
-            <Route path="/" element={(<Default profile={profile} />)} />
+            <Route path="/" element={(<Modules profile={profile} />)} />
+            <Route path="/profile" element={(<UserProfile profile={profile} updateAppProfile={updateProfile} />)} />
             <Route path="/message-wall" element={(<MessageWall profile={profile} />)} />
             <Route path="/example" element={(<Example profile={profile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
@@ -58,7 +49,7 @@ function App() {
         <div className="App">
           <NavBar profile={profile} updateAppProfile={updateProfile} />
           <Routes>
-            <Route path="/" element={(<Default />)} />
+            <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
             <Route path="*" element={(<NotFound />)} />

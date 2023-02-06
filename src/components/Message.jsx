@@ -1,33 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styles from '../styles/Messages.module.css';
-import { db } from '../pages/firebase';
 
 function Message(props) {
-  const { id, title, body } = props;
-  let pinned;
-  const [pinDesc, setDesc] = useState('📌 PIN');
-  const messageRef = db.collection('messages').doc(id);
+  const {
+    id, title, body, pinned, updatePinned,
+  } = props;
 
-  const setPinned = () => {
-    messageRef.get().then((snap) => {
-      if (snap.exists) {
-        const data = snap.data();
-        pinned = data.pinned;
-        messageRef.set({
-          pinned: !pinned,
-        }, { merge: true });
-        pinned = !pinned;
-        if (pinned) setDesc('❗️📌 UNPIN');
-        else setDesc('📌 PIN');
-      } else {
-        console.log('Document does not exist');
-      }
-    });
+  const update = () => {
+    updatePinned(id, !pinned);
   };
 
   return (
-    <div className={styles.message}>
+    <div className={pinned ? styles.pinnedmessage : styles.message}>
       <h5>
         Title:
         {' '}
@@ -38,7 +23,7 @@ function Message(props) {
         {' '}
         {body}
       </p>
-      <button type="button" onClick={(setPinned)}>{pinDesc}</button>
+      <button type="button" className={pinned ? styles.pinnedbutton : styles.button} onClick={update}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button>
     </div>
   );
 }
@@ -47,5 +32,7 @@ Message.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
+  pinned: PropTypes.bool.isRequired,
+  updatePinned: PropTypes.func.isRequired,
 };
 export default Message;

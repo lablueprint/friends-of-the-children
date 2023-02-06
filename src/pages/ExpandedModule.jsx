@@ -1,13 +1,16 @@
-import { React, useState, useEffect } from 'react';
+import {
+  React, useState, useEffect,
+} from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
+import {
+  collection, addDoc, arrayUnion, updateDoc, doc,
+} from 'firebase/firestore';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { db } from './firebase';
 
 function ExpandedModule({ profile }) {
-  // remove later
-  console.log(profile);
   const { role } = profile;
   const location = useLocation();
   const { id } = location.state;
@@ -17,6 +20,52 @@ function ExpandedModule({ profile }) {
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
+  const [refresh, setRefresh] = useState(false);
+
+  // Usestates for forms
+  const [mentor, setMentor] = useState(false);
+  const [caregiver, setCaregiver] = useState(false);
+  const [serviceArea, setServiceArea] = useState('');
+  const [formTitle, setFormtitle] = useState();
+  const [formBody, setFormbody] = useState();
+  const roles = [];
+  if (mentor) {
+    roles.push('mentor');
+  }
+  if (caregiver) {
+    roles.push('caregiver');
+  }
+
+  const submitForm = async () => {
+    const data = {
+      title: formTitle,
+      body: formBody,
+      serviceArea,
+      role: roles,
+      parent: id,
+      children: [],
+    };
+
+    // db.collection('modules').doc().add(data).then((dataRef) => {
+    // if (dataRef.id) {
+    //   console.log(dataRef.id);
+    // }
+    // });
+    const docRef = await addDoc(collection(db, 'modules'), data);
+    console.log('Document written with ID: ', docRef.id);
+
+    const moduleRef = doc(db, 'modules', id);
+    await updateDoc(moduleRef, {
+      children: arrayUnion(docRef.id),
+    });
+
+    setFormtitle('');
+    setFormbody('');
+    setServiceArea('');
+    setCaregiver(false);
+    setMentor(false);
+    setRefresh(!refresh);
+  };
 
   const getModule = () => {
     setChildren([]);
@@ -43,9 +92,36 @@ function ExpandedModule({ profile }) {
     });
   };
 
-  useEffect(getModule, [id]);
+  useEffect(getModule, [id, currRole, refresh]);
 
   if (parent != null) {
+    if (currRole === 'admin') {
+      return (
+        <div>
+          <div className={styles.card}>
+            <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+              Back
+            </Link>
+            <Module title={title} body={body} attachments={attachments} child={children} />
+          </div>
+          <form action="post">
+            <h1>Upload Module</h1>
+            Title:
+            <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
+            Body:
+            <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
+            Choose a role!!
+            Caregiver
+            <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
+            Mentor
+            <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
+            Service Area:
+            <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+            <button type="button" onClick={submitForm}>Submit</button>
+          </form>
+        </div>
+      );
+    }
     return (
       <div className={styles.card}>
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
@@ -56,12 +132,42 @@ function ExpandedModule({ profile }) {
     );
   }
 
+  if (currRole === 'admin') {
+    return (
+      <div>
+        <div className={styles.card}>
+          <Link to="/modules">
+            Back
+          </Link>
+          <Module title={title} body={body} attachments={attachments} child={children} />
+        </div>
+        <form action="post">
+          <h1>Upload Module</h1>
+          Title:
+          <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
+          Body:
+          <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
+          Choose a role!!
+          Caregiver
+          <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
+          Mentor
+          <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
+          Service Area:
+          <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+          <button type="button" onClick={submitForm}>Submit</button>
+        </form>
+      </div>
+
+    );
+  }
   return (
-    <div className={styles.card}>
-      <Link to="/modules">
-        Back
-      </Link>
-      <Module title={title} body={body} attachments={attachments} child={children} />
+    <div>
+      <div className={styles.card}>
+        <Link to="/modules">
+          Back
+        </Link>
+        <Module title={title} body={body} attachments={attachments} child={children} />
+      </div>
     </div>
   );
 }
