@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import bcrypt from 'bcryptjs';
+import PropTypes from 'prop-types';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+
+import { useNavigate } from 'react-router-dom';
 import { db } from './firebase';
 
-function Signup() {
+function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -12,40 +16,86 @@ function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
 
-  // const hashPassword = (pass) => { // hash does not work, useState error probably
-  //   const salt = '';
-  //   bcrypt.hash(pass, salt, (err, hash) => {
-  //     if (err) {
-  //       setErrorMessage('Invalid Hash');
-  //     }
-  //     console.log('hashing');
-  //     setPassword(hash);
-  //   });
-  // };
+  const provider = new GoogleAuthProvider();
+  const navigate = useNavigate();
+
+  function signUpWithGoogle() {
+    const auth = getAuth();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log('SC');
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        console.log('credential: ', credential);
+        const token = credential.accessToken;
+        console.log(token);
+        // The signed-in user info.
+        const { user: googleUser } = result;
+        console.log(googleUser);
+        setGoogleLoggedIn(true);
+        setEmail(googleUser.email);
+        setUsername(googleUser.displayName);
+      // ...
+      }).catch((error) => {
+      // Handle Errors here.
+        const errorCode = error.code;
+        console.log(errorCode);
+
+        const googleErrorMessage = error.message;
+        console.log(googleErrorMessage);
+
+        // The email of the user's account used.
+        // const { email } = error.customData;
+        // The AuthCredential type that was used.
+        // const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+      });
+  }
 
   const onSubmit = () => {
+    console.log('entered first');
     if (password !== confirmPassword) {
       setErrorMessage(errorMessage, 'Passwords must match!');
     }
-    // hashPassword(password);
-    // console.log(password);
-    // console.log('submitted');
+    console.log('Entered here');
 
-    // console.log(data);
-    bcrypt.hash(password, 10) // asychronous hashing function
-      .then((hashedPassword) => {
-        const data = {
-          firstName,
-          lastName,
-          email,
-          serviceArea,
-          role,
-          username,
-          password: hashedPassword,
-        };
-        db.collection('profiles').doc().set(data);
-      });
+    if (!googleLoggedIn) {
+      bcrypt.hash(password, 10) // asychronous hashing function
+        .then((hashedPassword) => {
+          const data = {
+            firstName,
+            lastName,
+            email,
+            serviceArea,
+            role,
+            username,
+            password: hashedPassword,
+            google: false,
+          };
+          console.log('google not used - entered');
+          db.collection('profiles').doc().set(data);
+          updateAppProfile(data);
+          console.log('Google not used - Finished');
+        });
+    } else {
+      const data = {
+        firstName,
+        lastName,
+        email,
+        serviceArea,
+        role,
+        username,
+        google: true,
+      };
+      console.log('Google used - entered');
+      db.collection('profiles').doc().set(data);
+      updateAppProfile(data);
+      console.log('Google used - finished');
+    }
+
+    navigate('/modules');
 
     // reset forms
     setFirstName('');
@@ -63,23 +113,15 @@ function Signup() {
       <div>
         <label htmlFor="FirstName">
           <br />
-          First name:
-          <input type="text" name="FirstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+          <input type="text" name="FirstName" value={firstName} placeholder="Enter your first name" onChange={(e) => setFirstName(e.target.value)} required />
         </label>
         <label htmlFor="LastName">
           <br />
-          Last name:
-          <input type="text" name="LastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-        </label>
-        <label htmlFor="Email">
-          <br />
-          Email:
-          <input type="email" name="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="text" name="LastName" value={lastName} placeholder="Enter your last name" onChange={(e) => setLastName(e.target.value)} required />
         </label>
         <label htmlFor="ServiceArea">
           <br />
-          ServiceArea:
-          <input type="text" name="ServiceArea" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} required />
+          <input type="text" name="ServiceArea" value={serviceArea} placeholder="Enter Service Area" onChange={(e) => setServiceArea(e.target.value)} required />
         </label>
         <label htmlFor="Role">
           <br />
@@ -91,21 +133,37 @@ function Signup() {
         </label>
         <label htmlFor="Username">
           <br />
-          Username:
-          <input type="text" name="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+
+          <input type="text" name="Username" value={username} placeholder="Enter your username" onChange={(e) => setUsername(e.target.value)} required />
         </label>
-        <label htmlFor="Password">
-          <br />
-          Password:
-          <input type="password" name="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </label>
-        <label htmlFor="ConfirmPassword">
-          <br />
-          Confirm Password:
-          <input type="password" name="ConfirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-        </label>
-        <br />
+
+        {!googleLoggedIn
+          ? (
+            <>
+              <label htmlFor="Password">
+                <br />
+                <input type="password" name="Password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </label>
+              <label htmlFor="ConfirmPassword">
+                <br />
+                <input type="password" name="ConfirmPassword" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              </label>
+              <label htmlFor="Email">
+                <br />
+                <input type="email" name="Email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </label>
+              <br />
+            </>
+          )
+          : <p />}
+
         <button type="button" onClick={onSubmit}>Submit</button>
+        {!googleLoggedIn
+          ? (
+            <button type="button" onClick={signUpWithGoogle}>Google Auth</button>
+          )
+          : <p />}
+
       </div>
     </form>
   );
@@ -117,5 +175,10 @@ function Signup() {
 
   );
 }
+
+// props validation
+Signup.propTypes = {
+  updateAppProfile: PropTypes.func.isRequired,
+};
 
 export default Signup;
