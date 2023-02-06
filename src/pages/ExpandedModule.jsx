@@ -6,8 +6,6 @@ import Module from '../components/Module';
 import { db } from './firebase';
 
 function ExpandedModule({ profile }) {
-  // remove later
-  console.log(profile);
   const { role } = profile;
   const location = useLocation();
   const { id } = location.state;
@@ -43,7 +41,7 @@ function ExpandedModule({ profile }) {
     });
   };
 
-  useEffect(getModule, [id]);
+  useEffect(getModule, [id, currRole]);
 
   if (parent != null) {
     return (

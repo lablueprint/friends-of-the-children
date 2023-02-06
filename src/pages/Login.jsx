@@ -55,7 +55,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
       setProfile(null);
       setPassword('');
     }
-  }, [profile]);
+  }, [profile, navigate, password, updateAppProfile]);
 
   const handleSubmit = (event) => {
     event.preventDefault(); // this prevents from page to be refreshing
