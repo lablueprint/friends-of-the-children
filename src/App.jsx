@@ -10,6 +10,7 @@ import {
   Calendar,
   ExpandedModule,
   NotFound,
+  UserProfile,
 } from './pages';
 
 import NavBar from './components/NavBar';
@@ -31,6 +32,7 @@ function App() {
           <NavBar profile={profile} updateAppProfile={updateProfile} />
           <Routes>
             <Route path="/" element={(<Modules profile={profile} />)} />
+            <Route path="/profile" element={(<UserProfile profile={profile} updateAppProfile={updateProfile} />)} />
             <Route path="/message-wall" element={(<MessageWall profile={profile} />)} />
             <Route path="/example" element={(<Example profile={profile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
