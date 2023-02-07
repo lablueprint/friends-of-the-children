@@ -109,7 +109,7 @@ function Signup({ updateAppProfile }) {
   };
 
   const SigninForm = (
-    <form id="signinform">
+    <form onSubmit={onSubmit} id="signinform">
       <div>
         <label htmlFor="FirstName">
           <br />
@@ -157,7 +157,13 @@ function Signup({ updateAppProfile }) {
           )
           : <p />}
 
-        <button type="button" onClick={onSubmit}>Submit</button>
+        {/* <button type="button">Submit</button> */}
+
+        <label htmlFor="Submit">
+          <br />
+          <input type="submit" />
+        </label>
+
         {!googleLoggedIn
           ? (
             <button type="button" onClick={signUpWithGoogle}>Google Auth</button>
