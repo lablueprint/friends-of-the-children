@@ -61,67 +61,55 @@ function Signup({ updateAppProfile }) {
     }
     console.log('Entered here');
 
-    // add emails to list
-    db.collection('emails').doc('emails').get().then((currEmails) => {
-      // console.log('Emails', currEmails.data().emails);
-      if (currEmails.data().emails.includes(email)) {
-        console.log('Email already taken!');
-        return;
-      } // when there's a new email:
-      currEmails.data().emails.push(email);
+    if (!googleLoggedIn) {
+      bcrypt.hash(password, 10) // asychronous hashing function
+        .then((hashedPassword) => {
+          const data = {
+            firstName,
+            lastName,
+            email,
+            serviceArea,
+            role,
+            username,
+            password: hashedPassword,
+            google: false,
+          };
+          console.log('google not used - entered');
+          db.collection('profiles').doc().set(data);
+          updateAppProfile(data);
+          console.log('Google not used - Finished');
+        });
+    } else {
+      const data = {
+        firstName,
+        lastName,
+        email,
+        serviceArea,
+        role,
+        username,
+        google: true,
+      };
+      console.log('Google used - entered');
+      db.collection('profiles').doc().set(data);
+      updateAppProfile(data);
+      console.log('Google used - finished');
+    }
 
-      if (!googleLoggedIn) {
-        bcrypt.hash(password, 10) // asychronous hashing function
-          .then((hashedPassword) => {
-            const data = {
-              firstName,
-              lastName,
-              email,
-              serviceArea,
-              role,
-              username,
-              password: hashedPassword,
-              google: false,
-            };
-            console.log('google not used - entered');
-            db.collection('profiles').doc().set(data);
-            updateAppProfile(data);
-            console.log('Google not used - Finished');
-          });
-      } else {
-        const data = {
-          firstName,
-          lastName,
-          email,
-          serviceArea,
-          role,
-          username,
-          google: true,
-        };
-        console.log('Google used - entered');
-        db.collection('profiles').doc().set(data);
-        updateAppProfile(data);
-        console.log('Google used - finished');
-      }
+    navigate('/modules');
 
-      // succsesfully navigate to landing page
-      navigate('/modules');
-
-      // reset forms
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setServiceArea('');
-      setRole('Caregiver');
-      setUsername('');
-      setPassword('');
-      setConfirmPassword('');
-      // currEmails.emails.push(email);
-    });
+    // reset forms
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setServiceArea('');
+    setRole('Caregiver');
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
   };
 
   const SigninForm = (
-    <form id="signinform">
+    <form onSubmit={onSubmit} id="signinform">
       <div>
         <label htmlFor="FirstName">
           <br />
@@ -169,7 +157,13 @@ function Signup({ updateAppProfile }) {
           )
           : <p />}
 
-        <button type="button" onClick={onSubmit}>Submit</button>
+        {/* <button type="button">Submit</button> */}
+
+        <label htmlFor="Submit">
+          <br />
+          <input type="submit" />
+        </label>
+
         {!googleLoggedIn
           ? (
             <button type="button" onClick={signUpWithGoogle}>Google Auth</button>
