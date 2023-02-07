@@ -38,7 +38,12 @@ function App() {
             <Route path="/message-wall" element={(<MessageWall profile={profile} />)} />
             <Route path="/example" element={(<Example profile={profile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
+<<<<<<< HEAD
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
+=======
+            {/* <Route path="/login" element={(<Login />)} /> */}
+            <Route path="/signup" element={(<Signup profile={profile} />)} />
+>>>>>>> 88df32e (unstaged)
             <Route path="/modules" element={(<Modules profile={profile} />)} />
             <Route path="/expanded-module" element={(<ExpandedModule profile={profile} />)} />
             <Route path="/calendar" element={(<Calendar profile={profile} />)} />
@@ -51,7 +56,12 @@ function App() {
           <Routes>
             <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
+<<<<<<< HEAD
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
+=======
+            {/* <Route path="/login" element={(<Login />)} /> */}
+            <Route path="/signup" element={(<Signup />)} />
+>>>>>>> 88df32e (unstaged)
             <Route path="*" element={(<NotFound />)} />
 
           </Routes>
