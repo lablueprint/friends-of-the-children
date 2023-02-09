@@ -16,11 +16,14 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
       },
   ...
  */
+
 import { db } from './firebase';
 
 function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+  const [userProfiles, setUserProfiles] = useState(null);
   // const [email, setEmail] = useState('');
   const [profile, setProfile] = useState(null);
   // const [userIsGoogleLoggedIn, setuserIsGoogleLoggedIn] = useState(false);
@@ -28,38 +31,21 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const navigate = useNavigate();
   // const profile = useRef();
 
-  const getUsers = (usernameSearch) => {
-    console.log('called users');
-    db.collection('profiles')
-      .where('username', '==', usernameSearch)
-      .get()
-      .then((sc) => {
-        // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-        sc.forEach((doc) => {
-          const data = doc.data();
+  const getUserProfiles = () => {
+    db.collection('profiles').get().then((sc) => {
+      const card = [];
+      sc.forEach((doc) => {
+        const data = doc.data();
+        if (data && data.role) {
           data.id = doc.id;
-          // console.log(data);
-          setProfile(data);
-        });
-        // if (data != null) {
-        //   bcrypt.compare(password, data.password) // compare passwords
-        //     .then((isValid) => {
-        //       if (isValid) { // check whether it is a valid credential
-        //         console.log('login successful');
-        //         const { password: profilePassword, ...userProfile } = data; // peform destruction to get profile w/o password
-        //         updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
-        //         navigate('/modules');
-        //       } else {
-        //         console.log('invalid credentials');
-        //       }
-        //     })
-        //     .catch(); // do error checking here if necessary
-        //   setPassword('');
-        // }
+          card.push(data);
+        }
       });
+      setUserProfiles(card);
+    });
   };
 
-  useEffect(() => {
+  const checkPassword = () => {
     console.log(profile);
     console.log(password);
     // check the hash password only if profile is not empty
@@ -75,6 +61,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
               // console.log(profile);
               // console.log(profile.password);
             } else {
+              setError(true);
               console.log('invalid credentials');
             }
           })
@@ -83,10 +70,64 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
         navigate('/modules');
       }
-      setProfile(null);
-      setPassword('');
-      setUsername('');
+      // HELLO WHY DID U GUYS INCLUDE THIS?
+      // setProfile(null);
+      // setPassword('');
+      // setUsername('');
     }
+  };
+
+  const getUsers = (usernameSearch) => {
+    const tempUserMatch = userProfiles.filter((p) => p.username === usernameSearch);
+    console.log(tempUserMatch);
+    if (tempUserMatch.length === 0) {
+      console.log('if');
+      setError(true);
+    } else {
+      console.log('else');
+      console.log(tempUserMatch);
+      const data = tempUserMatch[0];
+      data.id = tempUserMatch[0].id;
+      setProfile(data);
+    }
+
+    // console.log('called users');
+    // let tempError = true;
+    // fb.get()
+    //   .where('username', '==', usernameSearch)
+    //   .get()
+    //   .then((sc) => {
+    //     console.log(sc);
+    //     // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
+    //     sc.forEach((doc) => {
+    //       tempError = false;
+    //       const data = doc.data();
+    //       console.log(data);
+    //       data.id = doc.id;
+    //       setProfile(data);
+    //     });
+    //     setError(tempError);
+    // if (data != null) {
+    //   bcrypt.compare(password, data.password) // compare passwords
+    //     .then((isValid) => {
+    //       if (isValid) { // check whether it is a valid credential
+    //         console.log('login successful');
+    //         const { password: profilePassword, ...userProfile } = data; // peform destruction to get profile w/o password
+    //         updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
+    //         navigate('/modules');
+    //       } else {
+    //         console.log('invalid credentials');
+    //       }
+    //     })
+    //     .catch(); // do error checking here if necessary
+    //   setPassword('');
+    // }
+    // });
+  };
+
+  useEffect(() => {
+    getUserProfiles();
+    checkPassword();
   }, [profile, navigate, updateAppProfile]);
 
   const provider = new GoogleAuthProvider();
@@ -125,12 +166,12 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         getGoogleAccount(googleUser.email);
         // setUsername(googleUser.displayName);
       // ...
-      }).catch((error) => {
+      }).catch((e) => {
       // Handle Errors here.
-        const errorCode = error.code;
+        const errorCode = e.code;
         console.log(errorCode);
 
-        const googleErrorMessage = error.message;
+        const googleErrorMessage = e.message;
         console.log(googleErrorMessage);
 
         // The email of the user's account used.
@@ -142,8 +183,10 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   }
 
   const handleSubmit = (event) => {
+    setError(false);
     console.log('called');
     event.preventDefault(); // this prevents from page to be refreshing
+    console.log(username);
     getUsers(username);
     // setUsername('');
     // setPassword('');
@@ -178,6 +221,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
             required
           />
         </label>
+        {error ? <div>Your username or password is incorrect.</div> : <div />}
         <label htmlFor="Submit">
           <br />
           <input type="submit" />
