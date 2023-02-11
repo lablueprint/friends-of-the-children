@@ -42,6 +42,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         }
       });
       setUserProfiles(card);
+      console.log(card);
     });
   };
 
@@ -126,9 +127,12 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   };
 
   useEffect(() => {
-    getUserProfiles();
     checkPassword();
   }, [profile, navigate, updateAppProfile]);
+
+  useEffect(() => {
+    getUserProfiles();
+  }, []);
 
   const provider = new GoogleAuthProvider();
 
