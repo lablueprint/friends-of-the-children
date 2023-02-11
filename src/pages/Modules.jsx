@@ -56,7 +56,7 @@ function Modules({ profile }) {
     setMentor(false);
   };
 
-  useEffect(getModules, [submitForm]);
+  useEffect(getModules, []);
 
   if (currRole === 'admin') {
     return (
