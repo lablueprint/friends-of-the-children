@@ -1,0 +1,33 @@
+.message{
+    width: 200px;
+    margin: auto;
+    margin-bottom: 10px;
+    background-color: aquamarine;
+    border: solid;
+    border-radius: 20px;
+}
+
+.pinnedmessage{
+    width: 200px;
+    margin: auto;
+    margin-bottom: 10px;
+    background-color: rgb(255, 127, 127);
+    border: solid;
+    border-radius: 20px;
+}
+
+button{
+    border-radius: 50px;
+    margin: 5px;
+}
+
+.button{
+    border-radius: 50px;
+    margin: 5px;
+}
+
+.pinnedbutton{
+    border-radius: 50px;
+    margin: 5px;
+    background-color: rgb(219, 255, 127);
+}

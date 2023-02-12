@@ -1,0 +1,21 @@
+.card {
+    width: 60%;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: solid 3px;
+    border-color: salmon;
+    border-radius: 10px;
+}
+
+.backButton {
+    border: solid;
+}
+
+.title {
+    font-size: 30px;
+}
+
+.body {
+    font-size: 20px;
+}
