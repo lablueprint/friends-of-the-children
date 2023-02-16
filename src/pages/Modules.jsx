@@ -16,6 +16,7 @@ function Modules({ profile }) {
   const currRole = role.toLowerCase();
   const [selectedFile, setSelectedFile] = useState(null);
 
+  // add permissions to view module. order doesn't matter
   if (mentor) {
     roles.push('mentor');
   }
@@ -30,6 +31,7 @@ function Modules({ profile }) {
         const data = doc.data();
         if (data && data.role) {
           data.id = doc.id;
+          // fetching parent-level modules that we have permission to view
           if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
             card.push(data);
           }
@@ -50,6 +52,8 @@ function Modules({ profile }) {
     };
     db.collection('modules').doc().set(data);
 
+    setModules([...modules, data]);
+
     setTitle('');
     setBody('');
     setServiceArea('');
@@ -57,6 +61,7 @@ function Modules({ profile }) {
     setMentor(false);
   };
 
+  // empty dependency array means getModules is only being called on page load
   useEffect(getModules, []);
 
   if (currRole === 'admin') {
