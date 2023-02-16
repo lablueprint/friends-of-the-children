@@ -14,6 +14,7 @@ function Modules({ profile }) {
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
+  const [selectedFile, setSelectedFile] = useState(null);
 
   if (mentor) {
     roles.push('mentor');
@@ -86,6 +87,8 @@ function Modules({ profile }) {
           <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
           Service Area:
           <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+          File:
+          <input type="file" value={selectedFile} onChange={(e) => setSelectedFile(e.target.files[0])} />
           {/* Caregiver
         <input type="checkbox" />
         Mentor
