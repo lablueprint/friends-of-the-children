@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import bcrypt from 'bcryptjs';
 import PropTypes from 'prop-types';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
@@ -10,12 +10,13 @@ function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [serviceArea, setServiceArea] = useState('');
+  const [serviceArea, setServiceArea] = useState('AV');
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
+  const [usernames, setUsernames] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  // const [errorMessage, setErrorMessage] = useState('');
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
 
   const provider = new GoogleAuthProvider();
@@ -54,58 +55,83 @@ function Signup({ updateAppProfile }) {
       });
   }
 
+  const readProfiles = () => {
+    const tempUsers = [];
+    db.collection('profiles').get().then((sc) => {
+      sc.forEach((doc) => {
+        const data = doc.data();
+        if (data && data.username) {
+          tempUsers.push(data.username);
+        }
+      });
+    });
+    setUsernames(tempUsers);
+  };
+
+  useEffect(
+    readProfiles,
+    [],
+  );
+
   const onSubmit = () => {
-    console.log('entered first');
+    let isValid = true;
     if (password !== confirmPassword) {
-      setErrorMessage(errorMessage, 'Passwords must match!');
+      alert('Passwords must match!');
+      isValid = false;
     }
-    console.log('Entered here');
-
-    if (!googleLoggedIn) {
-      bcrypt.hash(password, 10) // asychronous hashing function
-        .then((hashedPassword) => {
-          const data = {
-            firstName,
-            lastName,
-            email,
-            serviceArea,
-            role,
-            username,
-            password: hashedPassword,
-            google: false,
-          };
-          console.log('google not used - entered');
-          db.collection('profiles').doc().set(data);
-          updateAppProfile(data);
-          console.log('Google not used - Finished');
-        });
-    } else {
-      const data = {
-        firstName,
-        lastName,
-        email,
-        serviceArea,
-        role,
-        username,
-        google: true,
-      };
-      console.log('Google used - entered');
-      db.collection('profiles').doc().set(data);
-      updateAppProfile(data);
-      console.log('Google used - finished');
+    if (usernames.includes(username)) {
+      alert('Username already taken');
+      isValid = false;
     }
 
-    navigate('/modules');
+    // console.log(errorMessage);
+    // alert(errorMessage);
+    if (isValid) {
+      if (!googleLoggedIn) {
+        bcrypt.hash(password, 10) // asychronous hashing function
+          .then((hashedPassword) => {
+            const data = {
+              firstName,
+              lastName,
+              email,
+              serviceArea,
+              role,
+              username,
+              password: hashedPassword,
+              google: false,
+            };
+            console.log('google not used - entered');
+            db.collection('profiles').doc().set(data);
+            updateAppProfile(data);
+            console.log('Google not used - Finished');
+          });
+      } else {
+        const data = {
+          firstName,
+          lastName,
+          email,
+          serviceArea,
+          role,
+          username,
+          google: true,
+        };
+        console.log('Google used - entered');
+        db.collection('profiles').doc().set(data);
+        updateAppProfile(data);
+        console.log('Google used - finished');
+      }
+      navigate('/modules');
 
-    // reset forms
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setServiceArea('');
-    setRole('Caregiver');
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
+      // reset forms
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setServiceArea('AV');
+      setRole('');
+      setUsername('');
+      setPassword('');
+      setConfirmPassword('');
+    }
   };
 
   const SigninForm = (
@@ -121,7 +147,11 @@ function Signup({ updateAppProfile }) {
         </label>
         <label htmlFor="ServiceArea">
           <br />
-          <input type="text" name="ServiceArea" value={serviceArea} placeholder="Enter Service Area" onChange={(e) => setServiceArea(e.target.value)} required />
+          Choose service area:
+          <select name="ServiceArea" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)}>
+            <option value="AV">AV</option>
+            <option value="MS">MS</option>
+          </select>
         </label>
         <label htmlFor="Role">
           <br />
@@ -129,6 +159,7 @@ function Signup({ updateAppProfile }) {
           <select name="Role" value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="Caregiver">Caregiver</option>
             <option value="Mentor">Mentor</option>
+            <option value="Admin">Admin</option>
           </select>
         </label>
         <label htmlFor="Username">
@@ -157,7 +188,7 @@ function Signup({ updateAppProfile }) {
           )
           : <p />}
 
-        {/* <button type="button">Submit</button> */}
+        {/* <button type="button" onClick={onSubmit}>Submit</button> */}
 
         <label htmlFor="Submit">
           <br />
@@ -166,7 +197,7 @@ function Signup({ updateAppProfile }) {
 
         {!googleLoggedIn
           ? (
-            <button type="button" onClick={signUpWithGoogle}>Google Auth</button>
+            <button type="submit" onClick={signUpWithGoogle}>Google Auth</button>
           )
           : <p />}
 
