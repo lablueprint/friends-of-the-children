@@ -21,4 +21,15 @@ router.get('/getAllProfiles', async (req, res) => {
   res.status(202).json(p);
 });
 
+router.get('/getModulebyId/:id', async (req, res) => {
+  const moduleId = req.params.id;
+  const data = await db.collection('modules').doc(moduleId).get();
+  res.status(202).json(data);
+});
+
+router.get('/getModulechild/:child', async(req,res) => {
+  const moduleChild = req.params.id;
+  const child = await db.collection('modules').doc(child).get();
+  res.status(202).json(data);
+});
 export default router;

@@ -9,6 +9,8 @@ import {
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { db } from './firebase';
+import * as api from '../api';
+
 
 function ExpandedModule({ profile }) {
   const { role } = profile;
@@ -67,9 +69,19 @@ function ExpandedModule({ profile }) {
     setRefresh(!refresh);
   };
 
+  const getModulebyIdfunc = async () => {
+    console.log(api.getModulebyId())
+    return await api.getModulebyId();
+  }
+
+  const getModuleChildfunc = async () => {
+    const {child} = await api.getModuleChild()
+    return child;
+  }
+
   const getModule = () => {
     setChildren([]);
-    db.collection('modules').doc(id).get().then((sc) => {
+    getModulebyIdfunc().then((sc) => {
       const data = sc.data();
       setTitle(data.title);
       setBody(data.body);
@@ -78,7 +90,7 @@ function ExpandedModule({ profile }) {
       // filter the children by role
       const tempChildren = [];
       data.children.forEach((child) => {
-        db.collection('modules').doc(child).get().then((snap) => {
+        getModuleChildfunc().then((snap) => {
           const childData = snap.data();
           if (currRole === 'admin' || childData.role.includes(currRole)) {
             const friend = {
