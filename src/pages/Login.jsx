@@ -281,7 +281,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         {error ? <div>Your username or password is incorrect.</div> : <div />}
         <label htmlFor="Submit">
           <br />
-          <input type="submit" />
+          <input type="submit" value="Log In" />
         </label>
         <br />
         <button type="button" onClick={signInWithGoogle}>Continue with Google</button>

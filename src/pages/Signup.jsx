@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import bcrypt from 'bcryptjs';
 import PropTypes from 'prop-types';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import {
+  TextField, Select, MenuItem, FormControl, InputLabel,
+} from '@mui/material';
 
 import { useNavigate } from 'react-router-dom';
 import { db } from './firebase';
@@ -16,7 +19,10 @@ function Signup({ updateAppProfile }) {
   const [usernames, setUsernames] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  // const [errorMessage, setErrorMessage] = useState('');
+  const [userErrorMessage, setUserErrorMessage] = useState('');
+  const [passErrorMessage, setPassErrorMessage] = useState('');
+  const [confirmError, setConfirmError] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
 
   const provider = new GoogleAuthProvider();
@@ -75,12 +81,19 @@ function Signup({ updateAppProfile }) {
 
   const onSubmit = () => {
     let isValid = true;
-    if (password !== confirmPassword) {
-      alert('Passwords must match!');
+    setConfirmError(false);
+    setUsernameError(false);
+    setUserErrorMessage('');
+    setPassErrorMessage('');
+
+    if (usernames.includes(username)) {
+      setUsernameError(true);
+      setUserErrorMessage('Username already exists!');
       isValid = false;
     }
-    if (usernames.includes(username)) {
-      alert('Username already taken');
+    if (password !== confirmPassword) {
+      setConfirmError(true);
+      setPassErrorMessage('Passwords don\'t match!');
       isValid = false;
     }
 
@@ -135,64 +148,113 @@ function Signup({ updateAppProfile }) {
   };
 
   const SigninForm = (
-    <form onSubmit={onSubmit} id="signinform">
+    <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
       <div>
-        <label htmlFor="FirstName">
-          <br />
-          <input type="text" name="FirstName" value={firstName} placeholder="Enter your first name" onChange={(e) => setFirstName(e.target.value)} required />
-        </label>
-        <label htmlFor="LastName">
-          <br />
-          <input type="text" name="LastName" value={lastName} placeholder="Enter your last name" onChange={(e) => setLastName(e.target.value)} required />
-        </label>
-        <label htmlFor="ServiceArea">
-          <br />
-          Choose service area:
-          <select name="ServiceArea" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)}>
-            <option value="AV">AV</option>
-            <option value="MS">MS</option>
-          </select>
-        </label>
-        <label htmlFor="Role">
-          <br />
-          Choose a role:
-          <select name="Role" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="Caregiver">Caregiver</option>
-            <option value="Mentor">Mentor</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </label>
-        <label htmlFor="Username">
-          <br />
-
-          <input type="text" name="Username" value={username} placeholder="Enter your username" onChange={(e) => setUsername(e.target.value)} required />
-        </label>
-
+        <TextField
+          id="firstName"
+          label="First Name"
+          defaultValue="Enter your first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+          variant="filled"
+        />
+        &nbsp;
+        <TextField
+          id="lastName"
+          label="Last Name"
+          defaultValue="Enter your last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          variant="filled"
+        />
+        &nbsp;
+        <FormControl sx={{ minWidth: 100 }}>
+          <InputLabel>Service Area</InputLabel>
+          <Select
+            id="serviceArea"
+            label="Service Area"
+            defaultValue="AV"
+            value={serviceArea}
+            onChange={(e) => setServiceArea(e.target.value)}
+            variant="filled"
+          >
+            <MenuItem value="AV">AV</MenuItem>
+            <MenuItem value="MS">MS</MenuItem>
+          </Select>
+        </FormControl>
+        &nbsp;
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel>Role</InputLabel>
+          <Select
+            id="role"
+            label="Role"
+            defaultValue="Role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            variant="filled"
+          >
+            <MenuItem value="Caregiver">Caregiver</MenuItem>
+            <MenuItem value="Mentor">Mentor</MenuItem>
+            <MenuItem value="Admin">Admin</MenuItem>
+          </Select>
+        </FormControl>
+        &nbsp;
+        <TextField
+          id="username"
+          label="Username"
+          defaultValue="Enter your username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          error={usernameError}
+          helperText={userErrorMessage}
+          required
+          variant="filled"
+        />
+        &nbsp;
         {!googleLoggedIn
           ? (
             <>
-              <label htmlFor="Password">
-                <br />
-                <input type="password" name="Password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              </label>
-              <label htmlFor="ConfirmPassword">
-                <br />
-                <input type="password" name="ConfirmPassword" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-              </label>
-              <label htmlFor="Email">
-                <br />
-                <input type="email" name="Email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </label>
-              <br />
+              <TextField
+                id="password"
+                label="Password"
+                defaultValue="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                variant="filled"
+              />
+              &nbsp;
+              <TextField
+                id="confirmPassword"
+                label="Confirm Password"
+                defaultValue="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={confirmError}
+                helperText={passErrorMessage}
+                required
+                variant="filled"
+              />
+              &nbsp;
+              <TextField
+                id="email"
+                label="Email"
+                type="email"
+                defaultValue="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                variant="filled"
+              />
             </>
           )
           : <p />}
 
-        {/* <button type="button" onClick={onSubmit}>Submit</button> */}
-
         <label htmlFor="Submit">
           <br />
-          <input type="submit" />
+          <input type="submit" value="Sign Up" />
         </label>
 
         {!googleLoggedIn
@@ -200,7 +262,6 @@ function Signup({ updateAppProfile }) {
             <button type="submit" onClick={signUpWithGoogle}>Google Auth</button>
           )
           : <p />}
-
       </div>
     </form>
   );
