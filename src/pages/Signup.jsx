@@ -85,7 +85,6 @@ function Signup({ updateAppProfile }) {
     setUsernameError(false);
     setUserErrorMessage('');
     setPassErrorMessage('');
-
     if (usernames.includes(username)) {
       setUsernameError(true);
       setUserErrorMessage('Username already exists!');
@@ -96,9 +95,6 @@ function Signup({ updateAppProfile }) {
       setPassErrorMessage('Passwords don\'t match!');
       isValid = false;
     }
-
-    // console.log(errorMessage);
-    // alert(errorMessage);
     if (isValid) {
       if (!googleLoggedIn) {
         bcrypt.hash(password, 10) // asychronous hashing function
@@ -134,7 +130,6 @@ function Signup({ updateAppProfile }) {
         console.log('Google used - finished');
       }
       navigate('/modules');
-
       // reset forms
       setFirstName('');
       setLastName('');
@@ -150,6 +145,7 @@ function Signup({ updateAppProfile }) {
   const SigninForm = (
     <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
       <div>
+        <br />
         <TextField
           id="firstName"
           label="First Name"
@@ -201,6 +197,8 @@ function Signup({ updateAppProfile }) {
           </Select>
         </FormControl>
         &nbsp;
+        <br />
+        <br />
         <TextField
           id="username"
           label="Username"
@@ -248,6 +246,7 @@ function Signup({ updateAppProfile }) {
                 required
                 variant="filled"
               />
+              <br />
             </>
           )
           : <p />}
