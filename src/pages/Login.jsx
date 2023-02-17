@@ -46,57 +46,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     });
   };
 
-  const setCookie = (cname, cvalue, exdays) => {
-    console.log(cvalue);
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    const expires = `expires=${d.toUTCString()}`;
-    document.cookie = `${cname}=${cvalue};${expires};path=/`;
-  };
-
-  const getCookie = (cname) => {
-    const name = `${cname}=`;
-    const decodedCookie = decodeURIComponent(document.cookie);
-    console.log(document.cookie);
-    console.log(decodedCookie);
-    const ca = decodedCookie.split(';');
-    for (let i = 0; i < ca.length; i += 1) {
-      let c = ca[i];
-      while (c.charAt(0) === ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) === 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return '';
-  };
-
-  const checkCookie = () => {
-    const user = getCookie('username');
-    console.log(user);
-    if (user !== '' || user != null) {
-      console.log(user);
-      console.log(userProfiles);
-      if (userProfiles) {
-        const tempUserMatch = userProfiles.filter((p) => p.username === user);
-        console.log(tempUserMatch);
-        if (tempUserMatch !== '') {
-          navigate('/modules');
-          const data = tempUserMatch[0];
-          data.id = tempUserMatch[0].id;
-          updateAppProfile(data); // pass to the upper lever (parent components so that it can be used for other pages)
-        }
-      }
-    }
-    // } else {
-    //   user = prompt('Please enter your name:', '');
-    //   if (user !== '' && user != null) {
-    //     setCookie('username', user, 30);
-    //   }
-    // }
-  };
-
   const checkPassword = () => {
     console.log(profile);
     console.log(password);
@@ -107,10 +56,9 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         bcrypt.compare(password, profile.password) // compare passwords
           .then((isValid) => {
             if (isValid) { // check whether it is a valid credential
-              navigate('/modules');
               console.log('login successful');
-              setCookie('username', profile.username, 30); // username, expires in 30 days
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+              navigate('/modules');
               // console.log(profile);
               // console.log(profile.password);
             } else {
@@ -123,10 +71,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
         navigate('/modules');
       }
-      // HELLO WHY DID U GUYS INCLUDE THIS?
-      // setProfile(null);
-      // setPassword('');
-      // setUsername('');
     }
   };
 
@@ -143,39 +87,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
       data.id = tempUserMatch[0].id;
       setProfile(data);
     }
-
-    // console.log('called users');
-    // let tempError = true;
-    // fb.get()
-    //   .where('username', '==', usernameSearch)
-    //   .get()
-    //   .then((sc) => {
-    //     console.log(sc);
-    //     // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-    //     sc.forEach((doc) => {
-    //       tempError = false;
-    //       const data = doc.data();
-    //       console.log(data);
-    //       data.id = doc.id;
-    //       setProfile(data);
-    //     });
-    //     setError(tempError);
-    // if (data != null) {
-    //   bcrypt.compare(password, data.password) // compare passwords
-    //     .then((isValid) => {
-    //       if (isValid) { // check whether it is a valid credential
-    //         console.log('login successful');
-    //         const { password: profilePassword, ...userProfile } = data; // peform destruction to get profile w/o password
-    //         updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
-    //         navigate('/modules');
-    //       } else {
-    //         console.log('invalid credentials');
-    //       }
-    //     })
-    //     .catch(); // do error checking here if necessary
-    //   setPassword('');
-    // }
-    // });
   };
 
   useEffect(() => {
@@ -184,7 +95,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   useEffect(() => {
     getUserProfiles();
-    checkCookie();
   }, []);
 
   const provider = new GoogleAuthProvider();
