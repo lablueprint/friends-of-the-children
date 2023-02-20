@@ -1,7 +1,8 @@
 import { React } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from './redux/sliceAuth';
 import {
   Example,
   Login,
@@ -18,15 +19,14 @@ import NavBar from './components/NavBar';
 
 function App() {
   const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
-
+  const dispatch = useDispatch();
   // const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
 
   // this functions props allow us to change the state in app.jsx from children components
   // Note: consider using "Context" for consistency throughout the app,
   // and might alse need cookies so that user stays logged after refreshing the page
   const updateProfile = (newProfile) => {
-    const profileData = JSON.stringify(newProfile);
-    localStorage.setItem('user', profileData);
+    dispatch(login(newProfile));
   };
 
   return (

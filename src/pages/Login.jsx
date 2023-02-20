@@ -55,6 +55,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     // check the hash password only if profile is not empty
     if (profile !== null) {
       console.log(true);
+      console.log(profile);
       if (!profile.google) {
         bcrypt.compare(password, profile.password) // compare passwords
           .then((isValid) => {
@@ -67,9 +68,12 @@ function Login({ updateAppProfile }) { // deconstruct the function props
               console.log('invalid credentials');
             }
           })
-          .catch(); // do error checking here if necessary
+          .catch((e) => {
+            console.log(e);
+          }); // do error checking here if necessary
       } else {
-        updateAppProfile(currUser); // pass to the upper lever (parent components so that it can be used for other pages)
+        dispatch(login(profile));
+        updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
       }
     }
   };
