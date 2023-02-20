@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/sliceAuth';
+import { db } from './firebase';
 /**
  * to resolve the warning about crypto, add fallback options
  * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
@@ -17,19 +19,22 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
   ...
  */
 
-import { db } from './firebase';
-
 function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [userProfiles, setUserProfiles] = useState(null);
-  // const [email, setEmail] = useState('');
   const [profile, setProfile] = useState(null);
+  // const [email, setEmail] = useState('');
   // const [userIsGoogleLoggedIn, setuserIsGoogleLoggedIn] = useState(false);
 
   const navigate = useNavigate();
   // const profile = useRef();
+
+  const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
+  console.log(currUser);
+  console.log(isLoggedIn);
+  const dispatch = useDispatch();
 
   const getUserProfiles = () => {
     db.collection('profiles').get().then((sc) => {
@@ -47,8 +52,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   };
 
   const checkPassword = () => {
-    console.log(profile);
-    console.log(password);
     // check the hash password only if profile is not empty
     if (profile !== null) {
       console.log(true);
@@ -57,10 +60,9 @@ function Login({ updateAppProfile }) { // deconstruct the function props
           .then((isValid) => {
             if (isValid) { // check whether it is a valid credential
               console.log('login successful');
+              dispatch(login(profile));
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
               navigate('/modules');
-              // console.log(profile);
-              // console.log(profile.password);
             } else {
               setError(true);
               console.log('invalid credentials');
@@ -68,7 +70,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
           })
           .catch(); // do error checking here if necessary
       } else {
-        updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+        updateAppProfile(currUser); // pass to the upper lever (parent components so that it can be used for other pages)
         navigate('/modules');
       }
     }
@@ -76,7 +78,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   const getUsers = (usernameSearch) => {
     const tempUserMatch = userProfiles.filter((p) => p.username === usernameSearch);
-    console.log(tempUserMatch);
+    // console.log(tempUserMatch);
     if (tempUserMatch.length === 0) {
       console.log('if');
       setError(true);
@@ -158,6 +160,10 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     // setUsername('');
     // setPassword('');
   };
+
+  if (isLoggedIn) {
+    return navigate('/modules');
+  }
 
   return (
     <div>

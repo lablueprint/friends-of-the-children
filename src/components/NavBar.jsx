@@ -1,10 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/sliceAuth';
 
 function NavBar({ profile, updateAppProfile }) {
   // const [loggedIn, setLoggedIn] = useState(false);
   // console.log(profile);
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    updateAppProfile(null);
+    dispatch(logout(profile));
+  };
 
   return (
     <div>
@@ -23,7 +30,7 @@ function NavBar({ profile, updateAppProfile }) {
             <Link to="/modules" className="btn btn-info"> Modules </Link>
             <Link to="/calendar" className="btn btn-info"> Calendar </Link>
             <Link to="/message-wall" className="btn btn-info"> Message Wall </Link>
-            <Link to="/" className="btn btn-danger" onClick={() => updateAppProfile(null)}> Log Out </Link>
+            <Link to="/" className="btn btn-danger" onClick={handleLogout}> Log Out </Link>
             {/* <Link to="/" className="btn btn-danger"> Log Out </Link> */}
           </div>
         )}
