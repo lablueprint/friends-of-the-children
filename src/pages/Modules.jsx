@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { db } from './firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
 
 function Modules({ profile }) {
@@ -14,7 +15,8 @@ function Modules({ profile }) {
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
-  const [selectedFile, setSelectedFile] = useState(null);
+  // const [selectedFile, setSelectedFile] = useState();
+  const [percent, setPercent] = useState(0);
 
   // add permissions to view module. order doesn't matter
   if (mentor) {
@@ -39,6 +41,41 @@ function Modules({ profile }) {
       });
       setModules(card);
     });
+  };
+
+  // upload file to Firebase:
+  const handleUpload = (file) => {
+    console.log('target:', file.name);
+    // if (!file) {
+    //   alert('Please choose a file first!');
+    // }
+    const fileName = file.name;
+    const storageRef = ref(storage, `/files/${fileName}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const p = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+        );
+
+        // update progress
+        setPercent(p);
+      },
+      (err) => console.log(err),
+      () => {
+        // download url
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log(url);
+        });
+      },
+    );
+  };
+
+  const handleChange = (e) => {
+    // setSelectedFile(e.target.files[0]);
+    handleUpload(e.target.files[0]);
   };
 
   const submitForm = () => {
@@ -93,12 +130,14 @@ function Modules({ profile }) {
           Service Area:
           <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
           File:
-          <input type="file" value={selectedFile} onChange={(e) => setSelectedFile(e.target.files[0])} />
-          {/* Caregiver
-        <input type="checkbox" />
-        Mentor
-        <input type="checkbox" /> */}
+          <input type="file" defaultValue="" onChange={handleChange} />
+          <p>
+            {percent}
+            {' '}
+            % done
+          </p>
           <button type="button" onClick={submitForm}>Submit</button>
+
         </form>
       </div>
     );
