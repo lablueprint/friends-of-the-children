@@ -62,7 +62,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
               console.log('login successful');
               dispatch(login(profile));
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-              navigate('/modules');
+              // navigate('/modules');
             } else {
               setError(true);
               console.log('invalid credentials');
