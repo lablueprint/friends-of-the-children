@@ -26,6 +26,7 @@ function UserProfile({ profile, updateAppProfile }) {
         setUpdateProfileMessage('Profile Successfully Updated!');
         updateAppProfile(updatedProfile);
         setEditProfile(false);
+        window.location.reload();
       })
       .catch((error) => {
         setUpdateProfileMessage('We ran into an error updating your profile!');

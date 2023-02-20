@@ -62,7 +62,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
               console.log('login successful');
               dispatch(login(profile));
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-              // navigate('/modules');
             } else {
               setError(true);
               console.log('invalid credentials');
@@ -71,7 +70,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
           .catch(); // do error checking here if necessary
       } else {
         updateAppProfile(currUser); // pass to the upper lever (parent components so that it can be used for other pages)
-        navigate('/modules');
       }
     }
   };
@@ -110,7 +108,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         sc.forEach((doc) => {
           const data = doc.data();
           data.id = doc.id;
-          // console.log(data);
           setProfile(data);
         });
       });
@@ -169,7 +166,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     <div>
       <form onSubmit={handleSubmit}>
         <label htmlFor="username">
-
           <br />
           <input
             type="text"
