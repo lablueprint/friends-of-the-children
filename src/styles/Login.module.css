@@ -1,0 +1,32 @@
+/* classes styling*/
+
+.logintitle {
+    position: absolute;
+    width: 239.61px;
+    height: 83px;
+    left: 986px;
+    top: 245px;
+
+    font-family: 'News Gothic';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 70px;
+    line-height: 83px;
+/* identical to box height */
+
+
+/* text */
+
+color: #3F3F3F;
+}
+
+input{
+    box-sizing: border-box;
+    position: absolute;
+    width: 541px;
+    height: 62px;
+    left: 986px;
+    top: 397px;
+    border: 1.5px solid #D5D5D5;
+    border-radius: 8px;
+}

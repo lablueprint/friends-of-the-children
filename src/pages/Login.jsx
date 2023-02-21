@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
+import styles from '../styles/Login.module.css';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../redux/sliceAuth';
@@ -168,6 +169,9 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   return (
     <div>
+      <div className={styles.logintitle}>
+        Login
+      </div>
       <form onSubmit={handleSubmit}>
         <label htmlFor="username">
           <br />
