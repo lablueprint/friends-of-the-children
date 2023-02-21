@@ -18,12 +18,20 @@ function NavBar({ profile, updateAppProfile }) {
     <div>
       {!profile
         ? (
-          <div className="login-buttons d-flex align-items-center justify-content-center gap-3 py-2">
+          <div className="login-buttons d-flex align-items-center justify-content-left gap-3 py-2">
             {/* <Link to="/login" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Log In </Link>
             <Link to="/signup" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Sign Up </Link> */}
-            <a href="/"><img src={fotcLogo} alt="fotc family" /></a>
-            <Link to="/login" className="btn btn-primary"> Log In </Link>
-            <Link to="/signup" className="btn btn-primary"> Sign Up </Link>
+            <a href="/">
+              <img
+                style={{
+                  position: 'absolute', width: '139px', height: '67px', left: '61px', top: '40px',
+                }}
+                src={fotcLogo}
+                alt="fotc logo"
+              />
+            </a>
+            {/* <Link to="/login" className="btn btn-primary"> Log In </Link>
+            <Link to="/signup" className="btn btn-primary"> Sign Up </Link> */}
           </div>
         )
         : (

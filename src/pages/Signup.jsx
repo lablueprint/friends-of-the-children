@@ -11,6 +11,7 @@ import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/login_family.svg';
 import UpperRight from '../assets/upperRight.svg';
 import BottomLeft from '../assets/bottomLeft.svg';
+import GoogleLogo from '../assets/google_logo.svg';
 
 function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
@@ -148,7 +149,7 @@ function Signup({ updateAppProfile }) {
   const SigninForm = (
     <div className={styles.signinForm}>
       <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
-        <h1>Sign Up</h1>
+        <h1 className={styles.bigtitle}>Sign Up</h1>
         <p>Please identify your role</p>
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel>Role</InputLabel>
@@ -158,7 +159,7 @@ function Signup({ updateAppProfile }) {
             defaultValue="Role"
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            variant="filled"
+            className={styles.textfield}
           >
             <MenuItem value="Caregiver">Caregiver</MenuItem>
             <MenuItem value="Mentor">Mentor</MenuItem>
@@ -175,7 +176,6 @@ function Signup({ updateAppProfile }) {
           required
           className={styles.textfield}
         />
-        &nbsp;
         <TextField
           id="lastName"
           label="Last Name"
@@ -185,7 +185,64 @@ function Signup({ updateAppProfile }) {
           required
           className={styles.textfield}
         />
-        &nbsp;
+        <br />
+        {!googleLoggedIn
+          ? (
+            <TextField
+              id="email"
+              label="Email"
+              type="email"
+              defaultValue="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className={styles.textfield}
+            />
+          )
+          : <p />}
+        <TextField
+          id="username"
+          label="Username"
+          defaultValue="Enter your username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          error={usernameError}
+          helperText={userErrorMessage}
+          required
+          className={styles.textfield}
+        />
+        <br />
+        {!googleLoggedIn
+          ? (
+            <>
+              <TextField
+                id="password"
+                label="Password"
+                defaultValue="Enter your password"
+                value={password}
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className={styles.textfield}
+              />
+              <br />
+              <TextField
+                id="confirmPassword"
+                label="Confirm Password"
+                defaultValue="Confirm your password"
+                value={confirmPassword}
+                type="password"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={confirmError}
+                helperText={passErrorMessage}
+                required
+                className={styles.textfield}
+              />
+              <br />
+            </>
+          )
+          : <p />}
+        <br />
         <FormControl sx={{ minWidth: 100 }}>
           <InputLabel>Service Area</InputLabel>
           <Select
@@ -200,60 +257,7 @@ function Signup({ updateAppProfile }) {
             <MenuItem value="MS">MS</MenuItem>
           </Select>
         </FormControl>
-        &nbsp;
         <br />
-        <br />
-        <TextField
-          id="username"
-          label="Username"
-          defaultValue="Enter your username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          error={usernameError}
-          helperText={userErrorMessage}
-          required
-          className={styles.textfield}
-        />
-        &nbsp;
-        {!googleLoggedIn
-          ? (
-            <>
-              <TextField
-                id="password"
-                label="Password"
-                defaultValue="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className={styles.textfield}
-              />
-              &nbsp;
-              <TextField
-                id="confirmPassword"
-                label="Confirm Password"
-                defaultValue="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                error={confirmError}
-                helperText={passErrorMessage}
-                required
-                className={styles.textfield}
-              />
-              &nbsp;
-              <TextField
-                id="email"
-                label="Email"
-                type="email"
-                defaultValue="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className={styles.textfield}
-              />
-              <br />
-            </>
-          )
-          : <p />}
 
         <div>
           <label htmlFor="Submit" className={styles.submit_buttons}>
@@ -263,7 +267,13 @@ function Signup({ updateAppProfile }) {
 
           {!googleLoggedIn
             ? (
-              <button type="submit" onClick={signUpWithGoogle} className={styles.submit_buttons}>Sign Up With Google</button>
+              <div>
+                <p>--------or--------</p>
+                <button type="submit" onClick={signUpWithGoogle} className={`${styles.submit_buttons} ${styles.google_button}`}>
+                  <img src={GoogleLogo} alt="google logo" className={styles.google_logo} />
+                  Sign Up With Google
+                </button>
+              </div>
             )
             : <p />}
         </div>
@@ -280,7 +290,7 @@ function Signup({ updateAppProfile }) {
           <p>
             Already have an account?
             {' '}
-            <a href="/login">Log In</a>
+            <a href="/login">Log in</a>
           </p>
         </div>
         {SigninForm}
