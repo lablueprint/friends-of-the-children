@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+
 import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
 
@@ -17,6 +18,7 @@ function Modules({ profile }) {
   const currRole = role.toLowerCase();
   // const [selectedFile, setSelectedFile] = useState();
   const [percent, setPercent] = useState(0);
+  const [link, setLink] = useState('');
 
   // add permissions to view module. order doesn't matter
   if (mentor) {
@@ -51,6 +53,7 @@ function Modules({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
+    setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -86,6 +89,7 @@ function Modules({ profile }) {
       role: roles,
       children: [],
       parent: null,
+      link,
     };
     db.collection('modules').doc().set(data);
 
