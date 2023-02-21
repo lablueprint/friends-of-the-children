@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: 'News Gothic';
 }
 
 .App-logo {
@@ -35,4 +36,16 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@font-face {
+  font-family: 'News Gothic';
+  src: url('./assets/fonts/NewsGothicRegular.otf');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'News Gothic Bold';
+  src: url('./assets/fonts/NewsGothicBold.otf');
+  font-weight: bold;
 }
