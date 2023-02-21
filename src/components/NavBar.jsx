@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/sliceAuth';
+import fotcLogo from '../assets/fotc_logo.svg';
 
 function NavBar({ profile, updateAppProfile }) {
   // const [loggedIn, setLoggedIn] = useState(false);
@@ -20,6 +21,7 @@ function NavBar({ profile, updateAppProfile }) {
           <div className="login-buttons d-flex align-items-center justify-content-center gap-3 py-2">
             {/* <Link to="/login" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Log In </Link>
             <Link to="/signup" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Sign Up </Link> */}
+            <a href="/"><img src={fotcLogo} alt="fotc family" /></a>
             <Link to="/login" className="btn btn-primary"> Log In </Link>
             <Link to="/signup" className="btn btn-primary"> Sign Up </Link>
           </div>

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
-import styles from '../styles/Login.module.css';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
+import styles from '../styles/Login.module.css';
 import { login } from '../redux/sliceAuth';
 import { db } from './firebase';
 /**
@@ -205,6 +205,11 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         </label>
         <br />
         <button type="button" onClick={signInWithGoogle}>Continue with Google</button>
+        <p>
+          {'Don\'t have an account?'}
+          {' '}
+          <a href="/signup">Sign Up</a>
+        </p>
       </form>
     </div>
   );

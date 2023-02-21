@@ -5,9 +5,12 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
-
 import { useNavigate } from 'react-router-dom';
 import { db } from './firebase';
+import styles from '../styles/Login.module.css';
+import LoginFamily from '../assets/login_family.svg';
+import UpperRight from '../assets/upperRight.svg';
+import BottomLeft from '../assets/bottomLeft.svg';
 
 function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
@@ -143,44 +146,10 @@ function Signup({ updateAppProfile }) {
   };
 
   const SigninForm = (
-    <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
-      <div>
-        <br />
-        <TextField
-          id="firstName"
-          label="First Name"
-          defaultValue="Enter your first name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-          variant="filled"
-        />
-        &nbsp;
-        <TextField
-          id="lastName"
-          label="Last Name"
-          defaultValue="Enter your last name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-          variant="filled"
-        />
-        &nbsp;
-        <FormControl sx={{ minWidth: 100 }}>
-          <InputLabel>Service Area</InputLabel>
-          <Select
-            id="serviceArea"
-            label="Service Area"
-            defaultValue="AV"
-            value={serviceArea}
-            onChange={(e) => setServiceArea(e.target.value)}
-            variant="filled"
-          >
-            <MenuItem value="AV">AV</MenuItem>
-            <MenuItem value="MS">MS</MenuItem>
-          </Select>
-        </FormControl>
-        &nbsp;
+    <div className={styles.signinForm}>
+      <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
+        <h1>Sign Up</h1>
+        <p>Please identify your role</p>
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel>Role</InputLabel>
           <Select
@@ -196,6 +165,41 @@ function Signup({ updateAppProfile }) {
             <MenuItem value="Admin">Admin</MenuItem>
           </Select>
         </FormControl>
+        <p>Enter your information</p>
+        <TextField
+          id="firstName"
+          label="First Name"
+          defaultValue="Enter your first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+          className={styles.textfield}
+        />
+        &nbsp;
+        <TextField
+          id="lastName"
+          label="Last Name"
+          defaultValue="Enter your last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          className={styles.textfield}
+        />
+        &nbsp;
+        <FormControl sx={{ minWidth: 100 }}>
+          <InputLabel>Service Area</InputLabel>
+          <Select
+            id="serviceArea"
+            label="Service Area"
+            defaultValue="AV"
+            value={serviceArea}
+            onChange={(e) => setServiceArea(e.target.value)}
+            className={styles.textfield}
+          >
+            <MenuItem value="AV">AV</MenuItem>
+            <MenuItem value="MS">MS</MenuItem>
+          </Select>
+        </FormControl>
         &nbsp;
         <br />
         <br />
@@ -208,7 +212,7 @@ function Signup({ updateAppProfile }) {
           error={usernameError}
           helperText={userErrorMessage}
           required
-          variant="filled"
+          className={styles.textfield}
         />
         &nbsp;
         {!googleLoggedIn
@@ -221,7 +225,7 @@ function Signup({ updateAppProfile }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                variant="filled"
+                className={styles.textfield}
               />
               &nbsp;
               <TextField
@@ -233,7 +237,7 @@ function Signup({ updateAppProfile }) {
                 error={confirmError}
                 helperText={passErrorMessage}
                 required
-                variant="filled"
+                className={styles.textfield}
               />
               &nbsp;
               <TextField
@@ -244,30 +248,44 @@ function Signup({ updateAppProfile }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                variant="filled"
+                className={styles.textfield}
               />
               <br />
             </>
           )
           : <p />}
 
-        <label htmlFor="Submit">
-          <br />
-          <input type="submit" value="Sign Up" />
-        </label>
+        <div>
+          <label htmlFor="Submit" className={styles.submit_buttons}>
+            <br />
+            <input className={styles.signup_button} type="submit" value="Sign Up" />
+          </label>
 
-        {!googleLoggedIn
-          ? (
-            <button type="submit" onClick={signUpWithGoogle}>Google Auth</button>
-          )
-          : <p />}
-      </div>
-    </form>
+          {!googleLoggedIn
+            ? (
+              <button type="submit" onClick={signUpWithGoogle} className={styles.submit_buttons}>Sign Up With Google</button>
+            )
+            : <p />}
+        </div>
+      </form>
+    </div>
   );
 
   return (
     <div>
-      {SigninForm}
+      <img src={UpperRight} alt="upper right design" className={styles.design_top} />
+      <div className={styles.container}>
+        <div className={styles.left_column}>
+          <img src={LoginFamily} alt="fotc family" className={styles.family_img} />
+          <p>
+            Already have an account?
+            {' '}
+            <a href="/login">Log In</a>
+          </p>
+        </div>
+        {SigninForm}
+      </div>
+      <img src={BottomLeft} alt="bottom left design" className={styles.design_bottom} />
     </div>
 
   );
