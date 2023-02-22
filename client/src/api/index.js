@@ -9,12 +9,13 @@ export const getAllProfiles = async() => {
     }
     catch(error){
         console.log(error.message)
+        console.log("could not get all profiles")
     }
 }
 
-export const getModulebyId = async() => { //gets ID of root module that the user clicked on 
+export const getModulebyId = async(id, currRole) => { //gets ID of root module that the user clicked on 
     try{
-        const module = await axios.get(`${url}/getModulebyId`);
+        const module = await axios.get(`${url}/getModulebyId/${id}/${currRole}`);
         return module;
     }
     catch(error){
@@ -23,13 +24,26 @@ export const getModulebyId = async() => { //gets ID of root module that the user
     }
 }
 
-export const getModuleChild = async() => {
+export const getGoogleaccount = async() => {
     try{
-        const modules = await axios.get(`${url}/getModulechild`);
-        return modules;
+        const account = await axios.get(`${url}/getGoogleaccount/:googleAccount`);
+        return account;
     }
     catch(error){
         console.log(error.message)
+        console.log("could not get google account")
+    }
+}
+
+export const getUsers = async(users) => {
+    try{
+        const user = await axios.get(`${url}/getUsers/${users}`);
+        console.log("axios user returns", user)
+        return user;
+    }
+    catch(error){
+        console.log(error.message)
+        console.log("could not get user")
     }
 }
 //to use this function to get all profiles, put the following in a useEffect: 

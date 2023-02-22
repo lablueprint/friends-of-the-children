@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import * as api from '../api';
 
 /**
  * to resolve the warning about crypto, add fallback options
@@ -28,35 +29,10 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const navigate = useNavigate();
   // const profile = useRef();
 
-  const getUsers = (usernameSearch) => {
-    console.log('called users');
-    db.collection('profiles')
-      .where('username', '==', usernameSearch)
-      .get()
-      .then((sc) => {
-        // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-        sc.forEach((doc) => {
-          const data = doc.data();
-          data.id = doc.id;
-          // console.log(data);
-          setProfile(data);
-        });
-        // if (data != null) {
-        //   bcrypt.compare(password, data.password) // compare passwords
-        //     .then((isValid) => {
-        //       if (isValid) { // check whether it is a valid credential
-        //         console.log('login successful');
-        //         const { password: profilePassword, ...userProfile } = data; // peform destruction to get profile w/o password
-        //         updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
-        //         navigate('/modules');
-        //       } else {
-        //         console.log('invalid credentials');
-        //       }
-        //     })
-        //     .catch(); // do error checking here if necessary
-        //   setPassword('');
-        // }
-      });
+  const getUsers = async (usernameSearch) => {
+    console.log("this is usernamesearch in getusers", usernameSearch)
+    const {firebaseUsername} = await api.getUsers(usernameSearch);
+    return firebaseUsername;
   };
 
   useEffect(() => {
@@ -64,6 +40,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     console.log(password);
     // check the hash password only if profile is not empty
     if (profile !== null) {
+      console.log("this is profile", profile)
       console.log(true);
       if (!profile.google) {
         bcrypt.compare(password, profile.password) // compare passwords
@@ -91,19 +68,9 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   const provider = new GoogleAuthProvider();
 
-  const getGoogleAccount = (userEmail) => {
-    db.collection('profiles')
-      .where('email', '==', userEmail)
-      .get()
-      .then((sc) => {
-        // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-        sc.forEach((doc) => {
-          const data = doc.data();
-          data.id = doc.id;
-          // console.log(data);
-          setProfile(data);
-        });
-      });
+  const getGoogleAccount = async (userEmail) => {
+    const {account} = await api.getGoogleaccount(userEmail);
+    return account
   };
 
   function signInWithGoogle() {
@@ -122,7 +89,8 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
         // setGoogleLoggedIn(true);
         // setEmail(googleUser.email);
-        getGoogleAccount(googleUser.email);
+        const account = getGoogleAccount(googleUser.email);
+        setProfile(account);
         // setUsername(googleUser.displayName);
       // ...
       }).catch((error) => {
@@ -141,10 +109,13 @@ function Login({ updateAppProfile }) { // deconstruct the function props
       });
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     console.log('called');
     event.preventDefault(); // this prevents from page to be refreshing
-    getUsers(username);
+    await getUsers(username).then((profileUsername) => {
+    setProfile(profileUsername);
+    console.log("this is username", profileUsername);
+    });
     // setUsername('');
     // setPassword('');
   };
