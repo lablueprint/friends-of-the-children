@@ -70,7 +70,6 @@ router.get('/getGoogleaccount/:googleAccount', async (req, res) => {
 
 router.get('/getUsers/:users', async (req, res) => {
   const usernameSearch = req.params.users;
-  console.log(usernameSearch);
   let userData;
   console.log('this is usernameSearch', usernameSearch);
   const profile = await db.collection('profiles').where('username', '==', usernameSearch).get().then(async (sc) => {
