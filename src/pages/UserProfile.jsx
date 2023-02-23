@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { TextField } from '@mui/material';
+import {
+  TextField, Select, MenuItem, FormControl, InputLabel,
+} from '@mui/material';
 import { db } from './firebase';
 
 function UserProfile({ profile, updateAppProfile }) {
@@ -24,6 +26,7 @@ function UserProfile({ profile, updateAppProfile }) {
         setUpdateProfileMessage('Profile Successfully Updated!');
         updateAppProfile(updatedProfile);
         setEditProfile(false);
+        window.location.reload();
       })
       .catch((error) => {
         setUpdateProfileMessage('We ran into an error updating your profile!');
@@ -92,17 +95,43 @@ function UserProfile({ profile, updateAppProfile }) {
       <p>
         Role:
         {' '}
-        <TextField
-          id="role"
-          label="Role"
-          defaultValue={profile.role}
-          value={updatedProfile.role}
-          InputProps={{
-            readOnly: !editProfile,
-          }}
-          onChange={(event) => HandleChange(event, 'role')}
-          variant="filled"
-        />
+        <FormControl>
+          <InputLabel>Role</InputLabel>
+          <Select
+            id="role"
+            label="Role"
+            defaultValue={profile.role}
+            value={updatedProfile.role}
+            disabled={!editProfile}
+            onChange={(event) => HandleChange(event, 'role')}
+            variant="filled"
+          >
+            <MenuItem value="Caregiver">Caregiver</MenuItem>
+            <MenuItem value="Mentor">Mentor</MenuItem>
+            <MenuItem value="Admin">Admin</MenuItem>
+          </Select>
+        </FormControl>
+      </p>
+      )}
+      {profile && profile.serviceArea && (
+      <p>
+        Service Area:
+        {' '}
+        <FormControl sx={{ m: 1, minWidth: 100 }}>
+          <InputLabel>Service Area</InputLabel>
+          <Select
+            id="serviceArea"
+            label="Service Area"
+            defaultValue={profile.serviceArea}
+            value={updatedProfile.serviceArea}
+            disabled={!editProfile}
+            onChange={(event) => HandleChange(event, 'serviceArea')}
+            variant="filled"
+          >
+            <MenuItem value="AV">AV</MenuItem>
+            <MenuItem value="MS">MS</MenuItem>
+          </Select>
+        </FormControl>
       </p>
       )}
       {profile && profile.username && (
