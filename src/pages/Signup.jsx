@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import bcrypt from 'bcryptjs';
 import PropTypes from 'prop-types';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import {
+  TextField, Select, MenuItem, FormControl, InputLabel,
+} from '@mui/material';
 
 import { useNavigate } from 'react-router-dom';
 import { db } from './firebase';
@@ -10,12 +13,16 @@ function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [serviceArea, setServiceArea] = useState('');
+  const [serviceArea, setServiceArea] = useState('AV');
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
+  const [usernames, setUsernames] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [userErrorMessage, setUserErrorMessage] = useState('');
+  const [passErrorMessage, setPassErrorMessage] = useState('');
+  const [confirmError, setConfirmError] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
 
   const provider = new GoogleAuthProvider();
@@ -54,122 +61,206 @@ function Signup({ updateAppProfile }) {
       });
   }
 
+  const readProfiles = () => {
+    const tempUsers = [];
+    db.collection('profiles').get().then((sc) => {
+      sc.forEach((doc) => {
+        const data = doc.data();
+        if (data && data.username) {
+          tempUsers.push(data.username);
+        }
+      });
+    });
+    setUsernames(tempUsers);
+  };
+
+  useEffect(
+    readProfiles,
+    [],
+  );
+
   const onSubmit = () => {
-    console.log('entered first');
+    let isValid = true;
+    setConfirmError(false);
+    setUsernameError(false);
+    setUserErrorMessage('');
+    setPassErrorMessage('');
+    if (usernames.includes(username)) {
+      setUsernameError(true);
+      setUserErrorMessage('Username already exists!');
+      isValid = false;
+    }
     if (password !== confirmPassword) {
-      setErrorMessage(errorMessage, 'Passwords must match!');
+      setConfirmError(true);
+      setPassErrorMessage('Passwords don\'t match!');
+      isValid = false;
     }
-    console.log('Entered here');
-
-    if (!googleLoggedIn) {
-      bcrypt.hash(password, 10) // asychronous hashing function
-        .then((hashedPassword) => {
-          const data = {
-            firstName,
-            lastName,
-            email,
-            serviceArea,
-            role,
-            username,
-            password: hashedPassword,
-            google: false,
-          };
-          console.log('google not used - entered');
-          db.collection('profiles').doc().set(data);
-          updateAppProfile(data);
-          console.log('Google not used - Finished');
-        });
-    } else {
-      const data = {
-        firstName,
-        lastName,
-        email,
-        serviceArea,
-        role,
-        username,
-        google: true,
-      };
-      console.log('Google used - entered');
-      db.collection('profiles').doc().set(data);
-      updateAppProfile(data);
-      console.log('Google used - finished');
+    if (isValid) {
+      if (!googleLoggedIn) {
+        bcrypt.hash(password, 10) // asychronous hashing function
+          .then((hashedPassword) => {
+            const data = {
+              firstName,
+              lastName,
+              email,
+              serviceArea,
+              role,
+              username,
+              password: hashedPassword,
+              google: false,
+            };
+            console.log('google not used - entered');
+            db.collection('profiles').doc().set(data);
+            updateAppProfile(data);
+            console.log('Google not used - Finished');
+          });
+      } else {
+        const data = {
+          firstName,
+          lastName,
+          email,
+          serviceArea,
+          role,
+          username,
+          google: true,
+        };
+        console.log('Google used - entered');
+        db.collection('profiles').doc().set(data);
+        updateAppProfile(data);
+        console.log('Google used - finished');
+      }
+      navigate('/modules');
+      // reset forms
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setServiceArea('AV');
+      setRole('');
+      setUsername('');
+      setPassword('');
+      setConfirmPassword('');
     }
-
-    navigate('/modules');
-
-    // reset forms
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setServiceArea('');
-    setRole('Caregiver');
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
   };
 
   const SigninForm = (
-    <form onSubmit={onSubmit} id="signinform">
+    <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
       <div>
-        <label htmlFor="FirstName">
-          <br />
-          <input type="text" name="FirstName" value={firstName} placeholder="Enter your first name" onChange={(e) => setFirstName(e.target.value)} required />
-        </label>
-        <label htmlFor="LastName">
-          <br />
-          <input type="text" name="LastName" value={lastName} placeholder="Enter your last name" onChange={(e) => setLastName(e.target.value)} required />
-        </label>
-        <label htmlFor="ServiceArea">
-          <br />
-          <input type="text" name="ServiceArea" value={serviceArea} placeholder="Enter Service Area" onChange={(e) => setServiceArea(e.target.value)} required />
-        </label>
-        <label htmlFor="Role">
-          <br />
-          Choose a role:
-          <select name="Role" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="Caregiver">Caregiver</option>
-            <option value="Mentor">Mentor</option>
-          </select>
-        </label>
-        <label htmlFor="Username">
-          <br />
-
-          <input type="text" name="Username" value={username} placeholder="Enter your username" onChange={(e) => setUsername(e.target.value)} required />
-        </label>
-
+        <br />
+        <TextField
+          id="firstName"
+          label="First Name"
+          defaultValue="Enter your first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+          variant="filled"
+        />
+        &nbsp;
+        <TextField
+          id="lastName"
+          label="Last Name"
+          defaultValue="Enter your last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          variant="filled"
+        />
+        &nbsp;
+        <FormControl sx={{ minWidth: 100 }}>
+          <InputLabel>Service Area</InputLabel>
+          <Select
+            id="serviceArea"
+            label="Service Area"
+            defaultValue="AV"
+            value={serviceArea}
+            onChange={(e) => setServiceArea(e.target.value)}
+            variant="filled"
+          >
+            <MenuItem value="AV">AV</MenuItem>
+            <MenuItem value="MS">MS</MenuItem>
+          </Select>
+        </FormControl>
+        &nbsp;
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel>Role</InputLabel>
+          <Select
+            id="role"
+            label="Role"
+            defaultValue="Role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            variant="filled"
+          >
+            <MenuItem value="Caregiver">Caregiver</MenuItem>
+            <MenuItem value="Mentor">Mentor</MenuItem>
+            <MenuItem value="Admin">Admin</MenuItem>
+          </Select>
+        </FormControl>
+        &nbsp;
+        <br />
+        <br />
+        <TextField
+          id="username"
+          label="Username"
+          defaultValue="Enter your username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          error={usernameError}
+          helperText={userErrorMessage}
+          required
+          variant="filled"
+        />
+        &nbsp;
         {!googleLoggedIn
           ? (
             <>
-              <label htmlFor="Password">
-                <br />
-                <input type="password" name="Password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              </label>
-              <label htmlFor="ConfirmPassword">
-                <br />
-                <input type="password" name="ConfirmPassword" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-              </label>
-              <label htmlFor="Email">
-                <br />
-                <input type="email" name="Email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </label>
+              <TextField
+                id="password"
+                label="Password"
+                defaultValue="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                variant="filled"
+              />
+              &nbsp;
+              <TextField
+                id="confirmPassword"
+                label="Confirm Password"
+                defaultValue="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={confirmError}
+                helperText={passErrorMessage}
+                required
+                variant="filled"
+              />
+              &nbsp;
+              <TextField
+                id="email"
+                label="Email"
+                type="email"
+                defaultValue="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                variant="filled"
+              />
               <br />
             </>
           )
           : <p />}
 
-        {/* <button type="button">Submit</button> */}
-
         <label htmlFor="Submit">
           <br />
-          <input type="submit" />
+          <input type="submit" value="Sign Up" />
         </label>
 
         {!googleLoggedIn
           ? (
-            <button type="button" onClick={signUpWithGoogle}>Google Auth</button>
+            <button type="submit" onClick={signUpWithGoogle}>Google Auth</button>
           )
           : <p />}
-
       </div>
     </form>
   );
