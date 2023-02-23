@@ -112,10 +112,8 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const handleSubmit = async (event) => {
     console.log('called');
     event.preventDefault(); // this prevents from page to be refreshing
-    await getUsers(username).then((profileUsername) => {
-    setProfile(profileUsername);
-    console.log("this is username", profileUsername);
-    });
+    const {data} = await api.getUsers(username);
+    setProfile(data);
     // setUsername('');
     // setPassword('');
   };
