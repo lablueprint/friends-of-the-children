@@ -24,9 +24,9 @@ export const getModulebyId = async(id, currRole) => { //gets ID of root module t
     }
 }
 
-export const getGoogleaccount = async() => {
+export const getGoogleaccount = async(googleEmail) => {
     try{
-        const account = await axios.get(`${url}/getGoogleaccount/:googleAccount`);
+        const account = await axios.get(`${url}/getGoogleaccount/${googleEmail}`);
         return account;
     }
     catch(error){

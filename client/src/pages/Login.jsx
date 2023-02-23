@@ -60,48 +60,43 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     }
   }, [profile, navigate, updateAppProfile]);
 
-  // const provider = new GoogleAuthProvider();
+  const provider = new GoogleAuthProvider();
 
-  // const getGoogleAccount = async (userEmail) => {
-  //   const {account} = await api.getGoogleaccount(userEmail);
-  //   return account
-  // };
+  function signInWithGoogle() {
+    const auth = getAuth();
+    signInWithPopup(auth, provider)
+      .then(async (result) => {
+        console.log('SC');
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        console.log('credential: ', credential);
+        const token = credential.accessToken;
+        console.log(token);
+        // The signed-in user info.
+        const { user: googleUser } = result;
+        console.log(googleUser);
 
-  // function signInWithGoogle() {
-  //   const auth = getAuth();
-  //   signInWithPopup(auth, provider)
-  //     .then((result) => {
-  //       console.log('SC');
-  //       // This gives you a Google Access Token. You can use it to access the Google API.
-  //       const credential = GoogleAuthProvider.credentialFromResult(result);
-  //       console.log('credential: ', credential);
-  //       const token = credential.accessToken;
-  //       console.log(token);
-  //       // The signed-in user info.
-  //       const { user: googleUser } = result;
-  //       console.log(googleUser);
+        // setGoogleLoggedIn(true);
+        // setEmail(googleUser.email);
+        const account = await api.getGoogleaccount(googleUser.email);
+        setProfile(account.data);
+        // setUsername(googleUser.displayName);
+      // ...
+      }).catch((error) => {
+      // Handle Errors here.
+        const errorCode = error.code;
+        console.log(errorCode);
 
-  //       // setGoogleLoggedIn(true);
-  //       // setEmail(googleUser.email);
-  //       const account = getGoogleAccount(googleUser.email);
-  //       setProfile(account);
-  //       // setUsername(googleUser.displayName);
-  //     // ...
-  //     }).catch((error) => {
-  //     // Handle Errors here.
-  //       const errorCode = error.code;
-  //       console.log(errorCode);
+        const googleErrorMessage = error.message;
+        console.log(googleErrorMessage);
 
-  //       const googleErrorMessage = error.message;
-  //       console.log(googleErrorMessage);
-
-  //       // The email of the user's account used.
-  //       // const { email } = error.customData;
-  //       // The AuthCredential type that was used.
-  //       // const credential = GoogleAuthProvider.credentialFromError(error);
-  //     // ...
-  //     });
-  // }
+        // The email of the user's account used.
+        // const { email } = error.customData;
+        // The AuthCredential type that was used.
+        // const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+      });
+  }
 
   const handleSubmit = async (event) => {
     console.log('called');
@@ -146,7 +141,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
           <input type="submit" />
         </label>
         <br />
-        {/* <button type="button" onClick={signInWithGoogle}>Continue with Google</button> */}
+        <button type="button" onClick={signInWithGoogle}>Continue with Google</button>
       </form>
     </div>
   );

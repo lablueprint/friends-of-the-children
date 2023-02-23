@@ -48,21 +48,19 @@ router.get('/getModulebyId/:id/:currRole', async (req, res) => {
 });
 
 router.get('/getGoogleaccount/:googleAccount', async (req, res) => {
-  const { googleAccount } = req.params;
+  const googleAccount  = req.params.googleAccount;
   let googleData;
   const account = await db.collection('profiles')
     .where('email', '==', googleAccount)
     .get()
-    .then((sc) => {
+    .then(async (sc) => {
     // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-
-      sc.forEach((doc) => {
-        const data = doc.data();
+      for (const doc of sc.docs) {
+        const data = await doc.data();
         data.id = doc.id;
-        // console.log(data);
-        profileData = data;
-      // setProfile(data); //set this in login.jsx
-      });
+        console.log('this is doc.data()', data);
+        googleData = data;
+      }
     });
   console.log(googleData);
   res.status(202).json(googleData);
@@ -76,13 +74,10 @@ router.get('/getUsers/:users', async (req, res) => {
     // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
     console.log('this is sc', sc.docs);
     for (const doc of sc.docs) {
-      // sc.forEach((doc) => {
       const data = await doc.data();
       data.id = doc.id;
-      // console.log(data);
       console.log('this is doc.data()', data);
       userData = data;
-      // });
     }
     // if (data != null) {
     //   bcrypt.compare(password, data.password) // compare passwords
