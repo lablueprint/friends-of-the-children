@@ -29,12 +29,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const navigate = useNavigate();
   // const profile = useRef();
 
-  const getUsers = async (usernameSearch) => {
-    console.log("this is usernamesearch in getusers", usernameSearch)
-    const {firebaseUsername} = await api.getUsers(usernameSearch);
-    return firebaseUsername;
-  };
-
   useEffect(() => {
     console.log(profile);
     console.log(password);
@@ -66,58 +60,58 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     }
   }, [profile, navigate, updateAppProfile]);
 
-  const provider = new GoogleAuthProvider();
+  // const provider = new GoogleAuthProvider();
 
-  const getGoogleAccount = async (userEmail) => {
-    const {account} = await api.getGoogleaccount(userEmail);
-    return account
-  };
+  // const getGoogleAccount = async (userEmail) => {
+  //   const {account} = await api.getGoogleaccount(userEmail);
+  //   return account
+  // };
 
-  function signInWithGoogle() {
-    const auth = getAuth();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log('SC');
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        console.log('credential: ', credential);
-        const token = credential.accessToken;
-        console.log(token);
-        // The signed-in user info.
-        const { user: googleUser } = result;
-        console.log(googleUser);
+  // function signInWithGoogle() {
+  //   const auth = getAuth();
+  //   signInWithPopup(auth, provider)
+  //     .then((result) => {
+  //       console.log('SC');
+  //       // This gives you a Google Access Token. You can use it to access the Google API.
+  //       const credential = GoogleAuthProvider.credentialFromResult(result);
+  //       console.log('credential: ', credential);
+  //       const token = credential.accessToken;
+  //       console.log(token);
+  //       // The signed-in user info.
+  //       const { user: googleUser } = result;
+  //       console.log(googleUser);
 
-        // setGoogleLoggedIn(true);
-        // setEmail(googleUser.email);
-        const account = getGoogleAccount(googleUser.email);
-        setProfile(account);
-        // setUsername(googleUser.displayName);
-      // ...
-      }).catch((error) => {
-      // Handle Errors here.
-        const errorCode = error.code;
-        console.log(errorCode);
+  //       // setGoogleLoggedIn(true);
+  //       // setEmail(googleUser.email);
+  //       const account = getGoogleAccount(googleUser.email);
+  //       setProfile(account);
+  //       // setUsername(googleUser.displayName);
+  //     // ...
+  //     }).catch((error) => {
+  //     // Handle Errors here.
+  //       const errorCode = error.code;
+  //       console.log(errorCode);
 
-        const googleErrorMessage = error.message;
-        console.log(googleErrorMessage);
+  //       const googleErrorMessage = error.message;
+  //       console.log(googleErrorMessage);
 
-        // The email of the user's account used.
-        // const { email } = error.customData;
-        // The AuthCredential type that was used.
-        // const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
-      });
-  }
+  //       // The email of the user's account used.
+  //       // const { email } = error.customData;
+  //       // The AuthCredential type that was used.
+  //       // const credential = GoogleAuthProvider.credentialFromError(error);
+  //     // ...
+  //     });
+  // }
 
   const handleSubmit = async (event) => {
     console.log('called');
     event.preventDefault(); // this prevents from page to be refreshing
-    const {data} = await api.getUsers(username);
-    setProfile(data);
+    const data = await api.getUsers(username);
+    
+    setProfile(data.data);
     // setUsername('');
     // setPassword('');
   };
-
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -152,7 +146,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
           <input type="submit" />
         </label>
         <br />
-        <button type="button" onClick={signInWithGoogle}>Continue with Google</button>
+        {/* <button type="button" onClick={signInWithGoogle}>Continue with Google</button> */}
       </form>
     </div>
   );
