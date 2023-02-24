@@ -73,7 +73,7 @@ color: #3F3F3F;
 
 .textfield{
     box-sizing: border-box;
-    border: 1.5px solid #D5D5D5;
+    /* border: 1.5px solid #D5D5D5 !important; */
     border-radius: 8px;
 }
 

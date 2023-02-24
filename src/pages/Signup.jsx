@@ -167,97 +167,101 @@ function Signup({ updateAppProfile }) {
           </Select>
         </FormControl>
         <p>Enter your information</p>
-        <TextField
-          id="firstName"
-          label="First Name"
-          defaultValue="Enter your first name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-          className={styles.textfield}
-        />
-        <TextField
-          id="lastName"
-          label="Last Name"
-          defaultValue="Enter your last name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-          className={styles.textfield}
-        />
-        <br />
-        {!googleLoggedIn
-          ? (
-            <TextField
-              id="email"
-              label="Email"
-              type="email"
-              defaultValue="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className={styles.textfield}
-            />
-          )
-          : <p />}
-        <TextField
-          id="username"
-          label="Username"
-          defaultValue="Enter your username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          error={usernameError}
-          helperText={userErrorMessage}
-          required
-          className={styles.textfield}
-        />
-        <br />
+        <div>
+          <TextField
+            id="firstName"
+            label="First Name"
+            defaultValue="Enter your first name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+            className={styles.textfield}
+          />
+          <TextField
+            id="lastName"
+            label="Last Name"
+            defaultValue="Enter your last name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+            className={styles.textfield}
+          />
+        </div>
+        <div>
+          {!googleLoggedIn
+            ? (
+              <TextField
+                id="email"
+                label="Email"
+                type="email"
+                defaultValue="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={styles.textfield}
+              />
+            )
+            : <p />}
+          <TextField
+            id="username"
+            label="Username"
+            defaultValue="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            error={usernameError}
+            helperText={userErrorMessage}
+            required
+            className={styles.textfield}
+          />
+        </div>
         {!googleLoggedIn
           ? (
             <>
-              <TextField
-                id="password"
-                label="Password"
-                defaultValue="Enter your password"
-                value={password}
-                type="password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className={styles.textfield}
-              />
-              <br />
-              <TextField
-                id="confirmPassword"
-                label="Confirm Password"
-                defaultValue="Confirm your password"
-                value={confirmPassword}
-                type="password"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                error={confirmError}
-                helperText={passErrorMessage}
-                required
-                className={styles.textfield}
-              />
-              <br />
+              <div>
+                <TextField
+                  id="password"
+                  label="Password"
+                  defaultValue="Enter your password"
+                  value={password}
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className={styles.textfield}
+                />
+              </div>
+              <div>
+                <TextField
+                  id="confirmPassword"
+                  label="Confirm Password"
+                  defaultValue="Confirm your password"
+                  value={confirmPassword}
+                  type="password"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  error={confirmError}
+                  helperText={passErrorMessage}
+                  required
+                  className={styles.textfield}
+                />
+              </div>
             </>
           )
           : <p />}
-        <br />
-        <FormControl sx={{ minWidth: 100 }}>
-          <InputLabel>Service Area</InputLabel>
-          <Select
-            id="serviceArea"
-            label="Service Area"
-            defaultValue="AV"
-            value={serviceArea}
-            onChange={(e) => setServiceArea(e.target.value)}
-            className={styles.textfield}
-          >
-            <MenuItem value="AV">AV</MenuItem>
-            <MenuItem value="MS">MS</MenuItem>
-          </Select>
-        </FormControl>
-        <br />
+        <div>
+          <FormControl sx={{ minWidth: 100 }}>
+            <InputLabel>Service Area</InputLabel>
+            <Select
+              id="serviceArea"
+              label="Service Area"
+              defaultValue="AV"
+              value={serviceArea}
+              onChange={(e) => setServiceArea(e.target.value)}
+              className={styles.textfield}
+            >
+              <MenuItem value="AV">AV</MenuItem>
+              <MenuItem value="MS">MS</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
 
         <div>
           <label htmlFor="Submit" className={styles.submit_buttons}>
