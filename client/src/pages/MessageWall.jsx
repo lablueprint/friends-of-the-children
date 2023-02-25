@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { app, db } from './firebase';
 import Message from '../components/Message';
+import * as api from '../api'
 
 function MessageWall({ profile }) {
   const [title, setTitle] = useState('');
@@ -14,34 +15,33 @@ function MessageWall({ profile }) {
 
   const { role, serviceArea } = profile;
 
-  const getMessages = () => {
-    db.collection('messages').get().then((sc) => {
-      const message = [];
-      sc.forEach((doc) => {
-        const dat = doc.data();
-        dat.id = doc.id;
-        message.push(dat);
-      });
-
-      // sort in reverse chronological order (i.e. newest at first)
-      message.sort((a, b) => {
-        if (a.date < b.date) {
-          return -1;
-        }
-        if (a.date > b.date) {
-          return 1;
-        }
-        return 0;
-      });
-
-      setMessages(message);
-    });
+  const getMessagesfunc = async () => {
+    const {data} = await api.getMessages();
+    console.log(data);
+    setMessages(data);
+    // return message;
   };
 
-  useEffect(
-    getMessages,
-    [],
-  );
+  useEffect(()=>{
+    console.log("this is user messages", messages);
+    console.log("this is filtered and pinned messages", messages.filter(
+      (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+    && message.target.includes(role.toLowerCase()))),
+    ));
+    console.log("this is unpinned filtered messages", messages.filter(
+      (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+    && message.target.includes(role.toLowerCase()))),
+    ));
+  }, [messages])
+  // const getMessages = () => {
+  //     getMessagesfunc().then((message) => {
+        
+  //     })
+  // };
+
+  useEffect(()=>{
+    getMessagesfunc();
+  },[]);
 
   const updatePinned = (id, pinned) => {
     // deep copy for useState to work properly
@@ -58,7 +58,7 @@ function MessageWall({ profile }) {
     }, { merge: true });
   };
 
-  const submitData = () => {
+  const submitData = async () => {
     if (mentor) {
       target.push('mentor');
     }
@@ -75,11 +75,10 @@ function MessageWall({ profile }) {
       date: app.firebase.firestore.Timestamp.fromDate(new Date()),
     };
 
-    db.collection('messages').doc().set(data);
-    setTitle('');
-    setBody('');
-    setmsgServiceArea('');
-    getMessages();
+    db.collection('messages').doc().set(data).then(getMessagesfunc).then(()=>{
+      setTitle('');
+      setBody('');
+      setmsgServiceArea('');});
   };
 
   const messageForm = (

@@ -46,6 +46,17 @@ export const getUsers = async(users) => {
         console.log("could not get user")
     }
 }
+
+export const getMessages = async() => {
+    try{
+        const messages = await axios.get(`${url}/getMessages`);
+        return messages;
+    }
+    catch(error){
+        console.log(error.message);
+        console.log("could not get messages")
+    }
+}
 //to use this function to get all profiles, put the following in a useEffect: 
 // async function fetchProfiles(){
 //     const {data} = await api.getAllProfiles();

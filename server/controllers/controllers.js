@@ -90,9 +90,36 @@ const getUsers =  async (req, res) => {
     res.status(202).json(userData);
   };
 
+  const getMessages = async (req, res) => {
+    let message = [];
+    await db.collection('messages').get().then((sc) => {
+      sc.forEach((doc) => {
+        const dat = doc.data();
+        dat.id = doc.id;
+        message.push(dat);
+      });
+
+      // sort in reverse chronological order (i.e. newest at first)
+      message.sort((a, b) => {
+        if (a.date < b.date) {
+          return -1;
+        }
+        if (a.date > b.date) {
+          return 1;
+        }
+        return 0;
+      });
+      console.log(message);
+      res.status(202).json(message);
+  
+    })
+
+  };
+
   export {
    getAllProfiles,
    getModulebyId,
    getGoogleaccount,
    getUsers,
+   getMessages,
   }
