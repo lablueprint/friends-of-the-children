@@ -1,5 +1,6 @@
 import { db } from '../firebase.js';
 const getAllProfiles = async (req, res) => {
+    console.log("getAllProfiles");
     const sc = await db.collection('profiles').get();
   
     const p = [];
@@ -13,6 +14,7 @@ const getAllProfiles = async (req, res) => {
   };
   
 const getModulebyId = async (req, res) => {
+  console.log("getModulebyId"); 
     const moduleId = req.params.id;
     const { currRole } = req.params;
     console.log('this is moduleId,', moduleId);
@@ -39,6 +41,7 @@ const getModulebyId = async (req, res) => {
   };
   
 const getGoogleaccount =  async (req, res) => {
+  console.log("getGoogleaccount");
     const googleAccount  = req.params.googleAccount;
     let googleData;
     const account = await db.collection('profiles')
@@ -58,6 +61,7 @@ const getGoogleaccount =  async (req, res) => {
   };
   
 const getUsers =  async (req, res) => {
+  console.log("getUsers");
     const usernameSearch = req.params.users;
     let userData;
     console.log('this is usernameSearch', usernameSearch);
