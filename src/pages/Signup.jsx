@@ -5,8 +5,8 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
-
 import { useNavigate } from 'react-router-dom';
+import Popup from './Popup';
 import { db } from './firebase';
 
 function Signup({ updateAppProfile }) {
@@ -24,6 +24,9 @@ function Signup({ updateAppProfile }) {
   const [confirmError, setConfirmError] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
+  const [googleError, setGoogleError] = useState(false);
+  const [googErrorCode, setGoogleErrorCode] = useState(false);
+  const [googErrorMessage, setGoogleErrorMessage] = useState('');
 
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
@@ -47,12 +50,9 @@ function Signup({ updateAppProfile }) {
       // ...
       }).catch((error) => {
       // Handle Errors here.
-        const errorCode = error.code;
-        console.log(errorCode);
-
-        const googleErrorMessage = error.message;
-        console.log(googleErrorMessage);
-
+        setGoogleError(true);
+        setGoogleErrorCode(error.code);
+        setGoogleErrorMessage(error.message);
         // The email of the user's account used.
         // const { email } = error.customData;
         // The AuthCredential type that was used.
@@ -268,8 +268,10 @@ function Signup({ updateAppProfile }) {
   return (
     <div>
       {SigninForm}
+      {usernameError ? <Popup errorTitle="Signup" errorCode={userErrorMessage} /> : null}
+      {confirmError ? <Popup errorTitle="Signup" errorCode={passErrorMessage} /> : null}
+      {googleError ? <Popup errorTitle="Signup" errorCode={googErrorCode.concat(' ', googErrorMessage)} /> : null}
     </div>
-
   );
 }
 
