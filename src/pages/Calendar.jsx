@@ -3,7 +3,7 @@
 
 // export default Calendar;
 
-import { React, useState } from 'react';
+import { React, useState, createRef } from 'react';
 // import Calendar from '@ericz1803/react-google-calendar';
 // import { Calendar, momentLocalizer } from 'react-big-calendar';
 // import { Calendar } from '@fullcalendar/core';
@@ -13,102 +13,63 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import styles from '../styles/Calendar.module.css';
 
-// function Calendar({ profile }) {
-//   // remove later
-//   console.log(profile);
-
+// function renderEventContent(eventInfo) {
+//   console.log(eventInfo);
 //   return (
-//     <div>
-//       Calendar page
-//     </div>
+//     <>
+//       <b>{eventInfo.timeText}</b>
+//       <i>{eventInfo.event.title}</i>
+//       <p>{eventInfo.event.extendedProps.location}</p>
+//       <p>
+//         {eventInfo.event.start.toLocaleString()}
+//         {' '}
+//         -
+//         {' '}
+//         {eventInfo.event.end.toLocaleString()}
+//       </p>
+
+//     </>
 //   );
 // }
 
-// calendar.propTypes = {
-//   profile: PropTypes.shape({
-//     firstName: PropTypes.string.isRequired,
-//     lastName: PropTypes.string.isRequired,
-//     username: PropTypes.string.isRequired,
-//     email: PropTypes.string.isRequired,
-//     role: PropTypes.string.isRequired,
-//     serviceArea: PropTypes.string.isRequired,
-//   }).isRequired,
-// };
-
-// const API_KEY = process.env.REACT_APP_FIREBASE_CALENDAR_ID;
-// const calendars = [
-//   { calendarId: 'hejwa9@gmail.com' },
-//   {
-//     calendarId: 'ayubali2443@gmail.com',
-//     color: '#B241D1', // optional, specify color of calendar 2 events
-//   },
-// ];
-
-function renderEventContent(eventInfo) {
-  console.log(eventInfo);
-  return (
-    <>
-      <b>{eventInfo.timeText}</b>
-      <i>{eventInfo.event.title}</i>
-      <p>{eventInfo.event.extendedProps.location}</p>
-      <p>
-        {eventInfo.event.start.toLocaleString()}
-        {' '}
-        -
-        {' '}
-        {eventInfo.event.end.toLocaleString()}
-      </p>
-
-    </>
-  );
-}
-
 function Calendar() {
-  const handleEventClick = (eventInfo) => {
-    eventInfo.jsEvent.preventDefault();
-    // alert('a day has been clicked');
-    console.log(eventInfo.event.title);
-    if (eventInfo.event.extendedProps.location) {
-      console.log('Location: ', eventInfo.event.extendedProps.location);
-    } else {
-      console.log('Location: No Location');
-    }
-    console.log('Start time: ', eventInfo.event.start);
-    console.log('End time: ', eventInfo.event.end);
-  };
-
-  const calendarRef = React.createRef();
+  // const handleEventClick = (eventInfo) => {
+  //   eventInfo.jsEvent.preventDefault();
+  //   // alert('a day has been clicked');
+  //   console.log(eventInfo.event.title);
+  //   if (eventInfo.event.extendedProps.location) {
+  //     console.log('Location: ', eventInfo.event.extendedProps.location);
+  //   } else {
+  //     console.log('Location: No Location');
+  //   }
+  //   console.log('Start time: ', eventInfo.event.start);
+  //   console.log('End time: ', eventInfo.event.end);
+  // };
 
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [descrip, setDescrip] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const calendarRef = createRef();
 
-  const addEvent = (e) => {
+  const addEvent = () => {
+    const event = {
+      title,
+      start: startTime,
+      end: endTime,
+      editable: true,
+      // description: descrip,
+      // location,
+    };
+    console.log(event);
     const api = calendarRef.current.getApi();
-    api.addEvent(e);
+    api.addEvent(event);
   };
 
   return (
     <div className={styles.calendar}>
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        googleCalendarApiKey={process.env.REACT_APP_FIREBASE_CALENDAR_ID}
-        events={{
-          googleCalendarId: 'fofthechildren@gmail.com',
-          className: 'gcal-event',
-        }}
-        selectable
-        eventClick={handleEventClick}
-        eventContent={renderEventContent}
-        showNonCurrentDates={false}
-      />
-
       <form action="post">
-        <h1>Upload Module</h1>
         Title:
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
         Description:
@@ -120,9 +81,29 @@ function Calendar() {
         End Time:
         <input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
 
-        <button type="button" onClick={(e) => addEvent(e)}>Submit</button>
+        <button className={styles.submit_button} type="button" onClick={(e) => addEvent(e)}>Add Event</button>
 
       </form>
+
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        selectable
+        editable
+        selectMirror
+        dayMaxEvents
+        eventBorderColor="black"
+        googleCalendarApiKey={process.env.REACT_APP_FIREBASE_CALENDAR_ID}
+        events={{
+          googleCalendarId: 'fofthechildren@gmail.com',
+          className: 'gcal-event',
+        }}
+
+        // eventClick={handleEventClick}
+        // eventContent={renderEventContent}
+        // showNonCurrentDates={false}
+      />
 
     </div>
   );
