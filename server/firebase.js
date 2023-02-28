@@ -1,19 +1,6 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-// import findConfig from 'find-config';
-import dotEnv from 'dotenv';
-
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
-
-// dotEnv.config({ path: findConfig('.env') });
-dotEnv.config();
-
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -24,7 +11,7 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
-console.log(process.env.REACT_APP_FIREBASE_API_KEY)
+console.log(process.env.REACT_APP_FIREBASE_API_KEY);
 const app = firebase.initializeApp(firebaseConfig);
 const auth = app.auth();
 const db = app.firestore();
