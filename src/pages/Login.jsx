@@ -199,6 +199,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
             <TextField
               id="password"
               label="Password"
+              type="password"
               defaultValue="Enter your password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
