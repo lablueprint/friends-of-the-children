@@ -148,7 +148,7 @@ function Signup({ updateAppProfile }) {
   };
 
   const SigninForm = (
-    <div className={`${styles.signinForm} ${styles.full_width}`}>
+    <div className={styles.signinForm}>
       <h1 className={styles.bigtitle}>Sign Up</h1>
       <p>Please identify your role</p>
       <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
@@ -237,44 +237,40 @@ function Signup({ updateAppProfile }) {
         </div>
         {!googleLoggedIn
           ? (
-            <>
-              <div>
-                <TextField
-                  id="password"
-                  label="Password"
-                  defaultValue="Enter your password"
-                  value={password}
-                  type="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className={`${styles.textfield} ${styles.full_width}`}
-                  inputProps={{
-                    style: {
-                      height: fieldHeight,
-                    },
-                  }}
-                />
-              </div>
-              <div>
-                <TextField
-                  id="confirmPassword"
-                  label="Confirm Password"
-                  defaultValue="Confirm your password"
-                  value={confirmPassword}
-                  type="password"
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  error={confirmError}
-                  helperText={passErrorMessage}
-                  required
-                  className={`${styles.textfield} ${styles.full_width}`}
-                  inputProps={{
-                    style: {
-                      height: fieldHeight,
-                    },
-                  }}
-                />
-              </div>
-            </>
+            <div>
+              <TextField
+                id="password"
+                label="Password"
+                defaultValue="Enter your password"
+                value={password}
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className={`${styles.textfield} ${styles.half_width}`}
+                inputProps={{
+                  style: {
+                    height: fieldHeight,
+                  },
+                }}
+              />
+              <TextField
+                id="confirmPassword"
+                label="Confirm Password"
+                defaultValue="Confirm your password"
+                value={confirmPassword}
+                type="password"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={confirmError}
+                helperText={passErrorMessage}
+                required
+                className={`${styles.textfield} ${styles.half_width}`}
+                inputProps={{
+                  style: {
+                    height: fieldHeight,
+                  },
+                }}
+              />
+            </div>
           )
           : <p />}
         <div>
