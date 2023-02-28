@@ -1,12 +1,4 @@
-// import React from 'react';
-// import PropTypes from 'prop-types';
-
-// export default Calendar;
-
 import { React, useState, createRef } from 'react';
-// import Calendar from '@ericz1803/react-google-calendar';
-// import { Calendar, momentLocalizer } from 'react-big-calendar';
-// import { Calendar } from '@fullcalendar/core';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
@@ -33,6 +25,13 @@ import styles from '../styles/Calendar.module.css';
 // }
 
 function Calendar() {
+  const [title, setTitle] = useState('');
+  const [location, setLocation] = useState('');
+  const [descrip, setDescrip] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const calendarRef = createRef();
+
   // const handleEventClick = (eventInfo) => {
   //   eventInfo.jsEvent.preventDefault();
   //   // alert('a day has been clicked');
@@ -46,14 +45,8 @@ function Calendar() {
   //   console.log('End time: ', eventInfo.event.end);
   // };
 
-  const [title, setTitle] = useState('');
-  const [location, setLocation] = useState('');
-  const [descrip, setDescrip] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const calendarRef = createRef();
-
-  const addEvent = () => {
+  const addEvent = (e) => {
+    e.preventDefault();
     const event = {
       title,
       start: startTime,
@@ -69,20 +62,18 @@ function Calendar() {
 
   return (
     <div className={styles.calendar}>
-      <form action="post">
+      <form onSubmit={(e) => addEvent(e)}>
         Title:
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
         Description:
         <input type="text" value={descrip} onChange={(e) => setDescrip(e.target.value)} />
         Location:
         <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} />
         Start Time:
-        <input type="text" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+        <input type="date" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
         End Time:
-        <input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-
-        <button className={styles.submit_button} type="button" onClick={(e) => addEvent(e)}>Add Event</button>
-
+        <input type="date" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+        <button className={styles.submit_button} type="submit">Add Event</button>
       </form>
 
       <FullCalendar
@@ -93,16 +84,14 @@ function Calendar() {
         editable
         selectMirror
         dayMaxEvents
-        eventBorderColor="black"
+        fixedWeekCount={false}
         googleCalendarApiKey={process.env.REACT_APP_FIREBASE_CALENDAR_ID}
         events={{
           googleCalendarId: 'fofthechildren@gmail.com',
           className: 'gcal-event',
         }}
-
         // eventClick={handleEventClick}
         // eventContent={renderEventContent}
-        // showNonCurrentDates={false}
       />
 
     </div>
