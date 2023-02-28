@@ -38,22 +38,33 @@ color: #3F3F3F;
 .container{
     display: flex;
     flex-direction: row;
-    margin-top: 20px;
+    height: 97vh;
 }
 
 .left_column{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     width: 50%;
 }
 
 .signinForm{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     width: 50%;
     text-align: left;
-    margin-left: 30px;
+    margin-left: 30px !important;
+}
+
+.signinForm p{
+    margin: 10px 0 10px 0 !important;
 }
 
 .family_img{
     width: 30vw;
-    margin: 20px;
+    margin-left: 60px;
+    margin-bottom: 20px;
 }
 
 .design_top{
@@ -61,6 +72,7 @@ color: #3F3F3F;
     z-index: -1000;
     right: 0;
     top: 0;
+    max-width: 100%;
 }
 
 .design_bottom{
@@ -71,16 +83,45 @@ color: #3F3F3F;
     max-width: 100%;
 }
 
+.design_top2{
+    position: absolute;
+    z-index: -1000;
+    left: 0;
+    top: 0;
+    max-width: 100%;
+    height: 300px;
+}
+
+.design_bottom2{
+    position: absolute;
+    z-index: -1000;
+    right: 0;
+    bottom: 0;
+    max-width: 100%;
+    height: 230px;
+}
+
 .textfield{
     box-sizing: border-box;
     /* border: 1.5px solid #D5D5D5 !important; */
     border-radius: 8px;
 }
 
-.submit_buttons{
+.full_width{
     width: 60%;
     margin: 0;
-    margin-bottom: 20px;
+    margin-bottom: 15px !important;
+}
+
+.half_width{
+    width: 29.5%;
+    margin: 0 10px 15px 0 !important;
+}
+
+.button_width{
+    width: 100%;
+    margin: 0;
+    margin-bottom: 20px !important;
 }
 
 .signup_button{
@@ -88,19 +129,38 @@ color: #3F3F3F;
     color: white;
     background: #00AAEE;
     border-color: transparent;
-    border-radius: 10px;
+    border-radius: 5px;
     width: 100%;
-    height: 40px;
+    height: 50px;
 }
 
 .google_button{
     background: transparent;
-    border-radius: 10px;
+    border-radius: 5px;
     border-color: #989898;
     color: #989898;
-    height: 40px;
+    height: 50px;
 }
 
 .google_logo{
     margin-right: 15px;
 }
+
+.or{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    color: #989898;
+    margin-bottom: 20px;
+}
+
+.or p{
+    margin: 0 !important;
+}
+
+.line {
+    width: 40%;
+    height: 1px;
+    background: #989898;
+  }

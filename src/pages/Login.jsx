@@ -4,7 +4,14 @@ import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  TextField,
+} from '@mui/material';
 import styles from '../styles/Login.module.css';
+import LoginFamily from '../assets/login_family.svg';
+import GoogleLogo from '../assets/google_logo.svg';
+import UpperLeft from '../assets/upperLeft.svg';
+import BottomRight from '../assets/bottomRight.svg';
 import { login } from '../redux/sliceAuth';
 import { db } from './firebase';
 /**
@@ -169,48 +176,60 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   return (
     <div>
-      <div className={styles.logintitle}>
-        Login
+      <img src={UpperLeft} alt="upper left design" className={styles.design_top2} />
+      <div className={styles.container}>
+        <div className={styles.left_column}>
+          <img src={LoginFamily} alt="fotc family" className={styles.family_img} />
+        </div>
+        <div className={styles.signinForm}>
+          <h1 className={styles.bigtitle}>
+            Login
+          </h1>
+          <p>Welcome back! Enter in details</p>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              id="username"
+              label="Username"
+              defaultValue="Enter your username"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              required
+              className={`${styles.textfield} ${styles.full_width}`}
+            />
+            <TextField
+              id="password"
+              label="Password"
+              defaultValue="Enter your password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              className={`${styles.textfield} ${styles.full_width}`}
+            />
+            {error ? <div>Your username or password is incorrect.</div> : <div />}
+            <div className={styles.full_width}>
+              <label className={styles.button_width} htmlFor="Submit">
+                <br />
+                <input className={styles.signup_button} type="submit" value="Log In" />
+              </label>
+              <div className={styles.or}>
+                <div className={styles.line} />
+                <p>or</p>
+                <div className={styles.line} />
+              </div>
+              <button type="button" onClick={signInWithGoogle} className={`${styles.button_width} ${styles.google_button}`}>
+                <img src={GoogleLogo} alt="google logo" className={styles.google_logo} />
+                Continue with Google
+              </button>
+              <p style={{ textAlign: 'center' }}>
+                {'Don\'t have an account?'}
+                {' '}
+                <a href="/signup"><b>Sign Up</b></a>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">
-          <br />
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <label htmlFor="password">
-          <br />
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-        {error ? <div>Your username or password is incorrect.</div> : <div />}
-        <label htmlFor="Submit">
-          <br />
-          <input type="submit" value="Log In" />
-        </label>
-        <br />
-        <button type="button" onClick={signInWithGoogle}>Continue with Google</button>
-        <p>
-          {'Don\'t have an account?'}
-          {' '}
-          <a href="/signup">Sign Up</a>
-        </p>
-      </form>
+      <img src={BottomRight} alt="bottom right design" className={styles.design_bottom2} />
     </div>
   );
 }

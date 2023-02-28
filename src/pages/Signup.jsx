@@ -28,6 +28,7 @@ function Signup({ updateAppProfile }) {
   const [confirmError, setConfirmError] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
+  const fieldHeight = '15px';
 
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
@@ -147,11 +148,11 @@ function Signup({ updateAppProfile }) {
   };
 
   const SigninForm = (
-    <div className={styles.signinForm}>
+    <div className={`${styles.signinForm} ${styles.full_width}`}>
+      <h1 className={styles.bigtitle}>Sign Up</h1>
+      <p>Please identify your role</p>
       <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
-        <h1 className={styles.bigtitle}>Sign Up</h1>
-        <p>Please identify your role</p>
-        <FormControl sx={{ minWidth: 120 }}>
+        <FormControl sx={{ width: '60%' }}>
           <InputLabel>Role</InputLabel>
           <Select
             id="role"
@@ -175,7 +176,12 @@ function Signup({ updateAppProfile }) {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
-            className={styles.textfield}
+            className={`${styles.textfield} ${styles.half_width}`}
+            inputProps={{
+              style: {
+                height: fieldHeight,
+              },
+            }}
           />
           <TextField
             id="lastName"
@@ -184,7 +190,12 @@ function Signup({ updateAppProfile }) {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
-            className={styles.textfield}
+            className={`${styles.textfield} ${styles.half_width}`}
+            inputProps={{
+              style: {
+                height: fieldHeight,
+              },
+            }}
           />
         </div>
         <div>
@@ -198,7 +209,12 @@ function Signup({ updateAppProfile }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className={styles.textfield}
+                className={`${styles.textfield} ${styles.half_width}`}
+                inputProps={{
+                  style: {
+                    height: fieldHeight,
+                  },
+                }}
               />
             )
             : <p />}
@@ -211,7 +227,12 @@ function Signup({ updateAppProfile }) {
             error={usernameError}
             helperText={userErrorMessage}
             required
-            className={styles.textfield}
+            className={`${styles.textfield} ${styles.half_width}`}
+            inputProps={{
+              style: {
+                height: fieldHeight,
+              },
+            }}
           />
         </div>
         {!googleLoggedIn
@@ -226,7 +247,12 @@ function Signup({ updateAppProfile }) {
                   type="password"
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className={styles.textfield}
+                  className={`${styles.textfield} ${styles.full_width}`}
+                  inputProps={{
+                    style: {
+                      height: fieldHeight,
+                    },
+                  }}
                 />
               </div>
               <div>
@@ -240,14 +266,19 @@ function Signup({ updateAppProfile }) {
                   error={confirmError}
                   helperText={passErrorMessage}
                   required
-                  className={styles.textfield}
+                  className={`${styles.textfield} ${styles.full_width}`}
+                  inputProps={{
+                    style: {
+                      height: fieldHeight,
+                    },
+                  }}
                 />
               </div>
             </>
           )
           : <p />}
         <div>
-          <FormControl sx={{ minWidth: 100 }}>
+          <FormControl sx={{ width: '60%' }}>
             <InputLabel>Service Area</InputLabel>
             <Select
               id="serviceArea"
@@ -263,8 +294,8 @@ function Signup({ updateAppProfile }) {
           </FormControl>
         </div>
 
-        <div>
-          <label htmlFor="Submit" className={styles.submit_buttons}>
+        <div className={styles.full_width}>
+          <label htmlFor="Submit" className={styles.button_width}>
             <br />
             <input className={styles.signup_button} type="submit" value="Sign Up" />
           </label>
@@ -272,8 +303,12 @@ function Signup({ updateAppProfile }) {
           {!googleLoggedIn
             ? (
               <div>
-                <p>--------or--------</p>
-                <button type="submit" onClick={signUpWithGoogle} className={`${styles.submit_buttons} ${styles.google_button}`}>
+                <div className={styles.or}>
+                  <div className={styles.line} />
+                  <p>or</p>
+                  <div className={styles.line} />
+                </div>
+                <button type="submit" onClick={signUpWithGoogle} className={`${styles.button_width} ${styles.google_button}`}>
                   <img src={GoogleLogo} alt="google logo" className={styles.google_logo} />
                   Sign Up With Google
                 </button>
@@ -294,7 +329,7 @@ function Signup({ updateAppProfile }) {
           <p>
             Already have an account?
             {' '}
-            <a href="/login">Log in</a>
+            <a href="/login"><b>Log in</b></a>
           </p>
         </div>
         {SigninForm}
