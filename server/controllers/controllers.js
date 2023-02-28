@@ -1,6 +1,7 @@
 import { db } from '../firebase.js';
 
 const getAllProfiles = async (req, res) => {
+  console.log('getAllProfiles');
   const sc = await db.collection('profiles').get();
 
   const p = [];
@@ -14,6 +15,7 @@ const getAllProfiles = async (req, res) => {
 };
 
 const getModulebyId = async (req, res) => {
+  console.log('getModulebyId');
   const moduleId = req.params.id;
   const { currRole } = req.params;
   console.log('this is moduleId,', moduleId);
@@ -40,6 +42,7 @@ const getModulebyId = async (req, res) => {
 };
 
 const getGoogleaccount = async (req, res) => {
+  console.log('getGoogleaccount');
   const { googleAccount } = req.params;
   let googleData;
   const account = await db.collection('profiles')
@@ -59,36 +62,45 @@ const getGoogleaccount = async (req, res) => {
 };
 
 const getUsers = async (req, res) => {
+  console.log('getUsers');
   const usernameSearch = req.params.users;
   let userData;
   console.log('this is usernameSearch', usernameSearch);
   const profile = await db.collection('profiles').where('username', '==', usernameSearch).get().then(async (sc) => {
     // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-    console.log('this is sc', sc.docs);
     for (const doc of sc.docs) {
       const data = await doc.data();
       data.id = doc.id;
       console.log('this is doc.data()', data);
-      userData = data;
+      googleData = data;
     }
-    // if (data != null) {
-    //   bcrypt.compare(password, data.password) // compare passwords
-    //     .then((isValid) => {
-    //       if (isValid) { // check whether it is a valid credential
-    //         console.log('login successful');
-    //         const { password: profilePassword, ...userProfile } = data; // peform destruction to get profile w/o password
-    //         updateAppProfile(userProfile); // pass to the upper lever (parent components so that it can be used for other pages)
-    //         navigate('/modules');
-    //       } else {
-    //         console.log('invalid credentials');
-    //       }
-    //     })
-    //     .catch(); // do error checking here if necessary
-    //   setPassword('');
-    // }
   });
-  console.log('this is userData', userData);
-  res.status(202).json(userData);
+  console.log(googleData);
+  res.status(202).json(googleData);
+};
+
+const getMessages = async (req, res) => {
+  const message = [];
+  await db.collection('messages').get().then((sc) => {
+    sc.forEach((doc) => {
+      const dat = doc.data();
+      dat.id = doc.id;
+      message.push(dat);
+    });
+
+    // sort in reverse chronological order (i.e. newest at first)
+    message.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;
+      }
+      if (a.date > b.date) {
+        return 1;
+      }
+      return 0;
+    });
+    console.log(message);
+    res.status(202).json(message);
+  });
 };
 
 export {
@@ -96,4 +108,5 @@ export {
   getModulebyId,
   getGoogleaccount,
   getUsers,
+  getMessages,
 };
