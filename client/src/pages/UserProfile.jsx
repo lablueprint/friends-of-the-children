@@ -23,6 +23,15 @@ function UserProfile({ profile, updateAppProfile }) {
       .doc(profile.id)
       .update(updatedProfile)
       .then(() => {
+        const payload = {
+          currentEmail: profile.email,
+          newEmail: updatedProfile.email,
+          serviceArea: updatedProfile.serviceArea,
+          role: updatedProfile.role,
+          firstName: updatedProfile.firstName,
+          lastName: updatedProfile.lastName
+        };
+        api.updateList(payload);
         setUpdateProfileMessage('Profile Successfully Updated!');
         updateAppProfile(updatedProfile);
         setEditProfile(false);

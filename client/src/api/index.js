@@ -46,6 +46,63 @@ export const getUsers = async(users) => {
         console.log("could not get user")
     }
 }
+
+export const createList = async(data)=>{
+    try{
+        const response = await axios.post(`${url}/mailchimp/createList`, data);
+        console.log("createList endpoint returns", response);
+    }
+    catch(error){
+        console.log(`occurred in createList endpoint: ${error.message}`);
+    }
+
+}
+
+//addToList data should be of the form:
+// {
+//     email_address: "",
+//     firstName: "",
+//     lastName: "",
+//     role: "",
+//     serviceArea: "",
+// }
+export const addToList = async(data)=>{
+    try{
+        const response = await axios.post(`${url}/mailchimp/addToList`, data);
+        console.log("updateList endpoint returns", response);
+    }
+    catch(error){
+        console.log(`occurred in addToList endpoint: ${error.message}`);
+    }
+
+}
+
+//updateList data should just be of the form:
+// {
+//     ... profile object without email,
+//     newEmail: updated email,
+//     currentEmail: current email of profile
+// }
+export const updateList = async(data) =>{
+    try{
+        const response = await axios.post(`${url}/mailchimp/updateList`, data);
+        console.log("updateList endpoint returns", response);
+    }
+    catch(error){
+        console.log(`error occured in updateList endpoint:${error.message}`)
+    }
+}
+
+export const getMessages = async() => {
+    try{
+        const messages = await axios.get(`${url}/getMessages`);
+        return messages;
+    }
+    catch(error){
+        console.log(error.message);
+        console.log("could not get messages")
+    }
+}
 //to use this function to get all profiles, put the following in a useEffect: 
 // async function fetchProfiles(){
 //     const {data} = await api.getAllProfiles();
