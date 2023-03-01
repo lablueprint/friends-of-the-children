@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  ref, uploadBytesResumable, getDownloadURL, listAll,
+  ref, uploadBytesResumable, getDownloadURL,
 } from 'firebase/storage';
 
 import { db, storage } from './firebase';
@@ -18,7 +18,7 @@ function Modules({ profile }) {
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
-  const [allImages, setImages] = useState([]);
+  // const [allImages, setImages] = useState([]);
   // const [currFile, setCurrFile] = useState({}); // what type of variable is currFile
 
   // const [selectedFile, setSelectedFile] = useState();
@@ -82,31 +82,30 @@ function Modules({ profile }) {
     );
   };
 
-  const getFromFirebase = () => {
-    // 1.
-    // const storageRef = storage.ref();
-    const storageRef = ref(storage);
-    console.log(storageRef);
-    console.log(listAll(storageRef));
+  // const getFromFirebase = () => {
+  //   // 1.
+  //   // const storageRef = storage.ref();
+  //   const storageRef = ref(storage);
+  //   // console.log(storageRef);
+  //   // console.log(listAll(storageRef));
 
-    // console.log();
-    // 2.
-    listAll(storageRef).then((res) => {
-      console.log(res);
+  //   // console.log();
+  //   // 2.
+  //   listAll(storageRef).then((res) => {
+  //     console.log(res);
 
-      // 3.
-      res.items.forEach((imageRef) => {
-        imageRef.getDownloadURL().then((url) => {
-          // 4.
-          setImages((images) => [...images, url]);
-        });
-      });
-    })
-      .catch((error) => {
-        console.log(error);
-      });
-    console.log(allImages);
-  };
+  //     // 3.
+  //     res.items.forEach((imageRef) => {
+  //       imageRef.getDownloadURL().then((url) => {
+  //         // 4.
+  //         setImages((images) => [...images, url]);
+  //       });
+  //     });
+  //   })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
 
   const handleChange = (e) => {
     handleUpload(e.target.files[0]); // test
@@ -141,8 +140,8 @@ function Modules({ profile }) {
   };
 
   // empty dependency array means getModules is only being called on page load
-  useEffect(getModules, []);
-  useEffect(getFromFirebase, [modules]);
+  useEffect(getModules);
+  // useEffect(getFromFirebase, [modules]);
 
   if (currRole === 'admin') {
     return (
@@ -205,10 +204,10 @@ function Modules({ profile }) {
 
 Modules.propTypes = {
   profile: PropTypes.shape({
-    firstName: PropTypes.string.isRequired,
-    lastName: PropTypes.string.isRequired,
-    username: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
+    // firstName: PropTypes.string.isRequired,
+    // lastName: PropTypes.string.isRequired,
+    // username: PropTypes.string.isRequired,
+    // email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,

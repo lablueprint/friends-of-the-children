@@ -6,7 +6,9 @@ import { useLocation, Link } from 'react-router-dom';
 import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import {
+  ref, uploadBytesResumable, getDownloadURL, listAll,
+} from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { db, storage } from './firebase';
@@ -17,9 +19,10 @@ function ExpandedModule({ profile }) {
   const { id } = location.state;
   const [title, setTitle] = useState();
   const [body, setBody] = useState();
-  const [attachments, setAttachments] = useState();
+  const [attachments, setAttachments] = useState(); // MIGHT not be needed, since link = attachments storage
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
+  const [allImages, setImages] = useState([]);
   const currRole = role.toLowerCase();
   const [refresh, setRefresh] = useState(false);
 
@@ -39,6 +42,38 @@ function ExpandedModule({ profile }) {
   if (caregiver) {
     roles.push('caregiver');
   }
+
+  const getFromFirebase = () => {
+    // 1.
+    // const storageRef = storage.ref();
+    const storageRef = ref(storage, '/files');
+    // console.log(storageRef);
+    // console.log(listAll(storageRef));
+
+    // console.log();
+    // 2.
+    listAll(storageRef).then((res) => {
+      console.log(res);
+
+      // 3.
+      res.items.forEach((imageRef) => {
+        getDownloadURL(imageRef).then((url) => {
+          console.log(url);
+          setImages((images) => [...images, url]);
+        });
+
+        // imageRef.getDownloadURL().then((url) => {
+        //   // 4.
+        //   console.log(url);
+        //   setImages((images) => [...images, url]);
+        // });
+      });
+    })
+      .catch((error) => {
+        console.log(error);
+      });
+    console.log(allImages);
+  };
 
   const submitForm = async () => {
     const data = {
@@ -134,6 +169,7 @@ function ExpandedModule({ profile }) {
   };
 
   useEffect(getModule, [id, currRole, refresh]);
+  useEffect(getFromFirebase, []);
 
   if (parent != null) {
     if (currRole === 'admin') {
@@ -143,7 +179,7 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} />
+            <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
           </div>
           <form action="post">
             <h1>Upload Module</h1>
@@ -175,7 +211,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
       </div>
     );
   }
@@ -187,7 +223,7 @@ function ExpandedModule({ profile }) {
           <Link to="/modules">
             Back
           </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} />
+          <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
         </div>
         <form action="post">
           <h1>Upload Module</h1>
@@ -221,7 +257,7 @@ function ExpandedModule({ profile }) {
         <Link to="/modules">
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
       </div>
     </div>
   );
@@ -229,10 +265,10 @@ function ExpandedModule({ profile }) {
 
 ExpandedModule.propTypes = {
   profile: PropTypes.shape({
-    firstName: PropTypes.string.isRequired,
-    lastName: PropTypes.string.isRequired,
-    username: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
+    // firstName: PropTypes.string.isRequired,
+    // lastName: PropTypes.string.isRequired,
+    // username: PropTypes.string.isRequired,
+    // email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,
