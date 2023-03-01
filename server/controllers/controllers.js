@@ -65,6 +65,7 @@ const getUsers = async (req, res) => {
   console.log('getUsers');
   const usernameSearch = req.params.users;
   let userData;
+  let googleData;
   console.log('this is usernameSearch', usernameSearch);
   const profile = await db.collection('profiles').where('username', '==', usernameSearch).get().then(async (sc) => {
     // TODO: check that there is only one user with usernameSearch (error message if it does not exist)

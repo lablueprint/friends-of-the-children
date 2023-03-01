@@ -36,21 +36,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   console.log(isLoggedIn);
   const dispatch = useDispatch();
 
-  const getUserProfiles = () => {
-    db.collection('profiles').get().then((sc) => {
-      const card = [];
-      sc.forEach((doc) => {
-        const data = doc.data();
-        if (data && data.role) {
-          data.id = doc.id;
-          card.push(data);
-        }
-      });
-      setUserProfiles(card);
-      console.log(card);
-    });
-  };
-
   const checkPassword = () => {
     // check the hash password only if profile is not empty
     if (profile !== null) {
@@ -79,44 +64,11 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     }
   };
 
-  const getUsers = (usernameSearch) => {
-    const tempUserMatch = userProfiles.filter((p) => p.username === usernameSearch);
-    // console.log(tempUserMatch);
-    if (tempUserMatch.length === 0) {
-      console.log('if');
-      setError(true);
-    } else {
-      console.log('else');
-      console.log(tempUserMatch);
-      const data = tempUserMatch[0];
-      data.id = tempUserMatch[0].id;
-      setProfile(data);
-    }
-  };
-
   useEffect(() => {
     checkPassword();
   }, [profile, navigate, updateAppProfile]);
 
-  useEffect(() => {
-    getUserProfiles();
-  }, []);
-
   const provider = new GoogleAuthProvider();
-
-  const getGoogleAccount = (userEmail) => {
-    db.collection('profiles')
-      .where('email', '==', userEmail)
-      .get()
-      .then((sc) => {
-        // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-        sc.forEach((doc) => {
-          const data = doc.data();
-          data.id = doc.id;
-          setProfile(data);
-        });
-      });
-  };
 
   function signInWithGoogle() {
     const auth = getAuth();

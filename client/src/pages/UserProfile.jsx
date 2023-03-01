@@ -120,10 +120,10 @@ function UserProfile({ profile, updateAppProfile }) {
             <MenuItem value="Admin">Admin</MenuItem>
           </Select>
         </FormControl>
-      </p>
+      </div>
       )}
       {profile && profile.serviceArea && (
-      <p>
+      <div>
         Service Area:
         {' '}
         <FormControl sx={{ m: 1, minWidth: 100 }}>
@@ -141,7 +141,7 @@ function UserProfile({ profile, updateAppProfile }) {
             <MenuItem value="MS">MS</MenuItem>
           </Select>
         </FormControl>
-      </p>
+      </div>
       )}
       {profile && profile.username && (
       <div>

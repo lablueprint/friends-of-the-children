@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { db } from './firebase';
 import styles from '../styles/Example.module.css';
 import * as api from '../api';
 
