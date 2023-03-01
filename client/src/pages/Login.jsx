@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import * as api from '../api';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/sliceAuth';
 /**
  * to resolve the warning about crypto, add fallback options
  * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
@@ -17,50 +18,105 @@ import * as api from '../api';
       },
   ...
  */
-import { db } from './firebase';
 
 function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  // const [email, setEmail] = useState('');
+  const [error, setError] = useState(false);
+  const [userProfiles, setUserProfiles] = useState(null);
   const [profile, setProfile] = useState(null);
+  // const [email, setEmail] = useState('');
   // const [userIsGoogleLoggedIn, setuserIsGoogleLoggedIn] = useState(false);
 
   const navigate = useNavigate();
   // const profile = useRef();
 
-  useEffect(() => {
-    console.log(profile);
-    console.log(password);
+  const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
+  console.log(currUser);
+  console.log(isLoggedIn);
+  const dispatch = useDispatch();
+
+  const getUserProfiles = () => {
+    db.collection('profiles').get().then((sc) => {
+      const card = [];
+      sc.forEach((doc) => {
+        const data = doc.data();
+        if (data && data.role) {
+          data.id = doc.id;
+          card.push(data);
+        }
+      });
+      setUserProfiles(card);
+      console.log(card);
+    });
+  };
+
+  const checkPassword = () => {
     // check the hash password only if profile is not empty
     if (profile !== null) {
       console.log("this is profile", profile)
       console.log(true);
+      console.log(profile);
       if (!profile.google) {
         bcrypt.compare(password, profile.password) // compare passwords
           .then((isValid) => {
             if (isValid) { // check whether it is a valid credential
               console.log('login successful');
+              dispatch(login(profile));
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-              navigate('/modules');
-              // console.log(profile);
-              // console.log(profile.password);
             } else {
+              setError(true);
               console.log('invalid credentials');
             }
           })
-          .catch(); // do error checking here if necessary
+          .catch((e) => {
+            console.log(e);
+          }); // do error checking here if necessary
       } else {
+        dispatch(login(profile));
         updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-        navigate('/modules');
       }
-      setProfile(null);
-      setPassword('');
-      setUsername('');
     }
+  };
+
+  const getUsers = (usernameSearch) => {
+    const tempUserMatch = userProfiles.filter((p) => p.username === usernameSearch);
+    // console.log(tempUserMatch);
+    if (tempUserMatch.length === 0) {
+      console.log('if');
+      setError(true);
+    } else {
+      console.log('else');
+      console.log(tempUserMatch);
+      const data = tempUserMatch[0];
+      data.id = tempUserMatch[0].id;
+      setProfile(data);
+    }
+  };
+
+  useEffect(() => {
+    checkPassword();
   }, [profile, navigate, updateAppProfile]);
 
+  useEffect(() => {
+    getUserProfiles();
+  }, []);
+
   const provider = new GoogleAuthProvider();
+
+  const getGoogleAccount = (userEmail) => {
+    db.collection('profiles')
+      .where('email', '==', userEmail)
+      .get()
+      .then((sc) => {
+        // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
+        sc.forEach((doc) => {
+          const data = doc.data();
+          data.id = doc.id;
+          setProfile(data);
+        });
+      });
+  };
 
   function signInWithGoogle() {
     const auth = getAuth();
@@ -82,12 +138,12 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         setProfile(account.data);
         // setUsername(googleUser.displayName);
       // ...
-      }).catch((error) => {
+      }).catch((e) => {
       // Handle Errors here.
-        const errorCode = error.code;
+        const errorCode = e.code;
         console.log(errorCode);
 
-        const googleErrorMessage = error.message;
+        const googleErrorMessage = e.message;
         console.log(googleErrorMessage);
 
         // The email of the user's account used.
@@ -107,11 +163,15 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     // setUsername('');
     // setPassword('');
   };
+
+  if (isLoggedIn) {
+    return navigate('/modules');
+  }
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
         <label htmlFor="username">
-
           <br />
           <input
             type="text"
@@ -136,9 +196,10 @@ function Login({ updateAppProfile }) { // deconstruct the function props
             required
           />
         </label>
+        {error ? <div>Your username or password is incorrect.</div> : <div />}
         <label htmlFor="Submit">
           <br />
-          <input type="submit" />
+          <input type="submit" value="Log In" />
         </label>
         <br />
         <button type="button" onClick={signInWithGoogle}>Continue with Google</button>
