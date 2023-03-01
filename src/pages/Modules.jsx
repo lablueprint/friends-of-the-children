@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import {
+  ref, uploadBytesResumable, getDownloadURL, listAll,
+} from 'firebase/storage';
 
 import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
@@ -16,6 +18,9 @@ function Modules({ profile }) {
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
+  const [allImages, setImages] = useState([]);
+  // const [currFile, setCurrFile] = useState({}); // what type of variable is currFile
+
   // const [selectedFile, setSelectedFile] = useState();
   const [percent, setPercent] = useState(0);
   const [link, setLink] = useState('');
@@ -53,6 +58,7 @@ function Modules({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
+    console.log(storageRef);
     setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -76,12 +82,44 @@ function Modules({ profile }) {
     );
   };
 
+  const getFromFirebase = () => {
+    // 1.
+    // const storageRef = storage.ref();
+    const storageRef = ref(storage);
+    console.log(storageRef);
+    console.log(listAll(storageRef));
+
+    // console.log();
+    // 2.
+    listAll(storageRef).then((res) => {
+      console.log(res);
+
+      // 3.
+      res.items.forEach((imageRef) => {
+        imageRef.getDownloadURL().then((url) => {
+          // 4.
+          setImages((images) => [...images, url]);
+        });
+      });
+    })
+      .catch((error) => {
+        console.log(error);
+      });
+    console.log(allImages);
+  };
+
   const handleChange = (e) => {
+    handleUpload(e.target.files[0]); // test
     // setSelectedFile(e.target.files[0]);
-    handleUpload(e.target.files[0]);
+    // console.log(e.target.files[0]);
+    // console.log(typeof (e.target.files[0]));
+    // setCurrFile(e.target.files[0]);
+    // console.log(currFile);
   };
 
   const submitForm = () => {
+    // handleUpload(currFile); // test
+
     const data = {
       title,
       body,
@@ -92,7 +130,7 @@ function Modules({ profile }) {
       link,
     };
     db.collection('modules').doc().set(data);
-
+    console.log(data);
     setModules([...modules, data]);
 
     setTitle('');
@@ -104,6 +142,7 @@ function Modules({ profile }) {
 
   // empty dependency array means getModules is only being called on page load
   useEffect(getModules, []);
+  useEffect(getFromFirebase, [modules]);
 
   if (currRole === 'admin') {
     return (
