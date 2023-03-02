@@ -9,7 +9,7 @@ import {
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
-import { db } from './firebase';
+import { db, storage } from './firebase';
 import * as api from '../api';
 
 
