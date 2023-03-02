@@ -24,7 +24,7 @@ function ExpandedModule({ profile }) {
   const [attachments, setAttachments] = useState(); // MIGHT not be needed, since link = attachments storage
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
-  const [allImages, setImages] = useState([]);
+  const [allImages, setImages] = useState('');
   const currRole = role.toLowerCase();
   const [refresh, setRefresh] = useState(false);
 
@@ -63,6 +63,7 @@ function ExpandedModule({ profile }) {
       .catch((error) => {
         console.log(error);
       });
+    console.log(allImages);
   };
 
   const submitForm = async () => {
@@ -122,7 +123,7 @@ function ExpandedModule({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    setLink(storageRef.fullPath);
+    // setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -140,7 +141,7 @@ function ExpandedModule({ profile }) {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log(url);
-          // setLink(url);
+          setLink(url);
         });
       },
     );
@@ -162,7 +163,7 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
+            <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
           </div>
           <form action="post">
             <h1>Upload Module</h1>
@@ -194,7 +195,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
       </div>
     );
   }
@@ -206,7 +207,7 @@ function ExpandedModule({ profile }) {
           <Link to="/modules">
             Back
           </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
+          <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
         </div>
         <form action="post">
           <h1>Upload Module</h1>
@@ -240,7 +241,7 @@ function ExpandedModule({ profile }) {
         <Link to="/modules">
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} link={allImages} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
       </div>
     </div>
   );
