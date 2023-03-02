@@ -24,6 +24,7 @@ const getModulebyId = async (req, res) => {
   let moddata;
   await db.collection('modules').doc(moduleId).get().then(async (sc) => {
     moddata = sc.data();
+    console.log("reading moddata", moddata);
     // filter the children by role
     for (const child of moddata.children) {
       await db.collection('modules').doc(child).get().then((snap) => {
@@ -41,25 +42,25 @@ const getModulebyId = async (req, res) => {
   res.status(202).json({ data: moddata, children_array });
 };
 
-const getGoogleaccount = async (req, res) => {
-  console.log('getGoogleaccount');
-  const { googleAccount } = req.params;
-  let googleData;
-  const account = await db.collection('profiles')
-    .where('email', '==', googleAccount)
-    .get()
-    .then(async (sc) => {
+const getGoogleaccount =  async (req, res) => {
+  console.log("getGoogleaccount");
+    const googleAccount  = req.params.googleAccount;
+    let googleData;
+    const account = await db.collection('profiles')
+      .where('email', '==', googleAccount)
+      .get()
+      .then(async (sc) => {
       // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-      for (const doc of sc.docs) {
-        const data = await doc.data();
-        data.id = doc.id;
-        console.log('this is doc.data()', data);
-        googleData = data;
-      }
-    });
-  console.log(googleData);
-  res.status(202).json(googleData);
-};
+        for (const doc of sc.docs) {
+          const data = await doc.data();
+          data.id = doc.id;
+          console.log('this is doc.data()', data);
+          googleData = data;
+        }
+      });
+    console.log(googleData);
+    res.status(202).json(googleData);
+  };
 
 const getUsers = async (req, res) => {
   console.log('getUsers');
