@@ -59,6 +59,7 @@ function Modules({ profile }) {
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
     console.log(storageRef);
+    console.log()
     setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -80,6 +81,7 @@ function Modules({ profile }) {
         });
       },
     );
+    //set linkstate here:
   };
 
   // const getFromFirebase = () => {

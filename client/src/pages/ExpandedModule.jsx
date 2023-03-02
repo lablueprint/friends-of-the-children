@@ -7,11 +7,13 @@ import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
 import {
-  ref, uploadBytesResumable, getDownloadURL, listAll,
+  ref, uploadBytesResumable, getDownloadURL, listAll, 
 } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { db, storage } from './firebase';
+import * as api from '../api';
+
 
 function ExpandedModule({ profile }) {
   const { role } = profile;
@@ -28,6 +30,7 @@ function ExpandedModule({ profile }) {
 
   const [percent, setPercent] = useState(0);
   const [link, setLink] = useState('');
+  const [moduleImage, setModuleImage] = useState('');
 
   // Usestates for forms
   const [mentor, setMentor] = useState(false);
@@ -43,36 +46,23 @@ function ExpandedModule({ profile }) {
     roles.push('caregiver');
   }
 
+  // getting files from firebase storage
   const getFromFirebase = () => {
-    // 1.
-    // const storageRef = storage.ref();
-    const storageRef = ref(storage, '/files');
-    // console.log(storageRef);
-    // console.log(listAll(storageRef));
+    // console.log(allImages);
+    const storageRef = ref(storage, '/' + moduleImage); // allImages is set by object.data.link (from getModulebyIdfunc)
 
-    // console.log();
-    // 2.
-    listAll(storageRef).then((res) => {
-      console.log(res);
-
-      // 3.
-      res.items.forEach((imageRef) => {
-        getDownloadURL(imageRef).then((url) => {
-          console.log(url);
-          setImages((images) => [...images, url]);
-        });
-
-        // imageRef.getDownloadURL().then((url) => {
-        //   // 4.
-        //   console.log(url);
-        //   setImages((images) => [...images, url]);
-        // });
-      });
-    })
+    getDownloadURL(storageRef).then((url) => {setImages((images) => [...images, url]);})
+    // listAll(storageRef).then((res) => {
+    //   res.items.forEach((imageRef) => {
+    //     getDownloadURL(imageRef).then((url) => {
+    //       console.log(url);
+    //       setImages((images) => [...images, url]);
+    //     });
+    //   });
+    // })
       .catch((error) => {
         console.log(error);
       });
-    console.log(allImages);
   };
 
   const submitForm = async () => {
@@ -86,11 +76,6 @@ function ExpandedModule({ profile }) {
       link,
     };
 
-    // db.collection('modules').doc().add(data).then((dataRef) => {
-    // if (dataRef.id) {
-    //   console.log(dataRef.id);
-    // }
-    // });
     const docRef = await addDoc(collection(db, 'modules'), data);
     console.log('Document written with ID: ', docRef.id);
 
@@ -107,29 +92,26 @@ function ExpandedModule({ profile }) {
     setRefresh(!refresh);
   };
 
-  const getModule = () => {
+  const getModulebyIdfunc = async (id, currRole) => {
+    //data object structured as {data, children_array}
+    const {data} = await api.getModulebyId(id, currRole);
+    return data;
+  }
+
+  const getModule = () => {//gets data object from api using async "wrapper function" above
+    //getModule cannot be async because it is used in the useEffect
     setChildren([]);
-    db.collection('modules').doc(id).get().then((sc) => {
-      const data = sc.data();
-      setTitle(data.title);
-      setBody(data.body);
-      setAttachments(data.attachments);
-      setParent(data.parent);
-      // filter the children by role
-      const tempChildren = [];
-      data.children.forEach((child) => {
-        db.collection('modules').doc(child).get().then((snap) => {
-          const childData = snap.data();
-          if (currRole === 'admin' || childData.role.includes(currRole)) {
-            const friend = {
-              id: child, title: childData.title, role: childData.role,
-            };
-            tempChildren.push(friend);
-          }
-          setChildren(tempChildren);
-        });
-      });
-    });
+    getModulebyIdfunc(id, currRole).then((object) => {
+      setTitle(object.data.title);
+      setBody(object.data.body);
+      setAttachments(object.data.attachments);
+      setParent(object.data.parent);
+      setChildren(object.children_array);
+      setModuleImage(object.data.link);
+      // console.log(object.data.link);
+    }
+      );
+    
   };
 
   // upload file to Firebase:
@@ -158,6 +140,7 @@ function ExpandedModule({ profile }) {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log(url);
+          // setLink(url);
         });
       },
     );

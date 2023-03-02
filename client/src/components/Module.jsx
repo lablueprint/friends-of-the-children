@@ -13,9 +13,18 @@ function Module(props) {
       <div className={styles.title}>{title}</div>
       <div className={styles.body}>{body}</div>
       <div className={styles.attachments}>{attachments}</div>
-      {link.map((image) => (
-        <div>{image}</div>
-      ))}
+      <div>
+        {link.map((image) => {
+            return (
+              <div key={image} className="image">
+                  <img src={image} alt="" width="40%" height="auto" />
+                  {/* <button onClick={() => deleteFromFirebase(image)}>
+                  Delete
+                  </button> */}
+              </div>
+            );
+        })}
+      </div>
       <div>{link}</div>
       {
         child.map((kid) => (
