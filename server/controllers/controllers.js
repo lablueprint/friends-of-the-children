@@ -47,17 +47,17 @@ const getGoogleaccount = async (req, res) => {
   const googleAccount  = req.params.googleAccount;
   let googleData;
   const account = await db.collection('profiles')
-  .where('email', '==', googleAccount)
-  .get()
-  .then(async (sc) => {
-  // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-    for (const doc of sc.docs) {
-      const data = await doc.data();
-      data.id = doc.id;
-      console.log('this is doc.data()', data);
-      googleData = data;
-    }
-  });
+    .where('email', '==', googleAccount)
+    .get()
+    .then(async (sc) => {
+      // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
+      for (const doc of sc.docs) {
+        const data = await doc.data();
+        data.id = doc.id;
+        console.log('this is doc.data()', data);
+        googleData = data;
+      }
+    });
   console.log(googleData);
   res.status(202).json(googleData);
 };
