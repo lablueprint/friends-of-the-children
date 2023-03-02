@@ -58,6 +58,41 @@ function Calendar() {
     console.log(event);
     const api = calendarRef.current.getApi();
     api.addEvent(event);
+
+    const data = {
+      // summary: 'Google I/O 2015',
+      location,
+      description: descrip,
+      start: {
+        dateTime: startTime,
+        timeZone: 'America/Los_Angeles',
+      },
+      end: {
+        dateTime: endTime,
+        timeZone: 'America/Los_Angeles',
+      },
+      // recurrence: [
+      //   'RRULE:FREQ=DAILY;COUNT=2',
+      // ],
+      // attendees: [
+      //   { email: 'lpage@example.com' },
+      //   { email: 'sbrin@example.com' },
+      // ],
+      // reminders: {
+      //   useDefault: false,
+      //   overrides: [
+      //     { method: 'email', minutes: 24 * 60 },
+      //     { method: 'popup', minutes: 10 },
+      //   ],
+      // },
+    };
+
+    const gapi = process.env.REACT_APP_FIREBASE_CALENDAR_ID;
+    console.log(gapi.client);
+    gapi.client.calendar.events.insert({
+      calendarId: 'fofthechildren@gmail.com',
+      resource: data,
+    });
   };
 
   return (

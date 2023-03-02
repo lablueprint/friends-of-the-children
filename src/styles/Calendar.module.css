@@ -12,6 +12,10 @@
     border-radius: 10px;
 }
 
+.calendar th{
+    background: rgba(102, 170, 170, 0.2);
+}
+
 .submit_button{
     border-radius: 10px;
     margin: 5px;
