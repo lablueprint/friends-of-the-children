@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { db } from './firebase';
 import styles from '../styles/Example.module.css';
+import * as api from '../api';
 
 function Example({ profile }) {
   const { firstName, lastName, username } = profile;
   const [profiles, setProfiles] = useState([]);
 
-  useEffect(() => {
-    db.collection('profiles').get().then((sc) => {
-      const p = [];
-      sc.forEach((doc) => {
-        const data = doc.data();
-        data.id = doc.id;
-        p.push(data);
-      });
-
-      setProfiles(p);
-    });
-  }, []);
+  useEffect( () => {
+    async function fetchProfiles(){
+      const {data} = await api.getAllProfiles();
+      setProfiles(data);
+    }
+    fetchProfiles();
+    }, []);
 
   return (
     <>

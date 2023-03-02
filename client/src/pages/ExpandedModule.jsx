@@ -9,7 +9,9 @@ import {
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
-import { db, storage } from './firebase';
+import { db } from './firebase';
+import * as api from '../api';
+
 
 function ExpandedModule({ profile }) {
   const { role } = profile;
@@ -72,29 +74,24 @@ function ExpandedModule({ profile }) {
     setRefresh(!refresh);
   };
 
-  const getModule = () => {
+  const getModulebyIdfunc = async (id, currRole) => {
+    //data object structured as {data, children_array}
+    const {data} = await api.getModulebyId(id, currRole);
+    return data;
+  }
+
+  const getModule = () => {//gets data object from api using async "wrapper function" above
+    //getModule cannot be async because it is used in the useEffect
     setChildren([]);
-    db.collection('modules').doc(id).get().then((sc) => {
-      const data = sc.data();
-      setTitle(data.title);
-      setBody(data.body);
-      setAttachments(data.attachments);
-      setParent(data.parent);
-      // filter the children by role
-      const tempChildren = [];
-      data.children.forEach((child) => {
-        db.collection('modules').doc(child).get().then((snap) => {
-          const childData = snap.data();
-          if (currRole === 'admin' || childData.role.includes(currRole)) {
-            const friend = {
-              id: child, title: childData.title, role: childData.role,
-            };
-            tempChildren.push(friend);
-          }
-          setChildren(tempChildren);
-        });
-      });
-    });
+    getModulebyIdfunc(id, currRole).then((object) => {
+      setTitle(object.data.title);
+      setBody(object.data.body);
+      setAttachments(object.data.attachments);
+      setParent(object.data.parent);
+      setChildren(object.children_array);
+    }
+      );
+    
   };
 
   // upload file to Firebase:
