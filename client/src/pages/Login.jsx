@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import * as api from '../api';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   TextField,
 } from '@mui/material';
+import * as api from '../api';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/login_family.svg';
 import GoogleLogo from '../assets/google_logo.svg';
@@ -31,7 +31,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
-  const [userProfiles, setUserProfiles] = useState(null);
   const [profile, setProfile] = useState(null);
   // const [email, setEmail] = useState('');
   // const [userIsGoogleLoggedIn, setuserIsGoogleLoggedIn] = useState(false);
@@ -47,7 +46,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const checkPassword = () => {
     // check the hash password only if profile is not empty
     if (profile !== null) {
-      console.log("this is profile", profile)
+      console.log('this is profile', profile);
       console.log(true);
       console.log(profile);
       if (!profile.google) {
@@ -118,7 +117,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     console.log('called');
     event.preventDefault(); // this prevents from page to be refreshing
     const data = await api.getUsers(username);
-    
+
     setProfile(data.data);
     // setUsername('');
     // setPassword('');
