@@ -18,8 +18,6 @@ function Modules({ profile }) {
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
-  // const [allImages, setImages] = useState([]);
-  // const [currFile, setCurrFile] = useState({}); // what type of variable is currFile
 
   // const [selectedFile, setSelectedFile] = useState();
   const [percent, setPercent] = useState(0);
@@ -84,42 +82,11 @@ function Modules({ profile }) {
     //set linkstate here:
   };
 
-  // const getFromFirebase = () => {
-  //   // 1.
-  //   // const storageRef = storage.ref();
-  //   const storageRef = ref(storage);
-  //   // console.log(storageRef);
-  //   // console.log(listAll(storageRef));
-
-  //   // console.log();
-  //   // 2.
-  //   listAll(storageRef).then((res) => {
-  //     console.log(res);
-
-  //     // 3.
-  //     res.items.forEach((imageRef) => {
-  //       imageRef.getDownloadURL().then((url) => {
-  //         // 4.
-  //         setImages((images) => [...images, url]);
-  //       });
-  //     });
-  //   })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-
   const handleChange = (e) => {
     handleUpload(e.target.files[0]); // test
-    // setSelectedFile(e.target.files[0]);
-    // console.log(e.target.files[0]);
-    // console.log(typeof (e.target.files[0]));
-    // setCurrFile(e.target.files[0]);
-    // console.log(currFile);
   };
 
   const submitForm = () => {
-    // handleUpload(currFile); // test
 
     const data = {
       title,

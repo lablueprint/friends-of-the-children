@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import styles from '../styles/Modules.module.css';
@@ -7,51 +7,39 @@ import {
 } from 'firebase/storage';
 import { db, storage } from '../pages/firebase';
 
-const setImageURL = (link) => {
-  let img = '';
-  const storageRef = ref(storage);
-  const starsRef = ref(storageRef).child(storage, '/' + link);
-  starsRef.getDownloadURL().then((url) => {
-      img = url;
-    }).catch(function(error){
-      // handle any errors
-    });
 
-  // const storage = getStorage();
-  // console.log(link);
-  // getDownloadURL(ref(storage, {link}))
-  //   .then((url) => {
-    
-  //   });
-  return img;
-}
 
 function Module(props) {
 
   const {
     title, body, attachments, child, link,
   } = props;
-  // const [allImages, setImages] = useState([]);
 
-  // const storageRef = ref(storage, '/' + {link}); // allImages is set by object.data.link (from getModulebyIdfunc)
-  
-  // getDownloadURL(storageRef).then((url) => {
-  //   // `url` is the download URL for 'images/stars.jpg'
+  const [img, setImg] = useState('');
 
-  //   // Or inserted into an <img> element
-  //   const img = document.getElementById('myimg');
-  //   img.setAttribute('src', url);
-  // })
-  // .catch((error) => {
-  //   // Handle any errors
-  // });
-  // // console.log(allImages);
+  const setImageURL = (link) => {
+    if(link.length > 0) {
+      const storage = getStorage();
+      const spaceRef = ref(storage, link);
+      getDownloadURL(spaceRef).then((url) => {
+        setImg(url);
+      }).catch((error) => {
+        console.log(error.message);
+      })
+    
+    }
+  };
+
+  useEffect(() => {setImageURL(link)}, [link]);
+
+  if(link.length === 0 || img.length === 0) return null;
 
   return (
     <div>
       <div className={styles.title}>{title}</div>
       <div className={styles.body}>{body}</div>
       <div className={styles.attachments}>{attachments}</div>
+      {/* keep bottom code for reference */}
       {/* <div>
         {link.map((image) => {
             return (
@@ -61,7 +49,7 @@ function Module(props) {
             );
         })}
       </div> */}
-      <img src={setImageURL({link})} alt="" width="40%" height="auto" />
+      <img src={img} alt="" width="30%" height="auto" />
       {
         child.map((kid) => (
           <Link to="/expanded-module" state={{ id: kid.id }}>
@@ -79,7 +67,16 @@ Module.propTypes = {
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   attachments: PropTypes.string.isRequired,
-  child: PropTypes.arrayOf.isRequired,
+  child: PropTypes.array.isRequired,
   link: PropTypes.string.isRequired,
 };
+
+Module.defaultProps = {
+  title: '',
+  body: '',
+  attachments: '',
+  child: [],
+  link: '',
+};
+
 export default Module;

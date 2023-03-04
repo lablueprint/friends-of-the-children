@@ -7,7 +7,7 @@ import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
 import {
-  ref, uploadBytesResumable, getDownloadURL, listAll, 
+  ref, uploadBytesResumable, getDownloadURL, listAll, getStorage 
 } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
@@ -24,7 +24,7 @@ function ExpandedModule({ profile }) {
   const [attachments, setAttachments] = useState(); // MIGHT not be needed, since link = attachments storage
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
-  const [allImages, setImages] = useState('');
+  // const [allImages, setImages] = useState('');
   const currRole = role.toLowerCase();
   const [refresh, setRefresh] = useState(false);
 
@@ -38,6 +38,8 @@ function ExpandedModule({ profile }) {
   const [serviceArea, setServiceArea] = useState('');
   const [formTitle, setFormtitle] = useState();
   const [formBody, setFormbody] = useState();
+
+
   const roles = [];
   if (mentor) {
     roles.push('mentor');
@@ -45,26 +47,6 @@ function ExpandedModule({ profile }) {
   if (caregiver) {
     roles.push('caregiver');
   }
-
-  // getting files from firebase storage
-  const getFromFirebase = () => {
-    // console.log(allImages);
-    const storageRef = ref(storage, '/' + moduleImage); // allImages is set by object.data.link (from getModulebyIdfunc)
-
-    getDownloadURL(storageRef).then((url) => {setImages((images) => [...images, url]);})
-    // listAll(storageRef).then((res) => {
-    //   res.items.forEach((imageRef) => {
-    //     getDownloadURL(imageRef).then((url) => {
-    //       console.log(url);
-    //       setImages((images) => [...images, url]);
-    //     });
-    //   });
-    // })
-      .catch((error) => {
-        console.log(error);
-      });
-    console.log(allImages);
-  };
 
   const submitForm = async () => {
     const data = {
@@ -108,8 +90,8 @@ function ExpandedModule({ profile }) {
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
       setChildren(object.children_array);
+      console.log(object.data.link);
       setModuleImage(object.data.link);
-      // console.log(object.data.link);
     }
       );
     
@@ -148,12 +130,10 @@ function ExpandedModule({ profile }) {
   };
 
   const handleChange = (e) => {
-    // setSelectedFile(e.target.files[0]);
     handleUpload(e.target.files[0]);
   };
 
   useEffect(getModule, [id, currRole, refresh]);
-  useEffect(getFromFirebase, []);
 
   if (parent != null) {
     if (currRole === 'admin') {
@@ -164,6 +144,7 @@ function ExpandedModule({ profile }) {
               Back
             </Link>
             <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+            {console.log(moduleImage)}
           </div>
           <form action="post">
             <h1>Upload Module</h1>
