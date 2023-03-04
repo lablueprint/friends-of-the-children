@@ -13,6 +13,18 @@ export const getAllProfiles = async() => {
     }
 }
 
+export const addDoc = async(data) => {
+    try {
+        let res = await axios.post(`${url}/addDoc`, data);
+        return res;
+
+    }
+    catch(error) {
+        console.log(error.message);
+        console.log("could not add doc");
+    }
+}
+
 export const getModulebyId = async(id, currRole) => { //gets ID of root module that the user clicked on 
     try{
         const module = await axios.get(`${url}/getModulebyId/${id}/${currRole}`);

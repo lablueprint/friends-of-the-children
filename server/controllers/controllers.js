@@ -1,4 +1,7 @@
 import { db } from '../firebase.js';
+import {
+  collection, addDoc, arrayUnion, updateDoc, doc,
+} from 'firebase/firestore';
 
 const getAllProfiles = async (req, res) => {
   console.log('getAllProfiles');
@@ -13,6 +16,13 @@ const getAllProfiles = async (req, res) => {
   // res.send(p);
   res.status(202).json(p);
 };
+
+const addDocument = async (req, res) => {
+  const data = JSON.stringify(req.body);
+  const docRef = await addDoc(collection(db, 'modules'), req.body);
+  console.log("this is docref", docRef.id)
+  res.status(200).json({id: docRef.id}); //idk if this is correct - dk
+}
 
 const getModulebyId = async (req, res) => {
   console.log('getModulebyId');
@@ -106,6 +116,7 @@ const getMessages = async (req, res) => {
 };
 
 export {
+  addDocument,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,

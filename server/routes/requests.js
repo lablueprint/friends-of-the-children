@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import mailchimp from '../mailchimp.js';
 
 import {
+  addDocument,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
@@ -12,6 +13,8 @@ import {
 } from '../controllers/controllers.js';
 
 const router = express.Router();
+
+router.post('/addDoc', addDocument);
 
 router.get('/', (req, res) => {
   res.send('We are live!');

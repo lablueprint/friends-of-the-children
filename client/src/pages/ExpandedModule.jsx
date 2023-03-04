@@ -53,12 +53,13 @@ function ExpandedModule({ profile }) {
     //   console.log(dataRef.id);
     // }
     // });
-    const docRef = await addDoc(collection(db, 'modules'), data);
-    console.log('Document written with ID: ', docRef.id);
 
+    // const docRef = await addDoc(collection(db, 'modules'), data);
+    const docRefid = await api.addDoc(data);
+    console.log(docRefid)
     const moduleRef = doc(db, 'modules', id);
     await updateDoc(moduleRef, {
-      children: arrayUnion(docRef.id),
+      children: arrayUnion(docRefid.data.id),
     });
 
     setFormtitle('');
