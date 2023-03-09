@@ -19,6 +19,7 @@
     "express": "^4.18.2",
     "find-config": "^1.0.0",
     "firebase": "^9.17.1",
+    "googleapis": "^112.0.0",
     "nodemon": "^2.0.20"
   }
 }

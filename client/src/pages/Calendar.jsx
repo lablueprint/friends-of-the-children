@@ -21,6 +21,15 @@ function Calendar() {
     console.log('End time: ', eventInfo.event.end);
   };
 
+  async function initializeGapiClient() {
+    await gapi.client.init({
+      apiKey: process.env.REACT_APP_FIREBASE_CALENDAR_ID,
+      discoveryDocs: [process.env.DISCOVERY_DOC],
+    });
+    gapiInited = true;
+    maybeEnableButtons();
+  }
+
   const addEventFunc = (e) => {
     e.preventDefault();
     // create json event object
