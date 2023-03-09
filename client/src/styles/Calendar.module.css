@@ -1,0 +1,22 @@
+.calendar{
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+.calendar a{
+    color: #3F3F3F;
+    text-decoration: none;
+}
+
+.calendar table{
+    border-radius: 10px;
+}
+
+.calendar th{
+    background: rgba(102, 170, 170, 0.2);
+}
+
+.submit_button{
+    border-radius: 10px;
+    margin: 5px;
+}

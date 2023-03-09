@@ -6,9 +6,7 @@ import { useLocation, Link } from 'react-router-dom';
 import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
-import {
-  ref, uploadBytesResumable, getDownloadURL, listAll, getStorage 
-} from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { db, storage } from './firebase';
@@ -30,7 +28,6 @@ function ExpandedModule({ profile }) {
 
   const [percent, setPercent] = useState(0);
   const [link, setLink] = useState('');
-  const [moduleImage, setModuleImage] = useState('');
 
   // Usestates for forms
   const [mentor, setMentor] = useState(false);
@@ -105,7 +102,7 @@ function ExpandedModule({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    // setLink(storageRef.fullPath);
+    setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -123,13 +120,13 @@ function ExpandedModule({ profile }) {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log(url);
-          setLink(url);
         });
       },
     );
   };
 
   const handleChange = (e) => {
+    // setSelectedFile(e.target.files[0]);
     handleUpload(e.target.files[0]);
   };
 
