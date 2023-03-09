@@ -5,6 +5,8 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../redux/sliceAuth';
 import fotcLogo from '../assets/fotc_logo.svg';
 
+// Navigation Bar component used to navigate to different pages
+
 function NavBar({ profile, updateAppProfile }) {
   // const [loggedIn, setLoggedIn] = useState(false);
   // console.log(profile);

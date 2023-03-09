@@ -14,6 +14,21 @@ import BottomLeft from '../assets/bottomLeft.svg';
 import GoogleLogo from '../assets/google_logo.svg';
 import * as api from '../api';
 
+/**
+ Page used to create a new account for new users
+ 
+ * to resolve the warning about crypto, add fallback options
+ * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
+ * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
+ * from line 305 to line 309 should look like
+  ...
+    resolve: {
+      fallback: {
+        "crypto": false
+      },
+  ...
+ */
+
 function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
