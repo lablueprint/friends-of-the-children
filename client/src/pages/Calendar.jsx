@@ -51,7 +51,7 @@ function Calendar() {
     <div>
       <div>
         <form onSubmit={(e) => addEventFunc(e)}>
-          <h1>Add Event</h1>
+          <h1>FOTC Calendar</h1>
           Title:
           <input type="text" name="title" />
           {/* Description:

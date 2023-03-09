@@ -46,7 +46,7 @@ function NavBar({ profile, updateAppProfile }) {
             <a href="/">
               <img
                 style={{
-                  'margin-bottom': '50px', width: '139px', height: '67px', top: '40px',
+                  marginBottom: '70px', width: '139px', height: '67px', top: '40px',
                 }}
                 src={fotcLogo}
                 alt="fotc logo"
