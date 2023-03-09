@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { app, db } from './firebase';
 import Message from '../components/Message';
-import * as api from '../api'
+import * as api from '../api';
 
 function MessageWall({ profile }) {
   const [title, setTitle] = useState('');
@@ -16,32 +16,32 @@ function MessageWall({ profile }) {
   const { role, serviceArea } = profile;
 
   const getMessagesfunc = async () => {
-    const {data} = await api.getMessages();
+    const { data } = await api.getMessages();
     console.log(data);
     setMessages(data);
     // return message;
   };
 
-  useEffect(()=>{
-    console.log("this is user messages", messages);
-    console.log("this is filtered and pinned messages", messages.filter(
+  useEffect(() => {
+    console.log('this is user messages', messages);
+    console.log('this is filtered and pinned messages', messages.filter(
       (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
     && message.target.includes(role.toLowerCase()))),
     ));
-    console.log("this is unpinned filtered messages", messages.filter(
+    console.log('this is unpinned filtered messages', messages.filter(
       (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
     && message.target.includes(role.toLowerCase()))),
     ));
-  }, [messages])
+  }, [messages]);
   // const getMessages = () => {
   //     getMessagesfunc().then((message) => {
-        
+
   //     })
   // };
 
-  useEffect(()=>{
+  useEffect(() => {
     getMessagesfunc();
-  },[]);
+  }, []);
 
   const updatePinned = (id, pinned) => {
     // deep copy for useState to work properly
@@ -75,10 +75,12 @@ function MessageWall({ profile }) {
       date: app.firebase.firestore.Timestamp.fromDate(new Date()),
     };
 
-    db.collection('messages').doc().set(data).then(getMessagesfunc).then(()=>{
-      setTitle('');
-      setBody('');
-      setmsgServiceArea('');});
+    db.collection('messages').doc().set(data).then(getMessagesfunc)
+      .then(() => {
+        setTitle('');
+        setBody('');
+        setmsgServiceArea('');
+      });
   };
 
   const messageForm = (

@@ -11,7 +11,6 @@ import Module from '../components/Module';
 import { db } from './firebase';
 import * as api from '../api';
 
-
 function ExpandedModule({ profile }) {
   const { role } = profile;
   const location = useLocation();
@@ -69,14 +68,14 @@ function ExpandedModule({ profile }) {
     setRefresh(!refresh);
   };
 
-  const getModulebyIdfunc = async (id, currRole) => {
-    //data object structured as {data, children_array}
-    const {data} = await api.getModulebyId(id, currRole);
+  const getModulebyIdfunc = async (tempId, tempcurrRole) => {
+    // data object structured as {data, children_array}
+    const { data } = await api.getModulebyId(tempId, tempcurrRole);
     return data;
-  }
+  };
 
-  const getModule = () => {//gets data object from api using async "wrapper function" above
-    //getModule cannot be async because it is used in the useEffect
+  const getModule = () => { // gets data object from api using async "wrapper function" above
+    // getModule cannot be async because it is used in the useEffect
     setChildren([]);
     getModulebyIdfunc(id, currRole).then((object) => {
       setTitle(object.data.title);
@@ -84,9 +83,7 @@ function ExpandedModule({ profile }) {
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
       setChildren(object.children_array);
-    }
-      );
-    
+    });
   };
 
   useEffect(getModule, [id, currRole, refresh]);

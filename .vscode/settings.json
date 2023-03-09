@@ -13,7 +13,10 @@
     },
 
     "editor.suggestSelection": "first",
-    "eslint.workingDirectories": [{"mode": "auto"}],
+    "eslint.workingDirectories": [
+        "./client",
+        "./server"
+    ],
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "workbench.colorTheme": "Atom One Dark",
     "workbench.editorAssociations": {
@@ -21,8 +24,13 @@
     },
 
     "eslint.validate": [
-        "javascript"
+        "javascript",
+        "javascriptreact"
     ],
+    // "eslint.workingDirectories": [
+    //     "./backend", 
+    //     "./frontend"
+    // ],
     "javascript.updateImportsOnFileMove.enabled": "always",
     "workbench.editor.enablePreview": false,
 }
