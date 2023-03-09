@@ -31,6 +31,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  // const [userProfiles, setUserProfiles] = useState(null);
   const [profile, setProfile] = useState(null);
   // const [email, setEmail] = useState('');
   // const [userIsGoogleLoggedIn, setuserIsGoogleLoggedIn] = useState(false);

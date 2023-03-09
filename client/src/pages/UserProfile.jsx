@@ -29,7 +29,7 @@ function UserProfile({ profile, updateAppProfile }) {
           serviceArea: updatedProfile.serviceArea,
           role: updatedProfile.role,
           firstName: updatedProfile.firstName,
-          lastName: updatedProfile.lastName
+          lastName: updatedProfile.lastName,
         };
         api.updateList(payload);
         setUpdateProfileMessage('Profile Successfully Updated!');

@@ -10,6 +10,7 @@ export const getAllProfiles = async () => {
     console.log(error.message);
     console.log('could not get all profiles');
   }
+  return null;
 };
 
 export const getModulebyId = async (id, currRole) => { // gets ID of root module that the user clicked on
@@ -20,9 +21,10 @@ export const getModulebyId = async (id, currRole) => { // gets ID of root module
     console.log(error.message);
     console.log('could not get module by ID');
   }
+  return null;
 };
 
-export const getGoogleaccount = async (googleEmail) => {
+export const getGoogleaccount = async (googleEmail) => { // gets google email
   try {
     const account = await axios.get(`${url}/getGoogleaccount/${googleEmail}`);
     return account;
@@ -30,6 +32,7 @@ export const getGoogleaccount = async (googleEmail) => {
     console.log(error.message);
     console.log('could not get google account');
   }
+  return null;
 };
 
 export const getUsers = async (users) => {
@@ -41,6 +44,7 @@ export const getUsers = async (users) => {
     console.log(error.message);
     console.log('could not get user');
   }
+  return null;
 };
 
 export const createList = async (data) => {
@@ -50,6 +54,7 @@ export const createList = async (data) => {
   } catch (error) {
     console.log(`occurred in createList endpoint: ${error.message}`);
   }
+  return null;
 };
 
 // addToList data should be of the form:
@@ -67,6 +72,7 @@ export const addToList = async (data) => {
   } catch (error) {
     console.log(`occurred in addToList endpoint: ${error.message}`);
   }
+  return null;
 };
 
 // updateList data should just be of the form:
@@ -82,6 +88,7 @@ export const updateList = async (data) => {
   } catch (error) {
     console.log(`error occured in updateList endpoint:${error.message}`);
   }
+  return null;
 };
 
 export const getMessages = async () => {
@@ -92,6 +99,7 @@ export const getMessages = async () => {
     console.log(error.message);
     console.log('could not get messages');
   }
+  return null;
 };
 // to use this function to get all profiles, put the following in a useEffect:
 // async function fetchProfiles(){
