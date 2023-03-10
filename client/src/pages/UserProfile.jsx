@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { TextField } from '@mui/material';
+import {
+  TextField, Select, MenuItem, FormControl, InputLabel,
+} from '@mui/material';
 import { db } from './firebase';
+import * as api from '../api';
 
 function UserProfile({ profile, updateAppProfile }) {
-  console.log(profile);
   const [editProfile, setEditProfile] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(profile);
   const [updateProfileMessage, setUpdateProfileMessage] = useState('');
@@ -21,9 +23,19 @@ function UserProfile({ profile, updateAppProfile }) {
       .doc(profile.id)
       .update(updatedProfile)
       .then(() => {
+        const payload = {
+          currentEmail: profile.email,
+          newEmail: updatedProfile.email,
+          serviceArea: updatedProfile.serviceArea,
+          role: updatedProfile.role,
+          firstName: updatedProfile.firstName,
+          lastName: updatedProfile.lastName,
+        };
+        api.updateList(payload);
         setUpdateProfileMessage('Profile Successfully Updated!');
         updateAppProfile(updatedProfile);
         setEditProfile(false);
+        window.location.reload();
       })
       .catch((error) => {
         setUpdateProfileMessage('We ran into an error updating your profile!');
@@ -38,13 +50,13 @@ function UserProfile({ profile, updateAppProfile }) {
   return (
     <div>
       {profile && profile.email && (
-      <p>
+      <div>
         Email:
         {' '}
         <TextField
           id="email"
           label="Email"
-          defaultValue={profile.email}
+          // defaultValue={profile.email}
           value={updatedProfile.email}
           InputProps={{
             readOnly: !editProfile,
@@ -52,16 +64,16 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'email')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       {profile && profile.firstName && (
-      <p>
+      <div>
         First Name:
         {' '}
         <TextField
           id="firstName"
           label="First Name"
-          defaultValue={profile.firstName}
+          // defaultValue={profile.firstName}
           value={updatedProfile.firstName}
           InputProps={{
             readOnly: !editProfile,
@@ -69,16 +81,16 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'firstName')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       {profile && profile.lastName && (
-      <p>
+      <div>
         Last Name:
         {' '}
         <TextField
           id="lastName"
           label="Last Name"
-          defaultValue={profile.lastName}
+          // defaultValue={profile.lastName}
           value={updatedProfile.lastName}
           InputProps={{
             readOnly: !editProfile,
@@ -86,33 +98,59 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'lastName')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       {profile && profile.role && (
-      <p>
+      <div>
         Role:
         {' '}
-        <TextField
-          id="role"
-          label="Role"
-          defaultValue={profile.role}
-          value={updatedProfile.role}
-          InputProps={{
-            readOnly: !editProfile,
-          }}
-          onChange={(event) => HandleChange(event, 'role')}
-          variant="filled"
-        />
-      </p>
+        <FormControl>
+          <InputLabel>Role</InputLabel>
+          <Select
+            id="role"
+            label="Role"
+            defaultValue={profile.role}
+            value={updatedProfile.role}
+            disabled={!editProfile}
+            onChange={(event) => HandleChange(event, 'role')}
+            variant="filled"
+          >
+            <MenuItem value="Caregiver">Caregiver</MenuItem>
+            <MenuItem value="Mentor">Mentor</MenuItem>
+            <MenuItem value="Admin">Admin</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
+      )}
+      {profile && profile.serviceArea && (
+      <div>
+        Service Area:
+        {' '}
+        <FormControl sx={{ m: 1, minWidth: 100 }}>
+          <InputLabel>Service Area</InputLabel>
+          <Select
+            id="serviceArea"
+            label="Service Area"
+            defaultValue={profile.serviceArea}
+            value={updatedProfile.serviceArea}
+            disabled={!editProfile}
+            onChange={(event) => HandleChange(event, 'serviceArea')}
+            variant="filled"
+          >
+            <MenuItem value="AV">AV</MenuItem>
+            <MenuItem value="MS">MS</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
       )}
       {profile && profile.username && (
-      <p>
+      <div>
         Username:
         {' '}
         <TextField
           id="username"
           label="Username"
-          defaultValue={profile.username}
+          // defaultValue={profile.username}
           value={updatedProfile.username}
           InputProps={{
             readOnly: !editProfile,
@@ -120,7 +158,7 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'username')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       <button type="button" className="btn btn-info" onClick={HandleClick}> Edit Profile </button>
       {editProfile && <button type="button" className="btn btn-info" onClick={HandleSubmit}> Submit </button>}
