@@ -7,13 +7,12 @@ import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
 import {
-  ref, uploadBytesResumable, getDownloadURL, listAll, getStorage 
+  ref, uploadBytesResumable, getDownloadURL, listAll, getStorage,
 } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { db, storage } from './firebase';
 import * as api from '../api';
-
 
 function ExpandedModule({ profile }) {
   const { role } = profile;
@@ -38,7 +37,6 @@ function ExpandedModule({ profile }) {
   const [serviceArea, setServiceArea] = useState('');
   const [formTitle, setFormtitle] = useState();
   const [formBody, setFormbody] = useState();
-
 
   const roles = [];
   if (mentor) {
@@ -75,14 +73,14 @@ function ExpandedModule({ profile }) {
     setRefresh(!refresh);
   };
 
-  const getModulebyIdfunc = async (id, currRole) => {
-    //data object structured as {data, children_array}
-    const {data} = await api.getModulebyId(id, currRole);
+  const getModulebyIdfunc = async (tempId, tempcurrRole) => {
+    // data object structured as {data, children_array}
+    const { data } = await api.getModulebyId(tempId, tempcurrRole);
     return data;
-  }
+  };
 
-  const getModule = () => {//gets data object from api using async "wrapper function" above
-    //getModule cannot be async because it is used in the useEffect
+  const getModule = () => { // gets data object from api using async "wrapper function" above
+    // getModule cannot be async because it is used in the useEffect
     setChildren([]);
     getModulebyIdfunc(id, currRole).then((object) => {
       setTitle(object.data.title);
@@ -92,9 +90,7 @@ function ExpandedModule({ profile }) {
       setChildren(object.children_array);
       console.log(object.data.link);
       setModuleImage(object.data.link);
-    }
-      );
-    
+    });
   };
 
   // upload file to Firebase:

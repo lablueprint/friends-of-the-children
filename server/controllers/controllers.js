@@ -24,6 +24,7 @@ const getModulebyId = async (req, res) => {
   let moddata;
   await db.collection('modules').doc(moduleId).get().then(async (sc) => {
     moddata = sc.data();
+    console.log('reading moddata', moddata);
     // filter the children by role
     for (const child of moddata.children) {
       await db.collection('modules').doc(child).get().then((snap) => {

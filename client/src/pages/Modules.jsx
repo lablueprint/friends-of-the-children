@@ -57,7 +57,7 @@ function Modules({ profile }) {
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
     console.log(storageRef);
-    console.log()
+    console.log();
     setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -79,15 +79,14 @@ function Modules({ profile }) {
         });
       },
     );
-    //set linkstate here:
+    // set linkstate here:
   };
 
   const handleChange = (e) => {
     handleUpload(e.target.files[0]); // test
   };
 
-  const submitForm = () => {
-
+  const submitForm = async () => {
     const data = {
       title,
       body,
@@ -97,8 +96,11 @@ function Modules({ profile }) {
       parent: null,
       link,
     };
-    db.collection('modules').doc().set(data);
-    console.log(data);
+
+    const tempId = (await db.collection('modules').add(data)).id;
+
+    data.id = tempId;
+
     setModules([...modules, data]);
 
     setTitle('');
