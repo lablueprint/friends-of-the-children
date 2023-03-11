@@ -5,7 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import { createEvent } from '../api/index';
 import styles from '../styles/Calendar.module.css';
-import ColorBlobs from '../assets/color_blobs.svg';
+import ColorBlobs from '../assets/images/color_blobs.svg';
 
 function Calendar() {
   const calendarRef = createRef();

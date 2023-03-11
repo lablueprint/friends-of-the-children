@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/sliceAuth';
-import fotcLogo from '../assets/fotc_logo.svg';
+import fotcLogo from '../assets/images/fotc_logo.svg';
 import styles from '../styles/NavBar.module.css';
 import ResourcesIcon from '../assets/icons/resources_icon.svg';
 import MenteesIcon from '../assets/icons/mentees_icon.svg';
