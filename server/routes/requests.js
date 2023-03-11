@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import mailchimp from '../mailchimp.js';
 
 import {
+  createEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
@@ -11,35 +12,14 @@ import {
   getMessages,
 } from '../controllers/controllers.js';
 
-const { google } = require('googleapis');
-
-const oauth2Client = new google.auth.OAuth2(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  YOUR_REDIRECT_URL
-);
-
-// generate a url that asks permissions for Blogger and Google Calendar scopes
-const scopes = [
-  'https://www.googleapis.com/auth/calendar',
-  'https://www.googleapis.com/auth/calendar.events'
-];
-
-router.post('/create-tokens', async(req, res, next) => {
-  try{
-    const {code} = req.body;
-    const response = await oauth2Client.getToken(code);
-    res.send(response);
-  } catch(error){
-    next(error)
-  }
-});
-
 const router = express.Router();
 
 router.get('/', (req, res) => {
   res.send('We are live!');
 });
+
+router.post('/createEvent', createEvent);
+
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
 

@@ -1,4 +1,43 @@
 import { db } from '../firebase.js';
+//so that the require('googleapis') statement doesn't throw error
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+const { google } = require('googleapis');
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, REFRESH_TOKEN } = process.env;
+
+const oauth2Client = new google.auth.OAuth2(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URL
+);
+
+const createEvent = async(req, res) => {
+  try{
+    const{title, description, location, start, end} = req.body;
+    oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+    const calendar = google.calendar('v3');
+    const response = await calendar.events.insert({
+      auth: oauth2Client,
+      calendarId: 'primary',
+      supportsAttachments: true,
+      requestBody:{
+        summary: title,
+        description,
+        location,
+        start: {
+          dateTime: new Date(start),
+        },
+        end: {
+          dateTime: new Date(end),
+        }
+      }
+    })
+    res.send(response);
+  } catch(error){
+    console.log(error);
+  }
+};
 
 const getAllProfiles = async (req, res) => {
   console.log('getAllProfiles');
@@ -106,6 +145,7 @@ const getMessages = async (req, res) => {
 };
 
 export {
+  createEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,

@@ -2,6 +2,17 @@ import axios from 'axios';
 
 const url = 'http://localhost:5000/fotc';
 
+export const createEvent = async (eventData) => {
+  try {
+    const event = await axios.post(`${url}/createEvent`, eventData);
+    return event;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not create event');
+  }
+  return null;
+};
+
 export const getAllProfiles = async () => {
   try {
     const allProfiles = await axios.get(`${url}/getAllProfiles`);
