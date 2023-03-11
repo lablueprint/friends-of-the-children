@@ -20,6 +20,7 @@ export const updateModulechildren = async (id, data) => {
     console.log(error.message);
     console.log('could not update module children');
   }
+  return null;
 };
 
 export const getModulebyId = async (id, currRole) => { // gets ID of root module that the user clicked on
@@ -30,6 +31,7 @@ export const getModulebyId = async (id, currRole) => { // gets ID of root module
     console.log(error.message);
     console.log('could not get module by ID');
   }
+  return null;
 };
 
 export const getGoogleaccount = async (googleEmail) => { // gets google email
