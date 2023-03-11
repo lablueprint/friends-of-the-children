@@ -68,14 +68,14 @@ export const createList = async(data)=>{
 
 }
 
-addToList data should be of the form:
-{
-    email_address: "",
-    firstName: "",
-    lastName: "",
-    role: "",
-    serviceArea: "",
-}
+// addToList data should be of the form:
+// {
+//     email_address: "",
+//     firstName: "",
+//     lastName: "",
+//     role: "",
+//     serviceArea: "",
+// }
 export const addToList = async(data)=>{
     try{
         const response = await axios.post(`${url}/mailchimp/addToList`, data);
@@ -87,12 +87,12 @@ export const addToList = async(data)=>{
 
 }
 
-updateList data should just be of the form:
-{
-    ... profile object without email,
-    newEmail: updated email,
-    currentEmail: current email of profile
-}
+// updateList data should just be of the form:
+// {
+//     ... profile object without email,
+//     newEmail: updated email,
+//     currentEmail: current email of profile
+// }
 export const updateList = async(data) =>{
     try{
         const response = await axios.post(`${url}/mailchimp/updateList`, data);
