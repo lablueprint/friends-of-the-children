@@ -175,10 +175,10 @@ function Modules({ profile }) {
 
 Modules.propTypes = {
   profile: PropTypes.shape({
-    // firstName: PropTypes.string.isRequired,
-    // lastName: PropTypes.string.isRequired,
-    // username: PropTypes.string.isRequired,
-    // email: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,

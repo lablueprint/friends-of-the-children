@@ -7,7 +7,7 @@ import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
 import {
-  ref, uploadBytesResumable, getDownloadURL, listAll, getStorage,
+  ref, uploadBytesResumable, getDownloadURL,
 } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
@@ -68,6 +68,7 @@ function ExpandedModule({ profile }) {
     setFormtitle('');
     setFormbody('');
     setServiceArea('');
+    setModuleImage('');
     setCaregiver(false);
     setMentor(false);
     setRefresh(!refresh);
@@ -90,6 +91,7 @@ function ExpandedModule({ profile }) {
       setChildren(object.children_array);
       console.log(object.data.link);
       setModuleImage(object.data.link);
+      console.log(`hi${object.data.link}`);
     });
   };
 
@@ -226,10 +228,10 @@ function ExpandedModule({ profile }) {
 
 ExpandedModule.propTypes = {
   profile: PropTypes.shape({
-    // firstName: PropTypes.string.isRequired,
-    // lastName: PropTypes.string.isRequired,
-    // username: PropTypes.string.isRequired,
-    // email: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,

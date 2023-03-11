@@ -1,38 +1,34 @@
 import { React, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { string } from 'prop-types';
 import { Link } from 'react-router-dom';
-import styles from '../styles/Modules.module.css';
 import {
-  ref, getStorage, uploadBytesResumable, getDownloadURL, listAll, 
+  ref, getStorage, getDownloadURL,
 } from 'firebase/storage';
-import { db, storage } from '../pages/firebase';
-
-
+import styles from '../styles/Modules.module.css';
 
 function Module(props) {
-
   const {
     title, body, attachments, child, link,
   } = props;
 
   const [img, setImg] = useState('');
+  console.log(img);
 
-  const setImageURL = (link) => {
-    if(link.length > 0) {
+  const setImageURL = (imgLink) => {
+    if (imgLink.length > 0) {
       const storage = getStorage();
-      const spaceRef = ref(storage, link);
+      const spaceRef = ref(storage, imgLink);
       getDownloadURL(spaceRef).then((url) => {
         setImg(url);
       }).catch((error) => {
-        console.log(error.message);
-      })
-    
+        console.error(error.message);
+      });
+    } else {
+      setImg('');
     }
   };
 
-  useEffect(() => {setImageURL(link)}, [link]);
-
-  if(link.length === 0 || img.length === 0) return null;
+  useEffect(() => { setImageURL(link); }, [link]);
 
   return (
     <div>
@@ -52,13 +48,13 @@ function Module(props) {
       <img src={img} alt="" width="30%" height="auto" />
       {
         child.map((kid) => (
-          <Link to="/expanded-module" state={{ id: kid.id }}>
+          <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
             <div className={styles.card}>
               <h1>{kid.title}</h1>
             </div>
           </Link>
         ))
-        }
+      }
     </div>
   );
 }
@@ -67,15 +63,15 @@ Module.propTypes = {
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   attachments: PropTypes.string.isRequired,
-  child: PropTypes.array.isRequired,
-  link: PropTypes.string.isRequired,
+  child: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    role: PropTypes.arrayOf(string).isRequired,
+  })).isRequired,
+  link: PropTypes.string,
 };
 
 Module.defaultProps = {
-  title: '',
-  body: '',
-  attachments: '',
-  child: [],
   link: '',
 };
 
