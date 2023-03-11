@@ -24,7 +24,7 @@ const getModulebyId = async (req, res) => {
   let moddata;
   await db.collection('modules').doc(moduleId).get().then(async (sc) => {
     moddata = sc.data();
-    console.log("reading moddata", moddata);
+    console.log('reading moddata', moddata);
     // filter the children by role
     for (const child of moddata.children) {
       await db.collection('modules').doc(child).get().then((snap) => {
@@ -43,8 +43,8 @@ const getModulebyId = async (req, res) => {
 };
 
 const getGoogleaccount = async (req, res) => {
-  console.log("getGoogleaccount");
-  const googleAccount  = req.params.googleAccount;
+  console.log('getGoogleaccount');
+  const { googleAccount } = req.params;
   let googleData;
   const account = await db.collection('profiles')
     .where('email', '==', googleAccount)

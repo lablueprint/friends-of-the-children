@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import * as api from '../api';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   TextField,
 } from '@mui/material';
+import * as api from '../api';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/login_family.svg';
 import GoogleLogo from '../assets/google_logo.svg';
@@ -17,7 +17,7 @@ import { login } from '../redux/sliceAuth';
 
 /**
  Page used to log into the app
- 
+
  * to resolve the warning about crypto, add fallback options
  * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
  * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
@@ -36,14 +36,42 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const [error, setError] = useState(false);
   const [profile, setProfile] = useState(null); // object holding current user's profile content
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const { isLoggedIn } = useSelector((state) => state.sliceAuth); // destructuring the state to obtain localStorage's user object and login status using redux
   const dispatch = useDispatch();
 
+  // Checking if inputted password matches profile's password from Firebase
+  // Called whenever inputted profile info gets updated or when user's existing profile is updated
+  const checkPassword = () => {
+    // Check the hash password only if profile is not empty
+    if (profile !== null) {
+      if (!profile.google) {
+        bcrypt.compare(password, profile.password) // compare passwords
+          .then((isValid) => {
+            if (isValid) { // check whether it is a valid credential
+              console.log('login successful');
+              dispatch(login(profile)); // pass in profile to redux
+              updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+            } else {
+              setError(true);
+              console.error('invalid credentials'); // TODO: is this needed? technically we have a message that pops up in the UI
+            }
+          })
+          // Handle Errors here
+          .catch((e) => {
+            console.log(e);
+          });
+      } else {
+        dispatch(login(profile));
+        updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+      }
+    }
+  };
+
   useEffect(() => {
     checkPassword();
-  }, [profile, navigate, updateAppProfile]); //TODO: i think navigate can be removed :o?
+  }, [profile, navigate, updateAppProfile]); // TODO: i think navigate can be removed :o?
 
   // Defaults main page to be modules if user is already logged in
   if (isLoggedIn) {
@@ -55,7 +83,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const handleSubmit = async (event) => {
     event.preventDefault(); // this prevents from page to be refreshing
     const data = await api.getUsers(username);
-    
+
     setProfile(data.data);
   };
 
@@ -80,34 +108,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         console.error(googleErrorMessage);
       });
   }
-
-  // Checking if inputted password matches profile's password from Firebase 
-  // Called whenever inputted profile info gets updated or when user's existing profile is updated
-  const checkPassword = () => {
-    // Check the hash password only if profile is not empty
-    if (profile !== null) {
-      if (!profile.google) {
-        bcrypt.compare(password, profile.password) // compare passwords
-          .then((isValid) => {
-            if (isValid) { // check whether it is a valid credential
-              console.log('login successful');
-              dispatch(login(profile)); // pass in profile to redux 
-              updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-            } else {
-              setError(true);
-              console.error('invalid credentials'); // TODO: is this needed? technically we have a message that pops up in the UI
-            }
-          })
-          // Handle Errors here
-          .catch((e) => {
-            console.log(e);
-          }); 
-      } else {
-        dispatch(login(profile));
-        updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-      }
-    }
-  };
 
   return (
     <div>
