@@ -4,11 +4,10 @@ import {
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
 import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
+  arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
-import { db } from './firebase';
 import * as api from '../api';
 
 
@@ -55,12 +54,14 @@ function ExpandedModule({ profile }) {
     // });
 
     // const docRef = await addDoc(collection(db, 'modules'), data);
-    const docRefid = await api.addDoc(data);
-    console.log(docRefid)
-    const moduleRef = doc(db, 'modules', id);
-    await updateDoc(moduleRef, {
-      children: arrayUnion(docRefid.data.id),
-    });
+    // const docRefid = await api.addDoc(data);
+    // console.log(docRefid)
+    // //const moduleRef = doc(db, 'modules', id);
+    // const moduleRef = await api.getDocref('modules', id);
+    // // await updateDoc(moduleRef, {
+    // //   children: arrayUnion(docRefid.data.id),
+    // // });
+    await api.updateModulechildren(id, data);
 
     setFormtitle('');
     setFormbody('');

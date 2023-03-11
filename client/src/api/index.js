@@ -25,6 +25,27 @@ export const addDoc = async(data) => {
     }
 }
 
+export const getDocref = async(collection, id) => {
+    try{
+        let docref = await axios.get(`${url}/doc/${collection}/${id}`);
+        return docref;
+    }
+    catch(error) {
+        console.log(error.message);
+        console.log("could not get doc ref");
+    }
+}
+
+export const updateModulechildren = async(id, data) => {
+    try{
+        await axios.post(`${url}/updateModulechildren`, {id: id, data: data});
+    }
+    catch(error) {
+        console.log(error.message);
+        console.log("could not update module children");
+    }
+}
+
 export const getModulebyId = async(id, currRole) => { //gets ID of root module that the user clicked on 
     try{
         const module = await axios.get(`${url}/getModulebyId/${id}/${currRole}`);
