@@ -17,20 +17,6 @@ const getAllProfiles = async (req, res) => {
   res.status(202).json(p);
 };
 
-const addDocument = async (req, res) => {
-  const data = JSON.stringify(req.body);
-  const docRef = await addDoc(collection(db, 'modules'), req.body);
-  // console.log("this is docref", docRef.id)
-  res.status(200).json({id: docRef.id}); 
-}
-
-const firebase_doc = async (req, res) => {
-  const collection = req.params.collection;
-  const id = req.params.id;
-  const moduleRef = await doc(db, collection, id);
-  res.status(200).json(moduleRef);
-}
-
 const firebase_updateModulechildren = async (req, res) => {
   // console.log("This is docRef in modulechildren", req.body.docRef)
   // console.log("this is moduleRef", req.body.moduleRef)
@@ -138,12 +124,10 @@ const getMessages = async (req, res) => {
 };
 
 export {
-  addDocument,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
   getUsers,
   getMessages,
-  firebase_doc,
   firebase_updateModulechildren,
 };
