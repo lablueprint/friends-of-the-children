@@ -6,9 +6,11 @@ import { useLocation, Link } from 'react-router-dom';
 import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
-import { db } from './firebase';
+import { db, storage } from './firebase';
+import * as api from '../api';
 
 function ExpandedModule({ profile }) {
   const { role } = profile;
@@ -21,6 +23,9 @@ function ExpandedModule({ profile }) {
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
   const [refresh, setRefresh] = useState(false);
+
+  const [percent, setPercent] = useState(0);
+  const [link, setLink] = useState('');
 
   // Usestates for forms
   const [mentor, setMentor] = useState(false);
@@ -44,6 +49,7 @@ function ExpandedModule({ profile }) {
       role: roles,
       parent: id,
       children: [],
+      link,
     };
 
     // db.collection('modules').doc().add(data).then((dataRef) => {
@@ -67,29 +73,58 @@ function ExpandedModule({ profile }) {
     setRefresh(!refresh);
   };
 
-  const getModule = () => {
+  const getModulebyIdfunc = async (tempId, tempcurrRole) => {
+    // data object structured as {data, children_array}
+    const { data } = await api.getModulebyId(tempId, tempcurrRole);
+    return data;
+  };
+
+  const getModule = () => { // gets data object from api using async "wrapper function" above
+    // getModule cannot be async because it is used in the useEffect
     setChildren([]);
-    db.collection('modules').doc(id).get().then((sc) => {
-      const data = sc.data();
-      setTitle(data.title);
-      setBody(data.body);
-      setAttachments(data.attachments);
-      setParent(data.parent);
-      // filter the children by role
-      const tempChildren = [];
-      data.children.forEach((child) => {
-        db.collection('modules').doc(child).get().then((snap) => {
-          const childData = snap.data();
-          if (currRole === 'admin' || childData.role.includes(currRole)) {
-            const friend = {
-              id: child, title: childData.title, role: childData.role,
-            };
-            tempChildren.push(friend);
-          }
-          setChildren(tempChildren);
-        });
-      });
+    getModulebyIdfunc(id, currRole).then((object) => {
+      setTitle(object.data.title);
+      setBody(object.data.body);
+      setAttachments(object.data.attachments);
+      setParent(object.data.parent);
+      setChildren(object.children_array);
     });
+  };
+
+  // upload file to Firebase:
+  const handleUpload = (file) => {
+    console.log('target:', file.name);
+    // if (!file) {
+    //   alert('Please choose a file first!');
+    // }
+    const fileName = file.name;
+    const storageRef = ref(storage, `/files/${fileName}`);
+    setLink(storageRef.fullPath);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const p = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+        );
+
+        // update progress
+        setPercent(p);
+      },
+      (err) => console.log(err),
+      () => {
+        // download url
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log(url);
+        });
+      },
+    );
+  };
+
+  const handleChange = (e) => {
+    // setSelectedFile(e.target.files[0]);
+    handleUpload(e.target.files[0]);
   };
 
   useEffect(getModule, [id, currRole, refresh]);
@@ -117,6 +152,13 @@ function ExpandedModule({ profile }) {
             <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
             Service Area:
             <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+            File:
+            <input type="file" defaultValue="" onChange={handleChange} />
+            <p>
+              {percent}
+              {' '}
+              % done
+            </p>
             <button type="button" onClick={submitForm}>Submit</button>
           </form>
         </div>
@@ -154,6 +196,13 @@ function ExpandedModule({ profile }) {
           <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
           Service Area:
           <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+          File:
+          <input type="file" defaultValue="" onChange={handleChange} />
+          <p>
+            {percent}
+            {' '}
+            % done
+          </p>
           <button type="button" onClick={submitForm}>Submit</button>
         </form>
       </div>

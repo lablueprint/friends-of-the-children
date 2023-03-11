@@ -5,9 +5,9 @@ import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
 import { db } from './firebase';
+import * as api from '../api';
 
 function UserProfile({ profile, updateAppProfile }) {
-  console.log(profile);
   const [editProfile, setEditProfile] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(profile);
   const [updateProfileMessage, setUpdateProfileMessage] = useState('');
@@ -23,6 +23,15 @@ function UserProfile({ profile, updateAppProfile }) {
       .doc(profile.id)
       .update(updatedProfile)
       .then(() => {
+        const payload = {
+          currentEmail: profile.email,
+          newEmail: updatedProfile.email,
+          serviceArea: updatedProfile.serviceArea,
+          role: updatedProfile.role,
+          firstName: updatedProfile.firstName,
+          lastName: updatedProfile.lastName,
+        };
+        api.updateList(payload);
         setUpdateProfileMessage('Profile Successfully Updated!');
         updateAppProfile(updatedProfile);
         setEditProfile(false);
@@ -41,13 +50,13 @@ function UserProfile({ profile, updateAppProfile }) {
   return (
     <div>
       {profile && profile.email && (
-      <p>
+      <div>
         Email:
         {' '}
         <TextField
           id="email"
           label="Email"
-          defaultValue={profile.email}
+          // defaultValue={profile.email}
           value={updatedProfile.email}
           InputProps={{
             readOnly: !editProfile,
@@ -55,16 +64,16 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'email')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       {profile && profile.firstName && (
-      <p>
+      <div>
         First Name:
         {' '}
         <TextField
           id="firstName"
           label="First Name"
-          defaultValue={profile.firstName}
+          // defaultValue={profile.firstName}
           value={updatedProfile.firstName}
           InputProps={{
             readOnly: !editProfile,
@@ -72,16 +81,16 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'firstName')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       {profile && profile.lastName && (
-      <p>
+      <div>
         Last Name:
         {' '}
         <TextField
           id="lastName"
           label="Last Name"
-          defaultValue={profile.lastName}
+          // defaultValue={profile.lastName}
           value={updatedProfile.lastName}
           InputProps={{
             readOnly: !editProfile,
@@ -89,10 +98,10 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'lastName')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       {profile && profile.role && (
-      <p>
+      <div>
         Role:
         {' '}
         <FormControl>
@@ -111,10 +120,10 @@ function UserProfile({ profile, updateAppProfile }) {
             <MenuItem value="Admin">Admin</MenuItem>
           </Select>
         </FormControl>
-      </p>
+      </div>
       )}
       {profile && profile.serviceArea && (
-      <p>
+      <div>
         Service Area:
         {' '}
         <FormControl sx={{ m: 1, minWidth: 100 }}>
@@ -132,16 +141,16 @@ function UserProfile({ profile, updateAppProfile }) {
             <MenuItem value="MS">MS</MenuItem>
           </Select>
         </FormControl>
-      </p>
+      </div>
       )}
       {profile && profile.username && (
-      <p>
+      <div>
         Username:
         {' '}
         <TextField
           id="username"
           label="Username"
-          defaultValue={profile.username}
+          // defaultValue={profile.username}
           value={updatedProfile.username}
           InputProps={{
             readOnly: !editProfile,
@@ -149,7 +158,7 @@ function UserProfile({ profile, updateAppProfile }) {
           onChange={(event) => HandleChange(event, 'username')}
           variant="filled"
         />
-      </p>
+      </div>
       )}
       <button type="button" className="btn btn-info" onClick={HandleClick}> Edit Profile </button>
       {editProfile && <button type="button" className="btn btn-info" onClick={HandleSubmit}> Submit </button>}
