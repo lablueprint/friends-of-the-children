@@ -101,8 +101,7 @@ function Signup({ updateAppProfile }) {
       setPassErrorMessage('Passwords don\'t match!');
       isValid = false;
     }
-    if (isValid) {    
-
+    if (isValid) {
       if (!googleLoggedIn) {
         bcrypt.hash(password, 10) // asychronous hashing function
           .then((hashedPassword) => {
@@ -120,18 +119,17 @@ function Signup({ updateAppProfile }) {
             db.collection('profiles').doc().set(data);
             updateAppProfile(data);
 
-          //mailchimp- update list on signup 
-          const payload = {
-            email_address: data.email,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            role: data.role,
-            serviceArea: data.serviceArea
-          }
-          api.addToList(payload);   
+            // mailchimp- update list on signup
+            const payload = {
+              email_address: data.email,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              role: data.role,
+              serviceArea: data.serviceArea,
+            };
+            api.addToList(payload);
             console.log('Google not used - Finished');
-
-          })
+          });
       } else {
         const data = {
           firstName,
@@ -146,15 +144,15 @@ function Signup({ updateAppProfile }) {
         db.collection('profiles').doc().set(data);
         updateAppProfile(data);
 
-      //mailchimp- update list on signup
-      const payload = {
-        email_address: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        serviceArea: data.serviceArea
-      }
-      api.addToList(payload);   
+        // mailchimp- update list on signup
+        const payload = {
+          email_address: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          role: data.role,
+          serviceArea: data.serviceArea,
+        };
+        api.addToList(payload);
         console.log('Google used - finished');
       }
       navigate('/modules');
