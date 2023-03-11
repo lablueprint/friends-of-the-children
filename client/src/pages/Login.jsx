@@ -50,7 +50,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
         bcrypt.compare(password, profile.password) // compare passwords
           .then((isValid) => {
             if (isValid) { // check whether it is a valid credential
-              console.log('login successful');
               dispatch(login(profile)); // pass in profile to redux
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
             } else {
@@ -60,7 +59,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
           })
           // Handle Errors here
           .catch((e) => {
-            console.log(e);
+            console.error(e);
           });
       } else {
         dispatch(login(profile));
