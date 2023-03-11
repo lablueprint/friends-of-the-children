@@ -13,29 +13,6 @@ export const getAllProfiles = async() => {
     }
 }
 
-// export const addDoc = async(data) => {
-//     try {
-//         let res = await axios.post(`${url}/addDoc`, data);
-//         return res;
-
-//     }
-//     catch(error) {
-//         console.log(error.message);
-//         console.log("could not add doc");
-//     }
-// }
-
-// export const getDocref = async(collection, id) => {
-//     try{
-//         let docref = await axios.get(`${url}/doc/${collection}/${id}`);
-//         return docref;
-//     }
-//     catch(error) {
-//         console.log(error.message);
-//         console.log("could not get doc ref");
-//     }
-// }
-
 export const updateModulechildren = async(id, data) => {
     try{
         await axios.post(`${url}/updateModulechildren`, {id: id, data: data});
@@ -80,51 +57,51 @@ export const getUsers = async(users) => {
     }
 }
 
-// export const createList = async(data)=>{
-//     try{
-//         const response = await axios.post(`${url}/mailchimp/createList`, data);
-//         console.log("createList endpoint returns", response);
-//     }
-//     catch(error){
-//         console.log(`occurred in createList endpoint: ${error.message}`);
-//     }
+export const createList = async(data)=>{
+    try{
+        const response = await axios.post(`${url}/mailchimp/createList`, data);
+        console.log("createList endpoint returns", response);
+    }
+    catch(error){
+        console.log(`occurred in createList endpoint: ${error.message}`);
+    }
 
-// }
+}
 
-//addToList data should be of the form:
-// {
-//     email_address: "",
-//     firstName: "",
-//     lastName: "",
-//     role: "",
-//     serviceArea: "",
-// }
-// export const addToList = async(data)=>{
-//     try{
-//         const response = await axios.post(`${url}/mailchimp/addToList`, data);
-//         console.log("updateList endpoint returns", response);
-//     }
-//     catch(error){
-//         console.log(`occurred in addToList endpoint: ${error.message}`);
-//     }
+addToList data should be of the form:
+{
+    email_address: "",
+    firstName: "",
+    lastName: "",
+    role: "",
+    serviceArea: "",
+}
+export const addToList = async(data)=>{
+    try{
+        const response = await axios.post(`${url}/mailchimp/addToList`, data);
+        console.log("updateList endpoint returns", response);
+    }
+    catch(error){
+        console.log(`occurred in addToList endpoint: ${error.message}`);
+    }
 
-// }
+}
 
-//updateList data should just be of the form:
-// {
-//     ... profile object without email,
-//     newEmail: updated email,
-//     currentEmail: current email of profile
-// }
-// export const updateList = async(data) =>{
-//     try{
-//         const response = await axios.post(`${url}/mailchimp/updateList`, data);
-//         console.log("updateList endpoint returns", response);
-//     }
-//     catch(error){
-//         console.log(`error occured in updateList endpoint:${error.message}`)
-//     }
-// }
+updateList data should just be of the form:
+{
+    ... profile object without email,
+    newEmail: updated email,
+    currentEmail: current email of profile
+}
+export const updateList = async(data) =>{
+    try{
+        const response = await axios.post(`${url}/mailchimp/updateList`, data);
+        console.log("updateList endpoint returns", response);
+    }
+    catch(error){
+        console.log(`error occured in updateList endpoint:${error.message}`)
+    }
+}
 
 export const getMessages = async() => {
     try{
