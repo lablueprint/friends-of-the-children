@@ -14,17 +14,19 @@ const oauth2Client = new google.auth.OAuth2(
 
 const createEvent = async(req, res) => {
   try{
-    const{title, description, location, start, end} = req.body;
+    const{title, description, location, attachments, start, end} = req.body;
     oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
     const calendar = google.calendar('v3');
     const response = await calendar.events.insert({
       auth: oauth2Client,
       calendarId: 'primary',
       supportsAttachments: true,
+      attachments: ['users.txt'],
       requestBody:{
         summary: title,
         description,
         location,
+        attachments,
         start: {
           dateTime: new Date(start),
         },
