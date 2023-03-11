@@ -91,7 +91,6 @@ function ExpandedModule({ profile }) {
       setChildren(object.children_array);
       console.log(object.data.link);
       setModuleImage(object.data.link);
-      console.log(`hi${object.data.link}`);
     });
   };
 
