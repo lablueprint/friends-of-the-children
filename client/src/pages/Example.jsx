@@ -7,13 +7,13 @@ function Example({ profile }) {
   const { firstName, lastName, username } = profile;
   const [profiles, setProfiles] = useState([]);
 
-  useEffect( () => {
-    async function fetchProfiles(){
-      const {data} = await api.getAllProfiles();
+  useEffect(() => {
+    async function fetchProfiles() {
+      const { data } = await api.getAllProfiles();
       setProfiles(data);
     }
     fetchProfiles();
-    }, []);
+  }, []);
 
   return (
     <>
