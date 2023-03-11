@@ -4,14 +4,11 @@ import {
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
 import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
-} from 'firebase/firestore';
-import {
   ref, uploadBytesResumable, getDownloadURL,
 } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
-import { db, storage } from './firebase';
+import { storage } from './firebase';
 import * as api from '../api';
 
 function ExpandedModule({ profile }) {
@@ -57,13 +54,8 @@ function ExpandedModule({ profile }) {
       link,
     };
 
-    const docRef = await addDoc(collection(db, 'modules'), data);
-    console.log('Document written with ID: ', docRef.id);
-
-    const moduleRef = doc(db, 'modules', id);
-    await updateDoc(moduleRef, {
-      children: arrayUnion(docRef.id),
-    });
+    await api.updateModulechildren(id, data); // pass in id, data to submit
+    // adds data to firebase, also appends new module to children array of module with passed in id
 
     setFormtitle('');
     setFormbody('');

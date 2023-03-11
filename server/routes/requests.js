@@ -9,7 +9,9 @@ import {
   getGoogleaccount,
   getUsers,
   getMessages,
+  firebase_updateModulechildren,
 } from '../controllers/controllers.js';
+//import { updateDoc } from '../../client/src/api/index.js';
 
 const router = express.Router();
 
@@ -27,6 +29,10 @@ router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
 // gets profile via regular sign in
 router.get('/getUsers/:users', getUsers);
+
+//adds a module to firebase
+//then adds new module to the parent's children array
+router.post('/updateModulechildren', firebase_updateModulechildren);
 
 // mailchimp routes
 router.get('/mailchimp', async (req, res) => {
