@@ -6,7 +6,7 @@ import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Popup from './Popup';
+import Popup from '../components/Popup';
 import { db } from './firebase';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/login_family.svg';
