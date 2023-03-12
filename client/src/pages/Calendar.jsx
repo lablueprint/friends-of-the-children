@@ -62,20 +62,17 @@ function Calendar({ profile }) {
   };
 
   const dropEvent = (info) => {
-    const date = new Date();
-    const duration = info.delta.days;
-    let newEndDate;
+    let endTime;
     // fullcalendar makes end date null if it's the same as the start date :/
     if (info.oldEvent.end === null) {
-      newEndDate = info.event.start;
+      endTime = info.event.start;
     } else {
-      // set new end date to the old end date + the amt of time the the block was dragged across
-      newEndDate = new Date(date.setDate(info.oldEvent.end.getDate() + duration));
+      endTime = info.event.end;
     }
     const eventData = {
       id: info.event.id,
       start: info.event.start,
-      end: newEndDate,
+      end: endTime,
       title: info.event.title,
     };
     // call updateEvent api route
