@@ -76,6 +76,13 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     checkPassword();
   }, [profile, navigate, updateAppProfile]);
 
+  // if on /login, navigates to /modules once user is logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/modules');
+    }
+  }, []);
+
   const provider = new GoogleAuthProvider();
 
   function signInWithGoogle() {
@@ -124,9 +131,9 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     // setPassword('');
   };
 
-  if (isLoggedIn) {
-    return navigate('/modules');
-  }
+  // useEffect(() => {
+  //   navigate('/modules');
+  // }, [updateAppProfile]);
 
   return (
     <div>
