@@ -4,7 +4,7 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import { createEvent } from '../api/index';
+import { createEvent, updateEvent } from '../api/index';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
 
@@ -26,7 +26,7 @@ function Calendar({ profile }) {
     console.log('End time: ', eventInfo.event.end);
   };
 
-  const addEventFunc = (e) => {
+  const addEvent = (e) => {
     e.preventDefault();
 
     const title = e.target.title.value;
@@ -36,11 +36,10 @@ function Calendar({ profile }) {
     const fileUrl = e.target.attachments.value;
     const start = e.target.start.value;
     const end = e.target.end.value;
-
+    // check if user inputs an attachment
     if (e.target.attachments.value) {
       attachments.push({ fileUrl, title: 'an attachment!' });
     }
-
     // create json event object
     const event = {
       title,
@@ -50,13 +49,37 @@ function Calendar({ profile }) {
       end,
       attachments,
     };
-
-    // add event on fullcalendar interface
-    const api = calendarRef.current.getApi();
-    api.addEvent(event);
-
     // add event to actual google calendar
-    createEvent(event);
+    createEvent(event).then((eventID) => {
+      // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
+      event.id = eventID;
+      // add event on fullcalendar interface
+      const api = calendarRef.current.getApi();
+      api.addEvent(event);
+      console.log(event.end);
+    });
+    e.target.reset();
+  };
+
+  const dropEvent = (info) => {
+    const date = new Date();
+    const duration = info.delta.days;
+    let newEndDate;
+    // fullcalendar makes end date null if it's the same as the start date :/
+    if (info.oldEvent.end === null) {
+      newEndDate = info.event.start;
+    } else {
+      // set new end date to the old end date + the amt of time the the block was dragged across
+      newEndDate = new Date(date.setDate(info.oldEvent.end.getDate() + duration));
+    }
+    const eventData = {
+      id: info.event.id,
+      start: info.event.start,
+      end: newEndDate,
+      title: info.event.title,
+    };
+    // call updateEvent api route
+    updateEvent(eventData);
   };
 
   if (currRole === 'admin') {
@@ -64,7 +87,7 @@ function Calendar({ profile }) {
       <div>
         <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
         <div>
-          <form onSubmit={(e) => addEventFunc(e)}>
+          <form onSubmit={(e) => addEvent(e)}>
             <h1>FOTC Calendar</h1>
             Title:
             <input type="text" name="title" required />
@@ -88,6 +111,9 @@ function Calendar({ profile }) {
             plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             selectable
+            editable
+            // update event when you drag & drop an event on the interface (for admin only)
+            eventDrop={dropEvent}
             selectMirror
             dayMaxEvents
             eventColor="rgba(0, 170, 238, 0.2)"

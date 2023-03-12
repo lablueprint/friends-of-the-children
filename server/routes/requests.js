@@ -5,6 +5,7 @@ import mailchimp from '../mailchimp.js';
 
 import {
   createEvent,
+  updateEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
@@ -18,7 +19,11 @@ router.get('/', (req, res) => {
   res.send('We are live!');
 });
 
+//creates an event on google calendar
 router.post('/createEvent', createEvent);
+
+//updates an event on google calendar
+router.put('/updateEvent', updateEvent);
 
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);

@@ -5,6 +5,18 @@ const url = 'http://localhost:5000/fotc';
 export const createEvent = async (eventData) => {
   try {
     const event = await axios.post(`${url}/createEvent`, eventData);
+    const eventID = event.data.id;
+    return eventID;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not create event');
+  }
+  return null;
+};
+
+export const updateEvent = async (eventData) => {
+  try {
+    const event = await axios.put(`${url}/updateEvent`, eventData);
     return event;
   } catch (error) {
     console.log(error.message);

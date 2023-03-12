@@ -21,7 +21,7 @@ const createEvent = async(req, res) => {
       auth: oauth2Client,
       calendarId: 'primary',
       supportsAttachments: true,
-      attachments: ['users.txt'],
+      attachments,
       requestBody:{
         summary: title,
         description,
@@ -35,7 +35,37 @@ const createEvent = async(req, res) => {
         }
       }
     })
-    res.send(response);
+    res.send(response.data);
+  } catch(error){
+    console.log(error);
+  }
+};
+
+const updateEvent = async (req, res) => {
+  try{
+    const{id, title, description, location, attachments, start, end} = req.body;
+    oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+    const calendar = google.calendar('v3');
+    const response = await calendar.events.update({
+      auth: oauth2Client,
+      calendarId: 'primary',
+      eventId: id,
+      supportsAttachments: true,
+      attachments,
+      requestBody:{
+        summary: title,
+        description,
+        // location,
+        // attachments,
+        start: {
+          dateTime: start,
+        },
+        end: {
+          dateTime: end,
+        }
+      }
+    })
+    res.send(response.data);
   } catch(error){
     console.log(error);
   }
@@ -148,6 +178,7 @@ const getMessages = async (req, res) => {
 
 export {
   createEvent,
+  updateEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
