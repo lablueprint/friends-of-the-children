@@ -4,7 +4,7 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import { createEvent, updateEvent } from '../api/index';
+import { createEvent, patchEvent } from '../api/index';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
 
@@ -63,7 +63,7 @@ function Calendar({ profile }) {
 
   const dropEvent = (info) => {
     let endTime;
-    // fullcalendar makes end date null if it's the same as the start date :/
+    // fullcalendar makes end date null if it's the same as the start date
     if (info.oldEvent.end === null) {
       endTime = info.event.start;
     } else {
@@ -73,10 +73,9 @@ function Calendar({ profile }) {
       id: info.event.id,
       start: info.event.start,
       end: endTime,
-      title: info.event.title,
     };
-    // call updateEvent api route
-    updateEvent(eventData);
+    // update event using patchEvent
+    patchEvent(eventData);
   };
 
   if (currRole === 'admin') {
