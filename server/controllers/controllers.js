@@ -1,27 +1,36 @@
+import { createRequire } from 'module';
 import { db } from '../firebase.js';
-//so that the require('googleapis') statement doesn't throw error
-import { createRequire } from "module";
+// so that the require('googleapis') statement doesn't throw error
+// import {
+//   collection, addDoc, arrayUnion, updateDoc, doc,
+// } from 'firebase/firestore';
+
 const require = createRequire(import.meta.url);
 
 const { google } = require('googleapis');
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, REFRESH_TOKEN } = process.env;
+
+const {
+  GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, REFRESH_TOKEN,
+} = process.env;
 
 const oauth2Client = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URL
+  GOOGLE_REDIRECT_URL,
 );
 
-const createEvent = async(req, res) => {
-  try{
-    const{title, description, location, attachments, start, end} = req.body;
-    oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+const createEvent = async (req, res) => {
+  try {
+    const {
+      title, description, location, attachments, start, end,
+    } = req.body;
+    oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
     const calendar = google.calendar('v3');
     const response = await calendar.events.insert({
       auth: oauth2Client,
       calendarId: 'primary',
       supportsAttachments: true,
-      requestBody:{
+      requestBody: {
         summary: title,
         description,
         location,
@@ -31,41 +40,38 @@ const createEvent = async(req, res) => {
         },
         end: {
           dateTime: new Date(end),
-        }
-      }
-    })
+        },
+      },
+    });
     res.send(response.data);
-  } catch(error){
+  } catch (error) {
     console.log(error);
   }
 };
 
 const patchEvent = async (req, res) => {
-  try{
-    const{id, start, end} = req.body;
-    oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+  try {
+    const { id, start, end } = req.body;
+    oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
     const calendar = google.calendar('v3');
     const response = await calendar.events.patch({
       auth: oauth2Client,
       calendarId: 'primary',
       eventId: id,
-      requestBody:{
+      requestBody: {
         start: {
           dateTime: start,
         },
         end: {
           dateTime: end,
-        }
-      }
-    })
+        },
+      },
+    });
     res.send(response.data);
-  } catch(error){
+  } catch (error) {
     console.log(error);
   }
 };
-import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
-} from 'firebase/firestore';
 
 const getAllProfiles = async (req, res) => {
   console.log('getAllProfiles');
@@ -84,17 +90,17 @@ const getAllProfiles = async (req, res) => {
 const firebase_updateModulechildren = async (req, res) => {
   // console.log("This is docRef in modulechildren", req.body.docRef)
   // console.log("this is moduleRef", req.body.moduleRef)
-  const id = req.body.id;
-  console.log("this is id", id);
+  const { id } = req.body;
+  console.log('this is id', id);
   const docRef = await addDoc(collection(db, 'modules'), req.body.data);
-  console.log("this is docref", docRef);
+  console.log('this is docref', docRef);
   console.log("docref's id", docRef.id);
   const moduleRef = doc(db, 'modules', id);
   await updateDoc(moduleRef, {
     children: arrayUnion(docRef.id),
   });
-  res.status(200).json("success");
-}
+  res.status(200).json('success');
+};
 
 const getModulebyId = async (req, res) => {
   console.log('getModulebyId');
@@ -118,7 +124,7 @@ const getModulebyId = async (req, res) => {
           children_array.push(friend);
           // console.log('pushed into TC', children_array);
         }
-      }); 
+      });
     }
   });
   res.status(202).json({ data: moddata, children_array });
@@ -126,7 +132,7 @@ const getModulebyId = async (req, res) => {
 
 const getGoogleaccount = async (req, res) => {
   // console.log("getGoogleaccount");
-  const googleAccount  = req.params.googleAccount;
+  const { googleAccount } = req.params;
   let googleData;
   const account = await db.collection('profiles')
     .where('email', '==', googleAccount)
