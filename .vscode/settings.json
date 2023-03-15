@@ -27,10 +27,6 @@
         "javascript",
         "javascriptreact"
     ],
-    // "eslint.workingDirectories": [
-    //     "./backend", 
-    //     "./frontend"
-    // ],
     "javascript.updateImportsOnFileMove.enabled": "always",
     "workbench.editor.enablePreview": false,
 }

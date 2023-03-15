@@ -38,6 +38,16 @@ export const getAllProfiles = async () => {
   return null;
 };
 
+export const updateModulechildren = async (id, data) => {
+  try {
+    await axios.post(`${url}/updateModulechildren`, { id, data });
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not update module children');
+  }
+  return null;
+};
+
 // gets ID of root module that the user clicked on
 export const getModulebyId = async (id, currRole) => {
   try {

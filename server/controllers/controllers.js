@@ -63,6 +63,9 @@ const patchEvent = async (req, res) => {
     console.log(error);
   }
 };
+import {
+  collection, addDoc, arrayUnion, updateDoc, doc,
+} from 'firebase/firestore';
 
 const getAllProfiles = async (req, res) => {
   console.log('getAllProfiles');
@@ -78,17 +81,32 @@ const getAllProfiles = async (req, res) => {
   res.status(202).json(p);
 };
 
+const firebase_updateModulechildren = async (req, res) => {
+  // console.log("This is docRef in modulechildren", req.body.docRef)
+  // console.log("this is moduleRef", req.body.moduleRef)
+  const id = req.body.id;
+  console.log("this is id", id);
+  const docRef = await addDoc(collection(db, 'modules'), req.body.data);
+  console.log("this is docref", docRef);
+  console.log("docref's id", docRef.id);
+  const moduleRef = doc(db, 'modules', id);
+  await updateDoc(moduleRef, {
+    children: arrayUnion(docRef.id),
+  });
+  res.status(200).json("success");
+}
+
 const getModulebyId = async (req, res) => {
   console.log('getModulebyId');
   const moduleId = req.params.id;
   const { currRole } = req.params;
-  console.log('this is moduleId,', moduleId);
-  console.log('this is currRole', currRole);
+  // console.log('this is moduleId,', moduleId);
+  // console.log('this is currRole', currRole);
   const children_array = [];
   let moddata;
   await db.collection('modules').doc(moduleId).get().then(async (sc) => {
     moddata = sc.data();
-    console.log('reading moddata', moddata);
+    // console.log("reading moddata", moddata);
     // filter the children by role
     for (const child of moddata.children) {
       await db.collection('modules').doc(child).get().then((snap) => {
@@ -98,17 +116,17 @@ const getModulebyId = async (req, res) => {
             id: child, title: childData.title, role: childData.role,
           };
           children_array.push(friend);
-          console.log('pushed into TC', children_array);
+          // console.log('pushed into TC', children_array);
         }
-      });
+      }); 
     }
   });
   res.status(202).json({ data: moddata, children_array });
 };
 
 const getGoogleaccount = async (req, res) => {
-  console.log('getGoogleaccount');
-  const { googleAccount } = req.params;
+  // console.log("getGoogleaccount");
+  const googleAccount  = req.params.googleAccount;
   let googleData;
   const account = await db.collection('profiles')
     .where('email', '==', googleAccount)
@@ -177,4 +195,5 @@ export {
   getGoogleaccount,
   getUsers,
   getMessages,
+  firebase_updateModulechildren,
 };

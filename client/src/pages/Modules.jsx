@@ -74,14 +74,14 @@ function Modules({ profile }) {
         });
       },
     );
+    // set linkstate here:
   };
 
   const handleChange = (e) => {
-    // setSelectedFile(e.target.files[0]);
-    handleUpload(e.target.files[0]);
+    handleUpload(e.target.files[0]); // test
   };
 
-  const submitForm = () => {
+  const submitForm = async () => {
     const data = {
       title,
       body,
@@ -91,7 +91,12 @@ function Modules({ profile }) {
       parent: null,
       link,
     };
-    db.collection('modules').doc().set(data);
+
+    const tempId = (await db.collection('modules').add(data)).id;
+
+    data.id = tempId;
+
+    setModules([...modules, data]);
 
     setModules([...modules, data]);
 
