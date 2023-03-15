@@ -2,6 +2,31 @@ import axios from 'axios';
 
 const url = 'http://localhost:5000/fotc';
 
+// creates event on gcal
+export const createEvent = async (eventData) => {
+  try {
+    const event = await axios.post(`${url}/createEvent`, eventData);
+    const eventID = event.data.id;
+    return eventID;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not create event');
+  }
+  return null;
+};
+
+// updates gcal event without modifying event properties that you don't specify to
+export const patchEvent = async (eventData) => {
+  try {
+    const event = await axios.patch(`${url}/patchEvent`, eventData);
+    return event;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not update event');
+  }
+  return null;
+};
+
 export const getAllProfiles = async () => {
   try {
     const allProfiles = await axios.get(`${url}/getAllProfiles`);
@@ -23,7 +48,8 @@ export const updateModulechildren = async (id, data) => {
   return null;
 };
 
-export const getModulebyId = async (id, currRole) => { // gets ID of root module that the user clicked on
+// gets ID of root module that the user clicked on
+export const getModulebyId = async (id, currRole) => {
   try {
     const module = await axios.get(`${url}/getModulebyId/${id}/${currRole}`);
     return module;
@@ -34,7 +60,8 @@ export const getModulebyId = async (id, currRole) => { // gets ID of root module
   return null;
 };
 
-export const getGoogleaccount = async (googleEmail) => { // gets google email
+// gets google email
+export const getGoogleaccount = async (googleEmail) => {
   try {
     const account = await axios.get(`${url}/getGoogleaccount/${googleEmail}`);
     return account;

@@ -2,6 +2,7 @@ import { React } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import { useDispatch, useSelector } from 'react-redux';
+import styles from './styles/NavBar.module.css';
 import { login } from './redux/sliceAuth';
 import {
   Example,
@@ -14,7 +15,6 @@ import {
   NotFound,
   UserProfile,
 } from './pages';
-
 import NavBar from './components/NavBar';
 
 function App() {
@@ -33,18 +33,22 @@ function App() {
     isLoggedIn
       ? (
         <div className="App">
-          <NavBar profile={currUser} updateAppProfile={updateProfile} />
-          <Routes>
-            <Route path="/" element={(<Modules profile={currUser} />)} />
-            <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
-            <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
-            <Route path="/example" element={(<Example profile={currUser} />)} />
-            <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
-            <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
-            <Route path="/modules" element={(<Modules profile={currUser} />)} />
-            <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
-            <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
-          </Routes>
+          <div className={styles.wrapper}>
+            <NavBar profile={currUser} updateAppProfile={updateProfile} />
+            <div className={styles.mainContent}>
+              <Routes>
+                <Route path="/" element={(<Modules profile={currUser} />)} />
+                <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
+                <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
+                <Route path="/example" element={(<Example profile={currUser} />)} />
+                <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
+                <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
+                <Route path="/modules" element={(<Modules profile={currUser} />)} />
+                <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
+                <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
+              </Routes>
+            </div>
+          </div>
         </div>
       )
       : (

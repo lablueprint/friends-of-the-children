@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import {
-  ref, uploadBytesResumable, getDownloadURL,
-} from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
@@ -18,7 +16,6 @@ function Modules({ profile }) {
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
-
   // const [selectedFile, setSelectedFile] = useState();
   const [percent, setPercent] = useState(0);
   const [link, setLink] = useState('');
@@ -56,8 +53,6 @@ function Modules({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    console.log(storageRef);
-    console.log();
     setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -103,6 +98,8 @@ function Modules({ profile }) {
 
     setModules([...modules, data]);
 
+    setModules([...modules, data]);
+
     setTitle('');
     setBody('');
     setServiceArea('');
@@ -111,8 +108,7 @@ function Modules({ profile }) {
   };
 
   // empty dependency array means getModules is only being called on page load
-  useEffect(getModules);
-  // useEffect(getFromFirebase, [modules]);
+  useEffect(getModules, []);
 
   if (currRole === 'admin') {
     return (

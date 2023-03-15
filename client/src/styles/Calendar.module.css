@@ -1,0 +1,40 @@
+.blobs{
+    position: fixed;
+    top: 0;
+    left: 10%;
+    z-index: -1000;
+}
+
+.calendar{
+    background: #FFFFFF;
+    box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    padding: 50px;
+    max-width: 1100px;
+    margin: 40px auto;
+    font-family: 'Inter';
+}
+
+.calendar a{
+    color: #3F3F3F;
+    text-decoration: none;
+}
+
+.calendar table{
+    /* border-radius: 10px; */
+}
+
+.calendar th{
+    height: 40px;
+    vertical-align: middle;
+    background: rgba(21, 109, 191, 0.1);
+}
+
+.submit_button{
+    border-radius: 10px;
+    margin: 5px;
+}
+
+.fc .fc-toolbar-title {
+    font-weight: 900 !important;
+}

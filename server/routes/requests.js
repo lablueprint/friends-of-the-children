@@ -4,6 +4,8 @@ import crypto from 'crypto';
 import mailchimp from '../mailchimp.js';
 
 import {
+  createEvent,
+  patchEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
@@ -18,6 +20,13 @@ const router = express.Router();
 router.get('/', (req, res) => {
   res.send('We are live!');
 });
+
+//creates an event on google calendar
+router.post('/createEvent', createEvent);
+
+//updates an event on google calendar
+router.patch('/patchEvent', patchEvent);
+
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
 
