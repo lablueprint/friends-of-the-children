@@ -1,9 +1,9 @@
 import { createRequire } from 'module';
+import {
+  collection, addDoc, arrayUnion, updateDoc, doc,
+} from 'firebase/firestore';
 import { db } from '../firebase.js';
 // so that the require('googleapis') statement doesn't throw error
-// import {
-//   collection, addDoc, arrayUnion, updateDoc, doc,
-// } from 'firebase/firestore';
 
 const require = createRequire(import.meta.url);
 

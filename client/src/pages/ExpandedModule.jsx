@@ -3,9 +3,6 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
-// import {
-//   collection, addDoc, arrayUnion, updateDoc, doc,
-// } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
@@ -21,7 +18,6 @@ function ExpandedModule({ profile }) {
   const [attachments, setAttachments] = useState(); // MIGHT not be needed, since link = attachments storage
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
-  // const [allImages, setImages] = useState('');
   const currRole = role.toLowerCase();
   const [refresh, setRefresh] = useState(false);
 
