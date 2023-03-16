@@ -7,7 +7,7 @@ import {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
-  getUsers,
+  getUserProfiles,
   getMessages,
 } from '../controllers/controllers.js';
 
@@ -26,7 +26,7 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
 // gets profile via regular sign in
-router.get('/getUsers/:users', getUsers);
+router.get('/getUserProfiles/:users', getUserProfiles);
 
 // mailchimp routes
 router.get('/mailchimp', async (req, res) => {

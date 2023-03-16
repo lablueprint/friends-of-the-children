@@ -62,23 +62,37 @@ const getGoogleaccount = async (req, res) => {
   res.status(202).json(googleData);
 };
 
-const getUsers = async (req, res) => {
+const getUserProfiles = async (req, res) => {
   console.log('getUsers');
   const usernameSearch = req.params.users;
   let userData;
   let googleData;
   console.log('this is usernameSearch', usernameSearch);
-  const profile = await db.collection('profiles').where('username', '==', usernameSearch).get().then(async (sc) => {
-    // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-    for (const doc of sc.docs) {
-      const data = await doc.data();
-      data.id = doc.id;
-      console.log('this is doc.data()', data);
-      googleData = data;
-    }
+
+  let usernames = [];
+
+  db.collection('profiles').get().then((sc) => {
+    sc.forEach((doc) => {
+      const data = doc.data();
+      if (data && data.role) {
+        data.id = doc.id;
+        usernames.push(data);
+      }
+    });
+    res.status(202).json(usernames);
   });
-  console.log(googleData);
-  res.status(202).json(googleData);
+
+  // const profile = await db.collection('profiles').where('username', '==', usernameSearch).get().then(async (sc) => {
+  //   // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
+  //   for (const doc of sc.docs) {
+  //     const data = await doc.data();
+  //     data.id = doc.id;
+  //     console.log('this is doc.data()', data);
+  //     googleData = data;
+  //   }
+  // });
+  // console.log(googleData);
+  // res.status(202).json(googleData);
 };
 
 const getMessages = async (req, res) => {
@@ -109,6 +123,6 @@ export {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
-  getUsers,
+  getUserProfiles,
   getMessages,
 };

@@ -35,9 +35,9 @@ export const getGoogleaccount = async (googleEmail) => { // gets google email
   return null;
 };
 
-export const getUsers = async (users) => {
+export const getUserProfiles = async (users) => {
   try {
-    const user = await axios.get(`${url}/getUsers/${users}`);
+    const user = await axios.get(`${url}/getUserProfiles/${users}`);
     console.log('axios user returns', user);
     return user;
   } catch (error) {

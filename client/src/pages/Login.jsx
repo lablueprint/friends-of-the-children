@@ -35,6 +35,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [profile, setProfile] = useState(null); // object holding current user's profile content
+  const [userProfiles, setUserProfiles] = useState(null); // array holding all user profiles objects from Firebase
 
   const navigate = useNavigate();
 
@@ -52,8 +53,11 @@ function Login({ updateAppProfile }) { // deconstruct the function props
             if (isValid) { // check whether it is a valid credential
               dispatch(login(profile)); // pass in profile to redux
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+              setError(false);
+              console.log('error doesnt exist');
             } else {
               setError(true);
+              console.log('error exists');
               console.error('invalid credentials'); // TODO: is this needed? technically we have a message that pops up in the UI
             }
           })
@@ -68,9 +72,33 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     }
   };
 
+  // Checking inputted username with all the usernames in database (stored in userProfiles array)
+  const checkUsers = (usernameSearch) => {
+    const tempUserMatch = userProfiles.filter((p) => p.username === usernameSearch); // array of objects with matching usernames
+    if (tempUserMatch.length === 0) { // no matching username
+      setError(true);
+    } else {
+      console.log('hi');
+      const data = tempUserMatch[0];
+      data.id = tempUserMatch[0].id;
+      setProfile(data); // updating current profile
+      checkPassword();
+    }
+  };
+
+  // useEffect(() => {
+  //   checkPassword();
+  // }, [profile, navigate, updateAppProfile]); // TODO: i think navigate can be removed :o?
+
   useEffect(() => {
-    checkPassword();
-  }, [profile, navigate, updateAppProfile]); // TODO: i think navigate can be removed :o?
+    // saving all the user profiles in an array (useProfiles) only on first load
+    const fetchData = async () => {
+      const data = await api.getUserProfiles();
+      setUserProfiles(data.data);
+    };
+    fetchData().catch(console.error);
+    console.error(error);
+  }, []);
 
   // Defaults main page to be modules if user is already logged in
   if (isLoggedIn) {
@@ -81,9 +109,8 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   // Called when user clicks "Login" button or presses Enter after inputting username + password
   const handleSubmit = async (event) => {
     event.preventDefault(); // this prevents from page to be refreshing
-    const data = await api.getUsers(username);
-
-    setProfile(data.data);
+    checkUsers(username);
+    // checkPassword(password);
   };
 
   const provider = new GoogleAuthProvider();
