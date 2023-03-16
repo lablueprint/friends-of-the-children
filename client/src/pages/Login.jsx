@@ -9,10 +9,10 @@ import {
 } from '@mui/material';
 import * as api from '../api';
 import styles from '../styles/Login.module.css';
-import LoginFamily from '../assets/login_family.svg';
-import GoogleLogo from '../assets/google_logo.svg';
-import UpperLeft from '../assets/upperLeft.svg';
-import BottomRight from '../assets/bottomRight.svg';
+import LoginFamily from '../assets/images/login_family.svg';
+import GoogleLogo from '../assets/images/google_logo.svg';
+import UpperLeft from '../assets/images/upperLeft.svg';
+import BottomRight from '../assets/images/bottomRight.svg';
 import { login } from '../redux/sliceAuth';
 
 /**
@@ -112,6 +112,13 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     checkUsers(username);
     // checkPassword(password);
   };
+
+  // if on /login, navigates to /modules once user is logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/modules');
+    }
+  }, []);
 
   const provider = new GoogleAuthProvider();
 

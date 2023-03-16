@@ -14,8 +14,7 @@
 
     "editor.suggestSelection": "first",
     "eslint.workingDirectories": [
-        "./client",
-        "./server"
+        {"mode": "auto"}
     ],
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "workbench.colorTheme": "Atom One Dark",

@@ -1,4 +1,77 @@
+import { createRequire } from 'module';
+import {
+  collection, addDoc, arrayUnion, updateDoc, doc,
+} from 'firebase/firestore';
 import { db } from '../firebase.js';
+// so that the require('googleapis') statement doesn't throw error
+
+const require = createRequire(import.meta.url);
+
+const { google } = require('googleapis');
+
+const {
+  GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, REFRESH_TOKEN,
+} = process.env;
+
+const oauth2Client = new google.auth.OAuth2(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URL,
+);
+
+const createEvent = async (req, res) => {
+  try {
+    const {
+      title, description, location, attachments, start, end,
+    } = req.body;
+    oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+    const calendar = google.calendar('v3');
+    const response = await calendar.events.insert({
+      auth: oauth2Client,
+      calendarId: 'primary',
+      supportsAttachments: true,
+      requestBody: {
+        summary: title,
+        description,
+        location,
+        attachments,
+        start: {
+          dateTime: new Date(start),
+        },
+        end: {
+          dateTime: new Date(end),
+        },
+      },
+    });
+    res.send(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const patchEvent = async (req, res) => {
+  try {
+    const { id, start, end } = req.body;
+    oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+    const calendar = google.calendar('v3');
+    const response = await calendar.events.patch({
+      auth: oauth2Client,
+      calendarId: 'primary',
+      eventId: id,
+      requestBody: {
+        start: {
+          dateTime: start,
+        },
+        end: {
+          dateTime: end,
+        },
+      },
+    });
+    res.send(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const getAllProfiles = async (req, res) => {
   console.log('getAllProfiles');
@@ -14,17 +87,32 @@ const getAllProfiles = async (req, res) => {
   res.status(202).json(p);
 };
 
+const firebase_updateModulechildren = async (req, res) => {
+  // console.log("This is docRef in modulechildren", req.body.docRef)
+  // console.log("this is moduleRef", req.body.moduleRef)
+  const { id } = req.body;
+  console.log('this is id', id);
+  const docRef = await addDoc(collection(db, 'modules'), req.body.data);
+  console.log('this is docref', docRef);
+  console.log("docref's id", docRef.id);
+  const moduleRef = doc(db, 'modules', id);
+  await updateDoc(moduleRef, {
+    children: arrayUnion(docRef.id),
+  });
+  res.status(200).json('success');
+};
+
 const getModulebyId = async (req, res) => {
   console.log('getModulebyId');
   const moduleId = req.params.id;
   const { currRole } = req.params;
-  console.log('this is moduleId,', moduleId);
-  console.log('this is currRole', currRole);
+  // console.log('this is moduleId,', moduleId);
+  // console.log('this is currRole', currRole);
   const children_array = [];
   let moddata;
   await db.collection('modules').doc(moduleId).get().then(async (sc) => {
     moddata = sc.data();
-    console.log('reading moddata', moddata);
+    // console.log("reading moddata", moddata);
     // filter the children by role
     for (const child of moddata.children) {
       await db.collection('modules').doc(child).get().then((snap) => {
@@ -34,7 +122,7 @@ const getModulebyId = async (req, res) => {
             id: child, title: childData.title, role: childData.role,
           };
           children_array.push(friend);
-          console.log('pushed into TC', children_array);
+          // console.log('pushed into TC', children_array);
         }
       });
     }
@@ -43,7 +131,7 @@ const getModulebyId = async (req, res) => {
 };
 
 const getGoogleaccount = async (req, res) => {
-  console.log('getGoogleaccount');
+  // console.log("getGoogleaccount");
   const { googleAccount } = req.params;
   let googleData;
   const account = await db.collection('profiles')
@@ -120,9 +208,12 @@ const getMessages = async (req, res) => {
 };
 
 export {
+  createEvent,
+  patchEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
   getUserProfiles,
   getMessages,
+  firebase_updateModulechildren,
 };

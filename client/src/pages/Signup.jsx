@@ -8,10 +8,10 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { db } from './firebase';
 import styles from '../styles/Login.module.css';
-import LoginFamily from '../assets/login_family.svg';
-import UpperRight from '../assets/upperRight.svg';
-import BottomLeft from '../assets/bottomLeft.svg';
-import GoogleLogo from '../assets/google_logo.svg';
+import LoginFamily from '../assets/images/login_family.svg';
+import UpperRight from '../assets/images/upperRight.svg';
+import BottomLeft from '../assets/images/bottomLeft.svg';
+import GoogleLogo from '../assets/images/google_logo.svg';
 import * as api from '../api';
 
 /**
