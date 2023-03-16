@@ -17,7 +17,6 @@ import { login } from '../redux/sliceAuth';
 
 /**
  Page used to log into the app
-
  * to resolve the warning about crypto, add fallback options
  * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
  * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
@@ -54,16 +53,15 @@ function Login({ updateAppProfile }) { // deconstruct the function props
               dispatch(login(profile)); // pass in profile to redux
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
               setError(false);
-              console.log('error doesnt exist');
             } else {
               setError(true);
-              console.log('error exists');
               console.error('invalid credentials'); // TODO: is this needed? technically we have a message that pops up in the UI
             }
           })
           // Handle Errors here
           .catch((e) => {
             console.error(e);
+            setError(true);
           });
       } else {
         dispatch(login(profile));
@@ -78,7 +76,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     if (tempUserMatch.length === 0) { // no matching username
       setError(true);
     } else {
-      console.log('hi');
       const data = tempUserMatch[0];
       data.id = tempUserMatch[0].id;
       setProfile(data); // updating current profile
@@ -86,18 +83,18 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     }
   };
 
-  // useEffect(() => {
-  //   checkPassword();
-  // }, [profile, navigate, updateAppProfile]); // TODO: i think navigate can be removed :o?
+  useEffect(() => {
+    checkPassword();
+  }, [profile]); // TODO: i think navigate can be removed :o?
+
+  const fetchData = async () => {
+    const data = await api.getUserProfiles();
+    setUserProfiles(data.data);
+  };
 
   useEffect(() => {
-    // saving all the user profiles in an array (useProfiles) only on first load
-    const fetchData = async () => {
-      const data = await api.getUserProfiles();
-      setUserProfiles(data.data);
-    };
+    // saving all the user profiles from Firebase in an array (useProfiles) only on first load
     fetchData().catch(console.error);
-    console.error(error);
   }, []);
 
   // Defaults main page to be modules if user is already logged in
@@ -112,13 +109,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     checkUsers(username);
     // checkPassword(password);
   };
-
-  // if on /login, navigates to /modules once user is logged in
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/modules');
-    }
-  }, []);
 
   const provider = new GoogleAuthProvider();
 
@@ -139,6 +129,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
         const googleErrorMessage = e.message;
         console.error(googleErrorMessage);
+        setError(true);
       });
   }
 
