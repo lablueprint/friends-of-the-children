@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const url = 'http://localhost:5000/fotc';
 
-// creates event on gcal
+// creates an event on gcal
 export const createEvent = async (eventData) => {
   try {
     const event = await axios.post(`${url}/createEvent`, eventData);
@@ -10,19 +10,19 @@ export const createEvent = async (eventData) => {
     return eventID;
   } catch (error) {
     console.log(error.message);
-    console.log('could not create event');
+    console.log('could not create this gcal event');
   }
   return null;
 };
 
-// updates gcal event without modifying event properties that you don't specify to
+// updates an event on gcal
 export const patchEvent = async (eventData) => {
   try {
     const event = await axios.patch(`${url}/patchEvent`, eventData);
     return event;
   } catch (error) {
     console.log(error.message);
-    console.log('could not update event');
+    console.log('could not update this gcal event');
   }
   return null;
 };
@@ -40,7 +40,8 @@ export const getAllProfiles = async () => {
 
 export const updateModulechildren = async (id, data) => {
   try {
-    await axios.post(`${url}/updateModulechildren`, { id, data });
+    const updatedChildren = await axios.post(`${url}/updateModulechildren`, { id, data });
+    return updatedChildren;
   } catch (error) {
     console.log(error.message);
     console.log('could not update module children');
@@ -88,6 +89,7 @@ export const createList = async (data) => {
   try {
     const response = await axios.post(`${url}/mailchimp/createList`, data);
     console.log('createList endpoint returns', response);
+    return response;
   } catch (error) {
     console.log(`occurred in createList endpoint: ${error.message}`);
   }
@@ -106,6 +108,7 @@ export const addToList = async (data) => {
   try {
     const response = await axios.post(`${url}/mailchimp/addToList`, data);
     console.log('updateList endpoint returns', response);
+    return response;
   } catch (error) {
     console.log(`occurred in addToList endpoint: ${error.message}`);
   }
@@ -122,6 +125,7 @@ export const updateList = async (data) => {
   try {
     const response = await axios.post(`${url}/mailchimp/updateList`, data);
     console.log('updateList endpoint returns', response);
+    return response;
   } catch (error) {
     console.log(`error occured in updateList endpoint:${error.message}`);
   }
