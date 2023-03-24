@@ -340,9 +340,12 @@ function Signup({ updateAppProfile }) {
 
   return (
     <div>
-      {usernameError ? <Popup errorTitle="Signup" errorCode={userErrorMessage} /> : null}
-      {confirmError ? <Popup errorTitle="Signup" errorCode={passErrorMessage} /> : null}
-      {googleError ? <Popup errorTitle="Signup" errorCode={googErrorCode.concat(' ', googErrorMessage)} /> : null}
+      {(() => {
+        if (usernameError) return <Popup errorTitle="Signup" errorCode={userErrorMessage} />;
+        if (confirmError) return <Popup errorTitle="Signup" errorCode={passErrorMessage} />;
+        if (googleError) return <Popup errorTitle="Signup" errorCode={googErrorCode.concat(' ', googErrorMessage)} />;
+        return null;
+      })()}
       <img src={UpperRight} alt="upper right design" className={styles.design_top} />
       <div className={styles.container}>
         <div className={styles.left_column}>
