@@ -9,11 +9,12 @@ import {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
+  getUserUsernames,
   getUserProfiles,
   getMessages,
   firebase_updateModulechildren,
 } from '../controllers/controllers.js';
-//import { updateDoc } from '../../client/src/api/index.js';
+// import { updateDoc } from '../../client/src/api/index.js';
 
 const router = express.Router();
 
@@ -21,10 +22,10 @@ router.get('/', (req, res) => {
   res.send('We are live!');
 });
 
-//creates an event on google calendar
+// creates an event on google calendar
 router.post('/createEvent', createEvent);
 
-//updates an event on google calendar
+// updates an event on google calendar
 router.patch('/patchEvent', patchEvent);
 
 // gets all profiles from firebase collection "profiles"
@@ -36,11 +37,13 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 // gets profile via google email
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
+router.get('/getUserUsernames/:users', getUserUsernames);
+
 // gets profile via regular sign in
 router.get('/getUserProfiles/:users', getUserProfiles);
 
-//adds a module to firebase
-//then adds new module to the parent's children array
+// adds a module to firebase
+// then adds new module to the parent's children array
 router.post('/updateModulechildren', firebase_updateModulechildren);
 
 // mailchimp routes

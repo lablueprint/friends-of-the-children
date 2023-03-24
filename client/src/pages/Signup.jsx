@@ -36,7 +36,7 @@ function Signup({ updateAppProfile }) {
   const [serviceArea, setServiceArea] = useState('AV');
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
-  const [usernames, setUsernames] = useState();
+  const [userUsernames, setUserUsernames] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userErrorMessage, setUserErrorMessage] = useState('');
@@ -64,7 +64,7 @@ function Signup({ updateAppProfile }) {
         console.log(googleUser);
         setGoogleLoggedIn(true);
         setEmail(googleUser.email);
-        setUsername(googleUser.displayName);
+        setUsername(googleUser.displayName); // TODO: this is wrong because their display name is not their username
       // ...
       }).catch((error) => {
       // Handle Errors here.
@@ -82,23 +82,14 @@ function Signup({ updateAppProfile }) {
       });
   }
 
-  const readProfiles = () => {
-    const tempUsers = [];
-    db.collection('profiles').get().then((sc) => {
-      sc.forEach((doc) => {
-        const data = doc.data();
-        if (data && data.username) {
-          tempUsers.push(data.username);
-        }
-      });
-    });
-    setUsernames(tempUsers);
+  const fetchData = async () => {
+    const data = await api.getUserUsernames();
+    setUserUsernames(data.data);
   };
 
-  useEffect(
-    readProfiles,
-    [],
-  );
+  useEffect(() => {
+    fetchData().catch(console.error);
+  }, []);
 
   const onSubmit = () => {
     let isValid = true;
@@ -106,7 +97,7 @@ function Signup({ updateAppProfile }) {
     setUsernameError(false);
     setUserErrorMessage('');
     setPassErrorMessage('');
-    if (usernames.includes(username)) {
+    if (userUsernames.includes(username)) {
       setUsernameError(true);
       setUserErrorMessage('Username already exists!');
       isValid = false;

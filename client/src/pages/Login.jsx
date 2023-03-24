@@ -83,14 +83,14 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     }
   };
 
-  useEffect(() => {
-    checkPassword();
-  }, [profile]); // TODO: i think navigate can be removed :o?
-
   const fetchData = async () => {
     const data = await api.getUserProfiles();
     setUserProfiles(data.data);
   };
+
+  useEffect(() => {
+    checkPassword();
+  }, [profile]);
 
   useEffect(() => {
     // saving all the user profiles from Firebase in an array (useProfiles) only on first load

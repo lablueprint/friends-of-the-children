@@ -150,24 +150,38 @@ const getGoogleaccount = async (req, res) => {
   res.status(202).json(googleData);
 };
 
-const getUserProfiles = async (req, res) => {
-  console.log('getUsers');
-  const usernameSearch = req.params.users;
-  let userData;
-  let googleData;
-  console.log('this is usernameSearch', usernameSearch);
+const getUserUsernames = async (req, res) => {
+  const usernames = [];
 
-  let usernames = [];
+  db.collection('profiles').get().then((sc) => {
+    sc.forEach((doc) => {
+      const data = doc.data();
+      if (data && data.username) {
+        data.id = doc.id;
+        usernames.push(data.username);
+      }
+    });
+    res.status(202).json(usernames);
+  });
+};
+
+const getUserProfiles = async (req, res) => {
+  // const usernameSearch = req.params.users;
+  // let userData;
+  // let googleData;
+  // console.log('this is usernameSearch', usernameSearch);
+
+  const profiles = [];
 
   db.collection('profiles').get().then((sc) => {
     sc.forEach((doc) => {
       const data = doc.data();
       if (data && data.role) {
         data.id = doc.id;
-        usernames.push(data);
+        profiles.push(data);
       }
     });
-    res.status(202).json(usernames);
+    res.status(202).json(profiles);
   });
 
   // const profile = await db.collection('profiles').where('username', '==', usernameSearch).get().then(async (sc) => {
@@ -213,6 +227,7 @@ export {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
+  getUserUsernames,
   getUserProfiles,
   getMessages,
   firebase_updateModulechildren,

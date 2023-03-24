@@ -72,6 +72,18 @@ export const getGoogleaccount = async (googleEmail) => {
   return null;
 };
 
+export const getUserUsernames = async (users) => {
+  try {
+    const user = await axios.get(`${url}/getUserUsernames/${users}`);
+    console.log('axios user returns', user);
+    return user;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not get user');
+  }
+  return null;
+};
+
 export const getUserProfiles = async (users) => {
   try {
     const user = await axios.get(`${url}/getUserProfiles/${users}`);
