@@ -49,3 +49,18 @@
   src: url('./assets/fonts/NewsGothicBold.otf');
   font-weight: bold;
 }
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./assets/fonts/Inter-Light.ttf');
+  font-weight: normal;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+}
+
+.fc-day-today {
+  background-color: rgba(21, 109, 191, 0.1) !important;
+}

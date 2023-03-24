@@ -4,18 +4,29 @@ import crypto from 'crypto';
 import mailchimp from '../mailchimp.js';
 
 import {
+  createEvent,
+  patchEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
   getUsers,
   getMessages,
+  firebase_updateModulechildren,
 } from '../controllers/controllers.js';
+//import { updateDoc } from '../../client/src/api/index.js';
 
 const router = express.Router();
 
 router.get('/', (req, res) => {
   res.send('We are live!');
 });
+
+//creates an event on google calendar
+router.post('/createEvent', createEvent);
+
+//updates an event on google calendar
+router.patch('/patchEvent', patchEvent);
+
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
 
@@ -27,6 +38,10 @@ router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
 // gets profile via regular sign in
 router.get('/getUsers/:users', getUsers);
+
+//adds a module to firebase
+//then adds new module to the parent's children array
+router.post('/updateModulechildren', firebase_updateModulechildren);
 
 // mailchimp routes
 router.get('/mailchimp', async (req, res) => {
