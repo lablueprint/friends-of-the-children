@@ -51,7 +51,7 @@ function ExpandedModule({ profile }) {
       link,
     };
 
-    await api.updateModulechildren(id, data); // pass in id, data to submit
+    await api.updateModuleChildren(id, data); // pass in id, data to submit
     // adds data to firebase, also appends new module to children array of module with passed in id
 
     setFormtitle('');
@@ -77,7 +77,7 @@ function ExpandedModule({ profile }) {
       setBody(object.data.body);
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
-      setChildren(object.children_array);
+      setChildren(object.childrenArray);
       console.log(object.data.link);
       setModuleImage(object.data.link);
     });

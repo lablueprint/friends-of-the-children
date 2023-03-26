@@ -1,3 +1,4 @@
+// send client-side (frontend) data to server
 import axios from 'axios';
 
 const url = 'http://localhost:5000/fotc';
@@ -5,12 +6,13 @@ const url = 'http://localhost:5000/fotc';
 // creates an event on gcal
 export const createEvent = async (eventData) => {
   try {
+    // eventData is sent as request body
     const event = await axios.post(`${url}/createEvent`, eventData);
     const eventID = event.data.id;
     return eventID;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not create this gcal event');
+    console.error(error.message);
+    console.error('could not create this gcal event');
   }
   return null;
 };
@@ -18,45 +20,50 @@ export const createEvent = async (eventData) => {
 // updates an event on gcal
 export const patchEvent = async (eventData) => {
   try {
+    // eventData is sent as request body
     const event = await axios.patch(`${url}/patchEvent`, eventData);
     return event;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not update this gcal event');
+    console.error(error.message);
+    console.error('could not update this gcal event');
   }
   return null;
 };
 
+// gets all user profiles
 export const getAllProfiles = async () => {
   try {
     const allProfiles = await axios.get(`${url}/getAllProfiles`);
     return allProfiles;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not get all profiles');
+    console.error(error.message);
+    console.error('could not get all profiles');
   }
   return null;
 };
 
-export const updateModulechildren = async (id, data) => {
+// creates a new child module
+export const updateModuleChildren = async (id, data) => {
   try {
-    const updatedChildren = await axios.post(`${url}/updateModulechildren`, { id, data });
+    // id and data are sent as request body
+    const updatedChildren = await axios.post(`${url}/updateModuleChildren`, { id, data });
     return updatedChildren;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not update module children');
+    console.error(error.message);
+    console.error('could not create new module');
   }
   return null;
 };
 
-// gets ID of root module that the user clicked on
+// gets a module and its children, filtered by role
 export const getModulebyId = async (id, currRole) => {
   try {
+    // id and currRole are sent as route parameters
     const module = await axios.get(`${url}/getModulebyId/${id}/${currRole}`);
     return module;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not get module by ID');
+    console.error(error.message);
+    console.error('could not get module by ID');
   }
   return null;
 };
@@ -64,23 +71,25 @@ export const getModulebyId = async (id, currRole) => {
 // gets google email
 export const getGoogleaccount = async (googleEmail) => {
   try {
+    // googleEmail is sent as a route parameter
     const account = await axios.get(`${url}/getGoogleaccount/${googleEmail}`);
     return account;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not get google account');
+    console.error(error.message);
+    console.error('could not get google account');
   }
   return null;
 };
 
-export const getUsers = async (users) => {
+// gets a user's data given their username
+export const getUsers = async (username) => {
   try {
-    const user = await axios.get(`${url}/getUsers/${users}`);
-    console.log('axios user returns', user);
+    // username is sent as a route parameter
+    const user = await axios.get(`${url}/getUsers/${username}`);
     return user;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not get user');
+    console.error(error.message);
+    console.error('could not get user');
   }
   return null;
 };
@@ -91,7 +100,7 @@ export const createList = async (data) => {
     console.log('createList endpoint returns', response);
     return response;
   } catch (error) {
-    console.log(`occurred in createList endpoint: ${error.message}`);
+    console.error(`occurred in createList endpoint: ${error.message}`);
   }
   return null;
 };
@@ -110,7 +119,7 @@ export const addToList = async (data) => {
     console.log('updateList endpoint returns', response);
     return response;
   } catch (error) {
-    console.log(`occurred in addToList endpoint: ${error.message}`);
+    console.error(`occurred in addToList endpoint: ${error.message}`);
   }
   return null;
 };
@@ -127,7 +136,7 @@ export const updateList = async (data) => {
     console.log('updateList endpoint returns', response);
     return response;
   } catch (error) {
-    console.log(`error occured in updateList endpoint:${error.message}`);
+    console.error(`error occured in updateList endpoint:${error.message}`);
   }
   return null;
 };
@@ -137,8 +146,8 @@ export const getMessages = async () => {
     const messages = await axios.get(`${url}/getMessages`);
     return messages;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not get messages');
+    console.error(error.message);
+    console.error('could not get messages');
   }
   return null;
 };

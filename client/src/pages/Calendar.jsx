@@ -4,13 +4,16 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import { createEvent, patchEvent } from '../api/index';
+import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
 
 function Calendar({ profile }) {
   const { role } = profile;
   const currRole = role.toLowerCase();
+  const {
+    REACT_APP_FIREBASE_CALENDAR_ID,
+  } = process.env;
 
   const calendarRef = createRef();
   const handleEventClick = (eventInfo) => {
@@ -50,12 +53,12 @@ function Calendar({ profile }) {
       attachments,
     };
     // add event to actual google calendar
-    createEvent(event).then((eventID) => {
+    api.createEvent(event).then((eventID) => {
       // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
       event.id = eventID;
       // add event on fullcalendar interface
-      const api = calendarRef.current.getApi();
-      api.addEvent(event);
+      const calApi = calendarRef.current.getApi();
+      calApi.addEvent(event);
       console.log(event.end);
     });
     e.target.reset();
@@ -75,7 +78,7 @@ function Calendar({ profile }) {
       end: endTime,
     };
     // update event using patchEvent
-    patchEvent(eventData);
+    api.patchEvent(eventData);
   };
 
   if (currRole === 'admin') {
@@ -115,7 +118,7 @@ function Calendar({ profile }) {
             eventColor="rgba(0, 170, 238, 0.2)"
             eventTextColor="black"
             fixedWeekCount={false}
-            googleCalendarApiKey={process.env.REACT_APP_FIREBASE_CALENDAR_ID}
+            googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
             events={{
               googleCalendarId: 'fofthechildren@gmail.com',
               className: 'gcal-event',
@@ -141,7 +144,7 @@ function Calendar({ profile }) {
           eventColor="rgba(0, 170, 238, 0.2)"
           eventTextColor="black"
           fixedWeekCount={false}
-          googleCalendarApiKey={process.env.REACT_APP_FIREBASE_CALENDAR_ID}
+          googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
           events={{
             googleCalendarId: 'fofthechildren@gmail.com',
             className: 'gcal-event',
