@@ -23,13 +23,14 @@ function MessageWall({ profile }) {
   };
 
   useEffect(() => {
+    console.log(serviceArea, role);
     console.log('this is user messages', messages);
     console.log('this is filtered and pinned messages', messages.filter(
-      (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+      (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
     && message.target.includes(role.toLowerCase()))),
     ));
     console.log('this is unpinned filtered messages', messages.filter(
-      (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+      (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
     && message.target.includes(role.toLowerCase()))),
     ));
   }, [messages]);
@@ -139,13 +140,13 @@ function MessageWall({ profile }) {
       <div>
         <h3>Message Wall</h3>
         {messages.filter(
-          (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+          (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role.toLowerCase()))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
         )}
         {messages.filter(
-          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role.toLowerCase()))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,

@@ -21,7 +21,7 @@ const oauth2Client = new google.auth.OAuth2(
   GOOGLE_REDIRECT_URL,
 );
 
-// insert an event to google calendar
+// inserts an event to google calendar
 const createEvent = async (req, res) => {
   try {
     // obtain data from client side
@@ -56,7 +56,7 @@ const createEvent = async (req, res) => {
   }
 };
 
-// updates gcal event without modifying event properties that you don't specify to (requires eventID)
+// updates gcal event without modifying any unspecified event properties (requires eventID)
 const patchEvent = async (req, res) => {
   try {
     const { id, start, end } = req.body;
@@ -84,7 +84,7 @@ const patchEvent = async (req, res) => {
   }
 };
 
-// returns all existing user profiles (as an array)
+// returns an array of all existing user profiles
 const getAllProfiles = async (req, res) => {
   try {
     // await user profile data from firebase
@@ -102,7 +102,7 @@ const getAllProfiles = async (req, res) => {
   }
 };
 
-// creates a new child module and updates its parent's children field
+// creates a child module, then adds its id to its parent's 'children' field
 const updateModuleChildren = async (req, res) => {
   try {
     // pass in parent id and child (new module) data from frontend
@@ -120,7 +120,7 @@ const updateModuleChildren = async (req, res) => {
   }
 };
 
-// returns a module's data given its id and filters out which children to display based on role
+// returns a module's data and a filtered array of its children (by role)
 const getModulebyId = async (req, res) => {
   try {
     const { id, currRole } = req.params;
@@ -146,7 +146,7 @@ const getModulebyId = async (req, res) => {
   }
 };
 
-// goes through firebase to find a matching profile given a google account email
+// finds a matching profile in firebase, given a google account email
 const getGoogleaccount = async (req, res) => {
   try {
     // gets google account email from route parameter (check /routes)
@@ -170,7 +170,7 @@ const getGoogleaccount = async (req, res) => {
   }
 };
 
-// goes through firebase to find a matching profile given a username
+// finds a matching profile in firebase, given a username
 const getUsers = async (req, res) => {
   try {
     // gets username from route parameter (check /routes)
