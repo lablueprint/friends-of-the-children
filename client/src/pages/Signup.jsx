@@ -6,7 +6,6 @@ import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Popup from '../components/Popup';
 import { db } from './firebase';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/images/login_family.svg';
@@ -37,7 +36,7 @@ function Signup({ updateAppProfile }) {
   const [serviceArea, setServiceArea] = useState('AV');
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
-  const [userUsernames, setUserUsernames] = useState();
+  const [userUsernames, setUserUsernames] = useState(); // specifically for reducing firebase calls, saving all usernames
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userErrorMessage, setUserErrorMessage] = useState('');
@@ -45,44 +44,12 @@ function Signup({ updateAppProfile }) {
   const [confirmError, setConfirmError] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
-  const [googleError, setGoogleError] = useState(false);
-  const [googErrorCode, setGoogleErrorCode] = useState(false);
-  const [googErrorMessage, setGoogleErrorMessage] = useState('');
   const fieldHeight = '15px';
 
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
 
-  function signUpWithGoogle() {
-    const auth = getAuth();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log('SC');
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        console.log('credential: ', credential);
-        const token = credential.accessToken;
-        console.log(token);
-        // The signed-in user info.
-        const { user: googleUser } = result;
-        console.log(googleUser);
-        setGoogleLoggedIn(true);
-        setEmail(googleUser.email);
-        setUsername(googleUser.displayName); // TODO: this is wrong because their display name is not their username
-      // ...
-      }).catch((error) => {
-      // Handle Errors here.
-        setGoogleError(true);
-        setGoogleErrorCode(error.code);
-        setGoogleErrorMessage(error.message);
-        // The email of the user's account used.
-        // const { email } = error.customData;
-        // The AuthCredential type that was used.
-        // const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
-      });
-  }
-
+  // API call to reduce Firebase calls, saving all usernames to userUsernames state (array)
   const fetchData = async () => {
     const data = await api.getUserUsernames();
     setUserUsernames(data.data);
@@ -92,6 +59,31 @@ function Signup({ updateAppProfile }) {
     fetchData().catch(console.error);
   }, []);
 
+  // Allows users to use their Google account (email, password) to create account
+  function signUpWithGoogle() {
+    const auth = getAuth();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const { user: googleUser } = result;
+        setGoogleLoggedIn(true);
+        setEmail(googleUser.email);
+        setUsername(googleUser.displayName); // TODO: this is wrong because their display name is not their username
+        // TODO: is there any way for us to get their display name's first and last name separately?
+
+        // TODO: also, it would be nice to have a "back" button or something, since it gets rid of all the other fields
+        // that aren't necessary bc u have a google account. but maybe the user can change their minds or something, then if so,
+        // it's a bit confusing what to do from there
+      }).catch((error) => {
+      // Handle Errors here.
+        const errorCode = error.code;
+        console.error(errorCode);
+
+        const googleErrorMessage = error.message;
+        console.error(googleErrorMessage);
+      });
+  }
+
+  // Catching errors, saving account info, adding to mailchimp list, resetting forms
   const onSubmit = () => {
     let isValid = true;
     setConfirmError(false);
@@ -122,7 +114,6 @@ function Signup({ updateAppProfile }) {
               password: hashedPassword,
               google: false,
             };
-            console.log('google not used - entered');
             db.collection('profiles').doc().set(data);
             updateAppProfile(data);
 
@@ -135,7 +126,6 @@ function Signup({ updateAppProfile }) {
               serviceArea: data.serviceArea,
             };
             api.addToList(payload);
-            console.log('Google not used - Finished');
           });
       } else {
         const data = {
@@ -147,7 +137,6 @@ function Signup({ updateAppProfile }) {
           username,
           google: true,
         };
-        console.log('Google used - entered');
         db.collection('profiles').doc().set(data);
         updateAppProfile(data);
 
@@ -160,7 +149,6 @@ function Signup({ updateAppProfile }) {
           serviceArea: data.serviceArea,
         };
         api.addToList(payload);
-        console.log('Google used - finished');
       }
       navigate('/modules');
       // reset forms
@@ -175,6 +163,7 @@ function Signup({ updateAppProfile }) {
     }
   };
 
+  // Actual input fields for signing up (UI)
   const SigninForm = (
     <div className={styles.signinForm}>
       <h1 className={styles.bigtitle}>Sign Up</h1>
@@ -346,12 +335,6 @@ function Signup({ updateAppProfile }) {
 
   return (
     <div>
-      {(() => {
-        if (usernameError) return <Popup errorTitle="Signup" errorCode={userErrorMessage} />;
-        if (confirmError) return <Popup errorTitle="Signup" errorCode={passErrorMessage} />;
-        if (googleError) return <Popup errorTitle="Signup" errorCode={googErrorCode.concat(' ', googErrorMessage)} />;
-        return null;
-      })()}
       <img src={UpperRight} alt="upper right design" className={styles.design_top} />
       <div className={styles.container}>
         <div className={styles.left_column}>
@@ -366,6 +349,7 @@ function Signup({ updateAppProfile }) {
       </div>
       <img src={BottomLeft} alt="bottom left design" className={styles.design_bottom} />
     </div>
+
   );
 }
 

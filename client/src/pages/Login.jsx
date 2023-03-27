@@ -17,6 +17,7 @@ import { login } from '../redux/sliceAuth';
 
 /**
  Page used to log into the app
+
  * to resolve the warning about crypto, add fallback options
  * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
  * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
