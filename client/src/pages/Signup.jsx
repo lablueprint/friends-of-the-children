@@ -6,6 +6,7 @@ import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Popup from '../components/Popup';
 import { db } from './firebase';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/images/login_family.svg';
@@ -44,6 +45,9 @@ function Signup({ updateAppProfile }) {
   const [confirmError, setConfirmError] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
+  const [googleError, setGoogleError] = useState(false);
+  const [googErrorCode, setGoogleErrorCode] = useState(false);
+  const [googErrorMessage, setGoogleErrorMessage] = useState('');
   const fieldHeight = '15px';
 
   const provider = new GoogleAuthProvider();
@@ -68,12 +72,9 @@ function Signup({ updateAppProfile }) {
       // ...
       }).catch((error) => {
       // Handle Errors here.
-        const errorCode = error.code;
-        console.log(errorCode);
-
-        const googleErrorMessage = error.message;
-        console.log(googleErrorMessage);
-
+        setGoogleError(true);
+        setGoogleErrorCode(error.code);
+        setGoogleErrorMessage(error.message);
         // The email of the user's account used.
         // const { email } = error.customData;
         // The AuthCredential type that was used.
@@ -345,6 +346,12 @@ function Signup({ updateAppProfile }) {
 
   return (
     <div>
+      {(() => {
+        if (usernameError) return <Popup errorTitle="Signup" errorCode={userErrorMessage} />;
+        if (confirmError) return <Popup errorTitle="Signup" errorCode={passErrorMessage} />;
+        if (googleError) return <Popup errorTitle="Signup" errorCode={googErrorCode.concat(' ', googErrorMessage)} />;
+        return null;
+      })()}
       <img src={UpperRight} alt="upper right design" className={styles.design_top} />
       <div className={styles.container}>
         <div className={styles.left_column}>
@@ -359,7 +366,6 @@ function Signup({ updateAppProfile }) {
       </div>
       <img src={BottomLeft} alt="bottom left design" className={styles.design_bottom} />
     </div>
-
   );
 }
 
