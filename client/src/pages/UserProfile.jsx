@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   TextField, Select, MenuItem, FormControl, InputLabel,
@@ -7,11 +7,11 @@ import {
 import { db } from './firebase';
 import * as api from '../api';
 
+// Allows users to see and change their profile properties
 function UserProfile({ profile, updateAppProfile }) {
   const [editProfile, setEditProfile] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(profile);
   const [updateProfileMessage, setUpdateProfileMessage] = useState('');
-  // db.collection('Profiles').get().then()
 
   function HandleClick() {
     setEditProfile(true);
