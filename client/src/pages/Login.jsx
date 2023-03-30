@@ -125,8 +125,9 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     console.log('called');
     event.preventDefault(); // this prevents from page to be refreshing
     const data = await api.getUsers(username);
-
-    setProfile(data.data);
+    // if no user with that username was found
+    if (!data) setError(true);
+    else { setProfile(data.data); }
     // setUsername('');
     // setPassword('');
   };
