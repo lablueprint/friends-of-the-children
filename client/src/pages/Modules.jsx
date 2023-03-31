@@ -16,7 +16,6 @@ function Modules({ profile }) {
   const [modules, setModules] = useState([]);
   const { role } = profile;
   const currRole = role.toLowerCase();
-  // const [selectedFile, setSelectedFile] = useState();
   const [percent, setPercent] = useState(0);
   const [link, setLink] = useState('');
 
@@ -27,11 +26,11 @@ function Modules({ profile }) {
   if (caregiver) {
     roles.push('caregiver');
   }
-
+  // TODO: Move getModules to the backend (access through api call)
   const getModules = () => {
     db.collection('modules').get().then((sc) => {
       const card = [];
-      sc.forEach((doc) => {
+      sc.forEach((doc) => { // display all modules that match the role of the profile (admin sees all modules)
         const data = doc.data();
         if (data && data.role) {
           data.id = doc.id;
@@ -45,9 +44,9 @@ function Modules({ profile }) {
     });
   };
 
+  // TODO: Move to backend, figure out how to maintain setPercent once it is moved to the backedn and sent back as a promise chain
   // upload file to Firebase:
   const handleUpload = (file) => {
-    console.log('target:', file.name);
     // if (!file) {
     //   alert('Please choose a file first!');
     // }
@@ -81,7 +80,7 @@ function Modules({ profile }) {
     handleUpload(e.target.files[0]); // test
   };
 
-  const submitForm = async () => {
+  const submitForm = async () => { // adds a module to the root module page
     const data = {
       title,
       body,
@@ -91,12 +90,15 @@ function Modules({ profile }) {
       parent: null,
       link,
     };
-
+    // receive module id
+    // TODO: Create api call (move db.collection to backend)
     const tempId = (await db.collection('modules').add(data)).id;
 
     data.id = tempId;
 
     setModules([...modules, data]);
+
+    setModules([...modules, data]); // why is this run twice? - dk
 
     setTitle('');
     setBody('');

@@ -9,6 +9,7 @@ import Module from '../components/Module';
 import { storage } from './firebase';
 import * as api from '../api';
 
+// Loads additional modules once user clicks into a root module
 function ExpandedModule({ profile }) {
   const { role } = profile;
   const location = useLocation();
@@ -32,6 +33,7 @@ function ExpandedModule({ profile }) {
   const [formTitle, setFormtitle] = useState();
   const [formBody, setFormbody] = useState();
 
+  // set role array for later use in identifying modules to display
   const roles = [];
   if (mentor) {
     roles.push('mentor');
@@ -40,7 +42,7 @@ function ExpandedModule({ profile }) {
     roles.push('caregiver');
   }
 
-  const submitForm = async () => {
+  const submitForm = async () => { // submit a module to the current module page
     const data = {
       title: formTitle,
       body: formBody,
@@ -51,7 +53,7 @@ function ExpandedModule({ profile }) {
       link,
     };
 
-    await api.updateModulechildren(id, data); // pass in id, data to submit
+    await api.updateModuleChildren(id, data); // pass in id, data to submit
     // adds data to firebase, also appends new module to children array of module with passed in id
 
     setFormtitle('');
@@ -77,7 +79,7 @@ function ExpandedModule({ profile }) {
       setBody(object.data.body);
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
-      setChildren(object.children_array);
+      setChildren(object.childrenArray);
       console.log(object.data.link);
       setModuleImage(object.data.link);
     });
@@ -121,6 +123,32 @@ function ExpandedModule({ profile }) {
 
   useEffect(getModule, [id, currRole, refresh]);
 
+  const ExpandedModuleForm = (
+    <div>
+      <form action="post">
+        <h1>Upload Module</h1>
+        Title:
+        <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
+        Body:
+        <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
+        Choose a role!!
+        Caregiver
+        <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
+        Mentor
+        <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
+        Service Area:
+        <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+        File:
+        <input type="file" defaultValue="" onChange={handleChange} />
+        <p>
+          {percent}
+          {' '}
+          % done
+        </p>
+        <button type="button" onClick={submitForm}>Submit</button>
+      </form>
+    </div>
+  );
   if (parent != null) {
     if (currRole === 'admin') {
       return (
@@ -132,28 +160,7 @@ function ExpandedModule({ profile }) {
             <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
             {console.log(moduleImage)}
           </div>
-          <form action="post">
-            <h1>Upload Module</h1>
-            Title:
-            <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
-            Body:
-            <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
-            Choose a role!!
-            Caregiver
-            <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
-            Mentor
-            <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
-            Service Area:
-            <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
-            File:
-            <input type="file" defaultValue="" onChange={handleChange} />
-            <p>
-              {percent}
-              {' '}
-              % done
-            </p>
-            <button type="button" onClick={submitForm}>Submit</button>
-          </form>
+          {ExpandedModuleForm}
         </div>
       );
     }
@@ -176,28 +183,7 @@ function ExpandedModule({ profile }) {
           </Link>
           <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
         </div>
-        <form action="post">
-          <h1>Upload Module</h1>
-          Title:
-          <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
-          Body:
-          <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
-          Choose a role!!
-          Caregiver
-          <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
-          Mentor
-          <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
-          Service Area:
-          <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
-          File:
-          <input type="file" defaultValue="" onChange={handleChange} />
-          <p>
-            {percent}
-            {' '}
-            % done
-          </p>
-          <button type="button" onClick={submitForm}>Submit</button>
-        </form>
+        {ExpandedModuleForm}
       </div>
 
     );
