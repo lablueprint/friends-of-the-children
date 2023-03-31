@@ -176,17 +176,17 @@ const getUserUsernames = async (req, res) => {
     const usernames = [];
 
     db.collection('profiles').get().then((sc) => {
-      sc.forEach((doc) => {
-        const data = doc.data();
+      sc.forEach((user) => {
+        const data = user.data();
         if (data && data.username) {
-          data.id = doc.id;
+          data.id = user.id;
           usernames.push(data.username);
         }
       });
       // error message if user doesn't exist (when data is undefined)
       // TODO: this might not be needed, since the context of this is that there
       // SHOULDN'T be any existing usernames ==> not an error
-      if (usernames.length() === 0) {
+      if (usernames.length === 0) {
         res.status(400).json('no existing user!');
       }
       res.status(202).json(usernames);
@@ -202,15 +202,15 @@ const getUserProfiles = async (req, res) => {
     const profiles = [];
 
     db.collection('profiles').get().then((sc) => {
-      sc.forEach((doc) => {
-        const data = doc.data();
+      sc.forEach((user) => {
+        const data = user.data();
         if (data && data.role) {
-          data.id = doc.id;
+          data.id = user.id;
           profiles.push(data);
         }
       });
       // if there are no existing users in database
-      if (profiles.length() === 0) {
+      if (profiles.length === 0) {
         res.status(400).json('no existing users!');
       }
       res.status(202).json(profiles);
