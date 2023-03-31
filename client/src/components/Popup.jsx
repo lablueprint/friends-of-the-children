@@ -9,24 +9,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 export default function Popup({ errorTitle, errorCode }) {
   const [open, setOpen] = useState(true);
-  // const [error, setError] = useState('')
 
-  /*
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  */
   const handleClose = () => {
     setOpen(false);
   };
 
   return (
     <div>
-      {/*
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open alert dialog
-      </Button>
-      */}
       <Dialog
         open={open}
         onClose={handleClose}
