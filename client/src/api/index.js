@@ -13,6 +13,17 @@ export const getAllProfiles = async() => {
     }
 }
 
+export const getAllProfilesEmail = async() => {
+    try{
+        const allProfiles = await axios.get(`${url}/getAllProfilesEmail`);
+        return allProfiles;
+    }
+    catch(error){
+        console.log(error.message)
+        console.log("could not get all profiles")
+    }
+}
+
 export const addDoc = async(data) => {
     try {
         let res = await axios.post(`${url}/addDoc`, data);
@@ -102,6 +113,43 @@ export const updateList = async(data) =>{
     }
     catch(error){
         console.log(`error occured in updateList endpoint:${error.message}`)
+    }
+}
+
+//sendEmail data should just be of the form:
+// {
+//     adminName: "".
+//     replyBackEmail:"",
+//     role: []
+// }
+export const sendEmails = async(data) =>{
+    try{
+
+        console.log(data.serviceArea);
+        // var newArray = [], size = 3;
+        // if(data.serviceArea.length === 0){newArray = [[]];}
+        // else if(data.serviceArea.length > 0){
+        //     while (data.serviceArea.length > 0) {
+        //         newArray.push(data.serviceArea.splice(0, size));
+        //     }
+        // }
+        
+        // data.serviceArea = newArray;
+
+        // console.log(newArray);
+
+        const response = await axios.post(`${url}/mailchimp/sendEmail`, data);
+        console.log("sendEmail endpoint returns", response);
+        return "Members have been notified via Email!"
+
+    }catch(error){
+        console.log(`error occured in sendEmail endpoint:${error.message}`)
+        if (error.response.status === 422){
+            return "No profiles match the service area and role combinations."
+        }
+        else{
+            return "Emails could not be sent due to an error!"
+        }
     }
 }
 
