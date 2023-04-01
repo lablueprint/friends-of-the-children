@@ -171,7 +171,7 @@ const getGoogleaccount = async (req, res) => {
 };
 
 // checking if the username already exists in database (new user signing up)
-const getUserUsernames = async (req, res) => {
+const getUsernames = async (req, res) => {
   try {
     const usernames = [];
 
@@ -183,12 +183,6 @@ const getUserUsernames = async (req, res) => {
           usernames.push(data.username);
         }
       });
-      // error message if user doesn't exist (when data is undefined)
-      // TODO: this might not be needed, since the context of this is that there
-      // SHOULDN'T be any existing usernames ==> not an error
-      if (usernames.length === 0) {
-        res.status(400).json('no existing user!');
-      }
       res.status(202).json(usernames);
     });
   } catch (error) {
@@ -212,8 +206,9 @@ const getUserProfiles = async (req, res) => {
       // if there are no existing users in database
       if (profiles.length === 0) {
         res.status(400).json('no existing users!');
+      } else {
+        res.status(202).json(profiles);
       }
-      res.status(202).json(profiles);
     });
   } catch (error) {
     res.status(400).json(error);
@@ -252,7 +247,7 @@ export {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
-  getUserUsernames,
+  getUsernames,
   getUserProfiles,
   getMessages,
   updateModuleChildren,

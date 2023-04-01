@@ -6,6 +6,7 @@ import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Popup from '../components/Popup';
 import { db } from './firebase';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/images/login_family.svg';
@@ -36,7 +37,7 @@ function Signup({ updateAppProfile }) {
   const [serviceArea, setServiceArea] = useState('AV');
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
-  const [userUsernames, setUserUsernames] = useState(); // specifically for reducing firebase calls, saving all usernames
+  const [usernames, setUsernames] = useState(); // specifically for reducing firebase calls, saving all usernames
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userErrorMessage, setUserErrorMessage] = useState('');
@@ -44,6 +45,9 @@ function Signup({ updateAppProfile }) {
   const [confirmError, setConfirmError] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
+  const [googleError, setGoogleError] = useState(false);
+  const [googErrorCode, setGoogleErrorCode] = useState(false);
+  const [googErrorMessage, setGoogleErrorMessage] = useState('');
   const fieldHeight = '15px';
 
   const provider = new GoogleAuthProvider();
@@ -51,8 +55,8 @@ function Signup({ updateAppProfile }) {
 
   // API call to reduce Firebase calls, saving all usernames to userUsernames state (array)
   const fetchData = async () => {
-    const data = await api.getUserUsernames();
-    setUserUsernames(data.data);
+    const data = await api.getUsernames();
+    setUsernames(data.data);
   };
 
   useEffect(() => {
@@ -75,11 +79,12 @@ function Signup({ updateAppProfile }) {
         // it's a bit confusing what to do from there
       }).catch((error) => {
       // Handle Errors here.
-        const errorCode = error.code;
-        console.error(errorCode);
+        setGoogleError(true);
+        setGoogleErrorCode(error.code);
+        setGoogleErrorMessage(error.message);
 
-        const googleErrorMessage = error.message;
-        console.error(googleErrorMessage);
+        console.error(error.code);
+        console.error(error.message);
       });
   }
 
@@ -90,7 +95,7 @@ function Signup({ updateAppProfile }) {
     setUsernameError(false);
     setUserErrorMessage('');
     setPassErrorMessage('');
-    if (userUsernames.includes(username)) {
+    if (usernames.includes(username)) {
       setUsernameError(true);
       setUserErrorMessage('Username already exists!');
       isValid = false;
@@ -335,6 +340,12 @@ function Signup({ updateAppProfile }) {
 
   return (
     <div>
+      {(() => {
+        if (usernameError) return <Popup errorTitle="Signup" errorCode={userErrorMessage} />;
+        if (confirmError) return <Popup errorTitle="Signup" errorCode={passErrorMessage} />;
+        if (googleError) return <Popup errorTitle="Signup" errorCode={googErrorCode.concat(' ', googErrorMessage)} />;
+        return null;
+      })()}
       <img src={UpperRight} alt="upper right design" className={styles.design_top} />
       <div className={styles.container}>
         <div className={styles.left_column}>

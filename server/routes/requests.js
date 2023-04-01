@@ -10,7 +10,7 @@ import {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
-  getUserUsernames,
+  getUsernames,
   getUserProfiles,
   getMessages,
   updateModuleChildren,
@@ -38,7 +38,7 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
 // gets existing users' usernames (for sign up username conflicts)
-router.get('/getUserUsernames/:users', getUserUsernames);
+router.get('/getUsernames', getUsernames);
 
 // gets all users' profiles for regular log in
 router.get('/getUserProfiles/:users', getUserProfiles);
