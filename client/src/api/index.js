@@ -81,11 +81,21 @@ export const getGoogleaccount = async (googleEmail) => {
   return null;
 };
 
-// gets a user's data given their username
-export const getUsers = async (username) => {
+export const getUsernames = async () => {
   try {
-    // username is sent as a route parameter
-    const user = await axios.get(`${url}/getUsers/${username}`);
+    const user = await axios.get(`${url}/getUsernames`);
+    return user;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not get list of usernames from profiles');
+  }
+  return null;
+};
+
+export const getUserProfiles = async (users) => {
+  try {
+    const user = await axios.get(`${url}/getUserProfiles/${users}`);
+    console.log('axios user returns', user);
     return user;
   } catch (error) {
     console.error(error.message);

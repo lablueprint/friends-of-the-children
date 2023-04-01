@@ -170,25 +170,19 @@ const getGoogleaccount = async (req, res) => {
   }
 };
 
-// finds a matching profile in firebase, given a username
-const getUsers = async (req, res) => {
+// checking if the username already exists in database (new user signing up)
+const getUsernames = async (req, res) => {
   try {
-    // gets username from route parameter (check /routes)
-    const { username } = req.params;
-    // returns data in firebase 'profiles' that matches username
-    let userData;
-    await db.collection('profiles').where('username', '==', username).get().then(async (sc) => {
-      sc.docs.forEach(async (docRef) => {
-        const data = await docRef.data();
-        data.id = docRef.id;
-        userData = data;
+    const usernames = [];
+    db.collection('profiles').get().then((sc) => {
+      sc.forEach((user) => {
+        const data = user.data();
+        if (data && data.username) {
+          usernames.push(data.username);
+        }
       });
+      res.status(202).json(usernames);
     });
-    // error message if user doesn't exist (when data is undefined)
-    if (userData === undefined) {
-      res.status(400).json('no existing user!');
-    }
-    res.status(202).json(userData);
   } catch (error) {
     res.status(400).json(error);
   }
@@ -226,7 +220,7 @@ export {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
-  getUsers,
+  getUsernames,
   getMessages,
   updateModuleChildren,
 };

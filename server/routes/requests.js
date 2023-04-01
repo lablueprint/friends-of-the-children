@@ -10,7 +10,7 @@ import {
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
-  getUsers,
+  getUsernames,
   getMessages,
   updateModuleChildren,
 } from '../controllers/controllers.js';
@@ -36,8 +36,8 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 // gets profile via google email
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
-// gets profile via regular sign in
-router.get('/getUsers/:username', getUsers);
+// gets existing users' usernames (for sign up username conflicts)
+router.get('/getUsernames', getUsernames);
 
 // adds a module to firebase
 // then adds new module to the parent's children array

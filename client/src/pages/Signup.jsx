@@ -15,6 +15,21 @@ import BottomLeft from '../assets/images/bottomLeft.svg';
 import GoogleLogo from '../assets/images/google_logo.svg';
 import * as api from '../api';
 
+/**
+ Page used to create a new account for new users
+
+ * to resolve the warning about crypto, add fallback options
+ * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
+ * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
+ * from line 305 to line 309 should look like
+  ...
+    resolve: {
+      fallback: {
+        "crypto": false
+      },
+  ...
+ */
+
 function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -22,7 +37,7 @@ function Signup({ updateAppProfile }) {
   const [serviceArea, setServiceArea] = useState('AV');
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
-  const [usernames, setUsernames] = useState();
+  const [usernames, setUsernames] = useState(); // specifically for reducing firebase calls, saving all usernames
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userErrorMessage, setUserErrorMessage] = useState('');
@@ -38,54 +53,42 @@ function Signup({ updateAppProfile }) {
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
 
+  // API call to reduce Firebase calls, saving all usernames to userUsernames state (array)
+  const fetchData = async () => {
+    const data = await api.getUsernames();
+    setUsernames(data.data);
+  };
+
+  useEffect(() => {
+    fetchData().catch(console.error);
+  }, []);
+
+  // Allows users to use their Google account (email, password) to create account
   function signUpWithGoogle() {
     const auth = getAuth();
     signInWithPopup(auth, provider)
       .then((result) => {
-        console.log('SC');
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        console.log('credential: ', credential);
-        const token = credential.accessToken;
-        console.log(token);
-        // The signed-in user info.
         const { user: googleUser } = result;
-        console.log(googleUser);
         setGoogleLoggedIn(true);
         setEmail(googleUser.email);
-        setUsername(googleUser.displayName);
-      // ...
+        setUsername(googleUser.displayName); // TODO: this is wrong because their display name is not their username
+        // TODO: is there any way for us to get their display name's first and last name separately?
+
+        // TODO: also, it would be nice to have a "back" button or something, since it gets rid of all the other fields
+        // that aren't necessary bc u have a google account. but maybe the user can change their minds or something, then if so,
+        // it's a bit confusing what to do from there
       }).catch((error) => {
       // Handle Errors here.
         setGoogleError(true);
         setGoogleErrorCode(error.code);
         setGoogleErrorMessage(error.message);
-        // The email of the user's account used.
-        // const { email } = error.customData;
-        // The AuthCredential type that was used.
-        // const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
+
+        console.error(error.code);
+        console.error(error.message);
       });
   }
 
-  const readProfiles = () => {
-    const tempUsers = [];
-    db.collection('profiles').get().then((sc) => {
-      sc.forEach((doc) => {
-        const data = doc.data();
-        if (data && data.username) {
-          tempUsers.push(data.username);
-        }
-      });
-    });
-    setUsernames(tempUsers);
-  };
-
-  useEffect(
-    readProfiles,
-    [],
-  );
-
+  // Catching errors, saving account info, adding to mailchimp list, resetting forms
   const onSubmit = () => {
     let isValid = true;
     setConfirmError(false);
@@ -116,7 +119,6 @@ function Signup({ updateAppProfile }) {
               password: hashedPassword,
               google: false,
             };
-            console.log('google not used - entered');
             db.collection('profiles').doc().set(data);
             updateAppProfile(data);
 
@@ -129,7 +131,6 @@ function Signup({ updateAppProfile }) {
               serviceArea: data.serviceArea,
             };
             api.addToList(payload);
-            console.log('Google not used - Finished');
           });
       } else {
         const data = {
@@ -141,7 +142,6 @@ function Signup({ updateAppProfile }) {
           username,
           google: true,
         };
-        console.log('Google used - entered');
         db.collection('profiles').doc().set(data);
         updateAppProfile(data);
 
@@ -154,7 +154,6 @@ function Signup({ updateAppProfile }) {
           serviceArea: data.serviceArea,
         };
         api.addToList(payload);
-        console.log('Google used - finished');
       }
       navigate('/modules');
       // reset forms
@@ -169,6 +168,7 @@ function Signup({ updateAppProfile }) {
     }
   };
 
+  // Actual input fields for signing up (UI)
   const SigninForm = (
     <div className={styles.signinForm}>
       <h1 className={styles.bigtitle}>Sign Up</h1>
@@ -360,6 +360,7 @@ function Signup({ updateAppProfile }) {
       </div>
       <img src={BottomLeft} alt="bottom left design" className={styles.design_bottom} />
     </div>
+
   );
 }
 
