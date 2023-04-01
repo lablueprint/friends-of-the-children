@@ -35,7 +35,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [profile, setProfile] = useState(null); // object holding current user's profile content
-  const [userProfiles, setUserProfiles] = useState(null); // array holding all user profiles objects from Firebase
+  const [allProfiles, setAllProfiles] = useState(null); // array holding all user profiles objects from Firebase
 
   const navigate = useNavigate();
 
@@ -73,7 +73,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   // Checking inputted username with all the usernames in database (stored in userProfiles array)
   const checkUsers = (usernameSearch) => {
-    const tempUserMatch = userProfiles.filter((p) => p.username === usernameSearch); // array of objects with matching usernames
+    const tempUserMatch = allProfiles.filter((p) => p.username === usernameSearch); // array of objects with matching usernames
     if (tempUserMatch.length === 0) { // no matching username
       setError(true);
     } else {
@@ -85,8 +85,8 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   };
 
   const fetchData = async () => {
-    const data = await api.getUserProfiles();
-    setUserProfiles(data.data);
+    const data = await api.getAllProfiles();
+    setAllProfiles(data.data);
   };
 
   useEffect(() => {

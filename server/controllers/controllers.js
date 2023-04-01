@@ -174,41 +174,14 @@ const getGoogleaccount = async (req, res) => {
 const getUsernames = async (req, res) => {
   try {
     const usernames = [];
-
     db.collection('profiles').get().then((sc) => {
       sc.forEach((user) => {
         const data = user.data();
         if (data && data.username) {
-          data.id = user.id;
           usernames.push(data.username);
         }
       });
       res.status(202).json(usernames);
-    });
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-// returns all user profiles in database (reducing Firebase calls)
-const getUserProfiles = async (req, res) => {
-  try {
-    const profiles = [];
-
-    db.collection('profiles').get().then((sc) => {
-      sc.forEach((user) => {
-        const data = user.data();
-        if (data && data.role) {
-          data.id = user.id;
-          profiles.push(data);
-        }
-      });
-      // if there are no existing users in database
-      if (profiles.length === 0) {
-        res.status(400).json('no existing users!');
-      } else {
-        res.status(202).json(profiles);
-      }
     });
   } catch (error) {
     res.status(400).json(error);
@@ -248,7 +221,6 @@ export {
   getModulebyId,
   getGoogleaccount,
   getUsernames,
-  getUserProfiles,
   getMessages,
   updateModuleChildren,
 };
