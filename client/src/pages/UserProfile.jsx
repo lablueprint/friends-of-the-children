@@ -17,7 +17,6 @@ function UserProfile({ profile, updateAppProfile }) {
   const [editProfile, setEditProfile] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(profile);
   const [updateProfileMessage, setUpdateProfileMessage] = useState('');
-  const [imageUpload, setImageUpload] = useState(null);
   const [imageUrl, setImageUrl] = useState(profile.image);
 
   const handleUpload = async (image) => {
