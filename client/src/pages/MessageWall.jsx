@@ -51,7 +51,7 @@ function MessageWall({ profile }) {
     }
 
     if (allServiceAreas) {
-      serviceAreas = await api.getAllProfilesEmail();
+      serviceAreas = await api.getAllProfiles();
       serviceAreas = serviceAreas.data.map((element) => ({ role: element.role, serviceArea: element.serviceArea }));
       if (!(mentor && caregiver)) {
         if (mentor) {

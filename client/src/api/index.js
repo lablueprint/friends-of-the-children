@@ -17,16 +17,6 @@ export const createEvent = async (eventData) => {
   return null;
 };
 
-export const getAllProfilesEmail = async () => {
-  try {
-    const allProfiles = await axios.get(`${url}/getAllProfilesEmail`);
-    return allProfiles;
-  } catch (error) {
-    console.log(error.message);
-    console.log('could not get all profiles');
-  }
-};
-
 // updates an event on gcal
 export const patchEvent = async (eventData) => {
   try {
