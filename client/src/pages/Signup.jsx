@@ -231,8 +231,8 @@ function Signup({ updateAppProfile }) {
           ? <p />
           : (
             <div>
-              {createTextField('Password', password, setPassword)}
-              {createTextField('Confirm Password', confirmPassword, setConfirmPassword, 'text', false, '', 'Confirm your password')}
+              {createTextField('Password', password, setPassword, 'password')}
+              {createTextField('Confirm Password', confirmPassword, setConfirmPassword, 'password', false, '', 'Confirm your password')}
             </div>
           )}
         <div>
