@@ -63,8 +63,7 @@ function UserProfile({ profile, updateAppProfile }) {
         api.updateList(payload);
         setUpdateProfileMessage('Profile Successfully Updated!');
         updateAppProfile(updatedProfile);
-        setEditProfile(false);
-        window.location.reload();
+        setTimeout(() => { setEditProfile(false); window.location.reload(); }, 800);
       })
       .catch((error) => {
         setUpdateProfileMessage('We ran into an error updating your profile!');
@@ -82,36 +81,47 @@ function UserProfile({ profile, updateAppProfile }) {
 
   return (
     <div className={styles.profile_page}>
-      <div className={styles.profile_heading}>
-        <div className={styles.pfp}>
-          <img src={imageUrl} alt="profile pic" className={styles.profile_pic} />
-          <label htmlFor={uploadImage} className={styles.custom_file_upload}>
-            <input type="file" accept=".png,.jpg,.svg,.gif" onChange={uploadImage} />
-          </label>
-        </div>
+      <div className={styles.profile_flex}>
         <div>
-          <h1>{`${profile.firstName} ${profile.lastName}`}</h1>
-          <div className={styles.icon_flex}>
-            <img src={UserIcon} alt="profile icon" className={styles.icon} />
-            <p>{profile.role}</p>
-            <img src={LocationIcon} alt="location icon" className={styles.icon} />
-            <p>{profile.serviceArea}</p>
+          <div className={styles.pfp}>
+            <img src={imageUrl} alt="profile pic" className={styles.profile_pic} />
+            <label htmlFor={uploadImage} className={styles.custom_file_upload}>
+              <input type="file" accept=".png,.jpg,.svg,.gif" onChange={uploadImage} />
+            </label>
+          </div>
+          <div className={styles.profile_heading}>
+            <h2>{`${profile.firstName} ${profile.lastName}`}</h2>
+            <div className={styles.icon_flex}>
+              <div className={styles.icon_wrap}>
+                <img src={UserIcon} alt="profile icon" className={styles.icon} />
+                <p>{profile.role}</p>
+              </div>
+              <div className={styles.icon_wrap}>
+                <img src={LocationIcon} alt="location icon" className={styles.icon} />
+                <p>{profile.serviceArea}</p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div className={styles.edit_container}>
-        {!editProfile && <button type="button" className={styles.edit_button} onClick={HandleClick}> Edit Profile </button> }
-        {editProfile && <button type="button" className={styles.save_button} onClick={HandleSubmit}> Save Profile </button>}
+        <div className={styles.edit_container}>
+          {!editProfile && <button type="button" className={styles.edit_button} onClick={HandleClick}> Edit Profile </button> }
+          {editProfile && <button type="button" className={styles.save_button} onClick={HandleSubmit}> Save Profile </button>}
+        </div>
       </div>
       <p>{updateProfileMessage}</p>
 
       <h4 className={styles.info_label}>Basic Information</h4>
       {profile && profile.firstName && (
       <div className={styles.labels_container}>
-        <p>First Name:</p>
+        {!editProfile && <p>First Name:</p>}
         <TextField
+          sx={{
+            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+          }}
+          disabled={!editProfile}
+          label={editProfile ? 'First Name' : ''}
           id="firstName"
-          className={styles.label}
+          className={!editProfile ? styles.label : styles.label2}
           value={updatedProfile.firstName}
           InputProps={{
             readOnly: !editProfile,
@@ -122,10 +132,15 @@ function UserProfile({ profile, updateAppProfile }) {
       )}
       {profile && profile.lastName && (
       <div className={styles.labels_container}>
-        <p>Last Name:</p>
+        {!editProfile && <p>Last Name:</p>}
         <TextField
+          sx={{
+            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+          }}
+          disabled={!editProfile}
+          label={editProfile ? 'Last Name' : ''}
           id="lastName"
-          className={styles.label}
+          className={!editProfile ? styles.label : styles.label2}
           value={updatedProfile.lastName}
           InputProps={{
             readOnly: !editProfile,
@@ -136,10 +151,15 @@ function UserProfile({ profile, updateAppProfile }) {
       )}
       {profile && profile.email && (
       <div className={styles.labels_container}>
-        <p>Email:</p>
+        {!editProfile && <p>Email:</p>}
         <TextField
+          sx={{
+            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+          }}
+          disabled={!editProfile}
+          label={editProfile ? 'Email' : ''}
           id="email"
-          className={styles.label}
+          className={!editProfile ? styles.label : styles.label2}
           value={updatedProfile.email}
           InputProps={{
             readOnly: !editProfile,
@@ -152,11 +172,16 @@ function UserProfile({ profile, updateAppProfile }) {
       <h4 className={styles.info_label}>Login Information</h4>
       {profile && profile.role && (
       <div className={styles.labels_container}>
-        <p>Role:</p>
+        {!editProfile && <p>Role:</p>}
         <FormControl>
+          {editProfile && <InputLabel>Role</InputLabel>}
           <Select
+            sx={{
+              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+            }}
+            label={editProfile ? 'Role' : ''}
             id="role"
-            className={styles.label}
+            className={!editProfile ? styles.label : styles.label2}
             defaultValue={profile.role}
             value={updatedProfile.role}
             disabled={!editProfile}
@@ -171,11 +196,16 @@ function UserProfile({ profile, updateAppProfile }) {
       )}
       {profile && profile.serviceArea && (
       <div className={styles.labels_container}>
-        <p>Service Area:</p>
+        {!editProfile && <p>Service Area:</p>}
         <FormControl>
+          {editProfile && <InputLabel>Service Area</InputLabel>}
           <Select
+            sx={{
+              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+            }}
+            label={editProfile ? 'Service Area' : ''}
             id="serviceArea"
-            className={styles.label}
+            className={!editProfile ? styles.label : styles.label2}
             defaultValue={profile.serviceArea}
             value={updatedProfile.serviceArea}
             disabled={!editProfile}
@@ -189,10 +219,15 @@ function UserProfile({ profile, updateAppProfile }) {
       )}
       {profile && profile.username && (
       <div className={styles.labels_container}>
-        <p>Username:</p>
+        {!editProfile && <p>Username:</p>}
         <TextField
+          sx={{
+            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+          }}
+          disabled={!editProfile}
+          label={editProfile ? 'Username' : ''}
           id="username"
-          className={styles.label}
+          className={!editProfile ? styles.label : styles.label2}
           value={updatedProfile.username}
           InputProps={{
             readOnly: !editProfile,

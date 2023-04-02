@@ -1,36 +1,64 @@
 .profile_page{
-    padding-bottom: 50px;
+    background-color: white;
+    background-image: url('../assets/images/pfp_frame.svg');
+    background-repeat: no-repeat;
+    border-radius: 20px;
+    margin: 10px 50px 100px 0px;
+    padding: 100px;
     text-align: left;
     margin-left: 50px;
 }
 
-.profile_heading{
+.profile_flex{
     display: flex;
-    column-gap: 50px;
-    justify-content: flex-start;
+    flex-wrap: wrap;
+    column-gap: 15vw;
+    row-gap: 5vw;
     align-items: flex-end;
-    margin-bottom: 30px;
 }
 
-.icon{
-    width: 20px;
-    height: 20px;
+.pfp{
+    display: inline-block;
+    margin-right: 2.5vw;
+}
+
+.profile_heading{
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.profile_heading h2{
+    font-weight: 700;
+    font-size: 2.5em;
+    line-height: 43px;
 }
 
 .icon_flex{
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-end;
-    column-gap: 20px;
+    column-gap: 30px;
 }
 
 .icon_flex p{
     margin: 0 !important;
 }
 
+.icon_wrap p{
+    display: inline-block;
+}
+
+.icon{
+    display: inline-block;
+    margin-right: 5px;
+    width: 20px;
+    height: 20px;
+}
+
 .profile_pic{
     background: bisque;
     border-radius: 10px;
-    width: 10vw;
+    width: 150px;
 }
 
 /* hide original file upload button */
@@ -63,6 +91,7 @@
 
 /* edit profile button */
 .edit_button{
+    font-size: 100%;
     font-weight: 700;
     color: #156DBF;
     background: transparent;
@@ -73,6 +102,7 @@
 }
 
 .save_button{
+    font-size: 1.1em;
     font-weight: 700;
     color: white;
     background: #156DBF;
@@ -91,19 +121,29 @@
 
 .labels_container{
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    width: 60%;
+    width: 80%;
     margin: 0;
     margin-bottom: 15px !important;
 }
 
 .labels_container p{
+    margin: 0 !important;
+    width: 100px;
     font-size: 1.1em;
     font-weight: 500;
 }
 
 .label{
-    width: 450px !important;
+    width: 35vw !important;
     background-color: #F6FAFF;
+    /* border-radius: 8px !important; */
+}
+
+.label2{
+    width: 35vw !important;
+    background-color: white;
+    /* border-radius: 20px !important; */
 }
