@@ -168,6 +168,33 @@ function Signup({ updateAppProfile }) {
     }
   };
 
+  // helper functions (using regex) for formatting strings
+  const lowerCase = (str) => str.replace(/(?:^\w|[A-Z]|\b\w)/g, (word) => (word.toLowerCase()));
+  const camelCase = (str) => str.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => (index === 0 ? word.toLowerCase() : word.toUpperCase())).replace(/\s+/g, '');
+
+  // helper function to create TextFields with less repetitive code.
+  // label is name of TextField, foo and setFoo are the useState hooks for the local variables.
+  // type, error, helperText, and defaultValue are all optional parameters if the TextField wants to overwrite them.
+  const createTextField = (label, foo, setFoo, type = 'text', error = false, helperText = '', defaultValue = '') => (
+    <TextField
+      id={camelCase(label)}
+      label={label}
+      type={type}
+      defaultValue={defaultValue === '' ? `Enter your ${lowerCase(label)}` : defaultValue}
+      value={foo}
+      onChange={(e) => setFoo(e.target.value)}
+      error={error}
+      helperText={helperText}
+      className={`${styles.textfield} ${styles.half_width}`}
+      required
+      inputProps={{
+        style: {
+          height: fieldHeight,
+        },
+      }}
+    />
+  );
+
   // Actual input fields for signing up (UI)
   const SigninForm = (
     <div className={styles.signinForm}>
@@ -191,110 +218,23 @@ function Signup({ updateAppProfile }) {
         </FormControl>
         <p>Enter your information</p>
         <div>
-          <TextField
-            id="firstName"
-            label="First Name"
-            defaultValue="Enter your first name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-            className={`${styles.textfield} ${styles.half_width}`}
-            inputProps={{
-              style: {
-                height: fieldHeight,
-              },
-            }}
-          />
-          <TextField
-            id="lastName"
-            label="Last Name"
-            defaultValue="Enter your last name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-            className={`${styles.textfield} ${styles.half_width}`}
-            inputProps={{
-              style: {
-                height: fieldHeight,
-              },
-            }}
-          />
+          {createTextField('First Name', firstName, setFirstName)}
+          {createTextField('Last Name', lastName, setLastName)}
         </div>
         <div>
-          {!googleLoggedIn
-            ? (
-              <TextField
-                id="email"
-                label="Email"
-                type="email"
-                defaultValue="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className={`${styles.textfield} ${styles.half_width}`}
-                inputProps={{
-                  style: {
-                    height: fieldHeight,
-                  },
-                }}
-              />
-            )
-            : <p />}
-          <TextField
-            id="username"
-            label="Username"
-            defaultValue="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            error={usernameError}
-            helperText={userErrorMessage}
-            required
-            className={`${styles.textfield} ${styles.half_width}`}
-            inputProps={{
-              style: {
-                height: fieldHeight,
-              },
-            }}
-          />
+          {googleLoggedIn
+            ? <p />
+            : createTextField('Email', email, setEmail, 'email')}
+          {createTextField('Username', username, setUsername, 'text', usernameError, userErrorMessage)}
         </div>
-        {!googleLoggedIn
-          ? (
+        {googleLoggedIn
+          ? <p />
+          : (
             <div>
-              <TextField
-                id="password"
-                label="Password"
-                defaultValue="Enter your password"
-                value={password}
-                type="password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className={`${styles.textfield} ${styles.half_width}`}
-                inputProps={{
-                  style: {
-                    height: fieldHeight,
-                  },
-                }}
-              />
-              <TextField
-                id="confirmPassword"
-                label="Confirm Password"
-                defaultValue="Confirm your password"
-                value={confirmPassword}
-                type="password"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                error={confirmError}
-                helperText={passErrorMessage}
-                required
-                className={`${styles.textfield} ${styles.half_width}`}
-                inputProps={{
-                  style: {
-                    height: fieldHeight,
-                  },
-                }}
-              />
+              {createTextField('Password', password, setPassword)}
+              {createTextField('Confirm Password', confirmPassword, setConfirmPassword, 'text', false, '', 'Confirm your password')}
             </div>
-          )
-          : <p />}
+          )}
         <div>
           <FormControl sx={{ width: '60%' }}>
             <InputLabel>Service Area</InputLabel>
