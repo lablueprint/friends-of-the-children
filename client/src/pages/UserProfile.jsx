@@ -86,7 +86,7 @@ function UserProfile({ profile, updateAppProfile }) {
         <div className={styles.pfp}>
           <img src={imageUrl} alt="profile pic" className={styles.profile_pic} />
           <label htmlFor={uploadImage} className={styles.custom_file_upload}>
-            <input type="file" accept=".png,.jpg,.svg," onChange={uploadImage} />
+            <input type="file" accept=".png,.jpg,.svg,.gif" onChange={uploadImage} />
           </label>
         </div>
         <div>
@@ -98,10 +98,12 @@ function UserProfile({ profile, updateAppProfile }) {
             <p>{profile.serviceArea}</p>
           </div>
         </div>
-        <button type="button" className={styles.edit_button} onClick={HandleClick}> Edit Profile </button>
-        {editProfile && <button type="button" className={styles.edit_button} onClick={HandleSubmit}> Submit </button>}
-        <p>{updateProfileMessage}</p>
       </div>
+      <div className={styles.edit_container}>
+        {!editProfile && <button type="button" className={styles.edit_button} onClick={HandleClick}> Edit Profile </button> }
+        {editProfile && <button type="button" className={styles.save_button} onClick={HandleSubmit}> Save Profile </button>}
+      </div>
+      <p>{updateProfileMessage}</p>
 
       <h4 className={styles.info_label}>Basic Information</h4>
       {profile && profile.firstName && (

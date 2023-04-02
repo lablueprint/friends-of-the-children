@@ -6,7 +6,8 @@
 
 .profile_heading{
     display: flex;
-    justify-content: space-between;
+    column-gap: 50px;
+    justify-content: flex-start;
     align-items: flex-end;
     margin-bottom: 30px;
 }
@@ -19,6 +20,7 @@
 .icon_flex{
     display: flex;
     align-items: flex-end;
+    column-gap: 20px;
 }
 
 .icon_flex p{
@@ -55,12 +57,26 @@
     cursor: pointer;
 }
 
+.edit_container{
+    display: inline-block;
+}
+
 /* edit profile button */
 .edit_button{
     font-weight: 700;
     color: #156DBF;
     background: transparent;
     border: solid #156DBF;
+    border-radius: 12px;
+    padding: .5vw 1.5vw;
+    height: 45px;
+}
+
+.save_button{
+    font-weight: 700;
+    color: white;
+    background: #156DBF;
+    border-color: transparent;
     border-radius: 12px;
     padding: .5vw 1.5vw;
     height: 45px;
