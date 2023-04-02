@@ -184,8 +184,8 @@ export const getMessages = async () => {
     const messages = await axios.get(`${url}/getMessages`);
     return messages;
   } catch (error) {
-    console.log(error.message);
-    console.log('could not get messages');
+    console.error(error.message);
+    console.error('could not get messages');
   }
   return null;
 };
