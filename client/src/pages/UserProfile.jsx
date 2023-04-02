@@ -4,14 +4,43 @@ import PropTypes from 'prop-types';
 import {
   TextField, Select, MenuItem, FormControl, InputLabel,
 } from '@mui/material';
-import { db } from './firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, updateDoc } from 'firebase/firestore';
+import styles from '../styles/UserProfile.module.css';
+import { db, storage } from './firebase';
 import * as api from '../api';
+import UserIcon from '../assets/icons/user_icon.svg';
+import LocationIcon from '../assets/icons/location_icon.svg';
 
 // Allows users to see and change their profile properties
 function UserProfile({ profile, updateAppProfile }) {
   const [editProfile, setEditProfile] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState(profile);
   const [updateProfileMessage, setUpdateProfileMessage] = useState('');
+  const [imageUpload, setImageUpload] = useState(null);
+  const [imageUrl, setImageUrl] = useState(profile.image);
+
+  const handleUpload = async (image) => {
+    console.log('target:', image.name);
+    const imageName = image.name;
+    const storageRef = ref(storage, `/images/${imageName}`);
+
+    uploadBytes(storageRef, image).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then(async (url) => {
+        setImageUrl(url);
+        console.log(url);
+        const docRef = doc(db, 'profiles', profile.id);
+        await updateDoc(docRef, {
+          image: url,
+        });
+        const newProfile = {
+          ...profile,
+          image: url,
+        };
+        updateAppProfile(newProfile);
+      });
+    });
+  };
 
   function HandleClick() {
     setEditProfile(true);
@@ -47,73 +76,89 @@ function UserProfile({ profile, updateAppProfile }) {
     setUpdatedProfile((prevValue) => ({ ...prevValue, [field]: event.target.value }));
   }
 
+  const uploadImage = (e) => {
+    handleUpload(e.target.files[0]);
+  };
+
   return (
-    <div>
-      {profile && profile.email && (
-      <div>
-        Email:
-        {' '}
-        <TextField
-          id="email"
-          label="Email"
-          // defaultValue={profile.email}
-          value={updatedProfile.email}
-          InputProps={{
-            readOnly: !editProfile,
-          }}
-          onChange={(event) => HandleChange(event, 'email')}
-          variant="filled"
-        />
+    <div className={styles.profile_page}>
+      <div className={styles.profile_heading}>
+        <div className={styles.pfp}>
+          <img src={imageUrl} alt="profile pic" className={styles.profile_pic} />
+          <label htmlFor={uploadImage} className={styles.custom_file_upload}>
+            <input type="file" accept=".png,.jpg,.svg," onChange={uploadImage} />
+          </label>
+        </div>
+        <div>
+          <h1>{`${profile.firstName} ${profile.lastName}`}</h1>
+          <div className={styles.icon_flex}>
+            <img src={UserIcon} alt="profile icon" className={styles.icon} />
+            <p>{profile.role}</p>
+            <img src={LocationIcon} alt="location icon" className={styles.icon} />
+            <p>{profile.serviceArea}</p>
+          </div>
+        </div>
+        <button type="button" className={styles.edit_button} onClick={HandleClick}> Edit Profile </button>
+        {editProfile && <button type="button" className={styles.edit_button} onClick={HandleSubmit}> Submit </button>}
+        <p>{updateProfileMessage}</p>
       </div>
-      )}
+
+      <h4 className={styles.info_label}>Basic Information</h4>
       {profile && profile.firstName && (
-      <div>
-        First Name:
-        {' '}
+      <div className={styles.labels_container}>
+        <p>First Name:</p>
         <TextField
           id="firstName"
-          label="First Name"
-          // defaultValue={profile.firstName}
+          className={styles.label}
           value={updatedProfile.firstName}
           InputProps={{
             readOnly: !editProfile,
           }}
           onChange={(event) => HandleChange(event, 'firstName')}
-          variant="filled"
         />
       </div>
       )}
       {profile && profile.lastName && (
-      <div>
-        Last Name:
-        {' '}
+      <div className={styles.labels_container}>
+        <p>Last Name:</p>
         <TextField
           id="lastName"
-          label="Last Name"
-          // defaultValue={profile.lastName}
+          className={styles.label}
           value={updatedProfile.lastName}
           InputProps={{
             readOnly: !editProfile,
           }}
           onChange={(event) => HandleChange(event, 'lastName')}
-          variant="filled"
         />
       </div>
       )}
+      {profile && profile.email && (
+      <div className={styles.labels_container}>
+        <p>Email:</p>
+        <TextField
+          id="email"
+          className={styles.label}
+          value={updatedProfile.email}
+          InputProps={{
+            readOnly: !editProfile,
+          }}
+          onChange={(event) => HandleChange(event, 'email')}
+        />
+      </div>
+      )}
+
+      <h4 className={styles.info_label}>Login Information</h4>
       {profile && profile.role && (
-      <div>
-        Role:
-        {' '}
+      <div className={styles.labels_container}>
+        <p>Role:</p>
         <FormControl>
-          <InputLabel>Role</InputLabel>
           <Select
             id="role"
-            label="Role"
+            className={styles.label}
             defaultValue={profile.role}
             value={updatedProfile.role}
             disabled={!editProfile}
             onChange={(event) => HandleChange(event, 'role')}
-            variant="filled"
           >
             <MenuItem value="Caregiver">Caregiver</MenuItem>
             <MenuItem value="Mentor">Mentor</MenuItem>
@@ -123,19 +168,16 @@ function UserProfile({ profile, updateAppProfile }) {
       </div>
       )}
       {profile && profile.serviceArea && (
-      <div>
-        Service Area:
-        {' '}
-        <FormControl sx={{ m: 1, minWidth: 100 }}>
-          <InputLabel>Service Area</InputLabel>
+      <div className={styles.labels_container}>
+        <p>Service Area:</p>
+        <FormControl>
           <Select
             id="serviceArea"
-            label="Service Area"
+            className={styles.label}
             defaultValue={profile.serviceArea}
             value={updatedProfile.serviceArea}
             disabled={!editProfile}
             onChange={(event) => HandleChange(event, 'serviceArea')}
-            variant="filled"
           >
             <MenuItem value="AV">AV</MenuItem>
             <MenuItem value="MS">MS</MenuItem>
@@ -144,25 +186,19 @@ function UserProfile({ profile, updateAppProfile }) {
       </div>
       )}
       {profile && profile.username && (
-      <div>
-        Username:
-        {' '}
+      <div className={styles.labels_container}>
+        <p>Username:</p>
         <TextField
           id="username"
-          label="Username"
-          // defaultValue={profile.username}
+          className={styles.label}
           value={updatedProfile.username}
           InputProps={{
             readOnly: !editProfile,
           }}
           onChange={(event) => HandleChange(event, 'username')}
-          variant="filled"
         />
       </div>
       )}
-      <button type="button" className="btn btn-info" onClick={HandleClick}> Edit Profile </button>
-      {editProfile && <button type="button" className="btn btn-info" onClick={HandleSubmit}> Submit </button>}
-      <p>{updateProfileMessage}</p>
     </div>
   );
 }
@@ -175,6 +211,7 @@ UserProfile.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,

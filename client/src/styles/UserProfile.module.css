@@ -1,0 +1,93 @@
+.profile_page{
+    padding-bottom: 50px;
+    text-align: left;
+    margin-left: 50px;
+}
+
+.profile_heading{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+}
+
+.icon{
+    width: 20px;
+    height: 20px;
+}
+
+.icon_flex{
+    display: flex;
+    align-items: flex-end;
+}
+
+.icon_flex p{
+    margin: 0 !important;
+}
+
+.profile_pic{
+    background: bisque;
+    border-radius: 10px;
+    width: 10vw;
+}
+
+/* hide original file upload button */
+.pfp input[type="file"] {
+    display: none;
+}
+
+/* position custom file upload button */
+.pfp label {
+    vertical-align: top;
+    margin-left: -1.5vw;
+}
+
+/* custom file upload button */
+.custom_file_upload{
+    border-radius: 50%;
+    background: #A4A4A4;
+    background-image: url(../assets/icons/edit_pencil.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 2vw;
+    height: 2vw;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* edit profile button */
+.edit_button{
+    font-weight: 700;
+    color: #156DBF;
+    background: transparent;
+    border: solid #156DBF;
+    border-radius: 12px;
+    padding: .5vw 1.5vw;
+    height: 45px;
+}
+
+.info_label{
+    margin-top: 50px;
+    margin-bottom: 25px;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.labels_container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 60%;
+    margin: 0;
+    margin-bottom: 15px !important;
+}
+
+.labels_container p{
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.label{
+    width: 450px !important;
+    background-color: #F6FAFF;
+}
