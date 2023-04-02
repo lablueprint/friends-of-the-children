@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: 'News Gothic';
 }
 
 .App-logo {
@@ -35,4 +36,31 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@font-face {
+  font-family: 'News Gothic';
+  src: url('./assets/fonts/NewsGothicRegular.otf');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'News Gothic Bold';
+  src: url('./assets/fonts/NewsGothicBold.otf');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./assets/fonts/Inter-Light.ttf');
+  font-weight: normal;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+}
+
+.fc-day-today {
+  background-color: rgba(21, 109, 191, 0.1) !important;
 }

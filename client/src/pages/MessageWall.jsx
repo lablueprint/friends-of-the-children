@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { app, db } from './firebase';
 import Message from '../components/Message';
-import * as api from '../api'
+import * as api from '../api';
 
 function MessageWall({ profile }) {
   const [title, setTitle] = useState('');
@@ -19,33 +19,13 @@ function MessageWall({ profile }) {
   const { role, serviceArea } = profile;
 
   const getMessagesfunc = async () => {
-    const {data} = await api.getMessages();
-    // console.log(data);
+    const { data } = await api.getMessages();
     setMessages(data);
-    // return message;
   };
 
-  useEffect(()=>{
-    // console.log("this is user messages", messages);
-    // console.log("this is filtered and pinned messages", messages.filter(
-    //   (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
-    // && message.target.includes(role.toLowerCase()))),
-    // ));
-    // console.log("this is unpinned filtered messages", messages.filter(
-    //   (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
-    // && message.target.includes(role.toLowerCase()))),
-    // ));
-  }, [messages])
-  // const getMessages = () => {
-  //     getMessagesfunc().then((message) => {
-        
-  //     })
-  // };
-
-  useEffect(()=>{
+  useEffect(() => {
     getMessagesfunc();
-  },[]);
-
+  }, []);
 
   const updatePinned = (id, pinned) => {
     // deep copy for useState to work properly
@@ -70,55 +50,49 @@ function MessageWall({ profile }) {
       target.push('Caregiver');
     }
 
-    if (allServiceAreas){
+    if (allServiceAreas) {
       serviceAreas = await api.getAllProfilesEmail();
-      serviceAreas = serviceAreas.data.map((element)=>{
-        return {role: element.role, serviceArea: element.serviceArea}
-      })
-      if(!(mentor && caregiver)){
-        if(mentor){
-          serviceAreas = serviceAreas.filter((element)=>{
-            return element.role==='Mentor';
-          })
-        }
-        else{
-          serviceAreas = serviceAreas.filter((element)=>{
-            return element.role==='Caregiver';
-          })
+      serviceAreas = serviceAreas.data.map((element) => ({ role: element.role, serviceArea: element.serviceArea }));
+      if (!(mentor && caregiver)) {
+        if (mentor) {
+          serviceAreas = serviceAreas.filter((element) => element.role === 'Mentor');
+        } else {
+          serviceAreas = serviceAreas.filter((element) => element.role === 'Caregiver');
         }
       }
-      serviceAreas = serviceAreas.map((element)=>element.serviceArea)
+      serviceAreas = serviceAreas.map((element) => element.serviceArea);
       serviceAreas = serviceAreas.filter((value, index, self) => self.indexOf(value) === index);
     }
 
     const data = {
       title,
       body,
-      serviceArea: allServiceAreas? serviceAreas: msgserviceArea.split(',').map(element=> element.trim()),
+      serviceArea: allServiceAreas ? serviceAreas : msgserviceArea.split(',').map((element) => element.trim()),
       target,
       pinned: false,
       date: app.firebase.firestore.Timestamp.fromDate(new Date()),
     };
 
-    //insert api call to send emails here
+    // insert api call to send emails here
     const emailData = {
       adminName: profile.firstName,
       replyBackEmail: profile.email,
       role: target,
-      serviceArea: allServiceAreas? serviceAreas: msgserviceArea.split(',').map(element=> element.trim())
-    }
+      serviceArea: allServiceAreas ? serviceAreas : msgserviceArea.split(',').map((element) => element.trim()),
+    };
 
-    const message  = await api.sendEmails(emailData, target);
+    const message = await api.sendEmails(emailData, target);
     seStatusMessage(message);
 
-    db.collection('messages').doc().set(data).then(getMessagesfunc).then(()=>{
-      setTitle('');
-      setBody('');
-      setmsgServiceArea('');
-      setAllServiceAreas(false);
-      setMentor(false);
-      setCaregiver(false);
-    });
+    db.collection('messages').doc().set(data).then(getMessagesfunc)
+      .then(() => {
+        setTitle('');
+        setBody('');
+        setmsgServiceArea('');
+        setAllServiceAreas(false);
+        setMentor(false);
+        setCaregiver(false);
+      });
   };
 
   const messageForm = (
@@ -138,7 +112,7 @@ function MessageWall({ profile }) {
       <div>
         <label htmlFor="msgserviceArea">
           Service Area (separated by commas):
-          <input type="text" id="msgserviceArea" name="msgserviceArea" disabled = {allServiceAreas} value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
+          <input type="text" id="msgserviceArea" name="msgserviceArea" disabled={allServiceAreas} value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
         </label>
         <label htmlFor="mentor">
           All?
@@ -182,13 +156,13 @@ function MessageWall({ profile }) {
       <div>
         <h3>Message Wall</h3>
         {messages.filter(
-          (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+          (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role.toLowerCase()))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
         )}
         {messages.filter(
-          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role.toLowerCase()))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,

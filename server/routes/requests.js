@@ -1,27 +1,35 @@
 /* eslint-disable no-await-in-loop */
+// all api routes
 /* eslint-disable import/extensions */
 import express from 'express';
 import mailchimp from '../mailchimp.js';
 
 import {
-  addDocument,
+  createEvent,
+  patchEvent,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
-  getUsers,
+  getUsernames,
   getMessages,
   addToMailchimpList,
   updateMailchimpList,
   sendMailchimpEmails,
+  updateModuleChildren,
 } from '../controllers/controllers.js';
 
 const router = express.Router();
 
-router.post('/addDoc', addDocument);
-
 router.get('/', (req, res) => {
   res.send('We are live!');
 });
+
+// creates an event on google calendar
+router.post('/createEvent', createEvent);
+
+// updates an event on google calendar
+router.patch('/patchEvent', patchEvent);
+
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
 
@@ -31,8 +39,12 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 // gets profile via google email
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
-// gets profile via regular sign in
-router.get('/getUsers/:users', getUsers);
+// gets existing users' usernames (for sign up username conflicts)
+router.get('/getUsernames', getUsernames);
+
+// adds a module to firebase
+// then adds new module to the parent's children array
+router.post('/updateModuleChildren', updateModuleChildren);
 
 router.get('/getMessages', getMessages);
 
@@ -65,6 +77,7 @@ router.get('/mailchimp', async (req, res) => {
     const response = await mailchimp.root.getRoot();
     res.send(response);
   } catch (error) {
+    console.error(error.message);
     res.status(401).json(error.message);
     // console.log(`Error in mailchimp endpoint ${error.message}`);
   }
