@@ -232,7 +232,7 @@ function Signup({ updateAppProfile }) {
           : (
             <div>
               {createTextField('Password', password, setPassword, 'password')}
-              {createTextField('Confirm Password', confirmPassword, setConfirmPassword, 'password', false, '', 'Confirm your password')}
+              {createTextField('Confirm Password', confirmPassword, setConfirmPassword, 'password', confirmError, passErrorMessage, 'Confirm your password')}
             </div>
           )}
         <div>
