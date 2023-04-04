@@ -5,6 +5,22 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import styles from '../styles/Calendar.module.css';
 
+/*
+
+CALENDAR PAGE
+- Display calendar with all events
+- Admins can add events
+- Show location, start time, end time, description on click
+
+TODO: Remove console.log statements
+TODO: Have a popup come up for invalid name/start date/end date
+TODO: Have different calendars for each service area, be able to specify service area when adding event
+TOOD: Display event info on click
+TODO: 'Add an event' form as a popup
+TODO: Export calendar functionality?
+
+*/
+
 function Calendar() {
   const calendarRef = createRef();
 
