@@ -3,22 +3,20 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
-import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
-} from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
-import { db, storage } from './firebase';
+import { storage } from './firebase';
 import * as api from '../api';
 
+// Loads additional modules once user clicks into a root module
 function ExpandedModule({ profile }) {
   const { role } = profile;
   const location = useLocation();
   const { id } = location.state;
   const [title, setTitle] = useState();
   const [body, setBody] = useState();
-  const [attachments, setAttachments] = useState();
+  const [attachments, setAttachments] = useState(); // MIGHT not be needed, since link = attachments storage
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
@@ -26,6 +24,7 @@ function ExpandedModule({ profile }) {
 
   const [percent, setPercent] = useState(0);
   const [link, setLink] = useState('');
+  const [moduleImage, setModuleImage] = useState('');
 
   // Usestates for forms
   const [mentor, setMentor] = useState(false);
@@ -33,6 +32,8 @@ function ExpandedModule({ profile }) {
   const [serviceArea, setServiceArea] = useState('');
   const [formTitle, setFormtitle] = useState();
   const [formBody, setFormbody] = useState();
+
+  // set role array for later use in identifying modules to display
   const roles = [];
   if (mentor) {
     roles.push('mentor');
@@ -41,7 +42,7 @@ function ExpandedModule({ profile }) {
     roles.push('caregiver');
   }
 
-  const submitForm = async () => {
+  const submitForm = async () => { // submit a module to the current module page
     const data = {
       title: formTitle,
       body: formBody,
@@ -52,22 +53,13 @@ function ExpandedModule({ profile }) {
       link,
     };
 
-    // db.collection('modules').doc().add(data).then((dataRef) => {
-    // if (dataRef.id) {
-    //   console.log(dataRef.id);
-    // }
-    // });
-    const docRef = await addDoc(collection(db, 'modules'), data);
-    console.log('Document written with ID: ', docRef.id);
-
-    const moduleRef = doc(db, 'modules', id);
-    await updateDoc(moduleRef, {
-      children: arrayUnion(docRef.id),
-    });
+    await api.updateModuleChildren(id, data); // pass in id, data to submit
+    // adds data to firebase, also appends new module to children array of module with passed in id
 
     setFormtitle('');
     setFormbody('');
     setServiceArea('');
+    setModuleImage('');
     setCaregiver(false);
     setMentor(false);
     setRefresh(!refresh);
@@ -87,7 +79,9 @@ function ExpandedModule({ profile }) {
       setBody(object.data.body);
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
-      setChildren(object.children_array);
+      setChildren(object.childrenArray);
+      console.log(object.data.link);
+      setModuleImage(object.data.link);
     });
   };
 
@@ -99,7 +93,7 @@ function ExpandedModule({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    setLink(storageRef.fullPath);
+    // setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -117,18 +111,44 @@ function ExpandedModule({ profile }) {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log(url);
+          setLink(url);
         });
       },
     );
   };
 
   const handleChange = (e) => {
-    // setSelectedFile(e.target.files[0]);
     handleUpload(e.target.files[0]);
   };
 
   useEffect(getModule, [id, currRole, refresh]);
 
+  const ExpandedModuleForm = (
+    <div>
+      <form action="post">
+        <h1>Upload Module</h1>
+        Title:
+        <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
+        Body:
+        <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
+        Choose a role!!
+        Caregiver
+        <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
+        Mentor
+        <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
+        Service Area:
+        <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
+        File:
+        <input type="file" defaultValue="" onChange={handleChange} />
+        <p>
+          {percent}
+          {' '}
+          % done
+        </p>
+        <button type="button" onClick={submitForm}>Submit</button>
+      </form>
+    </div>
+  );
   if (parent != null) {
     if (currRole === 'admin') {
       return (
@@ -137,30 +157,10 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} />
+            <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+            {console.log(moduleImage)}
           </div>
-          <form action="post">
-            <h1>Upload Module</h1>
-            Title:
-            <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
-            Body:
-            <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
-            Choose a role!!
-            Caregiver
-            <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
-            Mentor
-            <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
-            Service Area:
-            <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
-            File:
-            <input type="file" defaultValue="" onChange={handleChange} />
-            <p>
-              {percent}
-              {' '}
-              % done
-            </p>
-            <button type="button" onClick={submitForm}>Submit</button>
-          </form>
+          {ExpandedModuleForm}
         </div>
       );
     }
@@ -169,7 +169,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
       </div>
     );
   }
@@ -181,30 +181,9 @@ function ExpandedModule({ profile }) {
           <Link to="/modules">
             Back
           </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} />
+          <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
         </div>
-        <form action="post">
-          <h1>Upload Module</h1>
-          Title:
-          <input type="text" value={formTitle} onChange={(e) => setFormtitle(e.target.value)} />
-          Body:
-          <input type="text" value={formBody} onChange={(e) => setFormbody(e.target.value)} />
-          Choose a role!!
-          Caregiver
-          <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
-          Mentor
-          <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
-          Service Area:
-          <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
-          File:
-          <input type="file" defaultValue="" onChange={handleChange} />
-          <p>
-            {percent}
-            {' '}
-            % done
-          </p>
-          <button type="button" onClick={submitForm}>Submit</button>
-        </form>
+        {ExpandedModuleForm}
       </div>
 
     );
@@ -215,7 +194,7 @@ function ExpandedModule({ profile }) {
         <Link to="/modules">
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
       </div>
     </div>
   );

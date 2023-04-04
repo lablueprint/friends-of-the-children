@@ -1,71 +1,24 @@
-// import React from 'react';
-// import PropTypes from 'prop-types';
-
-// export default Calendar;
-
-import React from 'react';
-// import Calendar from '@ericz1803/react-google-calendar';
-// import { Calendar, momentLocalizer } from 'react-big-calendar';
-// import { Calendar } from '@fullcalendar/core';
+import { React, createRef } from 'react';
+import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
+import * as api from '../api';
+import styles from '../styles/Calendar.module.css';
+import ColorBlobs from '../assets/images/color_blobs.svg';
 
-// function Calendar({ profile }) {
-//   // remove later
-//   console.log(profile);
+function Calendar({ profile }) {
+  const { role } = profile;
+  const currRole = role.toLowerCase();
+  const {
+    REACT_APP_FIREBASE_CALENDAR_ID,
+  } = process.env;
 
-//   return (
-//     <div>
-//       Calendar page
-//     </div>
-//   );
-// }
-
-// calendar.propTypes = {
-//   profile: PropTypes.shape({
-//     firstName: PropTypes.string.isRequired,
-//     lastName: PropTypes.string.isRequired,
-//     username: PropTypes.string.isRequired,
-//     email: PropTypes.string.isRequired,
-//     role: PropTypes.string.isRequired,
-//     serviceArea: PropTypes.string.isRequired,
-//   }).isRequired,
-// };
-
-// const API_KEY = process.env.REACT_APP_FIREBASE_CALENDAR_ID;
-// const calendars = [
-//   { calendarId: 'hejwa9@gmail.com' },
-//   {
-//     calendarId: 'ayubali2443@gmail.com',
-//     color: '#B241D1', // optional, specify color of calendar 2 events
-//   },
-// ];
-
-function renderEventContent(eventInfo) {
-  console.log(eventInfo);
-  return (
-    <>
-      <b>{eventInfo.timeText}</b>
-      <i>{eventInfo.event.title}</i>
-      <p>{eventInfo.event.extendedProps.location}</p>
-      <p>
-        {eventInfo.event.start.toLocaleString()}
-        {' '}
-        -
-        {' '}
-        {eventInfo.event.end.toLocaleString()}
-      </p>
-
-    </>
-  );
-}
-
-function Example() {
+  const calendarRef = createRef();
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
-    alert('a day has been clicked');
+    // alert('a day has been clicked');
     console.log(eventInfo.event.title);
     if (eventInfo.event.extendedProps.location) {
       console.log('Location: ', eventInfo.event.extendedProps.location);
@@ -76,23 +29,141 @@ function Example() {
     console.log('End time: ', eventInfo.event.end);
   };
 
+  const addEvent = (e) => {
+    e.preventDefault();
+
+    const title = e.target.title.value;
+    const description = e.target.description.value;
+    const location = e.target.location.value;
+    const attachments = [];
+    const fileUrl = e.target.attachments.value;
+    const start = e.target.start.value;
+    const end = e.target.end.value;
+    // check if user inputs an attachment
+    if (e.target.attachments.value) {
+      attachments.push({ fileUrl, title: 'an attachment!' });
+    }
+    // create json event object
+    const event = {
+      title,
+      description,
+      location,
+      start,
+      end,
+      attachments,
+    };
+    // add event to actual google calendar
+    api.createEvent(event).then((eventID) => {
+      // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
+      event.id = eventID;
+      // add event on fullcalendar interface
+      const calApi = calendarRef.current.getApi();
+      calApi.addEvent(event);
+      console.log(event.end);
+    });
+    e.target.reset();
+  };
+
+  const dropEvent = (info) => {
+    let endTime;
+    // fullcalendar makes end date null if it's the same as the start date
+    if (info.oldEvent.end === null) {
+      endTime = info.event.start;
+    } else {
+      endTime = info.event.end;
+    }
+    const eventData = {
+      id: info.event.id,
+      start: info.event.start,
+      end: endTime,
+    };
+    // update event using patchEvent
+    api.patchEvent(eventData);
+  };
+
+  if (currRole === 'admin') {
+    return (
+      <div>
+        <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
+        <div>
+          <form onSubmit={(e) => addEvent(e)}>
+            <h1>FOTC Calendar</h1>
+            Title:
+            <input type="text" name="title" required />
+            Description:
+            <input type="text" name="description" />
+            Location:
+            <input type="text" name="location" />
+            Attachments (Google link):
+            <input type="text" name="attachments" />
+            Start Time:
+            <input type="datetime-local" name="start" required />
+            End Time:
+            <input type="datetime-local" name="end" required />
+            <button type="submit">Add Event</button>
+          </form>
+        </div>
+
+        <div className={styles.calendar}>
+          <FullCalendar
+            ref={calendarRef}
+            plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            selectable
+            editable
+            // update event when you drag & drop an event on the interface (for admin only)
+            eventDrop={dropEvent}
+            selectMirror
+            dayMaxEvents
+            eventColor="rgba(0, 170, 238, 0.2)"
+            eventTextColor="black"
+            fixedWeekCount={false}
+            googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
+            events={{
+              googleCalendarId: 'fofthechildren@gmail.com',
+              className: 'gcal-event',
+            }}
+            eventClick={handleEventClick}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <FullCalendar
-        plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        googleCalendarApiKey={process.env.REACT_APP_FIREBASE_CALENDAR_ID}
-        events={{
-          googleCalendarId: 'ayubali2443@gmail.com',
-          className: 'gcal-event',
-        }}
-        selectable
-        eventClick={handleEventClick}
-        eventContent={renderEventContent}
-      />
-
+      <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
+      <div className={styles.calendar}>
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          selectable
+          selectMirror
+          dayMaxEvents
+          eventColor="rgba(0, 170, 238, 0.2)"
+          eventTextColor="black"
+          fixedWeekCount={false}
+          googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
+          events={{
+            googleCalendarId: 'fofthechildren@gmail.com',
+            className: 'gcal-event',
+          }}
+          eventClick={handleEventClick}
+        />
+      </div>
     </div>
   );
 }
 
-export default Example;
+Calendar.propTypes = {
+  profile: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    serviceArea: PropTypes.string.isRequired,
+  }).isRequired,
+};
+export default Calendar;

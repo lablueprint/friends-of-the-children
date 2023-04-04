@@ -14,7 +14,10 @@ function MessageWall({ profile }) {
   const [mentor, setMentor] = useState(false);
   const [caregiver, setCaregiver] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [allServiceAreas, setAllServiceAreas] = useState(false);
+  const [statusMessage, seStatusMessage] = useState('');
   const target = [];
+  let serviceAreas = [];
 
   const { role, serviceArea } = profile;
 
@@ -27,6 +30,10 @@ function MessageWall({ profile }) {
     const { data } = await api.getMessages();
     setMessages(data);
   };
+
+  useEffect(() => {
+    getMessagesfunc();
+  }, []);
 
   // this function's purpose is to update the pinned update. it first stores all the messages in a temp variable
   // so those messages aren't affected, then it goes and finds the with a correspinding id and updates that pinned
@@ -48,20 +55,45 @@ function MessageWall({ profile }) {
 
   const submitData = async () => {
     if (mentor) {
-      target.push('mentor');
+      target.push('Mentor');
     }
     if (caregiver) {
-      target.push('caregiver');
+      target.push('Caregiver');
+    }
+
+    if (allServiceAreas) {
+      serviceAreas = await api.getAllProfiles();
+      serviceAreas = serviceAreas.data.map((element) => ({ role: element.role, serviceArea: element.serviceArea }));
+      if (!(mentor && caregiver)) {
+        if (mentor) {
+          serviceAreas = serviceAreas.filter((element) => element.role === 'Mentor');
+        } else {
+          serviceAreas = serviceAreas.filter((element) => element.role === 'Caregiver');
+        }
+      }
+      serviceAreas = serviceAreas.map((element) => element.serviceArea);
+      serviceAreas = serviceAreas.filter((value, index, self) => self.indexOf(value) === index);
     }
 
     const data = {
       title,
       body,
-      serviceArea: [msgserviceArea],
+      serviceArea: allServiceAreas ? serviceAreas : msgserviceArea.split(',').map((element) => element.trim()),
       target,
       pinned: false,
       date: app.firebase.firestore.Timestamp.fromDate(new Date()),
     };
+
+    // insert api call to send emails here
+    const emailData = {
+      adminName: profile.firstName,
+      replyBackEmail: profile.email,
+      role: target,
+      serviceArea: allServiceAreas ? serviceAreas : msgserviceArea.split(',').map((element) => element.trim()),
+    };
+
+    const message = await api.sendEmails(emailData, target);
+    seStatusMessage(message);
 
     // this code updates the database with new messages and resets the state variables back to empty strings after
     // a message is succesfully submitted
@@ -70,6 +102,9 @@ function MessageWall({ profile }) {
         setTitle('');
         setBody('');
         setmsgServiceArea('');
+        setAllServiceAreas(false);
+        setMentor(false);
+        setCaregiver(false);
       });
   };
 
@@ -92,8 +127,12 @@ function MessageWall({ profile }) {
       </div>
       <div>
         <label htmlFor="msgserviceArea">
-          Service Area:
-          <input type="text" id="msgserviceArea" name="msgserviceArea" value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
+          Service Area (separated by commas):
+          <input type="text" id="msgserviceArea" name="msgserviceArea" disabled={allServiceAreas} value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
+        </label>
+        <label htmlFor="mentor">
+          All?
+          <input type="checkbox" id="allServiceAreas" name="allServiceAreas" checked={allServiceAreas} onChange={(e) => setAllServiceAreas(e.target.checked)} />
         </label>
       </div>
       <div>
@@ -108,7 +147,8 @@ function MessageWall({ profile }) {
           <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
         </label>
       </div>
-      <button type="button" onClick={submitData}>Submit</button>
+      <button type="button" disabled={!(mentor || caregiver)} onClick={submitData}>Submit</button>
+      <p>{statusMessage}</p>
     </form>
   );
 
@@ -140,13 +180,13 @@ function MessageWall({ profile }) {
       <div>
         <h3>Message Wall</h3>
         {messages.filter(
-          (message) => (message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+          (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role.toLowerCase()))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
         )}
         {messages.filter(
-          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea.toLowerCase())
+          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role.toLowerCase()))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
