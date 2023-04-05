@@ -1,3 +1,6 @@
+// Message Wall is a page that is used to fetch and display messages. When a user submits a message, that message
+// is stored in the firebase data. From there, we can retrieve that data from the firebase and display it onto
+// the page. If the user is admin, all messages will be displayed, otherwise, it is specified to service area & target.
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { app, db } from './firebase';
@@ -18,6 +21,11 @@ function MessageWall({ profile }) {
 
   const { role, serviceArea } = profile;
 
+  // async function: an async function is a type of JS function that returns a promise (represents success or failure
+  // of our operation) and allows for other code to continue running while a time-consuming operation runs.
+
+  // in this specific getMessagesfunc, we extract the data by making a call to api.getMessages using the await
+  // keyword which pauses execution until it's done. Then we update the messages state with the data.
   const getMessagesfunc = async () => {
     const { data } = await api.getMessages();
     setMessages(data);
@@ -27,6 +35,9 @@ function MessageWall({ profile }) {
     getMessagesfunc();
   }, []);
 
+  // this function's purpose is to update the pinned update. it first stores all the messages in a temp variable
+  // so those messages aren't affected, then it goes and finds the with a correspinding id and updates that pinned
+  // status. Lastly, it sets the messages state to that message.
   const updatePinned = (id, pinned) => {
     // deep copy for useState to work properly
     // see https://www.coletiv.com/blog/dangers-of-using-objects-in-useState-and-useEffect-ReactJS-hooks/ for more context
@@ -84,6 +95,8 @@ function MessageWall({ profile }) {
     const message = await api.sendEmails(emailData, target);
     seStatusMessage(message);
 
+    // this code updates the database with new messages and resets the state variables back to empty strings after
+    // a message is succesfully submitted
     db.collection('messages').doc().set(data).then(getMessagesfunc)
       .then(() => {
         setTitle('');
@@ -95,6 +108,9 @@ function MessageWall({ profile }) {
       });
   };
 
+  // this function creates a form with different text fields such as title, body, and serviceArea, and also allows
+  // you to set whether the messages are "mentors" or "caregivers". this function also handles the submit button,
+  // when you click submit, it will call submitData function which will store everything in the databse.
   const messageForm = (
     <form>
       <div>
@@ -136,6 +152,14 @@ function MessageWall({ profile }) {
     </form>
   );
 
+  // this useEffect hook calls the getMessagesfunc the first time the page is loaded
+  useEffect(() => {
+    getMessagesfunc();
+  }, []);
+
+  // this a conditional and will render different things on the page based on the role. if role is admin, it will
+  // display all messages and allow for new messages to be submitted. else, it will display the messages specific
+  // to service area and target
   return (
     role.toLowerCase() === 'admin' ? (
       <div>
@@ -172,6 +196,8 @@ function MessageWall({ profile }) {
   );
 }
 
+// defines the types of properties and required datatypes that the profile object should contain and that should
+// be passed into the MessageWall component
 MessageWall.propTypes = {
   profile: PropTypes.shape({
     firstName: PropTypes.string.isRequired,
