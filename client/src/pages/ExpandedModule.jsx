@@ -23,7 +23,7 @@ function ExpandedModule({ profile }) {
   const [refresh, setRefresh] = useState(false);
 
   const [percent, setPercent] = useState(0);
-  const [link, setLink] = useState('');
+  const [links, setLinks] = useState([]);
   const [moduleImage, setModuleImage] = useState('');
 
   // Usestates for forms
@@ -50,7 +50,7 @@ function ExpandedModule({ profile }) {
       role: roles,
       parent: id,
       children: [],
-      link,
+      links,
     };
 
     await api.updateModuleChildren(id, data); // pass in id, data to submit
@@ -80,8 +80,7 @@ function ExpandedModule({ profile }) {
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
       setChildren(object.childrenArray);
-      console.log(object.data.link);
-      setModuleImage(object.data.link);
+      setModuleImage(object.data.links);
     });
   };
 
@@ -111,14 +110,17 @@ function ExpandedModule({ profile }) {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log(url);
-          setLink(url);
+          return url;
         });
       },
     );
   };
 
   const handleChange = (e) => {
-    handleUpload(e.target.files[0]);
+    // handleUpload(e.target.files[0]);
+    const urls = [];
+    urls.append(handleUpload(e.target.files.map((file) => file))); // allows you to display multiple files
+    setLinks(urls);
   };
 
   useEffect(getModule, [id, currRole, refresh]);
@@ -157,8 +159,7 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
-            {console.log(moduleImage)}
+            <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
           </div>
           {ExpandedModuleForm}
         </div>
@@ -169,7 +170,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+        <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
       </div>
     );
   }
@@ -178,10 +179,10 @@ function ExpandedModule({ profile }) {
     return (
       <div>
         <div className={styles.card}>
-          <Link to="/modules">
+          <Link to="/resources">
             Back
           </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+          <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
         </div>
         {ExpandedModuleForm}
       </div>
@@ -191,10 +192,10 @@ function ExpandedModule({ profile }) {
   return (
     <div>
       <div className={styles.card}>
-        <Link to="/modules">
+        <Link to="/resources">
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+        <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
       </div>
     </div>
   );

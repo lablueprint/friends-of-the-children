@@ -5,8 +5,9 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
+import * as api from '../api';
 
-function Modules({ profile }) {
+function Resources({ profile }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [serviceArea, setServiceArea] = useState('');
@@ -26,22 +27,10 @@ function Modules({ profile }) {
   if (caregiver) {
     roles.push('caregiver');
   }
-  // TODO: Move getModules to the backend (access through api call)
-  const getModules = () => {
-    db.collection('modules').get().then((sc) => {
-      const card = [];
-      sc.forEach((doc) => { // display all modules that match the role of the profile (admin sees all modules)
-        const data = doc.data();
-        if (data && data.role) {
-          data.id = doc.id;
-          // fetching parent-level modules that we have permission to view
-          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
-            card.push(data);
-          }
-        }
-      });
-      setModules(card);
-    });
+  // getting all modules relevant to current user
+  const fetchData = async () => {
+    const { data } = await api.getModules(currRole);
+    setModules(data);
   };
 
   // TODO: Move to backend, figure out how to maintain setPercent once it is moved to the backedn and sent back as a promise chain
@@ -77,7 +66,9 @@ function Modules({ profile }) {
   };
 
   const handleChange = (e) => {
-    handleUpload(e.target.files[0]); // test
+    console.log(e.target.files);
+    Array.from(e.target.files).forEach((file) => handleUpload(file)); // allows you to upload multiple files I THINK?
+    // handleUpload(e.target.files[0]); // test
   };
 
   const submitForm = async () => { // adds a module to the root module page
@@ -98,7 +89,7 @@ function Modules({ profile }) {
 
     setModules([...modules, data]);
 
-    setModules([...modules, data]); // why is this run twice? - dk
+    // setModules([...modules, data]); // why is this run twice? - dk
 
     setTitle('');
     setBody('');
@@ -108,7 +99,10 @@ function Modules({ profile }) {
   };
 
   // empty dependency array means getModules is only being called on page load
-  useEffect(getModules, []);
+  useEffect(() => {
+    // saving all the user profiles from Firebase in an array (useProfiles) only on first load
+    fetchData().catch(console.error);
+  }, []);
 
   if (currRole === 'admin') {
     return (
@@ -139,7 +133,7 @@ function Modules({ profile }) {
           Service Area:
           <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
           File:
-          <input type="file" defaultValue="" onChange={handleChange} />
+          <input type="file" defaultValue="" onChange={handleChange} multiple />
           <p>
             {percent}
             {' '}
@@ -169,7 +163,7 @@ function Modules({ profile }) {
   );
 }
 
-Modules.propTypes = {
+Resources.propTypes = {
   profile: PropTypes.shape({
     firstName: PropTypes.string.isRequired,
     lastName: PropTypes.string.isRequired,
@@ -179,4 +173,4 @@ Modules.propTypes = {
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,
 };
-export default Modules;
+export default Resources;

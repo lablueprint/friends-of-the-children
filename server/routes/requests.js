@@ -8,6 +8,7 @@ import {
   createEvent,
   patchEvent,
   getAllProfiles,
+  getModules,
   getModulebyId,
   getGoogleaccount,
   getUsernames,
@@ -32,6 +33,9 @@ router.patch('/patchEvent', patchEvent);
 
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
+
+// gets all modules from firebase collection "modules"
+router.get('/getModules/:currRole', getModules);
 
 // gets a module by ID, and returns that module and all of its direct children
 router.get('/getModulebyId/:id/:currRole', getModulebyId);

@@ -45,7 +45,9 @@ function Module(props) {
             );
         })}
       </div> */}
+      {/* add actual alt text for images */}
       <img src={img} alt="" width="30%" height="auto" />
+      {' '}
       {
         child.map((kid) => (
           <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
