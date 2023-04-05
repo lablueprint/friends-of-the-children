@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/sliceAuth';
-import fotcLogo from '../assets/fotc_logo.svg';
+import fotcLogo from '../assets/images/fotc_logo.svg';
 import styles from '../styles/NavBar.module.css';
 import ResourcesIcon from '../assets/icons/resources_icon.svg';
 import MenteesIcon from '../assets/icons/mentees_icon.svg';
@@ -11,23 +11,22 @@ import MessageIcon from '../assets/icons/message_icon.svg';
 import CalendarIcon from '../assets/icons/calendar_icon.svg';
 import UserIcon from '../assets/icons/user_icon.svg';
 
+// Navigation Bar component used to navigate to different pages
+
 function NavBar({ profile, updateAppProfile }) {
-  // const [loggedIn, setLoggedIn] = useState(false);
-  // console.log(profile);
+  // uses React Redux to log user out and
+  // remove profile info from localStorage
   const dispatch = useDispatch();
   const handleLogout = () => {
     updateAppProfile(null);
     dispatch(logout(profile));
   };
 
-  // "login-buttons d-flex align-items-center justify-content-center gap-3 py-2"
   return (
     <div>
       {!profile
         ? (
           <div>
-            {/* <Link to="/login" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Log In </Link>
-            <Link to="/signup" className="btn btn-primary" onClick={() => setLoggedIn(true)}> Sign Up </Link> */}
             <a href="/">
               <img
                 style={{
@@ -37,8 +36,6 @@ function NavBar({ profile, updateAppProfile }) {
                 alt="fotc logo"
               />
             </a>
-            {/* <Link to="/login" className="btn btn-primary"> Log In </Link>
-            <Link to="/signup" className="btn btn-primary"> Sign Up </Link> */}
           </div>
         )
         : (
@@ -56,7 +53,7 @@ function NavBar({ profile, updateAppProfile }) {
               <img src={ResourcesIcon} alt="resources icon" />
               Resources
             </Link>
-            {/* have requests link instead for admin */}
+            {/* TODO: have requests link instead for admin */}
             <Link to="/modules" className={styles.btn_info}>
               <img src={MenteesIcon} alt="mentees icon" />
               My Mentees
@@ -90,9 +87,6 @@ NavBar.propTypes = {
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,
-};
-
-NavBar.propTypes = {
   updateAppProfile: PropTypes.func.isRequired,
 };
 

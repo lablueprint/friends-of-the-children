@@ -1,9 +1,12 @@
 import { React, createRef } from 'react';
+import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
+import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
+import ColorBlobs from '../assets/images/color_blobs.svg';
 
 /*
 
@@ -12,7 +15,6 @@ CALENDAR PAGE
 - Admins can add events
 - Show location, start time, end time, description on click
 
-TODO: Remove console.log statements
 TODO: Have a popup come up for invalid name/start date/end date
 TODO: Have different calendars for each service area, be able to specify service area when adding event
 TOOD: Display event info on click
@@ -21,9 +23,14 @@ TODO: Export calendar functionality?
 
 */
 
-function Calendar() {
-  const calendarRef = createRef();
+function Calendar({ profile }) {
+  const { role } = profile;
+  const currRole = role.toLowerCase();
+  const {
+    REACT_APP_FIREBASE_CALENDAR_ID,
+  } = process.env;
 
+  const calendarRef = createRef();
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
     // alert('a day has been clicked');
@@ -37,61 +44,122 @@ function Calendar() {
     console.log('End time: ', eventInfo.event.end);
   };
 
-  const addEventFunc = (e) => {
+  const addEvent = (e) => {
     e.preventDefault();
-    // create json event object
+
     const title = e.target.title.value;
-    const startTime = e.target.startTime.value;
-    const endTime = e.target.endTime.value;
+    const description = e.target.description.value;
+    const location = e.target.location.value;
+    const attachments = [];
+    const fileUrl = e.target.attachments.value;
+    const start = e.target.start.value;
+    const end = e.target.end.value;
+    // check if user inputs an attachment
+    if (e.target.attachments.value) {
+      attachments.push({ fileUrl, title: 'an attachment!' });
+    }
+    // create json event object
     const event = {
       title,
-      start: startTime,
+      description,
+      location,
+      start,
+      end,
+      attachments,
+    };
+    // add event to actual google calendar
+    api.createEvent(event).then((eventID) => {
+      // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
+      event.id = eventID;
+      // add event on fullcalendar interface
+      const calApi = calendarRef.current.getApi();
+      calApi.addEvent(event);
+      console.log(event.end);
+    });
+    e.target.reset();
+  };
+
+  const dropEvent = (info) => {
+    let endTime;
+    // fullcalendar makes end date null if it's the same as the start date
+    if (info.oldEvent.end === null) {
+      endTime = info.event.start;
+    } else {
+      endTime = info.event.end;
+    }
+    const eventData = {
+      id: info.event.id,
+      start: info.event.start,
       end: endTime,
     };
-
-    // add event on fullcalendar interface
-    const api = calendarRef.current.getApi();
-    api.addEvent(event);
-
-    // add event to actual google calendar
-    const gapi = process.env.REACT_APP_FIREBASE_CALENDAR_ID;
-    console.log(gapi);
-    gapi.client.calendar.events.insert({
-      calendarId: 'fofthechildren@gmail.com',
-      event,
-    });
-    console.log(event);
+    // update event using patchEvent
+    api.patchEvent(eventData);
   };
+
+  if (currRole === 'admin') {
+    return (
+      <div>
+        <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
+        <div>
+          <form onSubmit={(e) => addEvent(e)}>
+            <h1>FOTC Calendar</h1>
+            Title:
+            <input type="text" name="title" required />
+            Description:
+            <input type="text" name="description" />
+            Location:
+            <input type="text" name="location" />
+            Attachments (Google link):
+            <input type="text" name="attachments" />
+            Start Time:
+            <input type="datetime-local" name="start" required />
+            End Time:
+            <input type="datetime-local" name="end" required />
+            <button type="submit">Add Event</button>
+          </form>
+        </div>
+
+        <div className={styles.calendar}>
+          <FullCalendar
+            ref={calendarRef}
+            plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            selectable
+            editable
+            // update event when you drag & drop an event on the interface (for admin only)
+            eventDrop={dropEvent}
+            selectMirror
+            dayMaxEvents
+            eventColor="rgba(0, 170, 238, 0.2)"
+            eventTextColor="black"
+            fixedWeekCount={false}
+            googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
+            events={{
+              googleCalendarId: 'fofthechildren@gmail.com',
+              className: 'gcal-event',
+            }}
+            eventClick={handleEventClick}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div>
-        <form onSubmit={(e) => addEventFunc(e)}>
-          <h1>FOTC Calendar</h1>
-          Title:
-          <input type="text" name="title" />
-          {/* Description:
-          <input type="text" value={descrip} onChange={(e) => setDescrip(e.target.value)} />
-          Location:
-          <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} /> */}
-          Start Time:
-          <input type="datetime-local" name="startTime" />
-          End Time:
-          <input type="datetime-local" name="endTime" />
-          <button type="submit">Add Event</button>
-        </form>
-      </div>
+      <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       <div className={styles.calendar}>
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           selectable
-          editable
           selectMirror
           dayMaxEvents
+          eventColor="rgba(0, 170, 238, 0.2)"
+          eventTextColor="black"
           fixedWeekCount={false}
-          googleCalendarApiKey={process.env.REACT_APP_FIREBASE_CALENDAR_ID}
+          googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
           events={{
             googleCalendarId: 'fofthechildren@gmail.com',
             className: 'gcal-event',
@@ -103,4 +171,14 @@ function Calendar() {
   );
 }
 
+Calendar.propTypes = {
+  profile: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    serviceArea: PropTypes.string.isRequired,
+  }).isRequired,
+};
 export default Calendar;

@@ -9,12 +9,15 @@ import {
 } from '@mui/material';
 import * as api from '../api';
 import styles from '../styles/Login.module.css';
-import LoginFamily from '../assets/login_family.svg';
-import GoogleLogo from '../assets/google_logo.svg';
-import UpperLeft from '../assets/upperLeft.svg';
-import BottomRight from '../assets/bottomRight.svg';
+import LoginFamily from '../assets/images/login_family.svg';
+import GoogleLogo from '../assets/images/google_logo.svg';
+import UpperLeft from '../assets/images/upperLeft.svg';
+import BottomRight from '../assets/images/bottomRight.svg';
 import { login } from '../redux/sliceAuth';
+
 /**
+ Page used to log into the app
+
  * to resolve the warning about crypto, add fallback options
  * go to \friends-of-the-children\node_modules\react-scripts\config\webpack.config.js
  * Note: you can ctrl + P (cmd + P on Mac) and search for "webpack.config.js" to go to the file
@@ -31,39 +34,36 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
-  const [profile, setProfile] = useState(null);
-  // const [email, setEmail] = useState('');
-  // const [userIsGoogleLoggedIn, setuserIsGoogleLoggedIn] = useState(false);
+  const [profile, setProfile] = useState(null); // object holding current user's profile content
+  const [allProfiles, setAllProfiles] = useState(null); // array holding all user profiles objects from Firebase
 
   const navigate = useNavigate();
-  // const profile = useRef();
 
-  const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
-  console.log(currUser);
-  console.log(isLoggedIn);
+  const { isLoggedIn } = useSelector((state) => state.sliceAuth); // destructuring the state to obtain localStorage's user object and login status using redux
   const dispatch = useDispatch();
 
+  // Checking if inputted password matches profile's password from Firebase
+  // Called whenever inputted profile info gets updated or when user's existing profile is updated
   const checkPassword = () => {
-    // check the hash password only if profile is not empty
+    // Check the hash password only if profile is not empty
     if (profile !== null) {
-      console.log('this is profile', profile);
-      console.log(true);
-      console.log(profile);
       if (!profile.google) {
         bcrypt.compare(password, profile.password) // compare passwords
           .then((isValid) => {
             if (isValid) { // check whether it is a valid credential
-              console.log('login successful');
-              dispatch(login(profile));
+              dispatch(login(profile)); // pass in profile to redux
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+              setError(false);
             } else {
               setError(true);
-              console.log('invalid credentials');
+              console.error('invalid credentials'); // TODO: is this needed? technically we have a message that pops up in the UI
             }
           })
+          // Handle Errors here
           .catch((e) => {
-            console.log(e);
-          }); // do error checking here if necessary
+            console.error(e);
+            setError(true);
+          });
       } else {
         dispatch(login(profile));
         updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
@@ -71,60 +71,67 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     }
   };
 
+  // Checking inputted username with all the usernames in database (stored in userProfiles array)
+  const checkUsers = (usernameSearch) => {
+    const tempUserMatch = allProfiles.filter((p) => p.username === usernameSearch); // array of objects with matching usernames
+    if (tempUserMatch.length === 0) { // no matching username
+      setError(true);
+    } else {
+      const data = tempUserMatch[0];
+      data.id = tempUserMatch[0].id;
+      setProfile(data); // updating current profile
+      checkPassword();
+    }
+  };
+
+  const fetchData = async () => {
+    const data = await api.getAllProfiles();
+    setAllProfiles(data.data);
+  };
+
   useEffect(() => {
     checkPassword();
-  }, [profile, navigate, updateAppProfile]);
+  }, [profile]);
+
+  useEffect(() => {
+    // saving all the user profiles from Firebase in an array (useProfiles) only on first load
+    fetchData().catch(console.error);
+  }, []);
+
+  // Defaults main page to be modules if user is already logged in
+  if (isLoggedIn) {
+    return navigate('/modules');
+  }
+
+  // Sets profile state with inputted profile info
+  // Called when user clicks "Login" button or presses Enter after inputting username + password
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // this prevents from page to be refreshing
+    checkUsers(username);
+    // checkPassword(password);
+  };
 
   const provider = new GoogleAuthProvider();
 
+  // Allows users to sign in with Google
   function signInWithGoogle() {
     const auth = getAuth();
     signInWithPopup(auth, provider)
       .then(async (result) => {
-        console.log('SC');
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        console.log('credential: ', credential);
-        const token = credential.accessToken;
-        console.log(token);
         // The signed-in user info.
         const { user: googleUser } = result;
-        console.log(googleUser);
 
-        // setGoogleLoggedIn(true);
-        // setEmail(googleUser.email);
         const account = await api.getGoogleaccount(googleUser.email);
         setProfile(account.data);
-        // setUsername(googleUser.displayName);
-      // ...
       }).catch((e) => {
       // Handle Errors here.
         const errorCode = e.code;
-        console.log(errorCode);
+        console.error(errorCode);
 
         const googleErrorMessage = e.message;
-        console.log(googleErrorMessage);
-
-        // The email of the user's account used.
-        // const { email } = error.customData;
-        // The AuthCredential type that was used.
-        // const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
+        console.error(googleErrorMessage);
+        setError(true);
       });
-  }
-
-  const handleSubmit = async (event) => {
-    console.log('called');
-    event.preventDefault(); // this prevents from page to be refreshing
-    const data = await api.getUsers(username);
-
-    setProfile(data.data);
-    // setUsername('');
-    // setPassword('');
-  };
-
-  if (isLoggedIn) {
-    return navigate('/modules');
   }
 
   return (
@@ -188,7 +195,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   );
 }
 
-// props validation
+// Props validation
 Login.propTypes = {
   updateAppProfile: PropTypes.func.isRequired,
 };
