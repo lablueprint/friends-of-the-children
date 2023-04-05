@@ -118,6 +118,7 @@ function Signup({ updateAppProfile }) {
               username,
               password: hashedPassword,
               google: false,
+              approved: false,
             };
             db.collection('profiles').doc().set(data);
             updateAppProfile(data);
@@ -141,6 +142,7 @@ function Signup({ updateAppProfile }) {
           role,
           username,
           google: true,
+          approved: false,
         };
         db.collection('profiles').doc().set(data);
         updateAppProfile(data);

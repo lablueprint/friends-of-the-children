@@ -14,6 +14,7 @@ import {
   ExpandedModule,
   NotFound,
   UserProfile,
+  Requests,
 } from './pages';
 import NavBar from './components/NavBar';
 
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/modules" element={(<Modules profile={currUser} />)} />
                 <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
                 <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
+                <Route path="/requests" element={(<Requests profile={currUser} />)} />
               </Routes>
             </div>
           </div>

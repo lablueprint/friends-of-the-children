@@ -7,6 +7,7 @@ import Calendar from './Calendar';
 import ExpandedModule from './ExpandedModule';
 import NotFound from './NotFound';
 import UserProfile from './UserProfile';
+import Requests from './Requests';
 
 export {
   Example,
@@ -16,4 +17,5 @@ export {
   Calendar,
   NotFound,
   UserProfile,
+  Requests,
 };
