@@ -40,4 +40,8 @@ GOOGLE_REDIRECT_URL=xxxxx
 REFRESH_TOKEN=xxxxx
 ```
 
+## Google Calendar
+
+Get your Google OAuth credentials, which grant access to the GCal API. Send the access token to API and get a refresh token.
+
 Make sure this file does not get committed to the Github repository.
