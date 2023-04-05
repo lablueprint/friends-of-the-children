@@ -119,6 +119,7 @@ function Signup({ updateAppProfile }) {
               password: hashedPassword,
               google: false,
               image: 'https://i.pinimg.com/550x/18/b9/ff/18b9ffb2a8a791d50213a9d595c4dd52.jpg',
+              approved: false,
             };
             db.collection('profiles').doc().set(data);
             updateAppProfile(data);
@@ -142,6 +143,7 @@ function Signup({ updateAppProfile }) {
           role,
           username,
           google: true,
+          approved: false,
         };
         db.collection('profiles').doc().set(data);
         updateAppProfile(data);
