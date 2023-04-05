@@ -3,8 +3,13 @@ import { createRequire } from 'module';
 import {
   collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
+
+import crypto from 'crypto';
+import { uuid } from 'uuidv4';
 // eslint-disable-next-line import/extensions
 import { db } from '../firebase.js';
+// eslint-disable-next-line import/extensions
+import mailchimp from '../mailchimp.js';
 
 // import google api
 const require = createRequire(import.meta.url);
@@ -154,11 +159,12 @@ const getGoogleaccount = async (req, res) => {
     // returns data in firebase 'profiles' that matches email
     let googleData;
     await db.collection('profiles').where('email', '==', googleAccount).get().then(async (sc) => {
-      sc.docs.forEach(async (dc) => {
-        const data = await dc.data();
-        data.id = dc.id;
+      // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
+      for (const doc of sc.docs) {
+        const data = await doc.data();
+        data.id = doc.id;
         googleData = data;
-      });
+      }
     });
     // error message if user doesn't exist (when data is undefined)
     if (googleData === undefined) {
@@ -214,6 +220,139 @@ const getMessages = async (req, res) => {
   }
 };
 
+// mailchimp controllers
+
+const addToMailchimpList = async (req, res) => {
+  try {
+    const response = await mailchimp.lists.addListMember(process.env.MAILCHIMP_AUDIENCE_ID, {
+      email_address: req.body.email_address,
+      status: 'subscribed',
+      merge_fields: {
+        FNAME: req.body.firstName,
+        LNAME: req.body.lastName,
+        ROLE: req.body.role,
+        SAREA: req.body.serviceArea,
+      },
+    });
+
+    console.log(`Added to list ${process.env.MAILCHIMP_AUDIENCE_ID}`);
+    res.status(202).json(response);
+  } catch (error) {
+    res.status(401).json(error.message);
+  }
+};
+
+const updateMailchimpList = async (req, res) => {
+  // field == email or status or fname or lname or role or serviceArea
+  try {
+    const updatedFields = {};
+    let subHash = '';
+
+    if ('currentEmail' in req.body) {
+      updatedFields.email_address = req.body.currentEmail;
+      subHash = crypto.createHash('md5').update(req.body.currentEmail.toLowerCase()).digest('hex');
+    } else {
+      throw new Error('Request body must contain an email');
+    }
+    if ('status' in req.body) {
+      updatedFields.status = req.body.status;
+    }
+    if ('newEmail' in req.body) {
+      updatedFields.email_address = req.body.newEmail;
+    }
+    if ('firstName' in req.body || 'lastName' in req.body || 'role' in req.body || 'serviceArea' in req.body) {
+      updatedFields.merge_fields = {};
+      if ('lastName' in req.body) {
+        updatedFields.merge_fields.LNAME = req.body.lastName;
+      }
+      if ('firstName' in req.body) {
+        updatedFields.merge_fields.FNAME = req.body.firstName;
+      }
+      if ('role' in req.body) {
+        updatedFields.merge_fields.ROLE = req.body.role;
+      }
+      if ('serviceArea' in req.body) {
+        updatedFields.merge_fields.SAREA = req.body.serviceArea;
+      }
+    }
+
+    console.log('updated fields:', updatedFields);
+
+    const response = await mailchimp.lists.updateListMember(process.env.MAILCHIMP_AUDIENCE_ID, subHash, updatedFields);
+
+    res.status(202).json(response);
+  } catch (error) {
+    res.status(401).json(error.message);
+  }
+};
+
+const sendMailchimpEmails = async (req, res) => {
+  try {
+    // pull required emails from firebase
+    const sc = await db.collection('profiles').get();
+
+    let records = sc.docs.map((docu) => docu.data());
+    records = records.filter((data) => req.body.role.includes(data.role));
+    records = records.filter((data) => req.body.serviceArea.includes(data.serviceArea));
+
+    console.log('the records retrieved are: ', records);
+
+    // check for no records
+    if (records.length === 0) {
+      throw new Error('there are no profiles that match any of the roles and service area combination provided');
+    }
+
+    // create a static segment
+    const segment = await mailchimp.lists.createSegment(process.env.MAILCHIMP_AUDIENCE_ID, {
+      name: `${uuid()}`,
+      static_segment: records.map((element) => element.email),
+    });
+
+    console.log('segment created');
+    // create a campaign
+    const campaign = await mailchimp.campaigns.create({
+      type: 'regular',
+      recipients: {
+        segment_opts: {
+          saved_segment_id: segment.id,
+        },
+        list_id: process.env.MAILCHIMP_AUDIENCE_ID,
+      },
+      settings: {
+        subject_line: `New Admin Announcement for ${req.body.role.join(' and ')} on the Portal`,
+        preview_text: 'New Announcement Posted!',
+        title: `Admin Announcement to ${req.body.role.join(' and ')}`,
+        from_name: req.body.adminName,
+        reply_to: req.body.replyBackEmail,
+        template_id: parseInt(process.env.MAILCHIMP_ADMIN_ANNOUNCEMENT_TEMPLATE_ID, 10),
+      },
+      content_type: 'template',
+    });
+
+    // send the campaign
+    const emailResponse = await mailchimp.campaigns.send(campaign.id);
+
+    // get all campaigns + check if any completed campaign segments can be deleted
+    let allCampaigns = await mailchimp.campaigns.list();
+    allCampaigns = allCampaigns.campaigns.filter((element) => element.status === 'sent' && element.recipients.segment_opts.saved_segment_id);
+    for (const element of allCampaigns) {
+      const delSegmentId = element.recipients.segment_opts.saved_segment_id;
+      const delResponse = await mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, element.recipients.segment_opts.saved_segment_id);
+    }
+
+    // delete the segment (maybe clean up when a new segment is about to be created and store all the segment ids in a list)
+    // const response = await mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, segment.id);
+    res.status(202).json(emailResponse);
+  } catch (error) {
+    console.log(error);
+    if (error.message === 'there are no profiles that match any of the roles and service area combination provided') {
+      res.status(422).json(error.message);
+    } else {
+      res.status(401).json(error.message);
+    }
+  }
+};
+
 export {
   createEvent,
   patchEvent,
@@ -222,5 +361,8 @@ export {
   getGoogleaccount,
   getUsernames,
   getMessages,
+  addToMailchimpList,
+  updateMailchimpList,
+  sendMailchimpEmails,
   updateModuleChildren,
 };

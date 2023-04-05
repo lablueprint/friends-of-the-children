@@ -31,6 +31,13 @@ export const patchEvent = async (eventData) => {
 };
 
 // gets all user profiles
+//
+// to use this function to get all profiles, put the following in a useEffect:
+// async function fetchProfiles(){
+//     const {data} = await api.getAllProfiles();
+//     console.log(data);
+//   }
+//   fetchProfiles();
 export const getAllProfiles = async () => {
   try {
     const allProfiles = await axios.get(`${url}/getAllProfiles`);
@@ -151,6 +158,27 @@ export const updateList = async (data) => {
   return null;
 };
 
+// sendEmail data should just be of the form:
+// {
+//     adminName: "".
+//     replyBackEmail:"",
+//     role: []
+// }
+export const sendEmails = async (data) => {
+  try {
+    const response = await axios.post(`${url}/mailchimp/sendEmail`, data);
+    console.log('sendEmail endpoint returns', response);
+    return 'Members have been notified via Email!';
+  } catch (error) {
+    console.error(`error occured in sendEmail endpoint:${error.message}`);
+    if (error.response.status === 422) {
+      return 'No profiles match the service area and role combinations.';
+    }
+
+    return 'Emails could not be sent due to an error!';
+  }
+};
+
 export const getMessages = async () => {
   try {
     const messages = await axios.get(`${url}/getMessages`);
@@ -161,9 +189,3 @@ export const getMessages = async () => {
   }
   return null;
 };
-// to use this function to get all profiles, put the following in a useEffect:
-// async function fetchProfiles(){
-//     const {data} = await api.getAllProfiles();
-//     console.log(data);
-//   }
-//   fetchProfiles();
