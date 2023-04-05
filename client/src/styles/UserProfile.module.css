@@ -1,0 +1,149 @@
+.profile_page{
+    background-color: white;
+    background-image: url('../assets/images/pfp_frame.svg');
+    background-repeat: no-repeat;
+    border-radius: 20px;
+    margin: 10px 50px 100px 0px;
+    padding: 100px;
+    text-align: left;
+    margin-left: 50px;
+}
+
+.profile_flex{
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 15vw;
+    row-gap: 5vw;
+    align-items: flex-end;
+}
+
+.pfp{
+    display: inline-block;
+    margin-right: 2.5vw;
+}
+
+.profile_heading{
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.profile_heading h2{
+    font-weight: 700;
+    font-size: 2.5em;
+    line-height: 43px;
+}
+
+.icon_flex{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    column-gap: 30px;
+}
+
+.icon_flex p{
+    margin: 0 !important;
+}
+
+.icon_wrap p{
+    display: inline-block;
+}
+
+.icon{
+    display: inline-block;
+    margin-right: 5px;
+    width: 20px;
+    height: 20px;
+}
+
+.profile_pic{
+    background: bisque;
+    border-radius: 10px;
+    width: 150px;
+}
+
+/* hide original file upload button */
+.pfp input[type="file"] {
+    display: none;
+}
+
+/* position custom file upload button */
+.pfp label {
+    vertical-align: top;
+    margin-left: -1.5vw;
+}
+
+/* custom file upload button */
+.custom_file_upload{
+    border-radius: 50%;
+    background: #A4A4A4;
+    background-image: url(../assets/icons/edit_pencil.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 2vw;
+    height: 2vw;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.edit_container{
+    display: inline-block;
+}
+
+/* edit profile button */
+.edit_button{
+    font-size: 100%;
+    font-weight: 700;
+    color: #156DBF;
+    background: transparent;
+    border: solid #156DBF;
+    border-radius: 12px;
+    padding: .5vw 1.5vw;
+    height: 45px;
+}
+
+.save_button{
+    font-size: 1.1em;
+    font-weight: 700;
+    color: white;
+    background: #156DBF;
+    border-color: transparent;
+    border-radius: 12px;
+    padding: .5vw 1.5vw;
+    height: 45px;
+}
+
+.info_label{
+    margin-top: 50px;
+    margin-bottom: 25px;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.labels_container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    margin: 0;
+    margin-bottom: 15px !important;
+}
+
+.labels_container p{
+    margin: 0 !important;
+    width: 100px;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.label{
+    width: 35vw !important;
+    background-color: #F6FAFF;
+    /* border-radius: 8px !important; */
+}
+
+.label2{
+    width: 35vw !important;
+    background-color: white;
+    /* border-radius: 20px !important; */
+}
