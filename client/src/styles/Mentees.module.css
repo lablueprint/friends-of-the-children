@@ -1,8 +1,14 @@
+.mentees_container{
+    text-align: left;
+}
+
+.card_container{
+    display: inline-block;
+    margin: 20px;
+    width: 250px;
+}
+
 .card{
-    width: 30%;
-    margin: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
     padding: 20px;
     background: #156DBF;
     border: 0.5px solid #CCCCCC;
@@ -16,6 +22,7 @@
 }
 
 .imageCard{
+    margin-bottom: 15px;
     height: 110px;
     border-radius: 10px;
     background: white;

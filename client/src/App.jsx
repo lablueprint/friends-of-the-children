@@ -42,7 +42,7 @@ function App() {
                 <Route path="/" element={(<Modules profile={currUser} />)} />
                 <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
                 <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
-                <Route path="/mentees" element={(<Mentees profile={currUser} />)} />
+                <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
                 <Route path="/mentees/*" element={(<ExpandedMentee profile={currUser} />)} />
                 <Route path="/example" element={(<Example profile={currUser} />)} />
                 <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />

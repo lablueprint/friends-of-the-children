@@ -1,35 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { db } from './firebase';
+// import { db } from './firebase';
 // import styles from '../styles/Mentees.module.css';
 // import * as api from '../api';
 
 function ExpandedMentee({ profile }) {
   console.log(profile);
   const location = useLocation();
-  const { id } = location.state;
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  //   const [firstName, setFirstName] = useState('');
-  //   const [firstName, setFirstName] = useState('');
-
-  const getMentee = () => {
-    db.collection('mentees').get(id).then((data) => {
-      console.log('SJKLFJDSLK');
-      setFirstName(data.firstName);
-      console.log(firstName);
-      setLastName(data.lastName);
-    });
-  };
-
-  useEffect(getMentee, [id]);
+  const {
+    id, firstName, lastName, age,
+  } = location.state;
+  console.log(id);
 
   return (
     <div>
-      <h1>MY MENTEES</h1>
-      <h3>{firstName}</h3>
-      <h3>{lastName}</h3>
+      <h1>{`${firstName} ${lastName}`}</h1>
+      <p>
+        Caregiver:
+        {' '}
+        {profile.firstName}
+      </p>
+      <p>
+        Service Area:
+        {' '}
+        {profile.serviceArea}
+      </p>
+      <p>
+        {age}
+        {' '}
+        years old
+      </p>
+      <h1>Folders</h1>
+      <button type="button">+ Add a new folder</button>
     </div>
   );
 }
