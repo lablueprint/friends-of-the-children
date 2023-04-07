@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable } from 'firebase/storage';
 
 import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
@@ -18,7 +18,7 @@ function Resources({ profile }) {
   const { role } = profile;
   const currRole = role.toLowerCase();
   const [percent, setPercent] = useState(0);
-  const [link, setLink] = useState('');
+  const [fileLinks, setFileLinks] = useState([]);
 
   // add permissions to view module. order doesn't matter
   if (mentor) {
@@ -41,7 +41,7 @@ function Resources({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    setLink(storageRef.fullPath);
+    // setLinks(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -55,20 +55,23 @@ function Resources({ profile }) {
         setPercent(p);
       },
       (err) => console.log(err),
-      () => {
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log(url);
-        });
-      },
+      // () => {
+      //   // download url
+      //   getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+      //     console.log(url);
+      //   });
+      // },
     );
+    console.log(storageRef.fullPath);
+    return storageRef.fullPath;
     // set linkstate here:
   };
 
   const handleChange = (e) => {
     console.log(e.target.files);
-    Array.from(e.target.files).forEach((file) => handleUpload(file)); // allows you to upload multiple files I THINK?
-    // handleUpload(e.target.files[0]); // test
+    const urls = [];
+    Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
+    setFileLinks(urls);
   };
 
   const submitForm = async () => { // adds a module to the root module page
@@ -79,8 +82,9 @@ function Resources({ profile }) {
       role: roles,
       children: [],
       parent: null,
-      link,
+      fileLinks, // set from handleChange, which triggers handleUpload of all the files
     };
+    console.log(fileLinks);
     // receive module id
     // TODO: Create api call (move db.collection to backend)
     const tempId = (await db.collection('modules').add(data)).id;
@@ -96,6 +100,7 @@ function Resources({ profile }) {
     setServiceArea('');
     setCaregiver(false);
     setMentor(false);
+    setFileLinks([]);
   };
 
   // empty dependency array means getModules is only being called on page load

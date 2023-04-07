@@ -23,8 +23,8 @@ function ExpandedModule({ profile }) {
   const [refresh, setRefresh] = useState(false);
 
   const [percent, setPercent] = useState(0);
-  const [links, setLinks] = useState([]);
-  const [moduleImage, setModuleImage] = useState('');
+  const [uploadLinks, setUploadLinks] = useState([]);
+  const [currModuleFiles, setCurrModuleFiles] = useState([]);
 
   // Usestates for forms
   const [mentor, setMentor] = useState(false);
@@ -50,7 +50,7 @@ function ExpandedModule({ profile }) {
       role: roles,
       parent: id,
       children: [],
-      links,
+      uploadLinks,
     };
 
     await api.updateModuleChildren(id, data); // pass in id, data to submit
@@ -59,7 +59,7 @@ function ExpandedModule({ profile }) {
     setFormtitle('');
     setFormbody('');
     setServiceArea('');
-    setModuleImage('');
+    setCurrModuleFiles([]);
     setCaregiver(false);
     setMentor(false);
     setRefresh(!refresh);
@@ -80,7 +80,7 @@ function ExpandedModule({ profile }) {
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
       setChildren(object.childrenArray);
-      setModuleImage(object.data.links);
+      setCurrModuleFiles(object.data.fileLinks);
     });
   };
 
@@ -105,7 +105,7 @@ function ExpandedModule({ profile }) {
         // update progress
         setPercent(p);
       },
-      (err) => console.log(err),
+      (err) => console.error(err),
       () => {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
@@ -119,8 +119,8 @@ function ExpandedModule({ profile }) {
   const handleChange = (e) => {
     // handleUpload(e.target.files[0]);
     const urls = [];
-    urls.append(handleUpload(e.target.files.map((file) => file))); // allows you to display multiple files
-    setLinks(urls);
+    Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
+    setUploadLinks(urls);
   };
 
   useEffect(getModule, [id, currRole, refresh]);
@@ -159,7 +159,7 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
+            <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
           </div>
           {ExpandedModuleForm}
         </div>
@@ -170,7 +170,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
+        <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
       </div>
     );
   }
@@ -182,7 +182,7 @@ function ExpandedModule({ profile }) {
           <Link to="/resources">
             Back
           </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
+          <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
         </div>
         {ExpandedModuleForm}
       </div>
@@ -195,7 +195,7 @@ function ExpandedModule({ profile }) {
         <Link to="/resources">
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} links={moduleImage} />
+        <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
       </div>
     </div>
   );
