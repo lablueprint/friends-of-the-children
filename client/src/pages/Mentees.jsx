@@ -22,9 +22,8 @@ function Mentees({ profile, updateAppProfile }) {
       sc.forEach((snap) => {
         const data = snap.data();
         const { id } = snap;
-        console.log(id);
         if (profile.mentees.includes(id)) {
-          data.id = doc.id;
+          data.id = id;
           tempMentees.push(data);
         }
       });
@@ -38,12 +37,16 @@ function Mentees({ profile, updateAppProfile }) {
     const lastName = e.target.lastName.value;
     const age = e.target.age.value;
     const notes = e.target.notes.value;
+    const caregiver = e.target.caregiverFirstName.value;
+    const folders = '{}';
 
     const data = {
       firstName,
       lastName,
       age,
       notes,
+      caregiver,
+      folders,
     };
 
     const menteeID = (await db.collection('mentees').add(data)).id;
@@ -78,8 +81,8 @@ function Mentees({ profile, updateAppProfile }) {
   return (
     <div>
       <h1>MY MENTEES</h1>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Add Child
+      <Button variant="contained" onClick={handleClickOpen}>
+        Add Child :D
       </Button>
 
       <div className={styles.mentees_container}>
@@ -88,7 +91,7 @@ function Mentees({ profile, updateAppProfile }) {
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age,
+                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiver, folders: mentee.folders,
               }}
             >
               <div className={styles.card}>

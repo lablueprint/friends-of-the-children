@@ -27,3 +27,14 @@
     border-radius: 10px;
     background: white;
 }
+
+.folder_container{
+    display: inline-block;
+    margin-right: 20px;
+    padding-top: 50px;
+    width: 250px;
+    height: 250px;
+    background-image: url(../assets/images/folder.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
