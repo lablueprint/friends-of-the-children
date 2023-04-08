@@ -15,6 +15,7 @@ import {
   NotFound,
   UserProfile,
   Requests,
+  UserNotApproved,
 } from './pages';
 import NavBar from './components/NavBar';
 
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
                 <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                 <Route path="/requests" element={(<Requests profile={currUser} />)} />
+                <Route path="/unapproved" element={(<UserNotApproved />)} />
               </Routes>
             </div>
           </div>
@@ -60,6 +62,7 @@ function App() {
             <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
+            <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />
             <Route path="*" element={(<NotFound />)} />
           </Routes>
         </div>
