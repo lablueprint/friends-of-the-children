@@ -21,11 +21,10 @@ function ExpandedMentee({ profile }) {
   const [folders, setFolders] = useState(null);
   const [folderArray, setFolderArray] = useState([]);
   const [open, setOpen] = useState(false);
-  console.log(id);
-  console.log(folderArray);
+  //   console.log(id);
+  console.log(folders);
 
   const getMentee = () => {
-    console.log('FOLDER CHANGED SO GETTING MENTEE');
     const tempFolders = [];
     db.collection('mentees').doc(id).get().then((sc) => {
       const data = sc.data();
@@ -39,11 +38,10 @@ function ExpandedMentee({ profile }) {
   };
 
   // update the mentee's folders field
-  const updateMentee = async () => {
-    console.log('UPDATING');
+  const updateMentee = async (target) => {
     const menteeRef = doc(db, 'mentees', id);
     await updateDoc(menteeRef, {
-      folders: JSON.stringify(folders),
+      folders: JSON.stringify(target),
     });
   };
 
@@ -52,17 +50,15 @@ function ExpandedMentee({ profile }) {
     const name = e.target.folderName.value;
     // add name as new key mapped to an empty array
     const tempObj = folders;
-    tempObj[name] = '[]';
-    const newFolder = JSON.parse(`{"${name}":"[]"}`);
+    tempObj[name] = [];
+    // const newFolder = JSON.parse(`{"${name}":[]}`);
 
     if (folders) {
-      await updateMentee();
-    } else {
-      await updateMentee(newFolder);
+      await updateMentee(folders);
     }
 
     setFolders(tempObj);
-    const arr = [`${name}`, '[]'];
+    const arr = [`${name}`, []];
     setFolderArray([...folderArray, arr]);
 
     setOpen(false);
@@ -110,7 +106,7 @@ function ExpandedMentee({ profile }) {
             <Link
               to={`./folder_${folder[0]}`}
               state={{
-                folderName: folder[0], media: folder[1], id, firstName, lastName, age, caregiver,
+                folders, folderName: folder[0], media: folder[1], id, firstName, lastName, age, caregiver,
               }}
             >
               <h2>{folder[0]}</h2>

@@ -1,3 +1,7 @@
+a{
+    text-decoration: none;
+}
+
 .mentees_container{
     text-align: left;
 }
@@ -37,4 +41,15 @@
     background-image: url(../assets/images/folder.svg);
     background-size: contain;
     background-repeat: no-repeat;
+}
+
+.img_container{
+    display: inline-block;
+    width: 250px;
+    margin-right: 20px;
+}
+
+.media_image{
+    width: 250px;
+    height: 250px;
 }
