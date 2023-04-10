@@ -30,6 +30,7 @@ import * as api from '../api';
   ...
  */
 
+// eslint-disable-next-line no-unused-vars
 function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -122,17 +123,7 @@ function Signup({ updateAppProfile }) {
               approved: false,
             };
             db.collection('profiles').doc().set(data);
-            updateAppProfile(data);
-
-            // mailchimp- update list on signup
-            const payload = {
-              email_address: data.email,
-              firstName: data.firstName,
-              lastName: data.lastName,
-              role: data.role,
-              serviceArea: data.serviceArea,
-            };
-            api.addToList(payload);
+            navigate('/unapproved', { state: { ...data } });
           });
       } else {
         const data = {
@@ -146,19 +137,9 @@ function Signup({ updateAppProfile }) {
           approved: false,
         };
         db.collection('profiles').doc().set(data);
-        updateAppProfile(data);
-
-        // mailchimp- update list on signup
-        const payload = {
-          email_address: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          role: data.role,
-          serviceArea: data.serviceArea,
-        };
-        api.addToList(payload);
+        navigate('/unapproved', { state: { ...data } });
       }
-      navigate('/modules');
+
       // reset forms
       setFirstName('');
       setLastName('');

@@ -8,6 +8,7 @@ import ExpandedModule from './ExpandedModule';
 import NotFound from './NotFound';
 import UserProfile from './UserProfile';
 import Requests from './Requests';
+import UserNotApproved from './UserNotApproved';
 
 export {
   Example,
@@ -18,4 +19,5 @@ export {
   NotFound,
   UserProfile,
   Requests,
+  UserNotApproved,
 };
