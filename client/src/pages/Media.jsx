@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { doc, updateDoc } from 'firebase/firestore';
+// import { arrayUnion } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
@@ -15,32 +15,24 @@ function Media({ profile }) {
   const location = useLocation();
   // media is the string of file links in this folder
   const {
-    id, folders, folderName, media, firstName, lastName, age, caregiver,
+    id, folderName, firstName, lastName, age, caregiver,
   } = location.state;
   // parse media string to an array
   const [open, setOpen] = useState(false);
   // this is the array of file links
-  const [mediaArray, setMediaArray] = useState(media);
+  const [mediaArray, setMediaArray] = useState([]);
   const [fileUrl, setFileUrl] = useState('');
   console.log(mediaArray);
 
   const getFolder = () => {
-    const tempMedia = [];
-    db.collection('mentees').doc(id).get().then((sc) => {
-      const data = sc.data();
-      console.log(data.folders);
-      const menteeFolders = JSON.parse(data.folders);
-      const folderMedia = menteeFolders[folderName];
-      console.log(folderMedia);
-      if (folderMedia.length) {
-        folderMedia.forEach((file) => {
-          tempMedia.push(file);
-        });
-      }
-    })
+    db.collection('mentees').doc(id).collection('folders').doc(folderName)
+      .get()
+      .then((sc) => {
+        const data = sc.data();
+        const { files } = data;
+        setMediaArray(files);
+      })
       .then(() => {
-        console.log(tempMedia);
-        setMediaArray(tempMedia);
         console.log(mediaArray);
       });
   };
@@ -49,17 +41,15 @@ function Media({ profile }) {
     getFolder();
   }, []);
 
+  // add file in firebase folder
   const updateMentee = async () => {
-    // update files array in firebase
-    const foldersObj = folders;
-    foldersObj[folderName] = mediaArray;
-    console.log(mediaArray);
-    console.log(foldersObj);
-    console.log(JSON.stringify(foldersObj));
-    const menteeRef = doc(db, 'mentees', id);
-    await updateDoc(menteeRef, {
-      folders: JSON.stringify(foldersObj),
-    });
+    await db.collection('mentees').doc(id).collection('folders').doc(folderName)
+      .set({
+        files: mediaArray,
+      });
+    // if (type === 'image') {
+
+    // }
   };
 
   const addMedia = async (e) => {
@@ -73,18 +63,14 @@ function Media({ profile }) {
     };
     tempArr.push(data);
     setMediaArray(tempArr);
-    // setMediaArray([...mediaArray, fileUrl]);
-    updateMentee();
 
-    console.log(mediaArray);
-
-    console.log('HERE');
+    await updateMentee();
 
     setOpen(false);
     e.target.reset();
   };
 
-  const handleUpload = async (image) => {
+  const handleUpload = (image) => {
     console.log('target:', image.name);
     const imageName = image.name;
     const storageRef = ref(storage, `/images/${imageName}`);
@@ -110,28 +96,46 @@ function Media({ profile }) {
   };
 
   return (
-    <div>
-      <h1>{`this is the ${folderName} folder!`}</h1>
-      <h1>{`${firstName} ${lastName}`}</h1>
-      <p>
-        Caregiver:
-        {' '}
-        {caregiver}
-      </p>
-      <p>
-        Service Area:
-        {' '}
-        {profile.serviceArea}
-      </p>
-      <p>
-        {age}
-        {' '}
-        years old
-      </p>
+    <div className={styles.folders_page}>
       <div>
-        <Button variant="contained" onClick={handleClickOpen}>
-          + Add Media
-        </Button>
+        <p>
+          {`My Mentees > ${firstName} ${lastName} > `}
+          <b>
+            {`${folderName}`}
+          </b>
+        </p>
+        <p>
+          Caregiver:
+          {' '}
+          {caregiver}
+        </p>
+      </div>
+
+      <div className={styles.profile_container}>
+        <div>
+          <div className={styles.pfp}>
+            <img className={styles.profile_pic} src="https://images.theconversation.com/files/304864/original/file-20191203-67028-qfiw3k.jpeg?ixlib=rb-1.1.0&rect=638%2C2%2C795%2C745&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip" alt="" />
+          </div>
+
+          <div className={styles.user_info}>
+            <h1>{`${firstName} ${lastName}`}</h1>
+            <p>
+              {age}
+              {' '}
+              years old
+            </p>
+          </div>
+
+          <div className={styles.service_area}>
+            <p>
+              {profile.serviceArea}
+            </p>
+          </div>
+
+          <Button variant="contained" onClick={handleClickOpen}>
+            + Add Media
+          </Button>
+        </div>
       </div>
 
       {mediaArray.map((file) => (

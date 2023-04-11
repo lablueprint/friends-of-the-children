@@ -79,8 +79,8 @@ function Mentees({ profile, updateAppProfile }) {
   };
 
   return (
-    <div>
-      <h1>MY MENTEES</h1>
+    <div className={styles.mentees_page}>
+      <h1>My Mentees</h1>
       <Button variant="contained" onClick={handleClickOpen}>
         Add Child :D
       </Button>

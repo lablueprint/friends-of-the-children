@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { doc, updateDoc } from 'firebase/firestore';
+// import { addDoc } from 'firebase/firestore';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -17,49 +17,37 @@ function ExpandedMentee({ profile }) {
   const {
     id, firstName, lastName, age, caregiver,
   } = location.state;
-  // folders = json object
-  const [folders, setFolders] = useState(null);
   const [folderArray, setFolderArray] = useState([]);
   const [open, setOpen] = useState(false);
-  //   console.log(id);
-  console.log(folders);
 
   const getMentee = () => {
     const tempFolders = [];
-    db.collection('mentees').doc(id).get().then((sc) => {
-      const data = sc.data();
-      const menteeFolders = JSON.parse(data.folders);
-      Object.entries(menteeFolders).forEach((folder) => {
-        tempFolders.push(folder);
+    db.collection('mentees').doc(id).collection('folders').get()
+      .then((sc) => {
+        sc.forEach((currDoc) => {
+          const folderName = currDoc.id;
+          if (folderName !== 'root') { tempFolders.push(folderName); }
+          console.log('Found subcollection with id:', currDoc.id);
+        });
+      })
+      .then(() => {
+        setFolderArray(tempFolders);
       });
-      setFolders(JSON.parse(data.folders));
-    });
-    setFolderArray(tempFolders);
   };
 
-  // update the mentee's folders field
+  // add new document to folders collection
   const updateMentee = async (target) => {
-    const menteeRef = doc(db, 'mentees', id);
-    await updateDoc(menteeRef, {
-      folders: JSON.stringify(target),
-    });
+    await db.collection('mentees').doc(id).collection('folders').doc(target)
+      .set({
+        files: [],
+      });
   };
 
   const addFolder = async (e) => {
     e.preventDefault();
     const name = e.target.folderName.value;
-    // add name as new key mapped to an empty array
-    const tempObj = folders;
-    tempObj[name] = [];
-    // const newFolder = JSON.parse(`{"${name}":[]}`);
-
-    if (folders) {
-      await updateMentee(folders);
-    }
-
-    setFolders(tempObj);
-    const arr = [`${name}`, []];
-    setFolderArray([...folderArray, arr]);
+    await updateMentee(name);
+    setFolderArray([...folderArray, name]);
 
     setOpen(false);
     e.target.reset();
@@ -76,43 +64,66 @@ function ExpandedMentee({ profile }) {
   };
 
   return (
-    <div>
-      <h1>{`${firstName} ${lastName}`}</h1>
-      <p>
-        Caregiver:
-        {' '}
-        {caregiver}
-      </p>
-      <p>
-        Service Area:
-        {' '}
-        {profile.serviceArea}
-      </p>
-      <p>
-        {age}
-        {' '}
-        years old
-      </p>
+    <div className={styles.folders_page}>
+      <div>
+        <p>
+          {'My Mentees > '}
+          <b>
+            {`${firstName} ${lastName}`}
+          </b>
+        </p>
+
+        <p>
+          Caregiver:
+          {' '}
+          {caregiver}
+        </p>
+      </div>
+
+      <div className={styles.profile_container}>
+        <div>
+          <div className={styles.pfp}>
+            <img className={styles.profile_pic} src="https://images.theconversation.com/files/304864/original/file-20191203-67028-qfiw3k.jpeg?ixlib=rb-1.1.0&rect=638%2C2%2C795%2C745&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip" alt="" />
+          </div>
+
+          <div className={styles.user_info}>
+            <h1>{`${firstName} ${lastName}`}</h1>
+            <p>
+              {age}
+              {' '}
+              years old
+            </p>
+          </div>
+
+          <div className={styles.service_area}>
+            <p>
+              {profile.serviceArea}
+            </p>
+          </div>
+
+          <Button variant="contained" onClick={handleClickOpen}>
+            + Upload File
+          </Button>
+        </div>
+      </div>
 
       <h3>Folders</h3>
-
-      <Button variant="outlined" onClick={handleClickOpen}>
-        + Add a New Folder
-      </Button>
-
       <div>
         {folderArray.map((folder) => (
           <div className={styles.folder_container}>
             <Link
-              to={`./folder_${folder[0]}`}
+              to={`./folder_${folder}`}
               state={{
-                folders, folderName: folder[0], media: folder[1], id, firstName, lastName, age, caregiver,
+                id, folderName: folder, firstName, lastName, age, caregiver,
               }}
             >
-              <h2>{folder[0]}</h2>
+              <h2>{folder}</h2>
             </Link>
           </div>
         ))}
+        <Button variant="outlined" onClick={handleClickOpen}>
+          + Add a New Folder
+        </Button>
       </div>
 
       <div>

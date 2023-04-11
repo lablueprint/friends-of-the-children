@@ -1,5 +1,19 @@
 a{
     text-decoration: none;
+    /* color: black; */
+}
+
+.mentees_page{
+    text-align: left;
+    padding: 50px 0px 50px 100px;
+}
+
+.folders_page{
+    background-image: url('../assets/images/banner.svg');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    padding: 50px 0px 50px 80px;
+    text-align: left;
 }
 
 .mentees_container{
@@ -8,8 +22,8 @@ a{
 
 .card_container{
     display: inline-block;
-    margin: 20px;
-    width: 250px;
+    margin: 30px 50px 0 0;
+    width: 300px;
 }
 
 .card{
@@ -34,22 +48,62 @@ a{
 
 .folder_container{
     display: inline-block;
-    margin-right: 20px;
     padding-top: 50px;
     width: 250px;
-    height: 250px;
+    height: 200px;
+    margin-left: -20px;
     background-image: url(../assets/images/folder.svg);
     background-size: contain;
     background-repeat: no-repeat;
 }
 
+.folder_container h2{
+    text-align: center;
+}
+
 .img_container{
     display: inline-block;
     width: 250px;
-    margin-right: 20px;
+    height: 250px;
+    margin-top: 50px;
 }
 
 .media_image{
-    width: 250px;
-    height: 250px;
+    width: 230px;
+    height: 230px;
+}
+
+.profile_container{
+    display: grid;
+    flex-wrap: wrap;
+    column-gap: 15vw;
+    row-gap: 5vw;
+    align-items: flex-end;
+    margin-bottom: 3vw;
+}
+
+.profile_container h1{
+    font-weight: 700;
+}
+
+.pfp{
+    display: inline-block;
+    margin-right: 2.5vw;
+}
+
+.profile_pic{
+    background: bisque;
+    border-radius: 50%;
+    width: 150px;
+}
+
+.user_info{
+    display: inline-block;
+    margin-right: 2.5vw;
+    vertical-align: bottom;
+}
+
+.service_area{
+    display: inline-block;
+    margin-right: 2.5vw;
 }
