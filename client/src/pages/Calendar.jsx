@@ -7,9 +7,10 @@ import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
+import * as constants from '../constants.js';
 
 function Calendar({ profile }) {
-  const { role } = profile;
+  const { role, serviceArea } = profile;
   const currRole = role.toLowerCase();
   const {
     REACT_APP_FIREBASE_CALENDAR_ID,
@@ -81,64 +82,36 @@ function Calendar({ profile }) {
     api.patchEvent(eventData);
   };
 
-  if (currRole === 'admin') {
-    return (
-      <div>
-        <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
-        <div>
-          <form onSubmit={(e) => addEvent(e)}>
-            <h1>FOTC Calendar</h1>
-            Title:
-            <input type="text" name="title" required />
-            Description:
-            <input type="text" name="description" />
-            Location:
-            <input type="text" name="location" />
-            Attachments (Google link):
-            <input type="text" name="attachments" />
-            Start Time:
-            <input type="datetime-local" name="start" required />
-            End Time:
-            <input type="datetime-local" name="end" required />
-            <button type="submit">Add Event</button>
-          </form>
-        </div>
-
-        <div className={styles.calendar}>
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            selectable
-            editable
-            // update event when you drag & drop an event on the interface (for admin only)
-            eventDrop={dropEvent}
-            selectMirror
-            dayMaxEvents
-            eventColor="rgba(0, 170, 238, 0.2)"
-            eventTextColor="black"
-            fixedWeekCount={false}
-            googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
-            events={{
-              googleCalendarId: 'fofthechildren@gmail.com',
-              className: 'gcal-event',
-            }}
-            eventClick={handleEventClick}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
+      {currRole === "admin" ?  // show form if admin, otherwise show nothing
+        <div>
+            <form onSubmit={(e) => addEvent(e)}>
+              <h1>FOTC test Calendar</h1>
+              Title:
+              <input type="text" name="title" required />
+              Description:
+              <input type="text" name="description" />
+              Location:
+              <input type="text" name="location" />
+              Attachments (Google link):
+              <input type="text" name="attachments" />
+              Start Time:
+              <input type="datetime-local" name="start" required />
+              End Time:
+              <input type="datetime-local" name="end" required />
+              <button type="submit">Add Event</button>
+            </form>
+        </div> : null }
       <div className={styles.calendar}>
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           selectable
+          editable={currRole === "admin" ? true : false}
+          eventDrop={currRole === "admin" ? dropEvent : null}
           selectMirror
           dayMaxEvents
           eventColor="rgba(0, 170, 238, 0.2)"
@@ -146,7 +119,7 @@ function Calendar({ profile }) {
           fixedWeekCount={false}
           googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
           events={{
-            googleCalendarId: 'fofthechildren@gmail.com',
+            googleCalendarId: constants.calIdFOTC,
             className: 'gcal-event',
           }}
           eventClick={handleEventClick}
