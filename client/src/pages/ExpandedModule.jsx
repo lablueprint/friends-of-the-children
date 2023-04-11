@@ -3,7 +3,7 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
 import { storage } from './firebase';
@@ -16,14 +16,13 @@ function ExpandedModule({ profile }) {
   const { id } = location.state;
   const [title, setTitle] = useState();
   const [body, setBody] = useState();
-  const [attachments, setAttachments] = useState(); // MIGHT not be needed, since link = attachments storage
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
   const [refresh, setRefresh] = useState(false);
 
   const [percent, setPercent] = useState(0);
-  const [uploadLinks, setUploadLinks] = useState([]);
+  const [fileLinks, setFileLinks] = useState([]);
   const [currModuleFiles, setCurrModuleFiles] = useState([]);
 
   // Usestates for forms
@@ -50,7 +49,7 @@ function ExpandedModule({ profile }) {
       role: roles,
       parent: id,
       children: [],
-      uploadLinks,
+      fileLinks,
     };
 
     await api.updateModuleChildren(id, data); // pass in id, data to submit
@@ -62,6 +61,7 @@ function ExpandedModule({ profile }) {
     setCurrModuleFiles([]);
     setCaregiver(false);
     setMentor(false);
+    setFileLinks([]);
     setRefresh(!refresh);
   };
 
@@ -77,7 +77,6 @@ function ExpandedModule({ profile }) {
     getModulebyIdfunc(id, currRole).then((object) => {
       setTitle(object.data.title);
       setBody(object.data.body);
-      setAttachments(object.data.attachments);
       setParent(object.data.parent);
       setChildren(object.childrenArray);
       setCurrModuleFiles(object.data.fileLinks);
@@ -86,13 +85,8 @@ function ExpandedModule({ profile }) {
 
   // upload file to Firebase:
   const handleUpload = (file) => {
-    console.log('target:', file.name);
-    // if (!file) {
-    //   alert('Please choose a file first!');
-    // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    // setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -106,21 +100,14 @@ function ExpandedModule({ profile }) {
         setPercent(p);
       },
       (err) => console.error(err),
-      () => {
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log(url);
-          return url;
-        });
-      },
     );
+    return storageRef.fullPath;
   };
 
   const handleChange = (e) => {
-    // handleUpload(e.target.files[0]);
     const urls = [];
     Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
-    setUploadLinks(urls);
+    setFileLinks(urls);
   };
 
   useEffect(getModule, [id, currRole, refresh]);
@@ -141,7 +128,7 @@ function ExpandedModule({ profile }) {
         Service Area:
         <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
         File:
-        <input type="file" defaultValue="" onChange={handleChange} />
+        <input type="file" defaultValue="" onChange={handleChange} multiple />
         <p>
           {percent}
           {' '}
@@ -159,7 +146,7 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
+            <Module title={title} body={body} child={children} links={currModuleFiles} />
           </div>
           {ExpandedModuleForm}
         </div>
@@ -170,7 +157,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
+        <Module title={title} body={body} child={children} links={currModuleFiles} />
       </div>
     );
   }
@@ -182,7 +169,7 @@ function ExpandedModule({ profile }) {
           <Link to="/resources">
             Back
           </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
+          <Module title={title} body={body} child={children} links={currModuleFiles} />
         </div>
         {ExpandedModuleForm}
       </div>
@@ -195,7 +182,7 @@ function ExpandedModule({ profile }) {
         <Link to="/resources">
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} links={currModuleFiles} />
+        <Module title={title} body={body} child={children} links={currModuleFiles} />
       </div>
     </div>
   );

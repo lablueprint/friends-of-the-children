@@ -8,65 +8,67 @@ import styles from '../styles/Modules.module.css';
 
 function Module(props) {
   const {
-    title, body, attachments, child, links,
+    title, body, child, links,
   } = props;
 
-  const [imgs, setImgs] = useState([]);
+  const [files, setFiles] = useState([]);
 
-  const setImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
-    const urls = [];
+  const updateImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
+    setFiles([]);
+    const fileContents = [];
     if (fileLinks.length > 0) {
       await Promise.all(fileLinks.map(async (fileLink) => { // i'm also gonna be slow bc i contain a Promise function!
         const storage = getStorage();
         const spaceRef = ref(storage, fileLink);
-        const fileType = (await getMetadata(spaceRef)).contentType; // getMetadata is a promise function,
+        const file = await getMetadata(spaceRef); // getMetadata is a promise function,
         // ^ so it's very slow (you need to wait for it to be fulfilled before u do anything w it)
-        if (fileType === 'image/png' || fileType === 'image/jpeg') {
-          getDownloadURL(spaceRef).then((url) => {
-            console.log('pls work');
-            console.log(urls.length);
-            console.log('bye');
-            console.log(url);
-            urls.push(url);
-            console.log(urls.length);
-          }).catch((error) => {
-            console.error(error.message);
-          });
-        }
+        const fileType = file.contentType;
+        const url = await getDownloadURL(spaceRef);
+        fileContents.push({ url, fileType });
       }));
-      setImgs(urls);
+      setFiles(fileContents);
     }
-    // } else { // might not need this anymore
-    //   setImgs([]);
-    // }
-    console.log(urls);
-    console.log('hi');
-    console.log(urls.length);
   };
 
-  useEffect(() => { setImageURL(links); }, [links]);
+  useEffect(() => { updateImageURL(links); }, [links]);
 
   return (
     <div>
       <div className={styles.title}>{title}</div>
       <div className={styles.body}>{body}</div>
-      <div className={styles.attachments}>{attachments}</div>
-      {/* keep bottom code for reference */}
+      {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
       <div>
-        {console.log(imgs)}
-        {/* {console.log(imgs.length)} */}
-        {/* {console.log(typeof imgs)} */}
-        {/* {console.log(typeof imgs['0'])} */}
-        {console.log(JSON.stringify(imgs, null, '\t'))}
-        {imgs.map((image) => (
-          <div>
-            hello
-            {/* <div key={image} className="image"> */}
-            {console.log(image)}
-            <img src={image} alt="" width="40%" height="auto" />
-            <br />
-          </div>
-        ))}
+        {files.map((file) => {
+          if (file.fileType === 'image/png' || file.fileType === 'image/jpeg') {
+            return (
+              <div>
+                {' '}
+                {/* i want to use key={i} but eslint won't let me (will change to (file, i) above) :o */}
+                {/* <div key={image} className="image"> */}
+                <img src={file.url} alt="" width="40%" height="auto" />
+                <br />
+              </div>
+            );
+          }
+          if (file.fileType === 'video/mp4' || file.fileType === 'video/mpeg' || file.fileType === 'video/quicktime') {
+            return (
+              <div>
+                <video width="40%" height="auto" controls src={file.url}>
+                  <track default kind="captions" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            );
+          }
+          if (file.fileType === 'application/pdf') {
+            return (
+              <div>
+                <embed src={file.url} width="80%" height="800em" />
+              </div>
+            );
+          }
+          return null;
+        })}
       </div>
       {/* add actual alt text for images */}
       {' '}
@@ -86,7 +88,6 @@ function Module(props) {
 Module.propTypes = {
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
-  attachments: PropTypes.string.isRequired,
   child: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,

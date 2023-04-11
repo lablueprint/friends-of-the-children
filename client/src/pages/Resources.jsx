@@ -55,12 +55,6 @@ function Resources({ profile }) {
         setPercent(p);
       },
       (err) => console.log(err),
-      // () => {
-      //   // download url
-      //   getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-      //     console.log(url);
-      //   });
-      // },
     );
     console.log(storageRef.fullPath);
     return storageRef.fullPath;
@@ -68,7 +62,6 @@ function Resources({ profile }) {
   };
 
   const handleChange = (e) => {
-    console.log(e.target.files);
     const urls = [];
     Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
     setFileLinks(urls);
