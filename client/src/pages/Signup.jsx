@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Popup from '../components/Popup';
-import { db } from './firebase';
+import { app, db } from './firebase';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/images/login_family.svg';
 import UpperRight from '../assets/images/upperRight.svg';
@@ -121,6 +121,7 @@ function Signup({ updateAppProfile }) {
               google: false,
               image: 'https://i.pinimg.com/550x/18/b9/ff/18b9ffb2a8a791d50213a9d595c4dd52.jpg',
               approved: false,
+              date: app.firebase.firestore.Timestamp.fromDate(new Date()),
             };
             db.collection('profiles').doc().set(data);
             navigate('/unapproved', { state: { ...data } });
@@ -135,6 +136,7 @@ function Signup({ updateAppProfile }) {
           username,
           google: true,
           approved: false,
+          date: app.firebase.firestore.Timestamp.fromDate(new Date()),
         };
         db.collection('profiles').doc().set(data);
         navigate('/unapproved', { state: { ...data } });
