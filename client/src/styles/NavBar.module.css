@@ -2,6 +2,8 @@
 .wrapper{
     display: flex;
     position: relative;
+    background-color: #F6FAFF;
+    height: 80vw;
 }
 
 /* any content to the right of navbar */
