@@ -19,7 +19,6 @@ function Calendar({ profile }) {
   const calendarRef = createRef();
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
-    // alert('a day has been clicked');
     console.log(eventInfo.event.title);
     if (eventInfo.event.extendedProps.location) {
       console.log('Location: ', eventInfo.event.extendedProps.location);
@@ -82,10 +81,55 @@ function Calendar({ profile }) {
     api.patchEvent(eventData);
   };
 
+  // Return calendar id(s) based on user role (admin = all cals, non-admin = only their service area)
+  const getCalendarByRole = () => {
+    if (currRole === "admin") {
+      return [
+        {
+          googleCalendarId: constants.calIdFOTC,
+          className: 'fotc-events',
+          color: 'rgba(0, 170, 238, 0.2)',
+        },
+        {
+          googleCalendarId: constants.calIdAV,
+          className: 'av-events',
+          color: 'rgba(238, 187, 17, 0.2)',
+        },
+        {
+          googleCalendarId: constants.calIdMS,
+          className: 'ms-events',
+          color: 'rgba(255, 85, 34, 0.2)',
+        }
+      ]
+    } else {
+      if (serviceArea.toLowerCase() === "av") {
+        return [{
+          googleCalendarId: constants.calIdAV,
+          className: 'av-events',
+          color: 'rgba(238, 187, 17, 0.2)',
+        }]
+      } else if (serviceArea.toLowerCase() === "ms") {
+        return [{
+          googleCalendarId: constants.calIdMS,
+          className: 'ms-events',
+          color: 'rgba(255, 85, 34, 0.2)',
+        }]
+      } else {
+        return [{
+          googleCalendarId: constants.calIdFOTC,
+          className: 'fotc-events',
+          color: 'rgba(0, 170, 238, 0.2)',
+        }]
+      }
+    }
+  }
+  const calendarInfo = getCalendarByRole();
+
+
   return (
     <div>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
-      {currRole === "admin" ?  // show form if admin, otherwise show nothing
+      {currRole === "admin" ?  // show event form iff admin, otherwise show nothing
         <div>
             <form onSubmit={(e) => addEvent(e)}>
               <h1>FOTC test Calendar</h1>
@@ -118,10 +162,7 @@ function Calendar({ profile }) {
           eventTextColor="black"
           fixedWeekCount={false}
           googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
-          events={{
-            googleCalendarId: constants.calIdFOTC,
-            className: 'gcal-event',
-          }}
+          eventSources={calendarInfo}
           eventClick={handleEventClick}
         />
       </div>
