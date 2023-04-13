@@ -123,6 +123,11 @@ function ExpandedModule({ profile }) {
 
   useEffect(getModule, [id, currRole, refresh]);
 
+  const deleteChild = (childId) => {
+    setChildren(children.filter((child) => child.id !== childId));
+    console.log('children is', children);
+  };
+
   const ExpandedModuleForm = (
     <div>
       <form action="post">
@@ -157,7 +162,7 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+            <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
             {console.log(moduleImage)}
           </div>
           {ExpandedModuleForm}
@@ -169,7 +174,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
       </div>
     );
   }
@@ -181,7 +186,7 @@ function ExpandedModule({ profile }) {
           <Link to="/modules">
             Back
           </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+          <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
         </div>
         {ExpandedModuleForm}
       </div>
@@ -194,7 +199,7 @@ function ExpandedModule({ profile }) {
         <Link to="/modules">
           Back
         </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} />
+        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
       </div>
     </div>
   );

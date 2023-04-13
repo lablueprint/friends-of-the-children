@@ -5,6 +5,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
+import * as api from '../api';
 
 function Modules({ profile }) {
   const [title, setTitle] = useState('');
@@ -107,6 +108,12 @@ function Modules({ profile }) {
     setMentor(false);
   };
 
+  const deleteModule = async (moduleId) => {
+    await api.deleteModule(moduleId);
+    console.log(modules);
+    setModules(modules.filter((module) => module.id !== moduleId));
+  };
+
   // empty dependency array means getModules is only being called on page load
   useEffect(getModules, []);
 
@@ -114,15 +121,17 @@ function Modules({ profile }) {
     return (
       <div>
         {modules.map((card) => (
-          <div key={card.id}>
+          <div key={card.id} className={styles.card}>
             <Link
               to="/expanded-module"
               state={{ id: card.id }}
             >
-              <div className={styles.card}>
+              <div>
                 <h1>{card.title}</h1>
               </div>
             </Link>
+            <button type="button" onClick={() => { deleteModule(card.id); }}> Delete Module </button>
+
           </div>
         ))}
         <form action="post">

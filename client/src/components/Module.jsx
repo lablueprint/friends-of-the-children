@@ -5,14 +5,16 @@ import {
   ref, getStorage, getDownloadURL,
 } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
+import * as api from '../api';
 
 function Module(props) {
   const {
-    title, body, attachments, child, link,
+    title, body, attachments, child, link, role, deleteChild,
   } = props;
 
   const [img, setImg] = useState('');
   console.log(img);
+  console.log('role is', role);
 
   const setImageURL = (imgLink) => {
     if (imgLink.length > 0) {
@@ -30,6 +32,52 @@ function Module(props) {
 
   useEffect(() => { setImageURL(link); }, [link]);
 
+  const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
+    api.deleteModule(moduleId).then(() => {
+      // reloads the page
+      deleteChild(moduleId);
+    });
+  };
+  if (role === 'admin') {
+    return (
+      <div>
+        <div className={styles.title}>{title}</div>
+        <div className={styles.body}>{body}</div>
+        <div className={styles.attachments}>{attachments}</div>
+        {/* keep bottom code for reference */}
+        {/* <div>
+        {link.map((image) => {
+            return (
+              <div key={image} className="image">
+                  <img src={image} alt="" width="40%" height="auto" />
+              </div>
+            );
+        })}
+      </div> */}
+        <img src={img} alt="" width="30%" height="auto" />
+        {
+        child.map((kid) => (
+          <div>
+            <div className={styles.card}>
+
+              <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
+                <h1>{kid.title}</h1>
+              </Link>
+              <button type="button" onClick={() => { deleteModule(kid.id); }}>
+                {' '}
+                Delete Module
+                {' '}
+                {kid.id}
+                {' '}
+              </button>
+            </div>
+
+          </div>
+        ))
+      }
+      </div>
+    );
+  }
   return (
     <div>
       <div className={styles.title}>{title}</div>
@@ -69,6 +117,8 @@ Module.propTypes = {
     role: PropTypes.arrayOf(string).isRequired,
   })).isRequired,
   link: PropTypes.string,
+  role: PropTypes.string.isRequired,
+  deleteChild: PropTypes.func.isRequired,
 };
 
 Module.defaultProps = {
