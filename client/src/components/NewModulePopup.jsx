@@ -2,7 +2,7 @@ import { React, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-// import Dialog from '@mui/material/Dialog';
+import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
@@ -18,7 +18,7 @@ import { db, storage } from '../pages/firebase';
 
 export default function NewModulePopup(props) {
   const {
-    updateModule,
+    updateModule, open, handleClose,
   } = props;
 
   //   const [open, setOpen] = React.useState(false);
@@ -114,88 +114,90 @@ export default function NewModulePopup(props) {
     <div>
       {/* <Button variant="outlined" onClick={handleClickOpen}>
         Add module
-      </Button>
-      <Dialog open={open} onClose={handleClose}> */}
-      <form onSubmit={submitForm}>
-        <DialogTitle>New Module: </DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Title"
-            fullWidth
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-          <TextField
-            margin="dense"
-            label="Body"
-            fullWidth
-            multiline
-            rows={4}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            required
-          />
-          <FormControlLabel
-            control={(
-              <Checkbox
-                checked={mentor}
-                onChange={(e) => setMentor(e.target.checked)}
-                name="mentor"
-                color="primary"
-              />
+      </Button> */}
+      <Dialog open={open} onClose={handleClose}>
+        <form onSubmit={submitForm}>
+          <DialogTitle>New Module: </DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Title"
+              fullWidth
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Body"
+              fullWidth
+              multiline
+              rows={4}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              required
+            />
+            <FormControlLabel
+              control={(
+                <Checkbox
+                  checked={mentor}
+                  onChange={(e) => setMentor(e.target.checked)}
+                  name="mentor"
+                  color="primary"
+                />
             )}
-            label="Mentor"
-          />
-          <FormControlLabel
-            control={(
-              <Checkbox
-                checked={caregiver}
-                onChange={(e) => setCaregiver(e.target.checked)}
-                name="caregiver"
-                color="primary"
-              />
+              label="Mentor"
+            />
+            <FormControlLabel
+              control={(
+                <Checkbox
+                  checked={caregiver}
+                  onChange={(e) => setCaregiver(e.target.checked)}
+                  name="caregiver"
+                  color="primary"
+                />
             )}
-            label="Caregiver"
-          />
-          <TextField
+              label="Caregiver"
+            />
+            <TextField
             //   className={classes.formControl}
-            label="Service Area"
-            fullWidth
-            value={serviceArea}
-            onChange={(e) => setServiceArea(e.target.value)}
-            required
-          />
-          <Typography variant="body2" color="textSecondary">
-            Attachments:
-          </Typography>
-          <input type="file" onChange={handleFileChange} multiple />
-          <p>
-            {percent}
-            {' '}
-            % done
-          </p>
-        </DialogContent>
-        <DialogActions>
-          {/* <Button onClick={handleClose} color="primary">
+              label="Service Area"
+              fullWidth
+              value={serviceArea}
+              onChange={(e) => setServiceArea(e.target.value)}
+              required
+            />
+            <Typography variant="body2" color="textSecondary">
+              Attachments:
+            </Typography>
+            <input type="file" onChange={handleFileChange} multiple />
+            <p>
+              {percent}
+              {' '}
+              % done
+            </p>
+          </DialogContent>
+          <DialogActions>
+            {/* <Button onClick={handleClose} color="primary">
             Cancel
           </Button> */}
-          <Button
-            type="submit"
-            color="primary"
-            variant="contained"
-          >
-            Submit
-          </Button>
-        </DialogActions>
-      </form>
-      {/* </Dialog> */}
+            <Button
+              type="submit"
+              color="primary"
+              variant="contained"
+            >
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </div>
   );
 }
 
 NewModulePopup.propTypes = {
   updateModule: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
 };
