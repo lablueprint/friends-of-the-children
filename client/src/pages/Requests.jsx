@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useTable } from 'react-table';
+import AdminTable from '../components/AdminTable';
 import * as api from '../api';
 
 function Requests({ profile }) {
@@ -19,9 +19,12 @@ function Requests({ profile }) {
   }, []);
 
   return (
-    <h1>
-      Requests
-    </h1>
+    <div>
+      <h1>
+        Requests
+      </h1>
+      <AdminTable />
+    </div>
   );
 }
 
