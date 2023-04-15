@@ -14,8 +14,8 @@ function ExpandedModule({ profile }) {
   const { role } = profile;
   const location = useLocation();
   const { id } = location.state;
-  const [title, setTitle] = useState();
-  const [body, setBody] = useState();
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
