@@ -35,20 +35,6 @@ function MessageWall({ profile }) {
     getMessagesfunc();
   }, []);
 
-  useEffect(() => {
-    const pinned = messages.filter(
-      (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
-    && message.target.includes(role))),
-    );
-    const unpinned = messages.filter(
-      (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
-    && message.target.includes(role))),
-    );
-    console.log(pinned);
-    console.log(unpinned);
-    // console.log(messages);
-  }, [messages]);
-
   // this function's purpose is to update the pinned update. it first stores all the messages in a temp variable
   // so those messages aren't affected, then it goes and finds the with a correspinding id and updates that pinned
   // status. Lastly, it sets the messages state to that message.
