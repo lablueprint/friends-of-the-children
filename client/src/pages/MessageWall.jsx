@@ -181,13 +181,13 @@ function MessageWall({ profile }) {
         <h3>Message Wall</h3>
         {messages.filter(
           (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role.toLowerCase()))),
+        && message.target.includes(role))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
         )}
         {messages.filter(
           (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role.toLowerCase()))),
+        && message.target.includes(role))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
         )}
