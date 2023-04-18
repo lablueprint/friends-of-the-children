@@ -80,6 +80,7 @@ function Media({ profile }) {
 
     const fileName = files.name;
     const fileType = files.type;
+
     console.log(fileType);
     const storageRef = ref(storage, `/images/${fileName}`);
 
@@ -89,6 +90,7 @@ function Media({ profile }) {
         const data = {
           title,
           fileUrl: url,
+          fileType,
         };
         tempArr.push(data);
         setMediaArray(tempArr);
@@ -148,15 +150,72 @@ function Media({ profile }) {
             </p>
           </div>
 
+          {folderName !== 'Images' && folderName !== 'Videos' && folderName !== 'Flyers' && (
           <Button variant="contained" onClick={handleClickOpen}>
             + Add Media
           </Button>
+          )}
+
         </div>
       </div>
 
+      {/* <div>
+        {mediaArray.map((file) => {
+          if (file.fileType === 'image/png' || file.fileType === 'image/jpeg') {
+            return (
+              <div className={styles.media_image}>
+                {' '}
+                <img src={file.fileUrl} alt={file.title} width="40%" height="auto" />
+                <br />
+              </div>
+            );
+          }
+          if (file.fileType === 'video/mp4' || file.fileType === 'video/mpeg' || file.fileType === 'video/quicktime') {
+            return (
+              <div key={file.url} className="video">
+                <video width="40%" height="auto" controls src={file.fileUrl} alt={file.title}>
+                  <track default kind="captions" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            );
+          }
+          if (file.fileType === 'application/pdf') {
+            return (
+              <div key={file.fileUrl} className="pdf">
+                <embed src={file.fileUrl} width="80%" height="800em" alt={file.title} />
+              </div>
+            );
+          }
+            <p>{file.title}</p>;
+            return null;
+        })}
+      </div> */}
+
       {mediaArray.map((file) => (
         <div className={styles.img_container}>
-          <img className={styles.media_image} src={file.fileUrl} alt="" />
+          {(file.fileType.includes('image')) && (
+          <div>
+            <img className={styles.media_image} src={file.fileUrl} alt={file.title} />
+          </div>
+          )}
+          {(file.fileType.includes('video')) && (
+          <div>
+            <video className={styles.media_image} controls src={file.fileUrl} alt={file.title}>
+              <track default kind="captions" />
+            </video>
+          </div>
+          )}
+          {(file.fileType.includes('link')) && (
+          <div>
+            <img className={styles.media_image} src={file.fileUrl} alt={file.title} />
+          </div>
+          )}
+          {(file.fileType.includes('pdf')) && (
+          <div key={file.url} className="pdf">
+            <embed className={styles.media_image} src={file.fileUrl} alt={file.title} />
+          </div>
+          )}
           <p>{file.title}</p>
         </div>
       ))}
