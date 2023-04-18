@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
-// import Dialog from '@mui/material/Dialog';
+import Dialog from '@mui/material/Dialog';
 // import { ref, uploadBytesResumable } from 'firebase/storage';
 import NewModulePopup from '../components/NewModulePopup';
 
@@ -121,20 +121,13 @@ function Resources({ profile }) {
         <Button variant="outlined" onClick={handleClickOpen}>
           Add module
         </Button>
-        {console.log(open)}
-        {/* {console.log(handleClose)}
-        {console.log(open)} */}
-        {/* <Dialog open={open} onClose={handleClose}> */}
-        <NewModulePopup>
-          {' '}
-          updateModule=
-          {updateModule}
-          open=
-          {open}
-          onClose=
-          {handleClose}
-        </NewModulePopup>
-        {/* </Dialog> */}
+        <Dialog open={open} onClose={handleClose}>
+          <NewModulePopup>
+            {' '}
+            updateModule=
+            {updateModule}
+          </NewModulePopup>
+        </Dialog>
       </div>
     );
   }
