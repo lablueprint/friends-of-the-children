@@ -154,53 +154,22 @@ function ExpandedModule({ profile }) {
       </form>
     </div>
   );
-  if (parent != null) {
-    if (currRole === 'admin') {
-      return (
-        <div>
-          <div className={styles.card}>
-            <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-              Back
-            </Link>
-            <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
-            {console.log(moduleImage)}
-          </div>
-          {ExpandedModuleForm}
-        </div>
-      );
-    }
-    return (
-      <div className={styles.card}>
-        <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-          Back
-        </Link>
-        <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
-      </div>
-    );
-  }
-
-  if (currRole === 'admin') {
-    return (
-      <div>
-        <div className={styles.card}>
-          <Link to="/modules">
-            Back
-          </Link>
-          <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
-        </div>
-        {ExpandedModuleForm}
-      </div>
-
-    );
-  }
   return (
     <div>
       <div className={styles.card}>
-        <Link to="/modules">
-          Back
-        </Link>
+        {parent != null ? (
+          <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+            Back
+          </Link>
+        ) : (
+          <Link to="/modules">
+            Back
+          </Link>
+        )}
         <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
+        {console.log(moduleImage)}
       </div>
+      {currRole === 'admin' && ExpandedModuleForm}
     </div>
   );
 }

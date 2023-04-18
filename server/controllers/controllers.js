@@ -153,11 +153,9 @@ const getModulebyId = async (req, res) => {
 
 const recursivelyDeletemodules = async (moduleID) => {
   try {
-    console.log('current module is ', moduleID);
     const moduleRef = await db.collection('modules').doc(moduleID).get();
     const currModule = moduleRef.data();
     if (Array.isArray(currModule.children) && currModule.children.length > 0) {
-      console.log('preparing to delete', currModule.children);
       // if there are submodules, recursively delete them
       for (const child of currModule.children) {
         await recursivelyDeletemodules(child);
@@ -168,15 +166,10 @@ const recursivelyDeletemodules = async (moduleID) => {
       const parentRefSnapshot = await parentRef.get();
       const currParent = parentRefSnapshot.data();
       const updatedChildren = currParent.children.filter((id) => id !== moduleID);
-      console.log('parent', currParent);
-      console.log('updated Chilrent', updatedChildren);
       await parentRef.update({ children: updatedChildren }).then();
-      console.log('updated children');
     }
     await db.collection('modules').doc(moduleID).delete(); // delete the current module
-    console.log('deleted current module: ', moduleID);
   } catch (error) {
-    console.log('could not delete');
     console.log(error);
   }
 };
@@ -184,7 +177,6 @@ const recursivelyDeletemodules = async (moduleID) => {
 const deleteModule = async (req, res) => {
   try {
     const { moduleID } = req.params;
-    // console.log('deleted: ', req.params.moduleID);
     await recursivelyDeletemodules(moduleID);
     res.status(202).json('successfully deleted module');
   } catch (error) {

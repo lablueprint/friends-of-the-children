@@ -38,46 +38,6 @@ function Module(props) {
       deleteChild(moduleId);
     });
   };
-  if (role === 'admin') {
-    return (
-      <div>
-        <div className={styles.title}>{title}</div>
-        <div className={styles.body}>{body}</div>
-        <div className={styles.attachments}>{attachments}</div>
-        {/* keep bottom code for reference */}
-        {/* <div>
-        {link.map((image) => {
-            return (
-              <div key={image} className="image">
-                  <img src={image} alt="" width="40%" height="auto" />
-              </div>
-            );
-        })}
-      </div> */}
-        <img src={img} alt="" width="30%" height="auto" />
-        {
-        child.map((kid) => (
-          <div>
-            <div className={styles.card}>
-
-              <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
-                <h1>{kid.title}</h1>
-              </Link>
-              <button type="button" onClick={() => { deleteModule(kid.id); }}>
-                {' '}
-                Delete Module
-                {' '}
-                {kid.id}
-                {' '}
-              </button>
-            </div>
-
-          </div>
-        ))
-      }
-      </div>
-    );
-  }
   return (
     <div>
       <div className={styles.title}>{title}</div>
@@ -96,11 +56,23 @@ function Module(props) {
       <img src={img} alt="" width="30%" height="auto" />
       {
         child.map((kid) => (
-          <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
+          <div>
             <div className={styles.card}>
-              <h1>{kid.title}</h1>
+              <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
+                <h1>{kid.title}</h1>
+              </Link>
+              {role === 'admin' && (
+              <button type="button" onClick={() => { deleteModule(kid.id); }}>
+                {' '}
+                Delete Module
+                {' '}
+                {kid.id}
+                {' '}
+              </button>
+              )}
             </div>
-          </Link>
+
+          </div>
         ))
       }
     </div>
