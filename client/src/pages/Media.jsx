@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-// import { arrayUnion } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import { arrayUnion } from 'firebase/firestore';
+// import { firestore } from 'firebase-admin';
 import styles from '../styles/Mentees.module.css';
 import { db, storage } from './firebase';
+
+// const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
 // import * as api from '../api';
 
 function Media({ profile }) {
@@ -21,7 +24,6 @@ function Media({ profile }) {
   const [open, setOpen] = useState(false);
   // this is the array of file links
   const [mediaArray, setMediaArray] = useState([]);
-  const [fileUrl, setFileUrl] = useState('');
   console.log(mediaArray);
 
   const getFolder = () => {
@@ -31,9 +33,7 @@ function Media({ profile }) {
         const data = sc.data();
         const { files } = data;
         setMediaArray(files);
-      })
-      .then(() => {
-        console.log(mediaArray);
+        console.log(files);
       });
   };
 
@@ -42,49 +42,65 @@ function Media({ profile }) {
   }, []);
 
   // add file in firebase folder
-  const updateMentee = async () => {
+  const updateMentee = async (data, type) => {
+    console.log(data);
+    console.log(type);
     await db.collection('mentees').doc(id).collection('folders').doc(folderName)
       .set({
         files: mediaArray,
       });
-    // if (type === 'image') {
-
-    // }
+    if (type.includes('image')) {
+      console.log('IMAGE HERE');
+      await db.collection('mentees').doc(id).collection('folders').doc('Images')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type.includes('video')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Videos')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type.includes('link')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Links')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type.includes('pdf')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Flyers')
+        .update({
+          files: arrayUnion(data),
+        });
+    }
   };
 
-  const addMedia = async (e) => {
+  const addMedia = (e) => {
     e.preventDefault();
     const title = e.target.title.value;
-    // append new file to the media files array
-    const tempArr = mediaArray;
-    const data = {
-      title,
-      fileUrl,
-    };
-    tempArr.push(data);
-    setMediaArray(tempArr);
+    const files = e.target.files.files[0];
 
-    await updateMentee();
+    const fileName = files.name;
+    const fileType = files.type;
+    console.log(fileType);
+    const storageRef = ref(storage, `/images/${fileName}`);
 
-    setOpen(false);
-    e.target.reset();
-  };
-
-  const handleUpload = (image) => {
-    console.log('target:', image.name);
-    const imageName = image.name;
-    const storageRef = ref(storage, `/images/${imageName}`);
-
-    uploadBytes(storageRef, image).then((snapshot) => {
-      getDownloadURL(snapshot.ref).then(async (url) => {
-        setFileUrl(url);
-        console.log(url);
-      });
+    uploadBytes(storageRef, files).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((url) => {
+        const tempArr = mediaArray;
+        const data = {
+          title,
+          fileUrl: url,
+        };
+        tempArr.push(data);
+        setMediaArray(tempArr);
+        return data;
+      })
+        .then((data) => {
+          console.log(data);
+          updateMentee(data, fileType);
+          setOpen(false);
+          e.target.reset();
+        });
     });
-  };
-
-  const uploadImage = (e) => {
-    handleUpload(e.target.files[0]);
   };
 
   const handleClickOpen = () => {
@@ -150,7 +166,7 @@ function Media({ profile }) {
           <DialogContent>
             <h5>Add Media</h5>
             <form onSubmit={(e) => addMedia(e)}>
-              <input type="file" accept=".png,.jpg,.svg,.gif" onChange={uploadImage} />
+              <input type="file" name="files" />
               <h5>Title</h5>
               <input type="text" name="title" required />
               <DialogActions>

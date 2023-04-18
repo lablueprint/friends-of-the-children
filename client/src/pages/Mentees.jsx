@@ -10,6 +10,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import styles from '../styles/Mentees.module.css';
 import { db } from './firebase';
+// import MenteeImage from '../assets/images/empty_mentees.svg';
 // import * as api from '../api';
 
 function Mentees({ profile, updateAppProfile }) {
@@ -58,6 +59,21 @@ function Mentees({ profile, updateAppProfile }) {
       mentees: [...profile.mentees, menteeID],
     });
 
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Videos')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Flyers')
+      .set({
+        files: [],
+      });
+
     const newProfile = {
       ...profile,
       mentees: [...profile.mentees, menteeID],
@@ -66,6 +82,7 @@ function Mentees({ profile, updateAppProfile }) {
 
     setOpen(false);
     e.target.reset();
+    window.location.reload();
   };
 
   useEffect(getMentees, []);
@@ -85,6 +102,8 @@ function Mentees({ profile, updateAppProfile }) {
         Add Child :D
       </Button>
 
+      {/* {mentees.length === 0 && (<img src={MenteeImage} alt="mentees" />)} */}
+
       <div className={styles.mentees_container}>
         {mentees.map((mentee) => (
           <div key={mentee.id} className={styles.card_container}>
@@ -96,7 +115,7 @@ function Mentees({ profile, updateAppProfile }) {
             >
               <div className={styles.card}>
                 <div className={styles.imageCard} />
-                <h1>{`${mentee.firstName} ${mentee.lastName}`}</h1>
+                <p>{`${mentee.firstName} ${mentee.lastName}`}</p>
               </div>
             </Link>
           </div>

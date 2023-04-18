@@ -8,6 +8,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import styles from '../styles/Mentees.module.css';
 import { db } from './firebase';
+import VideoIcon from '../assets/icons/videos_icon.svg';
+import ImageIcon from '../assets/icons/images_icon.svg';
+import FlyerIcon from '../assets/icons/flyers_icon.svg';
+
 // import { db } from './firebase';
 // import styles from '../styles/Mentees.module.css';
 // import * as api from '../api';
@@ -19,12 +23,18 @@ function ExpandedMentee({ profile }) {
   } = location.state;
   const [folderArray, setFolderArray] = useState([]);
   const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
 
   const getMentee = () => {
     const tempFolders = [];
     db.collection('mentees').doc(id).collection('folders').get()
       .then((sc) => {
+        if (sc.empty) {
+          console.log('No matching documents.');
+          return;
+        }
         sc.forEach((currDoc) => {
+          console.log(sc);
           const folderName = currDoc.id;
           if (folderName !== 'root') { tempFolders.push(folderName); }
           console.log('Found subcollection with id:', currDoc.id);
@@ -46,11 +56,13 @@ function ExpandedMentee({ profile }) {
   const addFolder = async (e) => {
     e.preventDefault();
     const name = e.target.folderName.value;
-    await updateMentee(name);
-    setFolderArray([...folderArray, name]);
+    updateMentee(name).then(() => {
+      console.log('hI');
+      setFolderArray([...folderArray, name]);
 
-    setOpen(false);
-    e.target.reset();
+      setOpen(false);
+      e.target.reset();
+    });
   };
 
   useEffect(getMentee, []);
@@ -61,6 +73,14 @@ function ExpandedMentee({ profile }) {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleClickOpen2 = () => {
+    setOpen2(true);
+  };
+
+  const handleClose2 = () => {
+    setOpen2(false);
   };
 
   return (
@@ -101,14 +121,14 @@ function ExpandedMentee({ profile }) {
             </p>
           </div>
 
-          <Button variant="contained" onClick={handleClickOpen}>
+          <Button variant="contained" onClick={handleClickOpen2}>
             + Upload File
           </Button>
         </div>
       </div>
 
       <h3>Folders</h3>
-      <div>
+      <div className={styles.folders_map}>
         {folderArray.map((folder) => (
           <div className={styles.folder_container}>
             <Link
@@ -117,7 +137,10 @@ function ExpandedMentee({ profile }) {
                 id, folderName: folder, firstName, lastName, age, caregiver,
               }}
             >
-              <h2>{folder}</h2>
+              {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
+              {folder === 'Images' && <img src={ImageIcon} alt="images icon" />}
+              {folder === 'Flyers' && <img src={FlyerIcon} alt="flyer icon" />}
+              <p>{folder}</p>
             </Link>
           </div>
         ))}
@@ -125,6 +148,8 @@ function ExpandedMentee({ profile }) {
           + Add a New Folder
         </Button>
       </div>
+
+      <h3>Recent Uploads</h3>
 
       <div>
         <Dialog open={open} onClose={handleClose}>
@@ -135,6 +160,30 @@ function ExpandedMentee({ profile }) {
               <input type="text" name="folderName" required />
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
+                <Button type="submit">Save</Button>
+              </DialogActions>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div>
+        <Dialog open={open2} onClose={handleClose2}>
+          <DialogContent>
+            <h5>Upload File</h5>
+            <form onSubmit={(e) => addFolder(e)}>
+              Title:
+              <input type="text" name="folderName" required />
+              <br />
+              <select name="folders">
+                <option value="">Select Folder</option>
+                <option value="volvo">Volvo</option>
+                <option value="saab">Saab</option>
+                <option value="fiat">Fiat</option>
+                <option value="audi">Audi</option>
+              </select>
+              <DialogActions>
+                <Button onClick={handleClose2}>Cancel</Button>
                 <Button type="submit">Save</Button>
               </DialogActions>
             </form>
