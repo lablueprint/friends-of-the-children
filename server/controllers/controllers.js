@@ -160,11 +160,11 @@ const getGoogleaccount = async (req, res) => {
     let googleData;
     await db.collection('profiles').where('email', '==', googleAccount).get().then(async (sc) => {
       // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-      for (const doc of sc.docs) {
-        const data = await doc.data();
-        data.id = doc.id;
+      sc.docs.forEach(async (tempDoc) => {
+        const data = await tempDoc.data();
+        data.id = tempDoc.id;
         googleData = data;
-      }
+      });
     });
     // error message if user doesn't exist (when data is undefined)
     if (googleData === undefined) {
