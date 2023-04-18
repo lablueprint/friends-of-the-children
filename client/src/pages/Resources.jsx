@@ -54,9 +54,8 @@ function Resources({ profile }) {
         // update progress
         setPercent(p);
       },
-      (err) => console.log(err),
+      (err) => console.error(err),
     );
-    console.log(storageRef.fullPath);
     return storageRef.fullPath;
     // set linkstate here:
   };
@@ -77,7 +76,6 @@ function Resources({ profile }) {
       parent: null,
       fileLinks, // set from handleChange, which triggers handleUpload of all the files
     };
-    console.log(fileLinks);
     // receive module id
     // TODO: Create api call (move db.collection to backend)
     const tempId = (await db.collection('modules').add(data)).id;

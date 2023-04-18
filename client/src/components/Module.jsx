@@ -24,7 +24,8 @@ function Module(props) {
         // ^ so it's very slow (you need to wait for it to be fulfilled before u do anything w it)
         const fileType = file.contentType;
         const url = await getDownloadURL(spaceRef);
-        fileContents.push({ url, fileType });
+        const fileName = file.name;
+        fileContents.push({ url, fileType, fileName });
       }));
       setFiles(fileContents);
     }
@@ -41,19 +42,17 @@ function Module(props) {
         {files.map((file) => {
           if (file.fileType === 'image/png' || file.fileType === 'image/jpeg') {
             return (
-              <div>
+              <div key={file.url} className="image">
                 {' '}
-                {/* i want to use key={i} but eslint won't let me (will change to (file, i) above) :o */}
-                {/* <div key={image} className="image"> */}
-                <img src={file.url} alt="" width="40%" height="auto" />
+                <img src={file.url} alt={file.fileName} width="40%" height="auto" />
                 <br />
               </div>
             );
           }
           if (file.fileType === 'video/mp4' || file.fileType === 'video/mpeg' || file.fileType === 'video/quicktime') {
             return (
-              <div>
-                <video width="40%" height="auto" controls src={file.url}>
+              <div key={file.url} className="video">
+                <video width="40%" height="auto" controls src={file.url} alt={file.fileName}>
                   <track default kind="captions" />
                   Your browser does not support the video tag.
                 </video>
@@ -62,15 +61,14 @@ function Module(props) {
           }
           if (file.fileType === 'application/pdf') {
             return (
-              <div>
-                <embed src={file.url} width="80%" height="800em" />
+              <div key={file.url} className="pdf">
+                <embed src={file.url} width="80%" height="800em" alt={file.fileName} />
               </div>
             );
           }
           return null;
         })}
       </div>
-      {/* add actual alt text for images */}
       {' '}
       {
         child.map((kid) => (
@@ -97,7 +95,7 @@ Module.propTypes = {
 };
 
 Module.defaultProps = {
-  links: [''],
+  links: [],
 };
 
 export default Module;
