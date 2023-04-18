@@ -27,6 +27,16 @@ function Module(props) {
         const fileName = file.name;
         fileContents.push({ url, fileType, fileName });
       }));
+      // sorting files alphabetically TODO: is this how you want it?
+      fileContents.sort((a, b) => {
+        if (a.fileName < b.fileName) {
+          return -1;
+        }
+        if (a.fileName > b.fileName) {
+          return 1;
+        }
+        return 0;
+      });
       setFiles(fileContents);
     }
   };
@@ -35,6 +45,7 @@ function Module(props) {
 
   return (
     <div>
+      {console.log(files)}
       <div className={styles.title}>{title}</div>
       <div className={styles.body}>{body}</div>
       {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
