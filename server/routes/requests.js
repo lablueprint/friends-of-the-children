@@ -11,6 +11,7 @@ import {
   getModules,
   getModulebyId,
   getGoogleaccount,
+  updateTextField,
   getUsernames,
   getMessages,
   addToMailchimpList,
@@ -42,6 +43,9 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 
 // gets profile via google email
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
+
+// updating module's text field
+router.get('/updateTextField', updateTextField);
 
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);

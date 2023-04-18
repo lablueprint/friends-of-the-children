@@ -8,7 +8,7 @@ import * as api from '../api';
 
 function Resources({ profile }) {
   const [modules, setModules] = useState([]);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const { role } = profile;
   const currRole = role.toLowerCase();
 
@@ -58,6 +58,7 @@ function Resources({ profile }) {
           updateModule={updateModule}
           open={open}
           handleClose={handleClose}
+          parentID={null}
         />
       </div>
     );

@@ -16,7 +16,7 @@ import { db, storage } from '../pages/firebase';
 
 export default function NewModulePopup(props) {
   const {
-    updateModule, open, handleClose,
+    updateModule, open, handleClose, parentID,
   } = props;
 
   //   const [open, setOpen] = React.useState(false);
@@ -36,7 +36,6 @@ export default function NewModulePopup(props) {
   if (caregiver) {
     roles.push('caregiver');
   }
-  console.log('open is ', open);
 
   // TODO: Move to backend, figure out how to maintain setPercent once it is moved to the backedn and sent back as a promise chain
   // upload file to Firebase:
@@ -63,13 +62,14 @@ export default function NewModulePopup(props) {
 
   const submitForm = async (e) => { // adds a module to the root module page
     e.preventDefault();
+    // const parentStatus = isExpandedModule ? parentID : null;
     const data = { // this goes into NewModulePopup
       title,
       body,
       serviceArea,
       role: roles,
       children: [],
-      parent: null,
+      parent: parentID,
       fileLinks, // set from handleChange, which triggers handleUpload of all the files
 
     };
@@ -182,4 +182,6 @@ NewModulePopup.propTypes = {
   updateModule: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
+  // isExpandedModule: PropTypes.bool.isRequired,
+  parentID: PropTypes.string.isRequired,
 };

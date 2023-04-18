@@ -101,6 +101,17 @@ export const getGoogleaccount = async (googleEmail) => {
   return null;
 };
 
+export const updateTextField = async (inputText) => {
+  try {
+    const updatedText = await axios.get(`${url}/updateTextField/${inputText}`);
+    return updatedText;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update text field');
+  }
+  return null;
+};
+
 export const getUsernames = async () => {
   try {
     const user = await axios.get(`${url}/getUsernames`);

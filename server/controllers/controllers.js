@@ -176,6 +176,21 @@ const getGoogleaccount = async (req, res) => {
   }
 };
 
+const updateTextField = async (req, res) => {
+  try {
+    const { updatedText } = req.params;
+    db.collection('modules')
+      .doc(module.id)
+      .update(updatedText)
+      .catch((error) => {
+        // setUpdateProfileMessage('We ran into an error updating your text field!');
+        console.log(error);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // checking if the username already exists in database (new user signing up)
 const getUsernames = async (req, res) => {
   try {
@@ -382,6 +397,7 @@ export {
   getModules,
   getModulebyId,
   getGoogleaccount,
+  updateTextField,
   getUsernames,
   getMessages,
   addToMailchimpList,
