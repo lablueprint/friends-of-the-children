@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  updateDoc, doc,
+  updateDoc, doc, getDoc,
+  arrayUnion,
 } from 'firebase/firestore';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -13,24 +14,40 @@ import { db } from './firebase';
 // import MenteeImage from '../assets/images/empty_mentees.svg';
 // import * as api from '../api';
 
-function Mentees({ profile, updateAppProfile }) {
+function Mentees({ profile }) {
   const [mentees, setMentees] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const getMentees = () => {
+  const getMenteeIDs = async () => {
+    const docRef = doc(db, 'profiles', profile.id);
+    const docSnap = await getDoc(docRef);
+    return docSnap.data().mentees;
+  };
+
+  const getMentees = async () => {
+    const menteess = await getMenteeIDs();
     db.collection('mentees').get().then((sc) => {
       const tempMentees = [];
       sc.forEach((snap) => {
         const data = snap.data();
         const { id } = snap;
-        if (profile.mentees.includes(id)) {
-          data.id = id;
-          tempMentees.push(data);
+        if (menteess.includes(id)) {
+          const data2 = {
+            ...data,
+            id,
+          };
+          tempMentees.push(data2);
         }
       });
       setMentees(tempMentees);
     });
   };
+
+  const getMenteesWrapper = () => {
+    getMentees();
+  };
+
+  useEffect(getMenteesWrapper, []);
 
   const addChild = async (e) => {
     e.preventDefault();
@@ -38,25 +55,35 @@ function Mentees({ profile, updateAppProfile }) {
     const lastName = e.target.lastName.value;
     const age = e.target.age.value;
     const notes = e.target.notes.value;
-    const caregiver = e.target.caregiverFirstName.value;
-    const folders = '{}';
+    const caregiverFirstName = e.target.caregiverFirstName.value;
+    const caregiverLastName = e.target.caregiverLastName.value;
+    const caregiverEmail = e.target.caregiverEmail.value;
 
     const data = {
       firstName,
       lastName,
       age,
       notes,
-      caregiver,
-      folders,
+      caregiverFirstName,
+      caregiverLastName,
+      caregiverEmail,
     };
 
+    // add new mentee object to mentees collection on firebase
     const menteeID = (await db.collection('mentees').add(data)).id;
 
-    setMentees([...mentees, data]);
+    const data2 = {
+      ...data,
+      id: menteeID,
+    };
 
+    const tempMentees = [...mentees, data2];
+    setMentees(tempMentees);
+
+    // update mentor's profile, add new mentee to mentee array field
     const mentorRef = doc(db, 'profiles', profile.id);
     await updateDoc(mentorRef, {
-      mentees: [...profile.mentees, menteeID],
+      mentees: arrayUnion(menteeID),
     });
 
     await db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
@@ -79,18 +106,12 @@ function Mentees({ profile, updateAppProfile }) {
         files: [],
       });
 
-    const newProfile = {
-      ...profile,
-      mentees: [...profile.mentees, menteeID],
-    };
-    updateAppProfile(newProfile);
-
     setOpen(false);
     e.target.reset();
-    window.location.reload();
+    getMentees();
   };
 
-  useEffect(getMentees, []);
+  console.log(mentees);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -176,7 +197,6 @@ Mentees.propTypes = {
     serviceArea: PropTypes.string.isRequired,
     mentees: PropTypes.arrayOf.isRequired,
   }).isRequired,
-  updateAppProfile: PropTypes.func.isRequired,
 };
 
 export default Mentees;

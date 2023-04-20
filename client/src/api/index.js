@@ -30,6 +30,16 @@ export const patchEvent = async (eventData) => {
   return null;
 };
 
+export const updateMentee = async (id, folderName, mediaArray, data, type) => {
+  try {
+    const updatedChildren = await axios.post(`${url}/updateModuleChildren/${id}/foldername=${folderName}/media=${mediaArray}/data=${data}/fileType=${type}`);
+    return updatedChildren;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update mentees');
+  }
+  return null;
+};
 // gets all user profiles
 //
 // to use this function to get all profiles, put the following in a useEffect:

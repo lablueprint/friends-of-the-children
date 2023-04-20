@@ -93,9 +93,7 @@ const updateMentee = async (req, res) => {
   try {
     const {
       id, folderName, mediaArray, data, type,
-    } = req.body;
-    console.log(data);
-    console.log(type);
+    } = req.params;
     await db.collection('mentees').doc(id).collection('folders').doc(folderName)
       .set({
         files: mediaArray,

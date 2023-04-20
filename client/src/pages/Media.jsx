@@ -6,12 +6,12 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import { arrayUnion } from 'firebase/firestore';
+// import { arrayUnion } from 'firebase/firestore';
 import styles from '../styles/Mentees.module.css';
 import { db, storage } from './firebase';
+import * as api from '../api';
 
 // const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
-// import * as api from '../api';
 
 function Media({ profile }) {
   const location = useLocation();
@@ -45,36 +45,34 @@ function Media({ profile }) {
   }, []);
 
   // add file in respective firebase folders (if type image -> Image folder too, etc)
-  const updateMentee = async (data, type) => {
-    console.log(data);
-    console.log(type);
-    await db.collection('mentees').doc(id).collection('folders').doc(folderName)
-      .set({
-        files: mediaArray,
-      });
-    if (type.includes('image')) {
-      console.log('IMAGE HERE');
-      await db.collection('mentees').doc(id).collection('folders').doc('Images')
-        .update({
-          files: arrayUnion(data),
-        });
-    } else if (type.includes('video')) {
-      await db.collection('mentees').doc(id).collection('folders').doc('Videos')
-        .update({
-          files: arrayUnion(data),
-        });
-    } else if (type === 'link') {
-      await db.collection('mentees').doc(id).collection('folders').doc('Links')
-        .update({
-          files: arrayUnion(data),
-        });
-    } else if (type.includes('pdf')) {
-      await db.collection('mentees').doc(id).collection('folders').doc('Flyers')
-        .update({
-          files: arrayUnion(data),
-        });
-    }
-  };
+  // const updateMentee = async (data, type) => {
+  //   await db.collection('mentees').doc(id).collection('folders').doc(folderName)
+  //     .set({
+  //       files: mediaArray,
+  //     });
+  //   if (type.includes('image')) {
+  //     console.log('IMAGE HERE');
+  //     await db.collection('mentees').doc(id).collection('folders').doc('Images')
+  //       .update({
+  //         files: arrayUnion(data),
+  //       });
+  //   } else if (type.includes('video')) {
+  //     await db.collection('mentees').doc(id).collection('folders').doc('Videos')
+  //       .update({
+  //         files: arrayUnion(data),
+  //       });
+  //   } else if (type === 'link') {
+  //     await db.collection('mentees').doc(id).collection('folders').doc('Links')
+  //       .update({
+  //         files: arrayUnion(data),
+  //       });
+  //   } else if (type.includes('pdf')) {
+  //     await db.collection('mentees').doc(id).collection('folders').doc('Flyers')
+  //       .update({
+  //         files: arrayUnion(data),
+  //       });
+  //   }
+  // };
 
   // creates new object for the file, updates mediaArray, and calls updateMentee
   const addMedia = (e) => {
@@ -103,7 +101,7 @@ function Media({ profile }) {
         })
           .then((data) => {
             console.log(data);
-            updateMentee(data, fileType);
+            api.updateMentee(id, folderName, mediaArray, data, fileType);
             setOpen(false);
             e.target.reset();
           });
@@ -119,7 +117,7 @@ function Media({ profile }) {
       };
       tempArr.push(data);
       setMediaArray(tempArr);
-      updateMentee(data, fileType);
+      api.updateMentee(id, folderName, mediaArray, data, fileType);
       setOpen(false);
       e.target.reset();
     }

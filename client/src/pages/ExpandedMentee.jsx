@@ -29,6 +29,7 @@ function ExpandedMentee({ profile }) {
 
   const getMentee = () => {
     const tempFolders = [];
+    console.log(id);
     db.collection('mentees').doc(id).collection('folders').get()
       .then((sc) => {
         if (sc.empty) {
