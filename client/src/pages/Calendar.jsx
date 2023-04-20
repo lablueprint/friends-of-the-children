@@ -1,4 +1,4 @@
-import { React, createRef } from 'react';
+import { React, useState, createRef } from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
@@ -18,6 +18,8 @@ function Calendar({ profile }) {
   const {
     REACT_APP_FIREBASE_CALENDAR_ID,
   } = process.env;
+  // Get default event service area based off user's service area
+  const [eventServiceArea, setEventServiceArea] = useState(serviceArea.toUpperCase());
 
   const calendarRef = createRef();
   const handleEventClick = (eventInfo) => {
@@ -28,8 +30,6 @@ function Calendar({ profile }) {
     } else {
       console.log('Location: No Location');
     }
-    console.log('Start time: ', eventInfo.event.start);
-    console.log('End time: ', eventInfo.event.end);
   };
 
   const addEvent = (e) => {
@@ -42,8 +42,15 @@ function Calendar({ profile }) {
     const fileUrl = e.target.attachments.value;
     const start = e.target.start.value;
     const end = e.target.end.value;
-    // const calendarId = constants.calIdAV; // TODO: MAKE NOT HARDCODED
-    const calendarId = constants.calIdFOTC; // TODO: MAKE NOT HARDCODED
+
+    let calendarId; // Admin users will specify event service area
+    if(eventServiceArea === "AV")
+      calendarId = constants.calIdAV;
+    else if (eventServiceArea === "MS")
+      calendarId = constants.calIdMS;
+    else
+      calendarId = constants.calIdFOTC;
+          
     // check if user inputs an attachment
     if (e.target.attachments.value) {
       attachments.push({ fileUrl, title: 'an attachment!' });
@@ -157,11 +164,13 @@ function Calendar({ profile }) {
                   <Select
                     id="serviceArea"
                     label="Service Area"
-                    defaultValue="AV"
-                    value={serviceArea}
-                    // onChange={(e) => setServiceArea(e.target.value)}
+                    defaultValue="FOTC"
+                    value={eventServiceArea}
+                    onChange={(e) => setEventServiceArea(e.target.value)}
                     className={styles.textfield}
                   >
+                    {/* TODO: update to NPO's real service areas */ }
+                    <MenuItem value="FOTC">FOTC</MenuItem>
                     <MenuItem value="AV">AV</MenuItem>
                     <MenuItem value="MS">MS</MenuItem>
                   </Select>
