@@ -65,7 +65,7 @@ function ExpandedModule({ profile }) {
         updateModule={updateModule}
         open={open}
         handleClose={handleClose}
-        parentID={parent}
+        parentID={id}
       />
     </div>
   );

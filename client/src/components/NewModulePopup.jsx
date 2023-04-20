@@ -13,6 +13,7 @@ import {
   ref, uploadBytesResumable,
 } from 'firebase/storage';
 import { db, storage } from '../pages/firebase';
+import * as api from '../api';
 
 export default function NewModulePopup(props) {
   const {
@@ -74,7 +75,11 @@ export default function NewModulePopup(props) {
 
     };
 
-    console.log(fileLinks);
+    if (parentID !== null) {
+      await api.updateModuleChildren(parentID, data); // pass in id, data to submit
+    }
+
+    console.log(parentID);
     // receive module id
     // TODO: Create api call (move db.collection to backend)
     const tempId = (await db.collection('modules').add(data)).id;
@@ -178,10 +183,14 @@ export default function NewModulePopup(props) {
   );
 }
 
+NewModulePopup.defaultProps = {
+  parentID: null,
+};
+
 NewModulePopup.propTypes = {
   updateModule: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   // isExpandedModule: PropTypes.bool.isRequired,
-  parentID: PropTypes.string.isRequired,
+  parentID: PropTypes.string,
 };
