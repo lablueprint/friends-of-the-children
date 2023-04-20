@@ -5,14 +5,14 @@ import {
   ref, getStorage, getDownloadURL,
 } from 'firebase/storage';
 import styles from '../styles/Modules.module.css';
+import * as api from '../api';
 
 function Module(props) {
   const {
-    title, body, attachments, child, link,
+    title, body, attachments, child, link, role, deleteChild,
   } = props;
 
   const [img, setImg] = useState('');
-  console.log(img);
 
   const setImageURL = (imgLink) => {
     if (imgLink.length > 0) {
@@ -30,6 +30,12 @@ function Module(props) {
 
   useEffect(() => { setImageURL(link); }, [link]);
 
+  const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
+    api.deleteModule(moduleId).then(() => {
+      // reloads the page
+      deleteChild(moduleId);
+    });
+  };
   return (
     <div>
       <div className={styles.title}>{title}</div>
@@ -48,11 +54,23 @@ function Module(props) {
       <img src={img} alt="" width="30%" height="auto" />
       {
         child.map((kid) => (
-          <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
+          <div>
             <div className={styles.card}>
-              <h1>{kid.title}</h1>
+              <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
+                <h1>{kid.title}</h1>
+              </Link>
+              {role === 'admin' && (
+              <button type="button" onClick={() => { deleteModule(kid.id); }}>
+                {' '}
+                Delete Module
+                {' '}
+                {kid.id}
+                {' '}
+              </button>
+              )}
             </div>
-          </Link>
+
+          </div>
         ))
       }
     </div>
@@ -69,6 +87,8 @@ Module.propTypes = {
     role: PropTypes.arrayOf(string).isRequired,
   })).isRequired,
   link: PropTypes.string,
+  role: PropTypes.string.isRequired,
+  deleteChild: PropTypes.func.isRequired,
 };
 
 Module.defaultProps = {
