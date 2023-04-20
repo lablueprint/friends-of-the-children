@@ -94,6 +94,11 @@ function Resources({ profile }) {
     setFileLinks([]);
   };
 
+  const deleteModule = async (moduleId) => {
+    await api.deleteModule(moduleId);
+    setModules(modules.filter((module) => module.id !== moduleId));
+  };
+
   // empty dependency array means getModules is only being called on page load
   useEffect(() => {
     // saving all the user profiles from Firebase in an array (useProfiles) only on first load
@@ -104,15 +109,17 @@ function Resources({ profile }) {
     return (
       <div>
         {modules.map((card) => (
-          <div key={card.id}>
+          <div key={card.id} className={styles.card}>
             <Link
               to="/expanded-module"
               state={{ id: card.id }}
             >
-              <div className={styles.card}>
+              <div>
                 <h1>{card.title}</h1>
               </div>
             </Link>
+            <button type="button" onClick={() => { deleteModule(card.id); }}> Delete Module </button>
+
           </div>
         ))}
         <form action="post">

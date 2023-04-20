@@ -1,7 +1,7 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
+  collection, addDoc, arrayUnion, updateDoc, doc, FieldValue,
 } from 'firebase/firestore';
 
 import crypto from 'crypto';
@@ -148,6 +148,39 @@ const getModulebyId = async (req, res) => {
     res.status(202).json({ data: moduleData, childrenArray });
   } catch (error) {
     res.status(400).json(error);
+  }
+};
+
+const recursivelyDeletemodules = async (moduleID) => {
+  try {
+    const moduleRef = await db.collection('modules').doc(moduleID).get();
+    const currModule = moduleRef.data();
+    if (Array.isArray(currModule.children) && currModule.children.length > 0) {
+      // if there are submodules, recursively delete them
+      for (const child of currModule.children) {
+        await recursivelyDeletemodules(child);
+      }
+    }
+    if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
+      const parentRef = db.collection('modules').doc(currModule.parent);
+      const parentRefSnapshot = await parentRef.get();
+      const currParent = parentRefSnapshot.data();
+      const updatedChildren = currParent.children.filter((id) => id !== moduleID);
+      await parentRef.update({ children: updatedChildren }).then();
+    }
+    await db.collection('modules').doc(moduleID).delete(); // delete the current module
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteModule = async (req, res) => {
+  try {
+    const { moduleID } = req.params;
+    await recursivelyDeletemodules(moduleID);
+    res.status(202).json('successfully deleted module');
+  } catch (error) {
+    res.status(400).json('could not delete module');
   }
 };
 
@@ -388,4 +421,5 @@ export {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  deleteModule,
 };

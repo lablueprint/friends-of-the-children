@@ -112,6 +112,10 @@ function ExpandedModule({ profile }) {
 
   useEffect(getModule, [id, currRole, refresh]);
 
+  const deleteChild = (childId) => {
+    setChildren(children.filter((child) => child.id !== childId));
+  };
+
   const ExpandedModuleForm = (
     <div>
       <form action="post">
@@ -138,52 +142,21 @@ function ExpandedModule({ profile }) {
       </form>
     </div>
   );
-  if (parent != null) {
-    if (currRole === 'admin') {
-      return (
-        <div>
-          <div className={styles.card}>
-            <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-              Back
-            </Link>
-            <Module title={title} body={body} child={children} links={currModuleFiles} />
-          </div>
-          {ExpandedModuleForm}
-        </div>
-      );
-    }
-    return (
-      <div className={styles.card}>
-        <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-          Back
-        </Link>
-        <Module title={title} body={body} child={children} links={currModuleFiles} />
-      </div>
-    );
-  }
-
-  if (currRole === 'admin') {
-    return (
-      <div>
-        <div className={styles.card}>
-          <Link to="/resources">
-            Back
-          </Link>
-          <Module title={title} body={body} child={children} links={currModuleFiles} />
-        </div>
-        {ExpandedModuleForm}
-      </div>
-
-    );
-  }
   return (
     <div>
       <div className={styles.card}>
-        <Link to="/resources">
-          Back
-        </Link>
-        <Module title={title} body={body} child={children} links={currModuleFiles} />
+        {parent != null ? (
+          <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+            Back
+          </Link>
+        ) : (
+          <Link to="/modules">
+            Back
+          </Link>
+        )}
+        <Module title={title} body={body} child={children} links={currModuleFiles} role={currRole} deleteChild={deleteChild} />
       </div>
+      {currRole === 'admin' && ExpandedModuleForm}
     </div>
   );
 }
