@@ -4,14 +4,20 @@ import { Link } from 'react-router-dom';
 import {
   ref, getStorage, getDownloadURL, getMetadata,
 } from 'firebase/storage';
+import {
+  TextField, Button,
+} from '@mui/material';
 import styles from '../styles/Modules.module.css';
+import * as api from '../api';
 
 function Module(props) {
   const {
-    title, body, child, links,
+    title, body, child, links, id,
   } = props;
 
   const [files, setFiles] = useState([]);
+  const [value, setValue] = useState('');
+  const [editText, setEditText] = useState(false);
 
   const updateImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
     setFiles([]);
@@ -29,13 +35,50 @@ function Module(props) {
       setFiles(fileContents);
     }
   };
-
+  const setValueofBody = (b) => {
+    setValue(b);
+  };
   useEffect(() => { updateImageURL(links); }, [links]);
+  useEffect(() => { setValueofBody(body); }, [body]);
+  const toggleEdit = async (save) => {
+    setEditText(!editText);
+    if (save) {
+      console.log('value is ', value);
+      await api.updateTextField(value, id);
+    }
+  };
 
   return (
     <div>
       <div className={styles.title}>{title}</div>
       <div className={styles.body}>{body}</div>
+      <div>
+        {editText ? (
+          <>
+            <TextField
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              variant="outlined"
+              multiline={false}
+            />
+            <Button onClick={() => toggleEdit(true)}>
+              Save
+            </Button>
+          </>
+        ) : (
+          <>
+            <TextField
+              value={value}
+              InputProps={{ readOnly: true }}
+              variant="outlined"
+              multiline={false}
+            />
+            <Button onClick={() => toggleEdit(false)}>
+              Edit
+            </Button>
+          </>
+        )}
+      </div>
       {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
       <div>
         {files.map((file) => {
@@ -94,6 +137,7 @@ Module.propTypes = {
     role: PropTypes.arrayOf(string).isRequired,
   })).isRequired,
   links: PropTypes.arrayOf(string),
+  id: PropTypes.string.isRequired,
 };
 
 Module.defaultProps = {

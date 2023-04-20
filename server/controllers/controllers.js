@@ -178,10 +178,12 @@ const getGoogleaccount = async (req, res) => {
 
 const updateTextField = async (req, res) => {
   try {
-    const { updatedText } = req.params;
-    db.collection('modules')
-      .doc(module.id)
-      .update(updatedText)
+    const { inputText, id } = req.params;
+    console.log('inputText is ', inputText);
+    console.log('id is ', id);
+    await db.collection('modules')
+      .doc(id)
+      .update({ body: inputText })
       .catch((error) => {
         // setUpdateProfileMessage('We ran into an error updating your text field!');
         console.log(error);

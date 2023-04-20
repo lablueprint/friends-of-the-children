@@ -77,7 +77,7 @@ function ExpandedModule({ profile }) {
             <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
               Back
             </Link>
-            <Module title={title} body={body} child={children} links={currModuleFiles} />
+            <Module title={title} body={body} child={children} links={currModuleFiles} id={id} />
           </div>
           {console.log(open)}
           {ExpandedModuleForm}
@@ -89,7 +89,7 @@ function ExpandedModule({ profile }) {
         <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
           Back
         </Link>
-        <Module title={title} body={body} child={children} links={currModuleFiles} />
+        <Module title={title} body={body} child={children} links={currModuleFiles} id={id} />
       </div>
     );
   }
@@ -101,7 +101,7 @@ function ExpandedModule({ profile }) {
           <Link to="/resources">
             Back
           </Link>
-          <Module title={title} body={body} child={children} links={currModuleFiles} />
+          <Module title={title} body={body} child={children} links={currModuleFiles} id={id} />
         </div>
         {console.log(open)}
         {ExpandedModuleForm}
@@ -115,7 +115,7 @@ function ExpandedModule({ profile }) {
         <Link to="/resources">
           Back
         </Link>
-        <Module title={title} body={body} child={children} links={currModuleFiles} />
+        <Module title={title} body={body} child={children} links={currModuleFiles} id={id} />
       </div>
     </div>
   );

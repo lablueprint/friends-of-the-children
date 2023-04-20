@@ -45,7 +45,7 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
 // updating module's text field
-router.get('/updateTextField', updateTextField);
+router.get('/updateTextField/:inputText/:id', updateTextField);
 
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);
