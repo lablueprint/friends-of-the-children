@@ -13,8 +13,6 @@ function Module(props) {
   } = props;
 
   const [img, setImg] = useState('');
-  console.log(img);
-  console.log('role is', role);
 
   const setImageURL = (imgLink) => {
     if (imgLink.length > 0) {

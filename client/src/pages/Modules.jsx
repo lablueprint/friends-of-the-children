@@ -66,12 +66,10 @@ function Modules({ profile }) {
         // update progress
         setPercent(p);
       },
-      (err) => console.log(err),
+      (err) => console.error(err),
       () => {
         // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log(url);
-        });
+        getDownloadURL(uploadTask.snapshot.ref);
       },
     );
     // set linkstate here:
@@ -110,7 +108,6 @@ function Modules({ profile }) {
 
   const deleteModule = async (moduleId) => {
     await api.deleteModule(moduleId);
-    console.log(modules);
     setModules(modules.filter((module) => module.id !== moduleId));
   };
 

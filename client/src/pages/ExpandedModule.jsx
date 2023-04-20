@@ -80,20 +80,14 @@ function ExpandedModule({ profile }) {
       setAttachments(object.data.attachments);
       setParent(object.data.parent);
       setChildren(object.childrenArray);
-      console.log(object.data.link);
       setModuleImage(object.data.link);
     });
   };
 
   // upload file to Firebase:
   const handleUpload = (file) => {
-    console.log('target:', file.name);
-    // if (!file) {
-    //   alert('Please choose a file first!');
-    // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    // setLink(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -106,11 +100,10 @@ function ExpandedModule({ profile }) {
         // update progress
         setPercent(p);
       },
-      (err) => console.log(err),
+      (err) => console.error(err),
       () => {
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log(url);
           setLink(url);
         });
       },
@@ -125,7 +118,6 @@ function ExpandedModule({ profile }) {
 
   const deleteChild = (childId) => {
     setChildren(children.filter((child) => child.id !== childId));
-    console.log('children is', children);
   };
 
   const ExpandedModuleForm = (
@@ -167,7 +159,6 @@ function ExpandedModule({ profile }) {
           </Link>
         )}
         <Module title={title} body={body} attachments={attachments} child={children} link={moduleImage} role={currRole} deleteChild={deleteChild} />
-        {console.log(moduleImage)}
       </div>
       {currRole === 'admin' && ExpandedModuleForm}
     </div>
