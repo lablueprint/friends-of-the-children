@@ -86,9 +86,15 @@ a{
 
 .img_container{
     display: inline-block;
+    vertical-align: middle;
     width: 250px;
     height: 250px;
     margin-top: 50px;
+}
+
+.img_container li{
+    margin-right: 20px;
+    word-wrap: break-word;
 }
 
 .media_image{
@@ -129,4 +135,8 @@ a{
 .service_area{
     display: inline-block;
     margin-right: 2.5vw;
+}
+
+.mediaForm p{
+    margin-bottom: 0 !important;
 }

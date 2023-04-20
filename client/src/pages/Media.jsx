@@ -7,7 +7,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import { arrayUnion } from 'firebase/firestore';
-// import { firestore } from 'firebase-admin';
 import styles from '../styles/Mentees.module.css';
 import { db, storage } from './firebase';
 
@@ -24,6 +23,9 @@ function Media({ profile }) {
   const [open, setOpen] = useState(false);
   // this is the array of file links
   const [mediaArray, setMediaArray] = useState([]);
+  // media states for dialog opening/closing views
+  const [isFile, setIsFile] = useState(false);
+  const [isLink, setIsLink] = useState(false);
   console.log(mediaArray);
 
   const getFolder = () => {
@@ -37,11 +39,12 @@ function Media({ profile }) {
       });
   };
 
+  // get the current folder contents on first load
   useEffect(() => {
     getFolder();
   }, []);
 
-  // add file in firebase folder
+  // add file in respective firebase folders (if type image -> Image folder too, etc)
   const updateMentee = async (data, type) => {
     console.log(data);
     console.log(type);
@@ -60,7 +63,7 @@ function Media({ profile }) {
         .update({
           files: arrayUnion(data),
         });
-    } else if (type.includes('link')) {
+    } else if (type === 'link') {
       await db.collection('mentees').doc(id).collection('folders').doc('Links')
         .update({
           files: arrayUnion(data),
@@ -73,42 +76,63 @@ function Media({ profile }) {
     }
   };
 
+  // creates new object for the file, updates mediaArray, and calls updateMentee
   const addMedia = (e) => {
     e.preventDefault();
     const title = e.target.title.value;
-    const files = e.target.files.files[0];
+    let fileName;
+    let fileType;
 
-    const fileName = files.name;
-    const fileType = files.type;
+    if (isFile) {
+      const files = e.target.files.files[0];
+      fileName = files.name;
+      fileType = files.type;
+
+      const storageRef = ref(storage, `/images/${fileName}`);
+      uploadBytes(storageRef, files).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
+          const tempArr = mediaArray;
+          const data = {
+            title,
+            fileUrl: url,
+            fileType,
+          };
+          tempArr.push(data);
+          setMediaArray(tempArr);
+          return data;
+        })
+          .then((data) => {
+            console.log(data);
+            updateMentee(data, fileType);
+            setOpen(false);
+            e.target.reset();
+          });
+      });
+    } else if (isLink) {
+      fileName = title;
+      fileType = 'link';
+      const tempArr = mediaArray;
+      const data = {
+        title,
+        fileUrl: e.target.link.value,
+        fileType,
+      };
+      tempArr.push(data);
+      setMediaArray(tempArr);
+      updateMentee(data, fileType);
+      setOpen(false);
+      e.target.reset();
+    }
 
     console.log(fileType);
-    const storageRef = ref(storage, `/images/${fileName}`);
-
-    uploadBytes(storageRef, files).then((snapshot) => {
-      getDownloadURL(snapshot.ref).then((url) => {
-        const tempArr = mediaArray;
-        const data = {
-          title,
-          fileUrl: url,
-          fileType,
-        };
-        tempArr.push(data);
-        setMediaArray(tempArr);
-        return data;
-      })
-        .then((data) => {
-          console.log(data);
-          updateMentee(data, fileType);
-          setOpen(false);
-          e.target.reset();
-        });
-    });
   };
 
+  // handle dialog form closing/opening
   const handleClickOpen = () => {
+    setIsFile(false);
+    setIsLink(false);
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
@@ -150,7 +174,10 @@ function Media({ profile }) {
             </p>
           </div>
 
-          {folderName !== 'Images' && folderName !== 'Videos' && folderName !== 'Flyers' && (
+          <h3>{`${folderName}`}</h3>
+
+          {/* users cannot directly add into the images/videos/flyers folders? */}
+          {folderName !== 'Images' && folderName !== 'Videos' && folderName !== 'Flyers' && folderName !== 'Links' && (
           <Button variant="contained" onClick={handleClickOpen}>
             + Add Media
           </Button>
@@ -159,39 +186,7 @@ function Media({ profile }) {
         </div>
       </div>
 
-      {/* <div>
-        {mediaArray.map((file) => {
-          if (file.fileType === 'image/png' || file.fileType === 'image/jpeg') {
-            return (
-              <div className={styles.media_image}>
-                {' '}
-                <img src={file.fileUrl} alt={file.title} width="40%" height="auto" />
-                <br />
-              </div>
-            );
-          }
-          if (file.fileType === 'video/mp4' || file.fileType === 'video/mpeg' || file.fileType === 'video/quicktime') {
-            return (
-              <div key={file.url} className="video">
-                <video width="40%" height="auto" controls src={file.fileUrl} alt={file.title}>
-                  <track default kind="captions" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            );
-          }
-          if (file.fileType === 'application/pdf') {
-            return (
-              <div key={file.fileUrl} className="pdf">
-                <embed src={file.fileUrl} width="80%" height="800em" alt={file.title} />
-              </div>
-            );
-          }
-            <p>{file.title}</p>;
-            return null;
-        })}
-      </div> */}
-
+      {/* mapping each file in the array to a little card element onscreen */}
       {mediaArray.map((file) => (
         <div className={styles.img_container}>
           {(file.fileType.includes('image')) && (
@@ -208,7 +203,7 @@ function Media({ profile }) {
           )}
           {(file.fileType.includes('link')) && (
           <div>
-            <img className={styles.media_image} src={file.fileUrl} alt={file.title} />
+            <li><a href={file.fileUrl} target="_blank" rel="noreferrer">{file.fileUrl}</a></li>
           </div>
           )}
           {(file.fileType.includes('pdf')) && (
@@ -223,16 +218,44 @@ function Media({ profile }) {
       <div>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <h5>Add Media</h5>
-            <form onSubmit={(e) => addMedia(e)}>
-              <input type="file" name="files" />
-              <h5>Title</h5>
-              <input type="text" name="title" required />
+            {!isFile && !isLink && (
+              <div>
+                <Button variant="contained" onClick={() => { setIsFile(true); setIsLink(false); }}>New File</Button>
+                <br />
+                <br />
+                <Button variant="contained" onClick={() => { setIsLink(true); setIsFile(false); }}>New Link</Button>
+              </div>
+            )}
+
+            {(isFile || isLink) && (
+              <Button onClick={() => { setIsFile(false); setIsLink(false); }}>BACK</Button>
+            )}
+
+            <form className={styles.mediaForm} onSubmit={(e) => addMedia(e)}>
+              {isFile && (
+              <div>
+                <h5>Add New File</h5>
+                <p>Title</p>
+                <input type="text" name="title" required />
+                <p>Select File</p>
+                <input type="file" name="files" />
+              </div>
+              )}
+              {isLink && (
+              <div>
+                <h5>Add New Link</h5>
+                <p>Title</p>
+                <input type="text" name="title" required />
+                <p>Link</p>
+                <input type="text" name="link" required />
+              </div>
+              )}
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
                 <Button type="submit">Save</Button>
               </DialogActions>
             </form>
+
           </DialogContent>
         </Dialog>
       </div>

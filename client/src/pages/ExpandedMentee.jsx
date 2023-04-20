@@ -24,6 +24,8 @@ function ExpandedMentee({ profile }) {
   const [folderArray, setFolderArray] = useState([]);
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
+  const [isFile, setIsFile] = useState(false);
+  const [isLink, setIsLink] = useState(false);
 
   const getMentee = () => {
     const tempFolders = [];
@@ -76,6 +78,8 @@ function ExpandedMentee({ profile }) {
   };
 
   const handleClickOpen2 = () => {
+    setIsFile(false);
+    setIsLink(false);
     setOpen2(true);
   };
 
@@ -140,6 +144,8 @@ function ExpandedMentee({ profile }) {
               {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
               {folder === 'Images' && <img src={ImageIcon} alt="images icon" />}
               {folder === 'Flyers' && <img src={FlyerIcon} alt="flyer icon" />}
+              {folder === 'Links' && <img src={FlyerIcon} alt="links icon" />}
+
               <p>{folder}</p>
             </Link>
           </div>
@@ -170,18 +176,52 @@ function ExpandedMentee({ profile }) {
       <div>
         <Dialog open={open2} onClose={handleClose2}>
           <DialogContent>
-            <h5>Upload File</h5>
-            <form onSubmit={(e) => addFolder(e)}>
-              Title:
-              <input type="text" name="folderName" required />
+            {!isFile && !isLink && (
+            <div>
+              <Button variant="contained" onClick={() => { setIsFile(true); setIsLink(false); }}>New File</Button>
               <br />
-              <select name="folders">
-                <option value="">Select Folder</option>
-                <option value="volvo">Volvo</option>
-                <option value="saab">Saab</option>
-                <option value="fiat">Fiat</option>
-                <option value="audi">Audi</option>
-              </select>
+              <br />
+              <Button variant="contained" onClick={() => { setIsLink(true); setIsFile(false); }}>New Link</Button>
+            </div>
+            )}
+
+            {(isFile || isLink) && (
+              <Button onClick={() => { setIsFile(false); setIsLink(false); }}>BACK</Button>
+            )}
+
+            <form className={styles.mediaForm}>
+              {isFile && (
+              <div>
+                <h5>Add New File</h5>
+                <p>Title</p>
+                <input type="text" name="title" required />
+                <p>Select File</p>
+                <input type="file" name="files" />
+              </div>
+              )}
+
+              {isLink && (
+              <div>
+                <h5>Add New Link</h5>
+                <p>Title</p>
+                <input type="text" name="title" required />
+                <p>Link</p>
+                <input type="text" name="link" required />
+              </div>
+              )}
+
+              {(isLink || isFile) && (
+              <div>
+                <p>Folder</p>
+                <select name="folders">
+                  <option value="">Select Folder</option>
+                  <option value="volvo">Volvo</option>
+                  <option value="saab">Saab</option>
+                  <option value="fiat">Fiat</option>
+                  <option value="audi">Audi</option>
+                </select>
+              </div>
+              )}
               <DialogActions>
                 <Button onClick={handleClose2}>Cancel</Button>
                 <Button type="submit">Save</Button>

@@ -74,6 +74,11 @@ function Mentees({ profile, updateAppProfile }) {
         files: [],
       });
 
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Links')
+      .set({
+        files: [],
+      });
+
     const newProfile = {
       ...profile,
       mentees: [...profile.mentees, menteeID],

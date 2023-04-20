@@ -89,6 +89,45 @@ const patchEvent = async (req, res) => {
   }
 };
 
+const updateMentee = async (req, res) => {
+  try {
+    const {
+      id, folderName, mediaArray, data, type,
+    } = req.body;
+    console.log(data);
+    console.log(type);
+    await db.collection('mentees').doc(id).collection('folders').doc(folderName)
+      .set({
+        files: mediaArray,
+      });
+    if (type.includes('image')) {
+      console.log('IMAGE HERE');
+      await db.collection('mentees').doc(id).collection('folders').doc('Images')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type.includes('video')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Videos')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type === 'link') {
+      await db.collection('mentees').doc(id).collection('folders').doc('Links')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type.includes('pdf')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Flyers')
+        .update({
+          files: arrayUnion(data),
+        });
+    }
+    res.status(200).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // returns an array of all existing user profiles
 const getAllProfiles = async (req, res) => {
   try {
@@ -356,6 +395,7 @@ const sendMailchimpEmails = async (req, res) => {
 export {
   createEvent,
   patchEvent,
+  updateMentee,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
