@@ -8,6 +8,9 @@ import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
 import * as constants from '../constants.js';
+import {
+  Select, MenuItem, FormControl, InputLabel,
+} from '@mui/material';
 
 function Calendar({ profile }) {
   const { role, serviceArea } = profile;
@@ -39,6 +42,8 @@ function Calendar({ profile }) {
     const fileUrl = e.target.attachments.value;
     const start = e.target.start.value;
     const end = e.target.end.value;
+    // const calendarId = constants.calIdAV; // TODO: MAKE NOT HARDCODED
+    const calendarId = constants.calIdFOTC; // TODO: MAKE NOT HARDCODED
     // check if user inputs an attachment
     if (e.target.attachments.value) {
       attachments.push({ fileUrl, title: 'an attachment!' });
@@ -51,6 +56,7 @@ function Calendar({ profile }) {
       start,
       end,
       attachments,
+      calendarId,
     };
     // add event to actual google calendar
     api.createEvent(event).then((eventID) => {
@@ -59,7 +65,8 @@ function Calendar({ profile }) {
       // add event on fullcalendar interface
       const calApi = calendarRef.current.getApi();
       calApi.addEvent(event);
-      console.log(event.end);
+      console.log("event data");
+      console.log(event)
     });
     e.target.reset();
   };
@@ -145,6 +152,20 @@ function Calendar({ profile }) {
               <input type="datetime-local" name="start" required />
               End Time:
               <input type="datetime-local" name="end" required />
+                <FormControl>
+                  <InputLabel>Service Area</InputLabel>
+                  <Select
+                    id="serviceArea"
+                    label="Service Area"
+                    defaultValue="AV"
+                    value={serviceArea}
+                    // onChange={(e) => setServiceArea(e.target.value)}
+                    className={styles.textfield}
+                  >
+                    <MenuItem value="AV">AV</MenuItem>
+                    <MenuItem value="MS">MS</MenuItem>
+                  </Select>
+                </FormControl>
               <button type="submit">Add Event</button>
             </form>
         </div> : null }
