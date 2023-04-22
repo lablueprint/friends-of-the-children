@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-// import { addDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import styles from '../styles/Mentees.module.css';
-import { db } from './firebase';
 import VideoIcon from '../assets/icons/videos_icon.svg';
 import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
-
-// import { db } from './firebase';
+import { storage } from './firebase';
+import * as api from '../api';
 // import styles from '../styles/Mentees.module.css';
-// import * as api from '../api';
 
 function ExpandedMentee({ profile }) {
   const location = useLocation();
@@ -27,48 +25,69 @@ function ExpandedMentee({ profile }) {
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
 
-  const getMentee = () => {
-    const tempFolders = [];
-    console.log(id);
-    db.collection('mentees').doc(id).collection('folders').get()
-      .then((sc) => {
-        if (sc.empty) {
-          console.log('No matching documents.');
-          return;
-        }
-        sc.forEach((currDoc) => {
-          console.log(sc);
-          const folderName = currDoc.id;
-          if (folderName !== 'root') { tempFolders.push(folderName); }
-          console.log('Found subcollection with id:', currDoc.id);
-        });
-      })
-      .then(() => {
-        setFolderArray(tempFolders);
-      });
-  };
-
-  // add new document to folders collection
-  const updateMentee = async (target) => {
-    await db.collection('mentees').doc(id).collection('folders').doc(target)
-      .set({
-        files: [],
-      });
-  };
-
   const addFolder = async (e) => {
     e.preventDefault();
     const name = e.target.folderName.value;
-    updateMentee(name).then(() => {
-      console.log('hI');
+    // call api function to add folder to database
+    api.addMenteeFolder(id, name).then(() => {
       setFolderArray([...folderArray, name]);
-
       setOpen(false);
       e.target.reset();
     });
   };
 
-  useEffect(getMentee, []);
+  useEffect(() => {
+    api.getMenteeFolders(id).then((folders) => {
+      setFolderArray(folders.data);
+    });
+  }, []);
+
+  const addMedia = (e) => {
+    e.preventDefault();
+    const title = e.target.title.value;
+    const folderName = e.target.folders.value;
+    let fileName;
+    let fileType;
+
+    api.getMenteeFiles(id, folderName).then((folderFiles) => {
+      const mediaArray = folderFiles.data;
+      if (isFile) {
+        const files = e.target.files.files[0];
+        fileName = files.name;
+        fileType = files.type;
+        const storageRef = ref(storage, `/images/${fileName}`);
+        uploadBytes(storageRef, files).then((snapshot) => {
+          getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
+            const data = {
+              title,
+              fileUrl: url,
+              fileType,
+            };
+            mediaArray.push(data);
+            return data;
+          })
+            .then((data) => {
+              console.log(data);
+              api.addMenteeFile(id, folderName, mediaArray, data, fileType);
+              setOpen2(false);
+              e.target.reset();
+            });
+        });
+      } else if (isLink) { // reading text input for links, not file input
+        fileName = title;
+        fileType = 'link';
+        const data = {
+          title,
+          fileUrl: e.target.link.value,
+          fileType,
+        };
+        mediaArray.push(data);
+        api.addMenteeFile(id, folderName, mediaArray, data, fileType);
+        setOpen2(false);
+        e.target.reset();
+      }
+    });
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -190,7 +209,7 @@ function ExpandedMentee({ profile }) {
               <Button onClick={() => { setIsFile(false); setIsLink(false); }}>BACK</Button>
             )}
 
-            <form className={styles.mediaForm}>
+            <form className={styles.mediaForm} onSubmit={(e) => addMedia(e)}>
               {isFile && (
               <div>
                 <h5>Add New File</h5>
@@ -216,10 +235,11 @@ function ExpandedMentee({ profile }) {
                 <p>Folder</p>
                 <select name="folders">
                   <option value="">Select Folder</option>
-                  <option value="volvo">Volvo</option>
-                  <option value="saab">Saab</option>
-                  <option value="fiat">Fiat</option>
-                  <option value="audi">Audi</option>
+                  {folderArray.map((folder) => (
+                    (
+                      folder !== 'Flyers' && folder !== 'Videos' && folder !== 'Images' && folder !== 'Links' && <option value={folder}>{folder}</option>
+                    )
+                  ))}
                 </select>
               </div>
               )}

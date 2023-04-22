@@ -1,53 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import {
-  updateDoc, doc, getDoc,
-  arrayUnion,
-} from 'firebase/firestore';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import styles from '../styles/Mentees.module.css';
-import { db } from './firebase';
+import * as api from '../api';
 // import MenteeImage from '../assets/images/empty_mentees.svg';
-// import * as api from '../api';
 
 function Mentees({ profile }) {
   const [mentees, setMentees] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const getMenteeIDs = async () => {
-    const docRef = doc(db, 'profiles', profile.id);
-    const docSnap = await getDoc(docRef);
-    return docSnap.data().mentees;
-  };
-
-  const getMentees = async () => {
-    const menteess = await getMenteeIDs();
-    db.collection('mentees').get().then((sc) => {
-      const tempMentees = [];
-      sc.forEach((snap) => {
-        const data = snap.data();
-        const { id } = snap;
-        if (menteess.includes(id)) {
-          const data2 = {
-            ...data,
-            id,
-          };
-          tempMentees.push(data2);
-        }
-      });
-      setMentees(tempMentees);
+  useEffect(() => {
+    api.getMentees(profile.id).then((tempMentees) => {
+      setMentees(tempMentees.data);
     });
-  };
-
-  const getMenteesWrapper = () => {
-    getMentees();
-  };
-
-  useEffect(getMenteesWrapper, []);
+  }, []);
 
   const addChild = async (e) => {
     e.preventDefault();
@@ -70,45 +40,22 @@ function Mentees({ profile }) {
     };
 
     // add new mentee object to mentees collection on firebase
-    const menteeID = (await db.collection('mentees').add(data)).id;
+    api.createMentee(data).then((mentee) => {
+      const menteeID = mentee.data;
+      const data2 = {
+        ...data,
+        id: menteeID,
+      };
 
-    const data2 = {
-      ...data,
-      id: menteeID,
-    };
+      const tempMentees = [...mentees, data2];
+      setMentees(tempMentees);
 
-    const tempMentees = [...mentees, data2];
-    setMentees(tempMentees);
+      api.addMentee(profile.id, menteeID);
 
-    // update mentor's profile, add new mentee to mentee array field
-    const mentorRef = doc(db, 'profiles', profile.id);
-    await updateDoc(mentorRef, {
-      mentees: arrayUnion(menteeID),
+      setOpen(false);
+      e.target.reset();
+      api.getMentees(profile.id);
     });
-
-    await db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
-      .set({
-        files: [],
-      });
-
-    await db.collection('mentees').doc(menteeID).collection('folders').doc('Videos')
-      .set({
-        files: [],
-      });
-
-    await db.collection('mentees').doc(menteeID).collection('folders').doc('Flyers')
-      .set({
-        files: [],
-      });
-
-    await db.collection('mentees').doc(menteeID).collection('folders').doc('Links')
-      .set({
-        files: [],
-      });
-
-    setOpen(false);
-    e.target.reset();
-    getMentees();
   };
 
   console.log(mentees);

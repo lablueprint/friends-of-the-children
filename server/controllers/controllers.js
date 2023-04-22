@@ -1,7 +1,7 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
+  collection, addDoc, getDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
 
 import crypto from 'crypto';
@@ -89,17 +89,140 @@ const patchEvent = async (req, res) => {
   }
 };
 
-const updateMentee = async (req, res) => {
+// returns an array of filtered mentees
+const getMentees = async (req, res) => {
+  try {
+    const { profileID } = req.params;
+    const docRef = doc(db, 'profiles', profileID);
+    const allMentees = (await getDoc(docRef)).data().mentees;
+    db.collection('mentees').get().then((sc) => {
+      const tempMentees = [];
+      sc.forEach((snap) => {
+        const data = snap.data();
+        const { id } = snap;
+        if (allMentees.includes(id)) {
+          const data2 = {
+            ...data,
+            id,
+          };
+          tempMentees.push(data2);
+        }
+      });
+      res.status(202).json(tempMentees);
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// adds new mentee doc to firebase mentees collection & returns its doc id
+const createMentee = async (req, res) => {
+  try {
+    const mentee = await db.collection('mentees').add(req.body);
+    res.status(202).json(mentee.id);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// update mentor's profile by adding the new mentee to mentee array field & create default folders
+const addMentee = async (req, res) => {
+  try {
+    const { profileID, menteeID } = req.params;
+    const mentorRef = doc(db, 'profiles', profileID);
+    await updateDoc(mentorRef, {
+      mentees: arrayUnion(menteeID),
+    });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Videos')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Flyers')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Links')
+      .set({
+        files: [],
+      });
+    res.status(202).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// returns array of the specified mentee's folders
+const getMenteeFolders = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tempFolders = [];
+    db.collection('mentees').doc(id).collection('folders').get()
+      .then((sc) => {
+        if (sc.empty) {
+          return;
+        }
+        sc.forEach((currDoc) => {
+          const folderName = currDoc.id;
+          if (folderName !== 'root') { tempFolders.push(folderName); }
+        });
+      })
+      .then(() => {
+        res.status(202).json(tempFolders);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// adds a new folder doc to the mentee's folders collection
+const addMenteeFolder = async (req, res) => {
+  try {
+    const { id, folderName } = req.params;
+    await db.collection('mentees').doc(id).collection('folders').doc(folderName)
+      .set({
+        files: [],
+      });
+    res.status(200).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// returns a mentee's folder contents (all its files/images/links)
+const getMenteeFiles = async (req, res) => {
+  try {
+    const { id, folderName } = req.params;
+    db.collection('mentees').doc(id).collection('folders').doc(folderName)
+      .get()
+      .then((sc) => {
+        const data = sc.data();
+        const { files } = data;
+        res.status(202).json(files);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// adds file in respective firebase folders (if type image -> Image folder too, etc)
+const addMenteeFile = async (req, res) => {
   try {
     const {
       id, folderName, mediaArray, data, type,
-    } = req.params;
+    } = req.body;
     await db.collection('mentees').doc(id).collection('folders').doc(folderName)
       .set({
         files: mediaArray,
       });
     if (type.includes('image')) {
-      console.log('IMAGE HERE');
       await db.collection('mentees').doc(id).collection('folders').doc('Images')
         .update({
           files: arrayUnion(data),
@@ -393,7 +516,13 @@ const sendMailchimpEmails = async (req, res) => {
 export {
   createEvent,
   patchEvent,
-  updateMentee,
+  getMentees,
+  createMentee,
+  addMentee,
+  getMenteeFolders,
+  addMenteeFolder,
+  getMenteeFiles,
+  addMenteeFile,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,

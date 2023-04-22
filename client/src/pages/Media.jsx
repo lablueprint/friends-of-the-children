@@ -6,12 +6,9 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-// import { arrayUnion } from 'firebase/firestore';
 import styles from '../styles/Mentees.module.css';
-import { db, storage } from './firebase';
+import { storage } from './firebase';
 import * as api from '../api';
-
-// const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
 
 function Media({ profile }) {
   const location = useLocation();
@@ -28,51 +25,12 @@ function Media({ profile }) {
   const [isLink, setIsLink] = useState(false);
   console.log(mediaArray);
 
-  const getFolder = () => {
-    db.collection('mentees').doc(id).collection('folders').doc(folderName)
-      .get()
-      .then((sc) => {
-        const data = sc.data();
-        const { files } = data;
-        setMediaArray(files);
-        console.log(files);
-      });
-  };
-
   // get the current folder contents on first load
   useEffect(() => {
-    getFolder();
+    api.getMenteeFiles(id, folderName).then((files) => {
+      setMediaArray(files.data);
+    });
   }, []);
-
-  // add file in respective firebase folders (if type image -> Image folder too, etc)
-  // const updateMentee = async (data, type) => {
-  //   await db.collection('mentees').doc(id).collection('folders').doc(folderName)
-  //     .set({
-  //       files: mediaArray,
-  //     });
-  //   if (type.includes('image')) {
-  //     console.log('IMAGE HERE');
-  //     await db.collection('mentees').doc(id).collection('folders').doc('Images')
-  //       .update({
-  //         files: arrayUnion(data),
-  //       });
-  //   } else if (type.includes('video')) {
-  //     await db.collection('mentees').doc(id).collection('folders').doc('Videos')
-  //       .update({
-  //         files: arrayUnion(data),
-  //       });
-  //   } else if (type === 'link') {
-  //     await db.collection('mentees').doc(id).collection('folders').doc('Links')
-  //       .update({
-  //         files: arrayUnion(data),
-  //       });
-  //   } else if (type.includes('pdf')) {
-  //     await db.collection('mentees').doc(id).collection('folders').doc('Flyers')
-  //       .update({
-  //         files: arrayUnion(data),
-  //       });
-  //   }
-  // };
 
   // creates new object for the file, updates mediaArray, and calls updateMentee
   const addMedia = (e) => {
@@ -101,12 +59,12 @@ function Media({ profile }) {
         })
           .then((data) => {
             console.log(data);
-            api.updateMentee(id, folderName, mediaArray, data, fileType);
+            api.addMenteeFile(id, folderName, mediaArray, data, fileType);
             setOpen(false);
             e.target.reset();
           });
       });
-    } else if (isLink) {
+    } else if (isLink) { // reading text input for links, not file input
       fileName = title;
       fileType = 'link';
       const tempArr = mediaArray;
@@ -117,12 +75,10 @@ function Media({ profile }) {
       };
       tempArr.push(data);
       setMediaArray(tempArr);
-      api.updateMentee(id, folderName, mediaArray, data, fileType);
+      api.addMenteeFile(id, folderName, mediaArray, data, fileType);
       setOpen(false);
       e.target.reset();
     }
-
-    console.log(fileType);
   };
 
   // handle dialog form closing/opening

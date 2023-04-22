@@ -7,7 +7,13 @@ import mailchimp from '../mailchimp.js';
 import {
   createEvent,
   patchEvent,
-  updateMentee,
+  getMentees,
+  createMentee,
+  addMentee,
+  getMenteeFolders,
+  addMenteeFolder,
+  getMenteeFiles,
+  addMenteeFile,
   getAllProfiles,
   getModulebyId,
   getGoogleaccount,
@@ -31,8 +37,26 @@ router.post('/createEvent', createEvent);
 // updates an event on google calendar
 router.patch('/patchEvent', patchEvent);
 
-// updates the mentee's folder
-router.post('/updateMentee', updateMentee);
+// gets all the mentees
+router.get('/getMentees/profileID=:profileID', getMentees);
+
+// gets the mentee's folders
+router.get('/getMenteeFolders/id=:id', getMenteeFolders);
+
+// creates a new mentee doc
+router.post('/createMentee', createMentee);
+
+// add a new mentee (link to mentor + create default folders)
+router.post('/addMentee/profileID=:profileID/menteeID=:menteeID', addMentee);
+
+// creates a new mentee folder
+router.post('/addMenteeFolder/id=:id/folder=:folderName', addMenteeFolder);
+
+// gets the mentee's folder contents
+router.get('/getMenteeFiles/id=:id/folder=:folderName', getMenteeFiles);
+
+// updates the mentee's folder with the new file
+router.post('/addMenteeFile', addMenteeFile);
 
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
