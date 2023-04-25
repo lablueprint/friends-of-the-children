@@ -156,7 +156,7 @@ function Signup({ updateAppProfile }) {
         };
         api.addToList(payload);
       }
-      navigate('/modules');
+      navigate('/resources');
       // reset forms
       setFirstName('');
       setLastName('');

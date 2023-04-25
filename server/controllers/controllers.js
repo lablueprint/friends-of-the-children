@@ -328,6 +328,39 @@ const getModulebyId = async (req, res) => {
   }
 };
 
+const recursivelyDeletemodules = async (moduleID) => {
+  try {
+    const moduleRef = await db.collection('modules').doc(moduleID).get();
+    const currModule = moduleRef.data();
+    if (Array.isArray(currModule.children) && currModule.children.length > 0) {
+      // if there are submodules, recursively delete them
+      for (const child of currModule.children) {
+        await recursivelyDeletemodules(child);
+      }
+    }
+    if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
+      const parentRef = db.collection('modules').doc(currModule.parent);
+      const parentRefSnapshot = await parentRef.get();
+      const currParent = parentRefSnapshot.data();
+      const updatedChildren = currParent.children.filter((id) => id !== moduleID);
+      await parentRef.update({ children: updatedChildren }).then();
+    }
+    await db.collection('modules').doc(moduleID).delete(); // delete the current module
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteModule = async (req, res) => {
+  try {
+    const { moduleID } = req.params;
+    await recursivelyDeletemodules(moduleID);
+    res.status(202).json('successfully deleted module');
+  } catch (error) {
+    res.status(400).json('could not delete module');
+  }
+};
+
 // finds a matching profile in firebase, given a google account email
 const getGoogleaccount = async (req, res) => {
   try {
@@ -365,6 +398,28 @@ const getUsernames = async (req, res) => {
         }
       });
       res.status(202).json(usernames);
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const getModules = async (req, res) => {
+  try {
+    const { currRole } = req.params;
+    const modules = [];
+    db.collection('modules').get().then((sc) => {
+      sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
+        const data = module.data();
+        if (data && data.role) {
+          data.id = module.id;
+          // fetching parent-level modules that we have permission to view
+          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
+            modules.push(data);
+          }
+        }
+      });
+      res.status(202).json(modules);
     });
   } catch (error) {
     res.status(400).json(error);
@@ -541,6 +596,7 @@ export {
   getMenteeFiles,
   addMenteeFile,
   getAllProfiles,
+  getModules,
   getModulebyId,
   getGoogleaccount,
   getUsernames,
@@ -549,4 +605,5 @@ export {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  deleteModule,
 };

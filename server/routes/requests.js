@@ -15,6 +15,7 @@ import {
   getMenteeFiles,
   addMenteeFile,
   getAllProfiles,
+  getModules,
   getModulebyId,
   getGoogleaccount,
   getUsernames,
@@ -23,6 +24,7 @@ import {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  deleteModule,
 } from '../controllers/controllers.js';
 
 const router = express.Router();
@@ -61,6 +63,9 @@ router.post('/addMenteeFile', addMenteeFile);
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
 
+// gets all modules from firebase collection "modules"
+router.get('/getModules/:currRole', getModules);
+
 // gets a module by ID, and returns that module and all of its direct children
 router.get('/getModulebyId/:id/:currRole', getModulebyId);
 
@@ -73,6 +78,9 @@ router.get('/getUsernames', getUsernames);
 // adds a module to firebase
 // then adds new module to the parent's children array
 router.post('/updateModuleChildren', updateModuleChildren);
+
+// deletes current module and all submodules underneath it
+router.delete('/deleteModule/:moduleID', deleteModule);
 
 router.get('/getMessages', getMessages);
 

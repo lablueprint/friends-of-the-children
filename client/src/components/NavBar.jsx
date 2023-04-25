@@ -49,7 +49,7 @@ function NavBar({ profile, updateAppProfile }) {
                 alt="fotc logo"
               />
             </a>
-            <Link to="/modules" className={styles.btn_info}>
+            <Link to="/resources" className={styles.btn_info}>
               <img src={ResourcesIcon} alt="resources icon" />
               Resources
             </Link>

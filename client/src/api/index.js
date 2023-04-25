@@ -145,6 +145,19 @@ export const updateModuleChildren = async (id, data) => {
   return null;
 };
 
+// gets modules, filtered by role
+export const getModules = async (currRole) => {
+  try {
+    // currRole are sent as route parameters
+    const modules = await axios.get(`${url}/getModules/${currRole}`);
+    return modules;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get modules');
+  }
+  return null;
+};
+
 // gets a module and its children, filtered by role
 export const getModulebyId = async (id, currRole) => {
   try {
@@ -156,6 +169,15 @@ export const getModulebyId = async (id, currRole) => {
     console.error('could not get module by ID');
   }
   return null;
+};
+
+export const deleteModule = async (moduleID) => {
+  try {
+    await axios.delete(`${url}/deleteModule/${moduleID}`);
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete modules');
+  }
 };
 
 // gets google email
