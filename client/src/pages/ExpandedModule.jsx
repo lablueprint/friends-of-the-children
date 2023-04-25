@@ -150,7 +150,7 @@ function ExpandedModule({ profile }) {
             Back
           </Link>
         ) : (
-          <Link to="/modules">
+          <Link to="/resources">
             Back
           </Link>
         )}

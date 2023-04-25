@@ -52,7 +52,6 @@ function Module(props) {
   };
   return (
     <div>
-      {console.log(files)}
       <div className={styles.title}>{title}</div>
       <div className={styles.body}>{body}</div>
       {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
