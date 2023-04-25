@@ -14,8 +14,8 @@ function ExpandedModule({ profile }) {
   const { role } = profile;
   const location = useLocation();
   const { id } = location.state;
-  const [title, setTitle] = useState();
-  const [body, setBody] = useState();
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
@@ -56,6 +56,10 @@ function ExpandedModule({ profile }) {
 
   useEffect(getModule, [id, currRole]); // possible TODO: refresh in dependency list
 
+  const deleteChild = (childId) => {
+    setChildren(children.filter((child) => child.id !== childId));
+  };
+
   const ExpandedModuleForm = (
     <div>
       <Button variant="outlined" onClick={handleClickOpen}>
@@ -69,53 +73,21 @@ function ExpandedModule({ profile }) {
       />
     </div>
   );
-  if (parent != null) {
-    if (currRole === 'admin') {
-      return (
-        <div>
-          <div className={styles.card}>
-            <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-              Back
-            </Link>
-            <Module title={title} body={body} child={children} links={currModuleFiles} />
-          </div>
-          {ExpandedModuleForm}
-        </div>
-      );
-    }
-    return (
-      <div className={styles.card}>
-        <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-          Back
-        </Link>
-        <Module title={title} body={body} child={children} links={currModuleFiles} />
-      </div>
-    );
-  }
-
-  if (currRole === 'admin') {
-    return (
-      <div>
-        <div className={styles.card}>
-          <Link to="/resources">
-            Back
-          </Link>
-          <Module title={title} body={body} child={children} links={currModuleFiles} />
-        </div>
-        {/* form specific to expanded module */}
-        {ExpandedModuleForm}
-      </div>
-
-    );
-  }
   return (
     <div>
       <div className={styles.card}>
-        <Link to="/resources">
-          Back
-        </Link>
-        <Module title={title} body={body} child={children} links={currModuleFiles} />
+        {parent != null ? (
+          <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+            Back
+          </Link>
+        ) : (
+          <Link to="/resources">
+            Back
+          </Link>
+        )}
+        <Module title={title} body={body} child={children} links={currModuleFiles} role={currRole} deleteChild={deleteChild} />
       </div>
+      {currRole === 'admin' && ExpandedModuleForm}
     </div>
   );
 }

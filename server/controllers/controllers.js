@@ -1,7 +1,7 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
+  collection, addDoc, arrayUnion, updateDoc, doc, FieldValue,
 } from 'firebase/firestore';
 
 import crypto from 'crypto';
@@ -151,6 +151,39 @@ const getModulebyId = async (req, res) => {
   }
 };
 
+const recursivelyDeletemodules = async (moduleID) => {
+  try {
+    const moduleRef = await db.collection('modules').doc(moduleID).get();
+    const currModule = moduleRef.data();
+    if (Array.isArray(currModule.children) && currModule.children.length > 0) {
+      // if there are submodules, recursively delete them
+      for (const child of currModule.children) {
+        await recursivelyDeletemodules(child);
+      }
+    }
+    if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
+      const parentRef = db.collection('modules').doc(currModule.parent);
+      const parentRefSnapshot = await parentRef.get();
+      const currParent = parentRefSnapshot.data();
+      const updatedChildren = currParent.children.filter((id) => id !== moduleID);
+      await parentRef.update({ children: updatedChildren }).then();
+    }
+    await db.collection('modules').doc(moduleID).delete(); // delete the current module
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteModule = async (req, res) => {
+  try {
+    const { moduleID } = req.params;
+    await recursivelyDeletemodules(moduleID);
+    res.status(202).json('successfully deleted module');
+  } catch (error) {
+    res.status(400).json('could not delete module');
+  }
+};
+
 // finds a matching profile in firebase, given a google account email
 const getGoogleaccount = async (req, res) => {
   try {
@@ -160,11 +193,11 @@ const getGoogleaccount = async (req, res) => {
     let googleData;
     await db.collection('profiles').where('email', '==', googleAccount).get().then(async (sc) => {
       // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-      for (const doc of sc.docs) {
-        const data = await doc.data();
-        data.id = doc.id;
+      sc.docs.forEach(async (tempDoc) => {
+        const data = await tempDoc.data();
+        data.id = tempDoc.id;
         googleData = data;
-      }
+      });
     });
     // error message if user doesn't exist (when data is undefined)
     if (googleData === undefined) {
@@ -404,4 +437,5 @@ export {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  deleteModule,
 };

@@ -88,6 +88,15 @@ export const getModulebyId = async (id, currRole) => {
   return null;
 };
 
+export const deleteModule = async (moduleID) => {
+  try {
+    await axios.delete(`${url}/deleteModule/${moduleID}`);
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete modules');
+  }
+};
+
 // gets google email
 export const getGoogleaccount = async (googleEmail) => {
   try {

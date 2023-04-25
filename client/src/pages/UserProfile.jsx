@@ -84,7 +84,7 @@ function UserProfile({ profile, updateAppProfile }) {
         <div>
           <div className={styles.pfp}>
             <img src={imageUrl} alt="profile pic" className={styles.profile_pic} />
-            <label htmlFor={uploadImage} className={styles.custom_file_upload}>
+            <label htmlFor="uploadImage" className={styles.custom_file_upload}>
               <input type="file" accept=".png,.jpg,.svg,.gif" onChange={uploadImage} />
             </label>
           </div>
