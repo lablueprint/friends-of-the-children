@@ -18,7 +18,6 @@ function Requests({ profile }) {
       // filter array of profile objects
       const unapprovedUsers = data.filter((user) => (('approved' in user) && (user.approved === false)));
       const reducedUsers = unapprovedUsers.map((user) => {
-        console.log(user);
         const myDate = new Date(user.date.seconds * 1000);
         return ({
           name: `${user.firstName} ${user.lastName}`,

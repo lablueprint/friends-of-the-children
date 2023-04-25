@@ -16,6 +16,7 @@ export default function AdminTable({ users }) {
 
   function createData(checked, name, username, email, role, dateJoined, status) {
     let approved = '';
+    console.log(dateJoined);
     const desiredDate = dateJoined.split(',')[0];
     console.log(desiredDate);
     if (status) {
@@ -24,11 +25,11 @@ export default function AdminTable({ users }) {
       approved = 'Not Approved';
     }
     return {
-      checked, name, username, email, role, desiredDate, approved,
+      checked, name, username, email, role, dateJoined: desiredDate, approved,
     };
   }
 
-  const rows = users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.date, user.status));
+  const rows = users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status));
 
   // const rows = [
   //   createData(false, 'Men Tor', 'menslay', 'menslay@yahoo.com', 'Mentor', '01/01/23', 'Not Approved'),
@@ -68,7 +69,7 @@ export default function AdminTable({ users }) {
               <TableCell align="left">{row.email}</TableCell>
               <TableCell align="left">{row.role}</TableCell>
               <TableCell align="left">{row.dateJoined}</TableCell>
-              <TableCell align="left">{row.status}</TableCell>
+              <TableCell align="left">{row.approved}</TableCell>
             </TableRow>
           ))}
         </TableBody>
