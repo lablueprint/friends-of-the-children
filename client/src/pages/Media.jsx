@@ -59,7 +59,7 @@ function Media({ profile }) {
         })
           .then((data) => {
             console.log(data);
-            api.addMenteeFile(id, folderName, mediaArray, data, fileType);
+            api.addMenteeFile(id, folderName, data, fileType);
             setOpen(false);
             e.target.reset();
           });
@@ -75,7 +75,7 @@ function Media({ profile }) {
       };
       tempArr.push(data);
       setMediaArray(tempArr);
-      api.addMenteeFile(id, folderName, mediaArray, data, fileType);
+      api.addMenteeFile(id, folderName, data, fileType);
       setOpen(false);
       e.target.reset();
     }
@@ -110,7 +110,7 @@ function Media({ profile }) {
       <div className={styles.profile_container}>
         <div>
           <div className={styles.pfp}>
-            <img className={styles.profile_pic} src="https://images.theconversation.com/files/304864/original/file-20191203-67028-qfiw3k.jpeg?ixlib=rb-1.1.0&rect=638%2C2%2C795%2C745&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip" alt="" />
+            <img className={styles.profile_pic} src="https://i.pinimg.com/564x/a0/8e/a5/a08ea58c5ea6000579249c7ccbfa99b0.jpg" alt="" />
           </div>
 
           <div className={styles.user_info}>
@@ -225,6 +225,7 @@ Media.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    mentees: PropTypes.arrayOf.isRequired,
   }).isRequired,
 };
 

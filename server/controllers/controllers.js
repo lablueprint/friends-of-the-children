@@ -134,6 +134,11 @@ const addMentee = async (req, res) => {
       mentees: arrayUnion(menteeID),
     });
 
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Root')
+      .set({
+        files: [],
+      });
+
     await db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
       .set({
         files: [],
@@ -171,7 +176,7 @@ const getMenteeFolders = async (req, res) => {
         }
         sc.forEach((currDoc) => {
           const folderName = currDoc.id;
-          if (folderName !== 'root') { tempFolders.push(folderName); }
+          if (folderName !== 'Root') { tempFolders.push(folderName); }
         });
       })
       .then(() => {
@@ -200,13 +205,15 @@ const addMenteeFolder = async (req, res) => {
 const getMenteeFiles = async (req, res) => {
   try {
     const { id, folderName } = req.params;
-    db.collection('mentees').doc(id).collection('folders').doc(folderName)
-      .get()
-      .then((sc) => {
-        const data = sc.data();
-        const { files } = data;
-        res.status(202).json(files);
-      });
+    if (folderName !== '') {
+      db.collection('mentees').doc(id).collection('folders').doc(folderName)
+        .get()
+        .then((sc) => {
+          const data = sc.data();
+          const { files } = data;
+          res.status(202).json(files);
+        });
+    }
   } catch (error) {
     res.status(400).json(error);
   }
@@ -216,12 +223,20 @@ const getMenteeFiles = async (req, res) => {
 const addMenteeFile = async (req, res) => {
   try {
     const {
-      id, folderName, mediaArray, data, type,
+      id, folderName, data, type,
     } = req.body;
-    await db.collection('mentees').doc(id).collection('folders').doc(folderName)
-      .set({
-        files: mediaArray,
+
+    if (folderName !== 'Root') {
+      await db.collection('mentees').doc(id).collection('folders').doc(folderName)
+        .update({
+          files: arrayUnion(data),
+        });
+    }
+    await db.collection('mentees').doc(id).collection('folders').doc('Root')
+      .update({
+        files: arrayUnion(data),
       });
+
     if (type.includes('image')) {
       await db.collection('mentees').doc(id).collection('folders').doc('Images')
         .update({

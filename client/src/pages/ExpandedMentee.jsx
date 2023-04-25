@@ -19,6 +19,7 @@ function ExpandedMentee({ profile }) {
   const {
     id, firstName, lastName, age, caregiver,
   } = location.state;
+  const [recents, setRecents] = useState([]);
   const [folderArray, setFolderArray] = useState([]);
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
@@ -40,6 +41,9 @@ function ExpandedMentee({ profile }) {
     api.getMenteeFolders(id).then((folders) => {
       setFolderArray(folders.data);
     });
+    api.getMenteeFiles(id, 'Root').then((files) => {
+      setRecents(files.data);
+    });
   }, []);
 
   const addMedia = (e) => {
@@ -49,44 +53,86 @@ function ExpandedMentee({ profile }) {
     let fileName;
     let fileType;
 
-    api.getMenteeFiles(id, folderName).then((folderFiles) => {
-      const mediaArray = folderFiles.data;
-      if (isFile) {
-        const files = e.target.files.files[0];
-        fileName = files.name;
-        fileType = files.type;
-        const storageRef = ref(storage, `/images/${fileName}`);
-        uploadBytes(storageRef, files).then((snapshot) => {
-          getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
-            const data = {
-              title,
-              fileUrl: url,
-              fileType,
-            };
-            mediaArray.push(data);
-            return data;
-          })
-            .then((data) => {
-              console.log(data);
-              api.addMenteeFile(id, folderName, mediaArray, data, fileType);
-              setOpen2(false);
-              e.target.reset();
-            });
-        });
-      } else if (isLink) { // reading text input for links, not file input
-        fileName = title;
-        fileType = 'link';
-        const data = {
-          title,
-          fileUrl: e.target.link.value,
-          fileType,
-        };
-        mediaArray.push(data);
-        api.addMenteeFile(id, folderName, mediaArray, data, fileType);
-        setOpen2(false);
-        e.target.reset();
-      }
-    });
+    console.log(folderName);
+    if (isFile) {
+      const files = e.target.files.files[0];
+      fileName = files.name;
+      fileType = files.type;
+
+      const storageRef = ref(storage, `/images/${fileName}`);
+      uploadBytes(storageRef, files).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
+          const tempArr = recents;
+          const data = {
+            title,
+            fileUrl: url,
+            fileType,
+          };
+          tempArr.push(data);
+          setRecents(tempArr);
+          return data;
+        })
+          .then((data) => {
+            console.log(data);
+            api.addMenteeFile(id, folderName, data, fileType);
+            setOpen2(false);
+            e.target.reset();
+          });
+      });
+    } else if (isLink) { // reading text input for links, not file input
+      fileName = title;
+      fileType = 'link';
+      const tempArr = recents;
+      const data = {
+        title,
+        fileUrl: e.target.link.value,
+        fileType,
+      };
+      tempArr.push(data);
+      setRecents(tempArr);
+      api.addMenteeFile(id, folderName, data, fileType);
+      setOpen2(false);
+      e.target.reset();
+    }
+
+    // api.getMenteeFiles(id, folderName).then((folderFiles) => {
+    //   const mediaArray = folderFiles.data;
+    //   if (isFile) {
+    //     const files = e.target.files.files[0];
+    //     fileName = files.name;
+    //     fileType = files.type;
+    //     const storageRef = ref(storage, `/images/${fileName}`);
+    //     uploadBytes(storageRef, files).then((snapshot) => {
+    //       getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
+    //         const data = {
+    //           title,
+    //           fileUrl: url,
+    //           fileType,
+    //         };
+    //         mediaArray.push(data);
+    //         return data;
+    //       })
+    //         .then((data) => {
+    //           console.log(data);
+    //           api.addMenteeFile(id, folderName, mediaArray, data, fileType);
+    //           setOpen2(false);
+    //           e.target.reset();
+    //         });
+    //     });
+    //   } else if (isLink) { // reading text input for links, not file input
+    //     fileName = title;
+    //     fileType = 'link';
+    //     const data = {
+    //       title,
+    //       fileUrl: e.target.link.value,
+    //       fileType,
+    //     };
+    //     mediaArray.push(data);
+    //     api.addMenteeFile(id, folderName, mediaArray, data, fileType);
+    //   }
+    // });
+    // setOpen2(false);
+    // e.target.reset();
   };
 
   const handleClickOpen = () => {
@@ -127,7 +173,7 @@ function ExpandedMentee({ profile }) {
       <div className={styles.profile_container}>
         <div>
           <div className={styles.pfp}>
-            <img className={styles.profile_pic} src="https://images.theconversation.com/files/304864/original/file-20191203-67028-qfiw3k.jpeg?ixlib=rb-1.1.0&rect=638%2C2%2C795%2C745&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip" alt="" />
+            <img className={styles.profile_pic} src="https://i.pinimg.com/564x/a0/8e/a5/a08ea58c5ea6000579249c7ccbfa99b0.jpg" alt="" />
           </div>
 
           <div className={styles.user_info}>
@@ -154,21 +200,23 @@ function ExpandedMentee({ profile }) {
       <h3>Folders</h3>
       <div className={styles.folders_map}>
         {folderArray.map((folder) => (
-          <div className={styles.folder_container}>
-            <Link
-              to={`./folder_${folder}`}
-              state={{
-                id, folderName: folder, firstName, lastName, age, caregiver,
-              }}
-            >
-              {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
-              {folder === 'Images' && <img src={ImageIcon} alt="images icon" />}
-              {folder === 'Flyers' && <img src={FlyerIcon} alt="flyer icon" />}
-              {folder === 'Links' && <img src={FlyerIcon} alt="links icon" />}
+          folder !== 'Root' && (
+            <div className={styles.folder_container}>
+              <Link
+                to={`./folder_${folder}`}
+                state={{
+                  id, folderName: folder, firstName, lastName, age, caregiver,
+                }}
+              >
+                {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
+                {folder === 'Images' && <img src={ImageIcon} alt="images icon" />}
+                {folder === 'Flyers' && <img src={FlyerIcon} alt="flyer icon" />}
+                {folder === 'Links' && <img src={FlyerIcon} alt="links icon" />}
 
-              <p>{folder}</p>
-            </Link>
-          </div>
+                <p>{folder}</p>
+              </Link>
+            </div>
+          )
         ))}
         <Button variant="outlined" onClick={handleClickOpen}>
           + Add a New Folder
@@ -176,7 +224,35 @@ function ExpandedMentee({ profile }) {
       </div>
 
       <h3>Recent Uploads</h3>
+      {recents.map((file) => (
+        <div className={styles.img_container}>
+          {(file.fileType.includes('image')) && (
+          <div>
+            <img className={styles.media_image} src={file.fileUrl} alt={file.title} />
+          </div>
+          )}
+          {(file.fileType.includes('video')) && (
+          <div>
+            <video className={styles.media_image} controls src={file.fileUrl} alt={file.title}>
+              <track default kind="captions" />
+            </video>
+          </div>
+          )}
+          {(file.fileType.includes('link')) && (
+          <div>
+            <li><a href={file.fileUrl} target="_blank" rel="noreferrer">{file.fileUrl}</a></li>
+          </div>
+          )}
+          {(file.fileType.includes('pdf')) && (
+          <div key={file.url} className="pdf">
+            <embed className={styles.media_image} src={file.fileUrl} alt={file.title} />
+          </div>
+          )}
+          <p>{file.title}</p>
+        </div>
+      ))}
 
+      {/* create a new folder */}
       <div>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
@@ -193,6 +269,7 @@ function ExpandedMentee({ profile }) {
         </Dialog>
       </div>
 
+      {/* add file */}
       <div>
         <Dialog open={open2} onClose={handleClose2}>
           <DialogContent>
@@ -219,7 +296,6 @@ function ExpandedMentee({ profile }) {
                 <input type="file" name="files" />
               </div>
               )}
-
               {isLink && (
               <div>
                 <h5>Add New Link</h5>
@@ -229,15 +305,15 @@ function ExpandedMentee({ profile }) {
                 <input type="text" name="link" required />
               </div>
               )}
-
               {(isLink || isFile) && (
               <div>
                 <p>Folder</p>
                 <select name="folders">
-                  <option value="">Select Folder</option>
+                  <option value="Root">Select Folder</option>
                   {folderArray.map((folder) => (
                     (
-                      folder !== 'Flyers' && folder !== 'Videos' && folder !== 'Images' && folder !== 'Links' && <option value={folder}>{folder}</option>
+                      folder !== 'Flyers' && folder !== 'Videos' && folder !== 'Images' && folder !== 'Links'
+                      && <option value={folder}>{folder}</option>
                     )
                   ))}
                 </select>
@@ -264,6 +340,7 @@ ExpandedMentee.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    mentees: PropTypes.arrayOf.isRequired,
   }).isRequired,
 };
 

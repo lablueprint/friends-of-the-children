@@ -101,10 +101,10 @@ export const getMenteeFiles = async (id, folderName) => {
   return null;
 };
 
-export const addMenteeFile = async (id, folderName, mediaArray, data, type) => {
+export const addMenteeFile = async (id, folderName, data, type) => {
   try {
     const updatedMentee = await axios.post(`${url}/addMenteeFile`, {
-      id, folderName, mediaArray, data, type,
+      id, folderName, data, type,
     });
     return updatedMentee;
   } catch (error) {
