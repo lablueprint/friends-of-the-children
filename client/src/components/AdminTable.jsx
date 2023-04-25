@@ -9,20 +9,34 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
-function createData(checked, name, username, email, role, dateJoined, status) {
-  return {
-    checked, name, username, email, role, dateJoined, status,
-  };
-}
+import PropTypes from 'prop-types';
 
-const rows = [
-  createData(false, 'Men Tor', 'menslay', 'menslay@yahoo.com', 'Mentor', '01/01/23', 'Not Approved'),
-  createData(false, 'Mi chin nyeon', 'michinnyeon', 'a@a.com', 'Caregiver', '01/01/23', 'Not Approved'),
-  createData(false, 'Sarah Chang', 'sarah', 'sarah@gmail.com', 'Mentor', '01/01/23', 'Not Approved'),
-];
-
-export default function AdminTable() {
+export default function AdminTable({ users }) {
   const [numChecked, setNumChecked] = useState(0);
+
+  function createData(checked, name, username, email, role, dateJoined, status) {
+    let approved = '';
+    const desiredDate = dateJoined.split(',')[0];
+    console.log(desiredDate);
+    if (status) {
+      approved = 'Approved';
+    } else {
+      approved = 'Not Approved';
+    }
+    return {
+      checked, name, username, email, role, desiredDate, approved,
+    };
+  }
+
+  const rows = users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.date, user.status));
+
+  // const rows = [
+  //   createData(false, 'Men Tor', 'menslay', 'menslay@yahoo.com', 'Mentor', '01/01/23', 'Not Approved'),
+  //   createData(false, 'Mi chin nyeon', 'michinnyeon', 'a@a.com', 'Caregiver', '01/01/23', 'Not Approved'),
+  //   createData(false, 'Sarah Chang', 'sarah', 'sarah@gmail.com', 'Mentor', '01/01/23', 'Not Approved'),
+  //   createData(false, 'galen heuer', 'galen', 'galenheuer@gmail.com', 'Caregiver', '01/01/23', 'Approved'),
+  //   createData(false, 'Care Giver', 'caregiver', 'hwang12@ucla.edu', 'Caregiver', '01/01/23', 'Approved'),
+  // ];
 
   function HandleChange(e) {
     console.log(e.target.value);
@@ -62,3 +76,14 @@ export default function AdminTable() {
     </TableContainer>
   );
 }
+
+AdminTable.propTypes = {
+  users: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string,
+    username: PropTypes.string,
+    email: PropTypes.string,
+    role: PropTypes.string,
+    date: PropTypes.string,
+    status: PropTypes.bool,
+  })).isRequired,
+};

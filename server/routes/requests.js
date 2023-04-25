@@ -16,6 +16,7 @@ import {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  getProfilesSortedByDate,
 } from '../controllers/controllers.js';
 
 const router = express.Router();
@@ -47,6 +48,9 @@ router.get('/getUsernames', getUsernames);
 router.post('/updateModuleChildren', updateModuleChildren);
 
 router.get('/getMessages', getMessages);
+
+//
+router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
 
 // mailchimp routes
 router.post('/mailchimp/addToList', addToMailchimpList);

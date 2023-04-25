@@ -10,10 +10,26 @@ function Requests({ profile }) {
   // allow admin to modify the user's approved status
 
   // gets all user profiles
+  const [pendingUsers, setPendingUsers] = useState([]);
   useEffect(() => {
     async function fetchProfiles() {
-      const { data } = await api.getAllProfiles();
-      console.log(data);
+      // ask jerry how to get the data sorted
+      const { data } = await api.getProfilesSortedByDate();
+      // filter array of profile objects
+      const unapprovedUsers = data.filter((user) => (('approved' in user) && (user.approved === false)));
+      const reducedUsers = unapprovedUsers.map((user) => {
+        console.log(user);
+        const myDate = new Date(user.date.seconds * 1000);
+        return ({
+          name: `${user.firstName} ${user.lastName}`,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          epochDate: myDate.toLocaleString(),
+          status: user.status,
+        });
+      });
+      setPendingUsers(reducedUsers);
     }
     fetchProfiles();
   }, []);
@@ -23,7 +39,9 @@ function Requests({ profile }) {
       <h1>
         Requests
       </h1>
-      <AdminTable />
+      <AdminTable users={pendingUsers} />
+      <button type="button">Submit</button>
+      {/* <p>{numApproved}</p> */}
     </div>
   );
 }

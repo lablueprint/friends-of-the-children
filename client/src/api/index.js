@@ -189,3 +189,14 @@ export const getMessages = async () => {
   }
   return null;
 };
+
+export const getProfilesSortedByDate = async () => {
+  try {
+    const sortedProfiles = await axios.get(`${url}/getProfilesSortedByDate`);
+    return sortedProfiles;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get profiles sorted by date');
+  }
+  return null;
+};

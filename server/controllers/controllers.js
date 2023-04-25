@@ -220,6 +220,34 @@ const getMessages = async (req, res) => {
   }
 };
 
+const getProfilesSortedByDate = async (req, res) => {
+  try {
+    // await user profile data from firebase
+    const sc = await db.collection('profiles').get();
+    const profiles = [];
+    // push each profile into response array
+    sc.forEach((dc) => {
+      const data = dc.data();
+      data.id = dc.id;
+      profiles.push(data);
+    });
+
+    profiles.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;
+      }
+      if (a.date > b.date) {
+        return 1;
+      }
+      return 0;
+    });
+
+    res.status(202).json(profiles);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // mailchimp controllers
 
 const addToMailchimpList = async (req, res) => {
@@ -365,4 +393,5 @@ export {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  getProfilesSortedByDate,
 };
