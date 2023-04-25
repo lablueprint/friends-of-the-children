@@ -79,7 +79,6 @@ function ExpandedModule({ profile }) {
             </Link>
             <Module title={title} body={body} child={children} links={currModuleFiles} />
           </div>
-          {console.log(open)}
           {ExpandedModuleForm}
         </div>
       );
@@ -103,7 +102,7 @@ function ExpandedModule({ profile }) {
           </Link>
           <Module title={title} body={body} child={children} links={currModuleFiles} />
         </div>
-        {console.log(open)}
+        {/* form specific to expanded module */}
         {ExpandedModuleForm}
       </div>
 

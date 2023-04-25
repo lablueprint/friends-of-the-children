@@ -55,9 +55,8 @@ export default function NewModulePopup(props) {
         // update progress
         setPercent(p);
       },
-      (err) => console.log(err),
+      (err) => console.error(err),
     );
-    console.log(storageRef.fullPath);
     return storageRef.fullPath;
   };
 
@@ -75,18 +74,17 @@ export default function NewModulePopup(props) {
 
     };
 
+    // if you are adding a child node to an expanded module, update parent's child array and child's parentID
     if (parentID !== null) {
       await api.updateModuleChildren(parentID, data); // pass in id, data to submit
     }
 
-    console.log(parentID);
     // receive module id
     // TODO: Create api call (move db.collection to backend)
     const tempId = (await db.collection('modules').add(data)).id;
 
     data.id = tempId;
 
-    console.log(data);
     updateModule(data);
 
     setTitle('');
