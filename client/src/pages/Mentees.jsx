@@ -83,7 +83,7 @@ function Mentees({ profile }) {
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiver, folders: mentee.folders,
+                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders,
               }}
             >
               <div className={styles.card}>
