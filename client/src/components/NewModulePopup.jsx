@@ -1,34 +1,34 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import Typography from '@mui/material/Typography';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import DialogTitle from '@mui/material/DialogTitle';
+import FormLabel from '@mui/material/FormLabel';
 import {
   ref, uploadBytesResumable,
 } from 'firebase/storage';
 import { db, storage } from '../pages/firebase';
 import * as api from '../api';
+import { serviceAreas } from '../constants';
 
 export default function NewModulePopup(props) {
   const {
     updateModule, open, handleClose, parentID,
   } = props;
 
-  //   const [open, setOpen] = React.useState(false);
   const roles = [];
   const [percent, setPercent] = useState(0);
   const [fileLinks, setFileLinks] = useState([]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const [serviceArea, setServiceArea] = useState('');
   const [mentor, setMentor] = useState(false);
   const [caregiver, setCaregiver] = useState(false);
+  const [serviceAreaToSelected, setServiceAreaToSelected] = useState({});
 
   // add permissions to view module. order doesn't matter
   if (mentor) {
@@ -37,6 +37,14 @@ export default function NewModulePopup(props) {
   if (caregiver) {
     roles.push('caregiver');
   }
+
+  useEffect(() => {
+    serviceAreas.forEach((SA) => {
+      const tempServiceAreaToSelected = { ...serviceAreaToSelected };
+      tempServiceAreaToSelected[SA] = false;
+      setServiceAreaToSelected(tempServiceAreaToSelected);
+    });
+  }, [serviceAreas]);
 
   // TODO: Move to backend, figure out how to maintain setPercent once it is moved to the backedn and sent back as a promise chain
   // upload file to Firebase:
@@ -60,13 +68,24 @@ export default function NewModulePopup(props) {
     return storageRef.fullPath;
   };
 
+  const selectedServiceAreas = () => {
+    const targetServiceAreas = [];
+    serviceAreas.forEach((SA) => {
+      if (serviceAreaToSelected[SA] === true) {
+        targetServiceAreas.push(SA);
+      }
+    });
+    return targetServiceAreas;
+  };
+
   const submitForm = async (e) => { // adds a module to the root module page
     e.preventDefault();
-    // const parentStatus = isExpandedModule ? parentID : null;
+    const selectedSAs = selectedServiceAreas();
+    console.log(selectedSAs);
     const data = { // this goes into NewModulePopup
       title,
       body,
-      serviceArea,
+      serviceArea: selectedSAs,
       role: roles,
       children: [],
       parent: parentID,
@@ -89,7 +108,7 @@ export default function NewModulePopup(props) {
 
     setTitle('');
     setBody('');
-    setServiceArea('');
+    setServiceAreaToSelected({});
     setCaregiver(false);
     setMentor(false);
     setFileLinks([]);
@@ -108,6 +127,7 @@ export default function NewModulePopup(props) {
         <form onSubmit={submitForm}>
           <DialogTitle>New Module: </DialogTitle>
           <DialogContent>
+            <FormLabel>Title</FormLabel>
             <TextField
               autoFocus
               margin="dense"
@@ -117,6 +137,7 @@ export default function NewModulePopup(props) {
               onChange={(e) => setTitle(e.target.value)}
               required
             />
+            <FormLabel>Body</FormLabel>
             <TextField
               margin="dense"
               label="Body"
@@ -127,6 +148,8 @@ export default function NewModulePopup(props) {
               onChange={(e) => setBody(e.target.value)}
               required
             />
+            <FormLabel>Target Audience: </FormLabel>
+            <br />
             <FormControlLabel
               control={(
                 <Checkbox
@@ -149,16 +172,29 @@ export default function NewModulePopup(props) {
             )}
               label="Caregiver"
             />
-            <TextField
-              label="Service Area"
-              fullWidth
-              value={serviceArea}
-              onChange={(e) => setServiceArea(e.target.value)}
-              required
-            />
-            <Typography variant="body2" color="textSecondary">
-              Attachments:
-            </Typography>
+            <br />
+            <FormLabel>Target Service Area: </FormLabel>
+            <br />
+            {serviceAreas.map((SA) => (
+              <FormControlLabel
+                control={(
+                  <Checkbox
+                    checked={serviceAreaToSelected[SA]}
+                    onChange={(e) => {
+                      const tempServiceAreaToSelected = { ...serviceAreaToSelected };
+                      tempServiceAreaToSelected[SA] = e.target.checked;
+                      setServiceAreaToSelected(tempServiceAreaToSelected);
+                    }}
+                    name={SA}
+                    color="primary"
+                  />
+            )}
+                label={SA}
+              />
+            )) }
+            <br />
+            <FormLabel>Attachments:</FormLabel>
+            <br />
             <input type="file" onChange={handleFileChange} multiple />
             <p>
               {percent}
