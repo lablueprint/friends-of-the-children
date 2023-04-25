@@ -210,8 +210,10 @@ const getMenteeFiles = async (req, res) => {
         .get()
         .then((sc) => {
           const data = sc.data();
-          const { files } = data;
-          res.status(202).json(files);
+          if (data) {
+            const { files } = data;
+            res.status(202).json(files);
+          }
         });
     }
   } catch (error) {
