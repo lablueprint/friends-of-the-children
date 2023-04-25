@@ -19,6 +19,7 @@ import {
   sendMailchimpEmails,
   updateModuleChildren,
   deleteModule,
+  addModule,
 } from '../controllers/controllers.js';
 
 const router = express.Router();
@@ -57,6 +58,9 @@ router.post('/updateModuleChildren', updateModuleChildren);
 
 // deletes current module and all submodules underneath it
 router.delete('/deleteModule/:moduleID', deleteModule);
+
+// adds a module to Firebase, returns dataRef (containing module's id in firebase)
+router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
 

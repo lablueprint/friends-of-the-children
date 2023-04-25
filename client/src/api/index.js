@@ -132,6 +132,10 @@ export const getUsernames = async () => {
   return null;
 };
 
+export const addModule = async (data) => {
+  try {
+    const moduleRef = await axios.post(`${url}/addModule`, { data });
+    return moduleRef;
 export const getUserProfiles = async (users) => {
   try {
     const user = await axios.get(`${url}/getUserProfiles/${users}`);

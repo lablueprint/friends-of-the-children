@@ -12,7 +12,7 @@ import FormLabel from '@mui/material/FormLabel';
 import {
   ref, uploadBytesResumable,
 } from 'firebase/storage';
-import { db, storage } from '../pages/firebase';
+import { storage } from '../pages/firebase';
 import * as api from '../api';
 import { serviceAreas } from '../constants';
 
@@ -22,7 +22,7 @@ export default function NewModulePopup(props) {
   } = props;
 
   const roles = [];
-  const [percent, setPercent] = useState(0);
+  // const [percent, setPercent] = useState(0);
   const [fileLinks, setFileLinks] = useState([]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -61,7 +61,8 @@ export default function NewModulePopup(props) {
         );
 
         // update progress
-        setPercent(p);
+        // setPercent(p);
+        console.log(p);
       },
       (err) => console.error(err),
     );
@@ -100,9 +101,15 @@ export default function NewModulePopup(props) {
 
     // receive module id
     // TODO: Create api call (move db.collection to backend)
-    const tempId = (await db.collection('modules').add(data)).id;
-
+    const tempId = (await api.addModule(data)).data;
+    // const tempId = await api.addModule(data);
+    // console.log(tempId);
+    // const newId = tempId.id;
+    console.log(tempId, 'is tempId');
     data.id = tempId;
+    // data.id = newId;
+
+    // data = await api.
 
     updateModule(data);
 
@@ -197,7 +204,7 @@ export default function NewModulePopup(props) {
             <br />
             <input type="file" onChange={handleFileChange} multiple />
             <p>
-              {percent}
+              XXX UPLOADING XXX
               {' '}
               % done
             </p>
