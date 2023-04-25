@@ -12,7 +12,7 @@ import {
   ExpandedMentee,
   Media,
   Signup,
-  Modules,
+  Resources,
   Calendar,
   ExpandedModule,
   NotFound,
@@ -40,7 +40,7 @@ function App() {
             <NavBar profile={currUser} updateAppProfile={updateProfile} />
             <div className={styles.mainContent}>
               <Routes>
-                <Route path="/" element={(<Modules profile={currUser} />)} />
+                <Route path="/" element={(<Resources profile={currUser} />)} />
                 <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
                 <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
                 <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
@@ -49,7 +49,7 @@ function App() {
                 <Route path="/example" element={(<Example profile={currUser} />)} />
                 <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
                 <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
-                <Route path="/modules" element={(<Modules profile={currUser} />)} />
+                <Route path="/resources" element={(<Resources profile={currUser} />)} />
                 <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
                 <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
               </Routes>
