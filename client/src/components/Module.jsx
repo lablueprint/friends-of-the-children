@@ -12,12 +12,13 @@ import * as api from '../api';
 
 function Module(props) {
   const {
-    title, body, child, links, role, deleteChild,
+    title, body, child, links, role, deleteChild, id,
   } = props;
 
   const [files, setFiles] = useState([]);
   const [value, setValue] = useState('');
-  const [editText, setEditText] = useState(false);
+  const [titleText, setTitleText] = useState('');
+  const [editText, setEditText] = useState(false); // toggles edit button
 
   const updateImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
     setFiles([]);
@@ -46,15 +47,22 @@ function Module(props) {
       setFiles(fileContents);
     }
   };
-  const setValueofBody = (b) => {
-    setValue(b);
+  const setValueofBodyandTitle = (b, t) => {
+    setBodyText(b);
+    setTitleText(t);
   };
   useEffect(() => { updateImageURL(links); }, [links]);
-  useEffect(() => { setValueofBody(body); }, [body]);
+  // Since page does not refresh when showing expanded module from root module, must manually change the text displayed when body/title changes
+  useEffect(() => { setValueofBodyandTitle(body, title); }, [body, title]);
   const toggleEdit = async (save) => {
     setEditText(!editText);
     if (save) {
-      // await api.updateTextField(value);
+      // Only call firebase if edits were made
+      if (bodyText !== body) {
+        await api.updateTextField(bodyText, id, 'body');
+      } else if (titleText !== title) {
+        await api.updateTextField(titleText, id, 'title');
+      }
     }
   };
 
@@ -67,14 +75,22 @@ function Module(props) {
   return (
     <div>
       <div className={styles.title}>{title}</div>
-      {/* <div className={styles.body}>{body}</div> */}
       <div>
         {editText ? (
           <>
             <TextField
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
+              value={titleText}
+              onChange={(e) => setTitleText(e.target.value)}
               variant="outlined"
+              multiline={false}
+              className="styles.title" // TODO style title, body
+            />
+            <TextField
+              value={bodyText}
+              onChange={(e) => setBodyText(e.target.value)}
+              variant="outlined"
+              multiline={false}
+              className="styles.body"
             />
             <Button onClick={() => toggleEdit(true)}>
               Save
@@ -83,9 +99,17 @@ function Module(props) {
         ) : (
           <>
             <TextField
-              value={value}
+              value={titleText}
               InputProps={{ readOnly: true }}
               variant="outlined"
+              multiline={false}
+              className="styles.title"
+            />
+            <TextField
+              value={bodyText}
+              InputProps={{ readOnly: true }}
+              variant="outlined"
+              multiline={false}
             />
             <Button onClick={() => toggleEdit(false)}>
               Edit
@@ -162,6 +186,7 @@ Module.propTypes = {
   links: PropTypes.arrayOf(string),
   role: PropTypes.string.isRequired,
   deleteChild: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
 };
 
 Module.defaultProps = {

@@ -211,14 +211,24 @@ const getGoogleaccount = async (req, res) => {
 
 const updateTextField = async (req, res) => {
   try {
-    const { updatedText } = req.params;
-    db.collection('modules')
-      .doc(module.id)
-      .update(updatedText)
-      .catch((error) => {
+    const { inputText, id, field } = req.params;
+    if (field === 'body') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ body: inputText })
+        .catch((error) => {
         // setUpdateProfileMessage('We ran into an error updating your text field!');
-        console.log(error);
-      });
+          console.log(error);
+        });
+    } else if (field === 'title') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ title: inputText })
+        .catch((error) => {
+          // setUpdateProfileMessage('We ran into an error updating your text field!');
+          console.log(error);
+        });
+    }
   } catch (error) {
     res.status(400).json(error);
   }
