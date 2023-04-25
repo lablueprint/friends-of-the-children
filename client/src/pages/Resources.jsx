@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable } from 'firebase/storage';
 
 import { db, storage } from './firebase';
 import styles from '../styles/Modules.module.css';
 import * as api from '../api';
 
-function Modules({ profile }) {
+function Resources({ profile }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [serviceArea, setServiceArea] = useState('');
@@ -18,7 +18,7 @@ function Modules({ profile }) {
   const { role } = profile;
   const currRole = role.toLowerCase();
   const [percent, setPercent] = useState(0);
-  const [link, setLink] = useState('');
+  const [fileLinks, setFileLinks] = useState([]);
 
   // add permissions to view module. order doesn't matter
   if (mentor) {
@@ -27,22 +27,10 @@ function Modules({ profile }) {
   if (caregiver) {
     roles.push('caregiver');
   }
-  // TODO: Move getModules to the backend (access through api call)
-  const getModules = () => {
-    db.collection('modules').get().then((sc) => {
-      const card = [];
-      sc.forEach((doc) => { // display all modules that match the role of the profile (admin sees all modules)
-        const data = doc.data();
-        if (data && data.role) {
-          data.id = doc.id;
-          // fetching parent-level modules that we have permission to view
-          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
-            card.push(data);
-          }
-        }
-      });
-      setModules(card);
-    });
+  // getting all modules relevant to current user
+  const fetchData = async () => {
+    const { data } = await api.getModules(currRole);
+    setModules(data);
   };
 
   // TODO: Move to backend, figure out how to maintain setPercent once it is moved to the backedn and sent back as a promise chain
@@ -53,7 +41,7 @@ function Modules({ profile }) {
     // }
     const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
-    setLink(storageRef.fullPath);
+    // setLinks(storageRef.fullPath);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -67,16 +55,15 @@ function Modules({ profile }) {
         setPercent(p);
       },
       (err) => console.error(err),
-      () => {
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref);
-      },
     );
+    return storageRef.fullPath;
     // set linkstate here:
   };
 
   const handleChange = (e) => {
-    handleUpload(e.target.files[0]); // test
+    const urls = [];
+    Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
+    setFileLinks(urls);
   };
 
   const submitForm = async () => { // adds a module to the root module page
@@ -87,7 +74,7 @@ function Modules({ profile }) {
       role: roles,
       children: [],
       parent: null,
-      link,
+      fileLinks, // set from handleChange, which triggers handleUpload of all the files
     };
     // receive module id
     // TODO: Create api call (move db.collection to backend)
@@ -97,13 +84,14 @@ function Modules({ profile }) {
 
     setModules([...modules, data]);
 
-    setModules([...modules, data]); // why is this run twice? - dk
+    // setModules([...modules, data]); // why is this run twice? - dk
 
     setTitle('');
     setBody('');
     setServiceArea('');
     setCaregiver(false);
     setMentor(false);
+    setFileLinks([]);
   };
 
   const deleteModule = async (moduleId) => {
@@ -112,7 +100,10 @@ function Modules({ profile }) {
   };
 
   // empty dependency array means getModules is only being called on page load
-  useEffect(getModules, []);
+  useEffect(() => {
+    // saving all the user profiles from Firebase in an array (useProfiles) only on first load
+    fetchData().catch(console.error);
+  }, []);
 
   if (currRole === 'admin') {
     return (
@@ -145,7 +136,7 @@ function Modules({ profile }) {
           Service Area:
           <input type="text" value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} />
           File:
-          <input type="file" defaultValue="" onChange={handleChange} />
+          <input type="file" defaultValue="" onChange={handleChange} multiple />
           <p>
             {percent}
             {' '}
@@ -175,7 +166,7 @@ function Modules({ profile }) {
   );
 }
 
-Modules.propTypes = {
+Resources.propTypes = {
   profile: PropTypes.shape({
     firstName: PropTypes.string.isRequired,
     lastName: PropTypes.string.isRequired,
@@ -185,4 +176,4 @@ Modules.propTypes = {
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,
 };
-export default Modules;
+export default Resources;

@@ -98,9 +98,9 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     fetchData().catch(console.error);
   }, []);
 
-  // Defaults main page to be modules if user is already logged in
+  // Defaults main page to be resources if user is already logged in
   if (isLoggedIn) {
-    return navigate('/modules');
+    return navigate('/resources');
   }
 
   // Sets profile state with inputted profile info

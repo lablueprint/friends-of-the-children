@@ -227,6 +227,28 @@ const getUsernames = async (req, res) => {
   }
 };
 
+const getModules = async (req, res) => {
+  try {
+    const { currRole } = req.params;
+    const modules = [];
+    db.collection('modules').get().then((sc) => {
+      sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
+        const data = module.data();
+        if (data && data.role) {
+          data.id = module.id;
+          // fetching parent-level modules that we have permission to view
+          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
+            modules.push(data);
+          }
+        }
+      });
+      res.status(202).json(modules);
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 const getMessages = async (req, res) => {
   try {
     const message = [];
@@ -390,6 +412,7 @@ export {
   createEvent,
   patchEvent,
   getAllProfiles,
+  getModules,
   getModulebyId,
   getGoogleaccount,
   getUsernames,
