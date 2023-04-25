@@ -192,7 +192,7 @@ function Media({ profile }) {
                 <p>Title</p>
                 <input type="text" name="title" required />
                 <p>Select File</p>
-                <input type="file" name="files" />
+                <input type="file" name="files" required />
               </div>
               )}
               {isLink && (

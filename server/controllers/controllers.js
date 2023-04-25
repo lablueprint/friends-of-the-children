@@ -100,7 +100,7 @@ const getMentees = async (req, res) => {
       sc.forEach((snap) => {
         const data = snap.data();
         const { id } = snap;
-        if (allMentees.includes(id)) {
+        if (allMentees && allMentees.includes(id)) {
           const data2 = {
             ...data,
             id,
