@@ -85,7 +85,7 @@ function ExpandedModule({ profile }) {
             Back
           </Link>
         )}
-        <Module title={title} body={body} child={children} links={currModuleFiles} role={currRole} deleteChild={deleteChild} />
+        <Module title={title} body={body} child={children} links={currModuleFiles} role={currRole} deleteChild={deleteChild} id={id} />
       </div>
       {currRole === 'admin' && ExpandedModuleForm}
     </div>

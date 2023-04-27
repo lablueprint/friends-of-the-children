@@ -59,6 +59,7 @@ function Module(props) {
     setEditText(!editText);
     if (save) {
       // Only call firebase if edits were made
+      console.log('id is ', id);
       if (bodyText !== body) {
         await api.updateTextField(bodyText, id, 'body');
       } else if (titleText !== title) {

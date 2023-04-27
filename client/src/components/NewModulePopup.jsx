@@ -97,20 +97,21 @@ export default function NewModulePopup(props) {
     // if you are adding a child node to an expanded module, update parent's child array and child's parentID
     if (parentID !== null) {
       await api.updateModuleChildren(parentID, data); // pass in id, data to submit
+    } else {
+      const tempId = (await api.addModule(data)).data; console.log(tempId, 'is tempId');
+      data.id = tempId;
+      console.log('added tempid', tempId, 'to data');
     }
-
     // receive module id
     // TODO: Create api call (move db.collection to backend)
-    const tempId = (await api.addModule(data)).data;
+
     // const tempId = await api.addModule(data);
     // console.log(tempId);
     // const newId = tempId.id;
-    console.log(tempId, 'is tempId');
-    data.id = tempId;
     // data.id = newId;
 
     // data = await api.
-
+    console.log('data is ', data);
     updateModule(data);
 
     setTitle('');

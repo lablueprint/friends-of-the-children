@@ -136,6 +136,13 @@ export const addModule = async (data) => {
   try {
     const moduleRef = await axios.post(`${url}/addModule`, { data });
     return moduleRef;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not add module');
+  }
+  return null;
+};
+
 export const getUserProfiles = async (users) => {
   try {
     const user = await axios.get(`${url}/getUserProfiles/${users}`);
