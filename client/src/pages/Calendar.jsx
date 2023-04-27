@@ -1,4 +1,4 @@
-import { React, useState, createRef } from 'react';
+import { React, createRef } from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
@@ -8,9 +8,7 @@ import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
 import * as constants from '../constants.js';
-import {
-  Select, MenuItem, FormControl, InputLabel,
-} from '@mui/material';
+import CalendarEventForm from '../components/CalendarEventForm.jsx';
 
 function Calendar({ profile }) {
   const { role, serviceArea } = profile;
@@ -18,64 +16,10 @@ function Calendar({ profile }) {
   const {
     REACT_APP_FIREBASE_CALENDAR_ID,
   } = process.env;
-  // Get default event service area based off user's service area
-  const [eventServiceArea, setEventServiceArea] = useState(serviceArea.toUpperCase());
 
   const calendarRef = createRef();
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
-    console.log(eventInfo.event.title);
-    if (eventInfo.event.extendedProps.location) {
-      console.log('Location: ', eventInfo.event.extendedProps.location);
-    } else {
-      console.log('Location: No Location');
-    }
-  };
-
-  const addEvent = (e) => {
-    e.preventDefault();
-
-    const title = e.target.title.value;
-    const description = e.target.description.value;
-    const location = e.target.location.value;
-    const attachments = [];
-    const fileUrl = e.target.attachments.value;
-    const start = e.target.start.value;
-    const end = e.target.end.value;
-
-    let calendarId; // Admin users will specify event service area
-    if(eventServiceArea === "AV")
-      calendarId = constants.calIdAV;
-    else if (eventServiceArea === "MS")
-      calendarId = constants.calIdMS;
-    else
-      calendarId = constants.calIdFOTC;
-          
-    // check if user inputs an attachment
-    if (e.target.attachments.value) {
-      attachments.push({ fileUrl, title: 'an attachment!' });
-    }
-    // create json event object
-    const event = {
-      title,
-      description,
-      location,
-      start,
-      end,
-      attachments,
-      calendarId,
-    };
-    // add event to actual google calendar
-    api.createEvent(event).then((eventID) => {
-      // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
-      event.id = eventID;
-      // add event on fullcalendar interface
-      const calApi = calendarRef.current.getApi();
-      calApi.addEvent(event);
-      console.log("event data");
-      console.log(event)
-    });
-    e.target.reset();
   };
 
   const dropEvent = (info) => {
@@ -95,7 +39,7 @@ function Calendar({ profile }) {
     api.patchEvent(eventData);
   };
 
-  // Return calendar id(s) based on user role (admin = all cals, non-admin = only their service area)
+  // Return cal id(s) based on user role (admin = all cals, non-admin = only their service area)
   const getCalendarByRole = () => {
     if (currRole === "admin") {
       return [
@@ -139,45 +83,11 @@ function Calendar({ profile }) {
   }
   const calendarInfo = getCalendarByRole();
 
-
   return (
     <div>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
-      {currRole === "admin" ?  // show event form iff admin, otherwise show nothing
-        <div>
-            <form onSubmit={(e) => addEvent(e)}>
-              <h1>FOTC test Calendar</h1>
-              Title:
-              <input type="text" name="title" required />
-              Description:
-              <input type="text" name="description" />
-              Location:
-              <input type="text" name="location" />
-              Attachments (Google link):
-              <input type="text" name="attachments" />
-              Start Time:
-              <input type="datetime-local" name="start" required />
-              End Time:
-              <input type="datetime-local" name="end" required />
-                <FormControl>
-                  <InputLabel>Service Area</InputLabel>
-                  <Select
-                    id="serviceArea"
-                    label="Service Area"
-                    defaultValue="FOTC"
-                    value={eventServiceArea}
-                    onChange={(e) => setEventServiceArea(e.target.value)}
-                    className={styles.textfield}
-                  >
-                    {/* TODO: update to NPO's real service areas */ }
-                    <MenuItem value="FOTC">FOTC</MenuItem>
-                    <MenuItem value="AV">AV</MenuItem>
-                    <MenuItem value="MS">MS</MenuItem>
-                  </Select>
-                </FormControl>
-              <button type="submit">Add Event</button>
-            </form>
-        </div> : null }
+      {currRole === "admin" ?  // enable add event form iff admin
+        <CalendarEventForm profile={profile}/> : null }
       <div className={styles.calendar}>
         <FullCalendar
           ref={calendarRef}
