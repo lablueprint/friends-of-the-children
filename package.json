@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "googleapis": "^112.0.0"
+    "googleapis": "^112.0.0",
+    "react-player": "^2.12.0"
   }
 }

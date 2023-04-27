@@ -30,6 +30,9 @@ export default function NewModulePopup(props) {
   const [caregiver, setCaregiver] = useState(false);
   const [serviceAreaToSelected, setServiceAreaToSelected] = useState({});
 
+  // serviceAreas = ['AV', 'MS']
+  // serviceAreaToSelected = {AV: false}
+
   // add permissions to view module. order doesn't matter
   if (mentor) {
     roles.push('mentor');

@@ -21,3 +21,23 @@
 .body {
     font-size: 20px;
 }
+
+.file {
+    display: inline-block;
+    vertical-align: middle;
+    width: 250px;
+    height: 250px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.preview {
+    display: inline-block;
+    width: 230px;
+    height: 230px;
+}
+
+/* .pdf {
+    height: 50%;
+    width: auto;
+} */

@@ -73,6 +73,7 @@ function Module(props) {
       deleteChild(moduleId);
     });
   };
+
   return (
     <div>
       <div className={styles.title}>{title}</div>
@@ -119,7 +120,30 @@ function Module(props) {
         )}
       </div>
       {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
-      <div>
+      {files.map((file) => (
+        <div className={styles.file}>
+          {(file.fileType.includes('image')) && (
+          <div key={file.url}>
+            <img className={styles.preview} src={file.url} alt={file.fileName} />
+          </div>
+          )}
+          {(file.fileType.includes('video')) && (
+          <div key={file.url}>
+            <video className={styles.preview} controls src={file.url} alt={file.fileName}>
+              <track default kind="captions" />
+            </video>
+          </div>
+          )}
+          {(file.fileType.includes('pdf')) && (
+          <div key={file.url} className="pdf">
+            <embed className={styles.preview} src={file.url} alt={file.fileName} />
+          </div>
+          )}
+          <p>{file.title}</p>
+        </div>
+      ))}
+
+      {/* <div className={styles.file}>
         {files.map((file) => {
           if (file.fileType === 'image/png' || file.fileType === 'image/jpeg') {
             return (
@@ -149,7 +173,7 @@ function Module(props) {
           }
           return null;
         })}
-      </div>
+      </div> */}
       {' '}
       {
         child.map((kid) => (
