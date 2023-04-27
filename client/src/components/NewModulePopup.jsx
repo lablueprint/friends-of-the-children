@@ -12,7 +12,7 @@ import FormLabel from '@mui/material/FormLabel';
 import {
   ref, uploadBytesResumable,
 } from 'firebase/storage';
-import { db, storage } from '../pages/firebase';
+import { storage } from '../pages/firebase';
 import * as api from '../api';
 import { serviceAreas } from '../constants';
 
@@ -22,7 +22,7 @@ export default function NewModulePopup(props) {
   } = props;
 
   const roles = [];
-  const [percent, setPercent] = useState(0);
+  // const [percent, setPercent] = useState(0);
   const [fileLinks, setFileLinks] = useState([]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -64,7 +64,8 @@ export default function NewModulePopup(props) {
         );
 
         // update progress
-        setPercent(p);
+        // setPercent(p);
+        console.log(p);
       },
       (err) => console.error(err),
     );
@@ -99,14 +100,21 @@ export default function NewModulePopup(props) {
     // if you are adding a child node to an expanded module, update parent's child array and child's parentID
     if (parentID !== null) {
       await api.updateModuleChildren(parentID, data); // pass in id, data to submit
+    } else {
+      const tempId = (await api.addModule(data)).data; console.log(tempId, 'is tempId');
+      data.id = tempId;
+      console.log('added tempid', tempId, 'to data');
     }
-
     // receive module id
     // TODO: Create api call (move db.collection to backend)
-    const tempId = (await db.collection('modules').add(data)).id;
 
-    data.id = tempId;
+    // const tempId = await api.addModule(data);
+    // console.log(tempId);
+    // const newId = tempId.id;
+    // data.id = newId;
 
+    // data = await api.
+    console.log('data is ', data);
     updateModule(data);
 
     setTitle('');
@@ -200,7 +208,7 @@ export default function NewModulePopup(props) {
             <br />
             <input type="file" onChange={handleFileChange} multiple />
             <p>
-              {percent}
+              XXX UPLOADING XXX
               {' '}
               % done
             </p>

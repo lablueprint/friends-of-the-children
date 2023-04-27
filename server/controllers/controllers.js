@@ -125,6 +125,17 @@ const updateModuleChildren = async (req, res) => {
   }
 };
 
+const addModule = async (req, res) => {
+  try {
+    const { data } = req.body;
+    const dataRef = await db.collection('modules').add(data);
+    const { id } = dataRef;
+    res.status(202).json(id);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // returns a module's data and a filtered array of its children (by role)
 const getModulebyId = async (req, res) => {
   try {
@@ -448,4 +459,5 @@ export {
   sendMailchimpEmails,
   updateModuleChildren,
   deleteModule,
+  addModule,
 };
