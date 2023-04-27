@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 
 export default function AdminTable({ users }) {
   const [numChecked, setNumChecked] = useState(0);
+  const [table, setTable] = useState([]);
 
   function createData(checked, name, username, email, role, dateJoined, status) {
     let approved = '';
@@ -29,7 +30,14 @@ export default function AdminTable({ users }) {
     };
   }
 
-  const rows = users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status));
+  useEffect(() => {
+    setTable(users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status)));
+  }, [users]);
+  // setTable(rows);
+  // }, [rows]);
+  // print whenever table is updated
+  useEffect(() => console.log(table), [table]);
+  // useEffect(() => console.log(users), [users]);
 
   // const rows = [
   //   createData(false, 'Men Tor', 'menslay', 'menslay@yahoo.com', 'Mentor', '01/01/23', 'Not Approved'),
@@ -39,8 +47,16 @@ export default function AdminTable({ users }) {
   //   createData(false, 'Care Giver', 'caregiver', 'hwang12@ucla.edu', 'Caregiver', '01/01/23', 'Approved'),
   // ];
 
-  function HandleChange(e) {
-    console.log(e.target.value);
+  function HandleChange(e, username) {
+    setTable((prevValue) => prevValue.map((user) => {
+      if (user.username === username) {
+        return {
+          // return the user with the checked state updated
+          name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, checked: !prevValue.checked,
+        };
+      }
+      return user;
+    }));
   }
 
   return (
@@ -58,12 +74,12 @@ export default function AdminTable({ users }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {table.map((row) => (
             <TableRow
-              key={row.name}
+              key={row.username}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <Checkbox align="center" onChange={(event) => { HandleChange(event); }} />
+              <Checkbox align="center" onChange={(event) => { HandleChange(event, row.username); }} />
               <TableCell align="left">{row.name}</TableCell>
               <TableCell align="left">{row.username}</TableCell>
               <TableCell align="left">{row.email}</TableCell>

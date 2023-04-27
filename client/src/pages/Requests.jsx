@@ -38,7 +38,7 @@ function Requests({ profile }) {
       <h1>
         Requests
       </h1>
-      <AdminTable users={pendingUsers} />
+      { pendingUsers && <AdminTable users={pendingUsers} />}
       <button type="button">Submit</button>
       {/* <p>{numApproved}</p> */}
     </div>
