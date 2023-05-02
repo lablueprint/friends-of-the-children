@@ -81,7 +81,6 @@ export default function NewModulePopup(props) {
   const submitForm = async (e) => { // adds a module to the root module page
     e.preventDefault();
     const selectedSAs = selectedServiceAreas();
-    console.log(selectedSAs);
     const data = { // this goes into NewModulePopup
       title,
       body,
@@ -98,9 +97,8 @@ export default function NewModulePopup(props) {
       const expandedModuleID = (await api.updateModuleChildren(parentID, data)).data; // pass in id, data to submit
       data.id = expandedModuleID;
     } else {
-      const tempId = (await api.addModule(data)).data; console.log(tempId, 'is tempId');
+      const tempId = (await api.addModule(data)).data;
       data.id = tempId;
-      console.log('added tempid', tempId, 'to data');
     }
     // receive module id
     // TODO: Create api call (move db.collection to backend)
@@ -111,7 +109,6 @@ export default function NewModulePopup(props) {
     // data.id = newId;
 
     // data = await api.
-    console.log('data is ', data);
     updateModule(data);
 
     setTitle('');

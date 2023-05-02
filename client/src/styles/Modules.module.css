@@ -21,3 +21,41 @@
 .body {
     font-size: 20px;
 }
+
+.file {
+    display: inline-block;
+    vertical-align: middle;
+    /* width: 250px;
+    height: auto; */
+    /* margin-top: 50px;
+    margin-bottom: 50px; */
+    background-color: #DEF1FF;
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    margin: 30px 10px 30px 10px;
+}
+
+.preview {
+    display: inline-block;
+    width: 230px !important;
+    height: 230px !important;
+    /* position: absolute; */
+    /* left: 5.8%;
+    right: 5.54%;
+    top: 5.11%;
+    bottom: 16.94%; */
+    border-radius: 10px;
+}
+
+.description {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+/* .pdf {
+    height: 50%;
+    width: auto;
+} */
