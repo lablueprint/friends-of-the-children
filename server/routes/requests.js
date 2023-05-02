@@ -14,6 +14,7 @@ import {
   addMenteeFolder,
   getMenteeFiles,
   addMenteeFile,
+  uploadFile,
   getAllProfiles,
   getModules,
   getModulebyId,
@@ -59,6 +60,9 @@ router.get('/getMenteeFiles/id=:id/folder=:folderName', getMenteeFiles);
 
 // updates the mentee's folder with the new file
 router.post('/addMenteeFile', addMenteeFile);
+
+// uploads a file to firebase
+router.post('/uploadFile', uploadFile);
 
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);

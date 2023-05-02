@@ -3,14 +3,15 @@ import { createRequire } from 'module';
 import {
   collection, addDoc, getDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
-
+import {
+  ref, uploadBytes, getDownloadURL,
+} from 'firebase/storage';
 import crypto from 'crypto';
 import { uuid } from 'uuidv4';
 // eslint-disable-next-line import/extensions
-import { db } from '../firebase.js';
+import { db, storage } from '../firebase.js';
 // eslint-disable-next-line import/extensions
 import mailchimp from '../mailchimp.js';
-
 // import google api
 const require = createRequire(import.meta.url);
 const { google } = require('googleapis');
@@ -261,6 +262,25 @@ const addMenteeFile = async (req, res) => {
         });
     }
     res.status(200).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const uploadFile = async (req, res) => {
+  try {
+    console.log('HERE', req.files);
+    const { files } = req.body;
+    console.log(files.name);
+    console.log('REQBODY:', req.body);
+    const storageRef = ref(storage, `/images/${files.name}`);
+
+    uploadBytes(storageRef, files).then((snapshot) => {
+      console.log('jhkjhjkhjkhjh');
+      getDownloadURL(snapshot.ref).then((url) => {
+        res.status(202).json(url);
+      });
+    });
   } catch (error) {
     res.status(400).json(error);
   }
@@ -595,6 +615,7 @@ export {
   addMenteeFolder,
   getMenteeFiles,
   addMenteeFile,
+  uploadFile,
   getAllProfiles,
   getModules,
   getModulebyId,

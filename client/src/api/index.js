@@ -113,6 +113,24 @@ export const addMenteeFile = async (id, folderName, data, type) => {
   }
   return null;
 };
+
+export const uploadFile = async (files) => {
+  try {
+    console.log(files);
+    const formData = new FormData();
+    formData.append('file', this.file);
+    const fileURL = await axios.post(`${url}/uploadFile`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return fileURL;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not upload file');
+  }
+  return null;
+};
 // gets all user profiles
 //
 // to use this function to get all profiles, put the following in a useEffect:
