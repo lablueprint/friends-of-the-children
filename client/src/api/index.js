@@ -97,6 +97,15 @@ export const deleteModule = async (moduleID) => {
   }
 };
 
+export const deleteFile = async (moduleID, fileToDelete) => {
+  try {
+    await axios.delete(`${url}/deleteFile`, { data: { moduleID, fileToDelete } });
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete file');
+  }
+};
+
 // gets google email
 export const getGoogleaccount = async (googleEmail) => {
   try {

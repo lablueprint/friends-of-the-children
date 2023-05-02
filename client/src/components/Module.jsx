@@ -33,7 +33,9 @@ function Module(props) {
         const fileType = file.contentType;
         const url = await getDownloadURL(spaceRef);
         const fileName = file.name;
-        fileContents.push({ url, fileType, fileName });
+        fileContents.push({
+          url, fileType, fileName, fileLink,
+        });
       }));
       // sorting files alphabetically TODO: is this how you want it?
       fileContents.sort((a, b) => {
@@ -71,6 +73,11 @@ function Module(props) {
     api.deleteModule(moduleId).then(() => {
       // reloads the page
       deleteChild(moduleId);
+    });
+  };
+  const deleteFile = async (fileToDelete) => {
+    api.deleteFile(id, fileToDelete).then(() => {
+      setFiles(files.filter((file) => file.fileLink !== fileToDelete));
     });
   };
   return (
@@ -127,6 +134,7 @@ function Module(props) {
                 {' '}
                 <img src={file.url} alt={file.fileName} width="40%" height="auto" />
                 <br />
+                <button type="button" onClick={() => { deleteFile(file.fileLink); }}> Delete Image</button>
               </div>
             );
           }

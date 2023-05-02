@@ -19,6 +19,7 @@ import {
   sendMailchimpEmails,
   updateModuleChildren,
   deleteModule,
+  deleteFile,
   addModule,
 } from '../controllers/controllers.js';
 
@@ -58,6 +59,9 @@ router.post('/updateModuleChildren', updateModuleChildren);
 
 // deletes current module and all submodules underneath it
 router.delete('/deleteModule/:moduleID', deleteModule);
+
+// deletes file from module FileLink array field and Firebase storage
+router.delete('/deleteFile', deleteFile);
 
 // adds a module to Firebase, returns dataRef (containing module's id in firebase)
 router.post('/addModule', addModule);
