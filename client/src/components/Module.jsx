@@ -5,8 +5,11 @@ import {
   ref, getStorage, getDownloadURL, getMetadata,
 } from 'firebase/storage';
 import {
-  TextField, Button,
+  TextField, Button, Checkbox,
 } from '@mui/material';
+import imgIcon from '../assets/icons/file_img.svg';
+import vidIcon from '../assets/icons/file_vid.svg';
+import pdfIcon from '../assets/icons/file_pdf.svg';
 import styles from '../styles/Modules.module.css';
 import * as api from '../api';
 
@@ -20,6 +23,26 @@ function Module(props) {
   const [titleText, setTitleText] = useState('');
   const [bodyText, setBodyText] = useState('');
   const [editText, setEditText] = useState(false); // toggles edit button
+  const [checked, setChecked] = useState([]);
+  const [hoveredFile, setHoveredFile] = useState(null);
+
+  const handleMouseEnter = (fileId) => {
+    setHoveredFile(fileId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredFile(null);
+  };
+
+  const handleCheckboxChange = (event, fileName) => {
+    const isChecked = event.target.checked;
+    setChecked((prevCheckedFiles) => {
+      if (isChecked) {
+        return [...prevCheckedFiles, fileName];
+      }
+      return prevCheckedFiles.filter((file) => id !== file);
+    });
+  };
 
   const updateImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
     setFiles([]);
@@ -33,7 +56,9 @@ function Module(props) {
         const fileType = file.contentType;
         const url = await getDownloadURL(spaceRef);
         const fileName = file.name;
-        fileContents.push({ url, fileType, fileName });
+        fileContents.push({
+          url, fileType, fileName, fileLink,
+        });
       }));
       // sorting files alphabetically TODO: is this how you want it?
       fileContents.sort((a, b) => {
@@ -125,6 +150,29 @@ function Module(props) {
           {(file.fileType.includes('image')) && (
           <div key={file.url}>
             <img className={styles.preview} src={file.url} alt={file.fileName} />
+            <div className={styles.description}>
+              {/* {editText ? (
+                <Checkbox
+                  checked={checked.indexOf(file.fileLink) !== -1}
+                  onChange={handleCheckboxChange}
+                  value={file.fileLink}
+                />
+              ) : (<img src={imgIcon} alt="img icon" />)} */}
+              <div
+                key={file.fileLink}
+                onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img src={file.imageSrc} alt={file.name} />
+                {hoveredFile === file.fileLink ? (
+                  <Checkbox
+                    checked={checked.includes(file.fileLink)}
+                    onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                  />
+                ) : (<img src={imgIcon} alt="img icon" />)}
+              </div>
+              <div className={styles.fileName}>{file.fileName}</div>
+            </div>
           </div>
           )}
           {(file.fileType.includes('video')) && (
@@ -132,49 +180,47 @@ function Module(props) {
             <video className={styles.preview} controls src={file.url} alt={file.fileName}>
               <track default kind="captions" />
             </video>
+            <div className={styles.description}>
+              <div
+                key={file.fileLink}
+                onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img src={file.imageSrc} alt={file.name} />
+                {hoveredFile === file.fileLink ? (
+                  <Checkbox
+                    checked={checked.includes(file.fileLink)}
+                    onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                  />
+                ) : (<img src={vidIcon} alt="video icon" />)}
+              </div>
+              <div className={styles.fileName}>{file.fileName}</div>
+            </div>
           </div>
           )}
           {(file.fileType.includes('pdf')) && (
           <div key={file.url} className="pdf">
             <embed className={styles.preview} src={file.url} alt={file.fileName} />
+            <div className={styles.description}>
+              <div
+                key={file.fileLink}
+                onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img src={file.imageSrc} alt={file.name} />
+                {hoveredFile === file.fileLink ? (
+                  <Checkbox
+                    checked={checked.includes(file.fileLink)}
+                    onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                  />
+                ) : (<img src={pdfIcon} alt="pdf icon" />)}
+              </div>
+              <div className={styles.fileName}>{file.fileName}</div>
+            </div>
           </div>
           )}
-          <p>{file.title}</p>
         </div>
       ))}
-
-      {/* <div className={styles.file}>
-        {files.map((file) => {
-          if (file.fileType === 'image/png' || file.fileType === 'image/jpeg') {
-            return (
-              <div key={file.url} className="image">
-                {' '}
-                <img src={file.url} alt={file.fileName} width="40%" height="auto" />
-                <br />
-              </div>
-            );
-          }
-          if (file.fileType === 'video/mp4' || file.fileType === 'video/mpeg' || file.fileType === 'video/quicktime') {
-            return (
-              <div key={file.url} className="video">
-                <video width="40%" height="auto" controls src={file.url} alt={file.fileName}>
-                  <track default kind="captions" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            );
-          }
-          if (file.fileType === 'application/pdf') {
-            return (
-              <div key={file.url} className="pdf">
-                <embed src={file.url} width="80%" height="800em" alt={file.fileName} />
-              </div>
-            );
-          }
-          return null;
-        })}
-      </div> */}
-      {' '}
       {
         child.map((kid) => (
           <div>
