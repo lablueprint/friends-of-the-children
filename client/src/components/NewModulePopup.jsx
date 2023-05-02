@@ -99,7 +99,8 @@ export default function NewModulePopup(props) {
 
     // if you are adding a child node to an expanded module, update parent's child array and child's parentID
     if (parentID !== null) {
-      await api.updateModuleChildren(parentID, data); // pass in id, data to submit
+      const expandedModuleID = (await api.updateModuleChildren(parentID, data)).data; // pass in id, data to submit
+      data.id = expandedModuleID;
     } else {
       const tempId = (await api.addModule(data)).data; console.log(tempId, 'is tempId');
       data.id = tempId;
