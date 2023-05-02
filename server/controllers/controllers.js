@@ -119,7 +119,7 @@ const updateModuleChildren = async (req, res) => {
     await updateDoc(moduleRef, {
       children: arrayUnion(docRef.id),
     });
-    res.status(200).json('success');
+    res.status(202).json(docRef.id);
   } catch (error) {
     res.status(400).json(error);
   }
@@ -129,7 +129,7 @@ const addModule = async (req, res) => {
   try {
     const { data } = req.body;
     const dataRef = await db.collection('modules').add(data);
-    const { id } = dataRef;
+    const { id } = dataRef; // newly added module's id
     res.status(202).json(id);
   } catch (error) {
     res.status(400).json(error);
