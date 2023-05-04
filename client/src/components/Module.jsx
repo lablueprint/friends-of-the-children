@@ -103,7 +103,11 @@ function Module(props) {
       deleteChild(moduleId);
     });
   };
-
+  const deleteFile = async (fileToDelete) => {
+    api.deleteFile(id, fileToDelete).then(() => {
+      setFiles(files.filter((file) => file.fileLink !== fileToDelete));
+    });
+  };
   return (
     <div>
       <div className={styles.title}>{title}</div>
@@ -176,6 +180,8 @@ function Module(props) {
                   />
                 ) : (<img src={imgIcon} alt="img icon" />)}
               </div>
+              <br />
+              <button type="button" onClick={() => { deleteFile(file.fileLink); }}> Delete Image</button>
               <div className={styles.fileName}>{file.fileName}</div>
             </div>
           </div>

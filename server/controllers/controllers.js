@@ -1,8 +1,9 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, arrayUnion, updateDoc, doc, FieldValue,
+  collection, addDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
+import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 import crypto from 'crypto';
 import { uuid } from 'uuidv4';
@@ -192,6 +193,29 @@ const deleteModule = async (req, res) => {
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete module');
+  }
+};
+
+const deleteFile = async (req, res) => {
+  try {
+    // delete path from module files array field
+    const { moduleID, fileToDelete } = req.body;
+    const moduleRef = await db.collection('modules').doc(moduleID);
+    const moduleRefSnapshot = await moduleRef.get();
+    const currModule = moduleRefSnapshot.data();
+    console.log('currModule is ', currModule);
+    const updateFileLinkField = currModule.fileLinks.filter((id) => id !== fileToDelete);
+    console.log('updatefilelinkfield is ', updateFileLinkField);
+    await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
+      console.log(currModule.fileLinks);
+    });
+
+    const storage = getStorage();
+    const fileRef = ref(storage, fileToDelete);
+    await deleteObject(fileRef);
+    res.status(202).json('successfully deleted module');
+  } catch (error) {
+    res.status(400).json('could not delete file');
   }
 };
 
@@ -459,5 +483,6 @@ export {
   sendMailchimpEmails,
   updateModuleChildren,
   deleteModule,
+  deleteFile,
   addModule,
 };

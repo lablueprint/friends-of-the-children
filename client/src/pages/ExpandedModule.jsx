@@ -3,10 +3,8 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
-import Button from '@mui/material/Button';
 import styles from '../styles/Modules.module.css';
 import Module from '../components/Module';
-import NewModulePopup from '../components/NewModulePopup';
 import * as api from '../api';
 
 // Loads additional modules once user clicks into a root module
@@ -20,7 +18,7 @@ function ExpandedModule({ profile }) {
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
   // const [refresh, setRefresh] = useState(false);
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
   const [currModuleFiles, setCurrModuleFiles] = useState([]);
 
@@ -42,40 +40,15 @@ function ExpandedModule({ profile }) {
     });
   };
 
-  const updateModule = (data) => {
-    setChildren([...children, data]);
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   useEffect(getModule, [id, currRole]); // possible TODO: refresh in dependency list
 
   const deleteChild = (childId) => {
     setChildren(children.filter((child) => child.id !== childId));
   };
 
-  const ExpandedModuleForm = (
-    <div>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Add module
-      </Button>
-      <NewModulePopup
-        updateModule={updateModule}
-        open={open}
-        handleClose={handleClose}
-        parentID={id}
-      />
-    </div>
-  );
   return (
     <div>
-      <div className={styles.card}>
+      <div>
         {parent != null ? (
           <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
             Back
@@ -87,7 +60,6 @@ function ExpandedModule({ profile }) {
         )}
         <Module title={title} body={body} child={children} links={currModuleFiles} role={currRole} deleteChild={deleteChild} id={id} />
       </div>
-      {currRole === 'admin' && ExpandedModuleForm}
     </div>
   );
 }
