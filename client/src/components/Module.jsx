@@ -103,9 +103,9 @@ function Module(props) {
       deleteChild(moduleId);
     });
   };
-  const deleteFile = async (fileToDelete) => {
-    api.deleteFile(id, fileToDelete).then(() => {
-      setFiles(files.filter((file) => file.fileLink !== fileToDelete));
+  const deleteFiles = async (filesToDelete) => {
+    api.deleteFiles(id, filesToDelete).then(() => {
+      setFiles(files.filter((file) => !filesToDelete.includes(file)));
     });
   };
   return (
@@ -180,8 +180,6 @@ function Module(props) {
                   />
                 ) : (<img src={imgIcon} alt="img icon" />)}
               </div>
-              <br />
-              <button type="button" onClick={() => { deleteFile(file.fileLink); }}> Delete Image</button>
               <div className={styles.fileName}>{file.fileName}</div>
             </div>
           </div>
@@ -257,14 +255,18 @@ function Module(props) {
         { checked.length > 0
           ? (
             <div className={styles.deleteFilesBar}>
-              <div>
-                <div className={styles.selected}>
+              <div className={styles.totalSelected}>
+                <div className={styles.selectedNumber}>
                   {checked.length}
                 </div>
-                {' '}
-                selected
+                <div className={styles.selectedText}>
+                  {' '}
+                  selected
+                </div>
               </div>
-
+              <button type="button" className={styles.deleteButton} onClick={() => (deleteFiles(checked))}>
+                Delete
+              </button>
             </div>
           )
           : <div />}

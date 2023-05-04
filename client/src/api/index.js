@@ -97,12 +97,12 @@ export const deleteModule = async (moduleID) => {
   }
 };
 
-export const deleteFile = async (moduleID, fileToDelete) => {
+export const deleteFiles = async (moduleID, filesToDelete) => {
   try {
-    await axios.delete(`${url}/deleteFile`, { data: { moduleID, fileToDelete } });
+    await axios.delete(`${url}/deleteFiles`, { data: { moduleID, filesToDelete } });
   } catch (error) {
     console.error(error.message);
-    console.error('could not delete file');
+    console.error('could not delete files');
   }
 };
 

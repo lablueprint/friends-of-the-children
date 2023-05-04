@@ -196,23 +196,24 @@ const deleteModule = async (req, res) => {
   }
 };
 
-const deleteFile = async (req, res) => {
+const deleteFiles = async (req, res) => {
   try {
+    const storage = getStorage();
     // delete path from module files array field
-    const { moduleID, fileToDelete } = req.body;
+    const { moduleID, filesToDelete } = req.body;
     const moduleRef = await db.collection('modules').doc(moduleID);
     const moduleRefSnapshot = await moduleRef.get();
     const currModule = moduleRefSnapshot.data();
     console.log('currModule is ', currModule);
-    const updateFileLinkField = currModule.fileLinks.filter((id) => id !== fileToDelete);
-    console.log('updatefilelinkfield is ', updateFileLinkField);
-    await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
-      console.log(currModule.fileLinks);
+    filesToDelete.forEach(async (file) => {
+      const updateFileLinkField = currModule.fileLinks.filter((id) => id !== file);
+      console.log('updatefilelinkfield is ', updateFileLinkField);
+      await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
+        console.log(currModule.fileLinks);
+      });
+      const fileRef = ref(storage, file);
+      await deleteObject(fileRef);
     });
-
-    const storage = getStorage();
-    const fileRef = ref(storage, fileToDelete);
-    await deleteObject(fileRef);
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete file');
@@ -483,6 +484,6 @@ export {
   sendMailchimpEmails,
   updateModuleChildren,
   deleteModule,
-  deleteFile,
+  deleteFiles,
   addModule,
 };
