@@ -35,12 +35,17 @@ function Module(props) {
   };
 
   const handleCheckboxChange = (event, fileName) => {
+    if (checked.includes(fileName)) {
+      setChecked(checked.filter((file) => (file !== fileName)));
+      return;
+    }
+
     const isChecked = event.target.checked;
-    setChecked((prevCheckedFiles) => {
+    setChecked(() => {
       if (isChecked) {
-        return [...prevCheckedFiles, fileName];
+        return [...checked, fileName];
       }
-      return prevCheckedFiles.filter((file) => id !== file);
+      return checked.filter((file) => id !== file);
     });
   };
 
@@ -242,6 +247,22 @@ function Module(props) {
           </div>
         ))
       }
+      <div>
+        { checked.length > 0
+          ? (
+            <div className={styles.deleteFilesBar}>
+              <div>
+                <div className={styles.selected}>
+                  {checked.length}
+                </div>
+                {' '}
+                selected
+              </div>
+
+            </div>
+          )
+          : <div />}
+      </div>
     </div>
   );
 }
