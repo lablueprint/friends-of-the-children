@@ -89,6 +89,7 @@ function Calendar({ profile }) {
       {currRole === "admin" ?  // enable add event form iff admin
         <CalendarEventForm profile={profile}/> : null }
       <div className={styles.calendar}>
+        {console.log("calendar ref in cal BEFORE ref" + JSON.stringify(calendarRef))}
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
@@ -105,6 +106,7 @@ function Calendar({ profile }) {
           eventSources={calendarInfo}
           eventClick={handleEventClick}
         />
+        {console.log("calendar ref in cal AFTER ref" + JSON.stringify(calendarRef))}
       </div>
     </div>
   );

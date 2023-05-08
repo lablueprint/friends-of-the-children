@@ -25,6 +25,8 @@ function CalendarEventForm({ profile }) {
     const start = e.target.start.value;
     const end = e.target.end.value;
 
+    console.log("add event 1!" + title);
+
     let calendarId; // Admin users will specify event service area
     if(eventServiceArea === "AV")
       calendarId = constants.calIdAV;
@@ -47,12 +49,16 @@ function CalendarEventForm({ profile }) {
       attachments,
       calendarId,
     };
+
+    console.log("add event 2!" + event.start);
     // add event to actual google calendar
     api.createEvent(event).then((eventID) => {
+      console.log("add event 3!" + eventID);
       // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
       event.id = eventID;
-      // add event on fullcalendar interface
-      const calApi = calendarRef.current.getApi();
+      // add event on fullcalendar 
+      console.log("calendar current is " + calendarRef.current);
+      const calApi = calendarRef.current.getApi(); // GETTING CAUGHT HERE GETaPI
       calApi.addEvent(event);
       console.log("event data");
       console.log(event)
@@ -61,7 +67,9 @@ function CalendarEventForm({ profile }) {
   };
 
   return (
-      <div>
+      <div ref={calendarRef}>
+        {console.log("calendar ref is " + JSON.stringify(calendarRef))}
+        {console.log("calendar current in return is " + calendarRef.current)}
           <form onSubmit={(e) => addEvent(e)}>
             <h1>FOTC test Calendar</h1>
             Title:
