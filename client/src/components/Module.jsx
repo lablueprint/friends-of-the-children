@@ -202,7 +202,7 @@ function Module(props) {
           )}
           {(file.fileType.includes('video')) && (
           <div key={file.url}>
-            <div className={styles.preview}>
+            <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
               <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
                 <track default kind="captions" />
               </video>
@@ -228,7 +228,9 @@ function Module(props) {
           )}
           {(file.fileType.includes('pdf')) && (
           <div key={file.url} className="pdf">
-            <embed className={styles.preview} src={file.url} alt={file.fileName} />
+            <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
+              <embed className={styles.preview} src={file.url} alt={file.fileName} />
+            </div>
             <div className={styles.description}>
               <div
                 key={file.fileLink}
