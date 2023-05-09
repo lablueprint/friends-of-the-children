@@ -1,4 +1,4 @@
-import { React, createRef } from 'react';
+import { React, useRef } from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
@@ -7,8 +7,8 @@ import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
-import * as constants from '../constants.js';
-import CalendarEventForm from '../components/CalendarEventForm.jsx';
+import * as constants from '../constants';
+import CalendarEventForm from '../components/CalendarEventForm';
 
 /*
 
@@ -32,7 +32,7 @@ function Calendar({ profile }) {
     REACT_APP_FIREBASE_CALENDAR_ID,
   } = process.env;
 
-  const calendarRef = createRef();
+  const calendarRef = useRef();
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
   };
@@ -56,7 +56,7 @@ function Calendar({ profile }) {
 
   // Return cal id(s) based on user role (admin = all cals, non-admin = only their service area)
   const getCalendarByRole = () => {
-    if (currRole === "admin") {
+    if (currRole === 'admin') {
       return [
         {
           googleCalendarId: constants.calIdFOTC,
@@ -72,46 +72,54 @@ function Calendar({ profile }) {
           googleCalendarId: constants.calIdMS,
           className: 'ms-events',
           color: 'rgba(255, 85, 34, 0.2)',
-        }
-      ]
-    } else {
-      if (serviceArea.toLowerCase() === "av") {
-        return [{
-          googleCalendarId: constants.calIdAV,
-          className: 'av-events',
-          color: 'rgba(238, 187, 17, 0.2)',
-        }]
-      } else if (serviceArea.toLowerCase() === "ms") {
-        return [{
-          googleCalendarId: constants.calIdMS,
-          className: 'ms-events',
-          color: 'rgba(255, 85, 34, 0.2)',
-        }]
-      } else {
-        return [{
-          googleCalendarId: constants.calIdFOTC,
-          className: 'fotc-events',
-          color: 'rgba(0, 170, 238, 0.2)',
-        }]
-      }
+        },
+      ];
     }
-  }
+    if (serviceArea.toLowerCase() === 'av') {
+      return [{
+        googleCalendarId: constants.calIdAV,
+        className: 'av-events',
+        color: 'rgba(238, 187, 17, 0.2)',
+      }];
+    } if (serviceArea.toLowerCase() === 'ms') {
+      return [{
+        googleCalendarId: constants.calIdMS,
+        className: 'ms-events',
+        color: 'rgba(255, 85, 34, 0.2)',
+      }];
+    }
+    return [{
+      googleCalendarId: constants.calIdFOTC,
+      className: 'fotc-events',
+      color: 'rgba(0, 170, 238, 0.2)',
+    }];
+  };
   const calendarInfo = getCalendarByRole();
+
+  const createForm = () => {
+    console.log(calendarRef);
+    return currRole === 'admin' // enable add event form iff admin
+      ? <CalendarEventForm profile={profile} calendarRef={() => (calendarRef)} /> : null;
+  };
+
+  const test = () => {
+    console.log('test');
+    console.log(calendarRef);
+  };
 
   return (
     <div>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
-      {currRole === "admin" ?  // enable add event form iff admin
-        <CalendarEventForm profile={profile}/> : null }
+      {createForm()}
       <div className={styles.calendar}>
-        {console.log("calendar ref in cal BEFORE ref" + JSON.stringify(calendarRef))}
+        {/* {console.log("calendar ref in cal BEFORE ref" + JSON.stringify(calendarRef))} */}
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           selectable
-          editable={currRole === "admin" ? true : false}
-          eventDrop={currRole === "admin" ? dropEvent : null}
+          editable={currRole === 'admin'}
+          eventDrop={currRole === 'admin' ? dropEvent : null}
           selectMirror
           dayMaxEvents
           eventColor="rgba(0, 170, 238, 0.2)"
@@ -121,7 +129,8 @@ function Calendar({ profile }) {
           eventSources={calendarInfo}
           eventClick={handleEventClick}
         />
-        {console.log("calendar ref in cal AFTER ref" + JSON.stringify(calendarRef))}
+        <button onClick={test} type="submit">hello </button>
+        {/* {console.log("calendar ref in cal AFTER ref" + JSON.stringify(calendarRef))} */}
       </div>
     </div>
   );
