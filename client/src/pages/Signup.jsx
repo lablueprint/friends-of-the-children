@@ -118,6 +118,7 @@ function Signup({ updateAppProfile }) {
               username,
               password: hashedPassword,
               google: false,
+              image: 'https://i.pinimg.com/550x/18/b9/ff/18b9ffb2a8a791d50213a9d595c4dd52.jpg',
             };
             db.collection('profiles').doc().set(data);
             updateAppProfile(data);
@@ -155,7 +156,7 @@ function Signup({ updateAppProfile }) {
         };
         api.addToList(payload);
       }
-      navigate('/modules');
+      navigate('/resources');
       // reset forms
       setFirstName('');
       setLastName('');

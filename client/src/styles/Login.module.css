@@ -6,7 +6,9 @@
 
 .container{
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
+    justify-content: space-evenly;
     height: 97vh;
 }
 
@@ -14,16 +16,18 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-    width: 50%;
+    width: 500px;
+    /* flex: 50% */
 }
 
 .signinForm{
     display: flex;
     justify-content: center;
     flex-direction: column;
-    width: 50%;
+    max-width: 500px;
     text-align: left;
-    margin-left: 30px !important;
+    /* margin-left: 30px !important; */
+    /* flex: 50% */
 }
 
 .signinForm p{
@@ -31,9 +35,10 @@
 }
 
 .family_img{
-    width: 30vw;
+    max-width: 85%;
+    /* width: 30vw;
     margin-left: 60px;
-    margin-bottom: 20px;
+    margin-bottom: 20px; */
 }
 
 .design_top{

@@ -30,6 +30,107 @@ export const patchEvent = async (eventData) => {
   return null;
 };
 
+// get a profile's mentees
+export const getMentees = async (profileID) => {
+  try {
+    const mentees = await axios.get(`${url}/getMentees/profileID=${profileID}`);
+    return mentees;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get mentees');
+  }
+  return null;
+};
+
+// creates a new mentee doc
+export const createMentee = async (stuff) => {
+  try {
+    const menteeID = await axios.post(`${url}/createMentee`, stuff);
+    return menteeID;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not create mentee document and fetch mentee id');
+  }
+  return null;
+};
+// add a new mentee (link to mentor + create default folders)
+export const addMentee = async (profileID, menteeID) => {
+  try {
+    const newMentee = await axios.post(`${url}/addMentee/profileID=${profileID}/menteeID=${menteeID}`);
+    return newMentee;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not add new mentee');
+  }
+  return null;
+};
+
+// get a mentee's folders
+export const getMenteeFolders = async (id) => {
+  try {
+    const folders = await axios.get(`${url}/getMenteeFolders/id=${id}`);
+    return folders;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not get mentee folders');
+  }
+  return null;
+};
+
+// adds a new mentee folder
+export const addMenteeFolder = async (id, folderName) => {
+  try {
+    const newFolder = await axios.post(`${url}/addMenteeFolder/id=${id}/folder=${folderName}`);
+    return newFolder;
+  } catch (error) {
+    console.error(error.message);
+    console.error(`could not add the new mentee folder ${folderName}`);
+  }
+  return null;
+};
+
+// get a mentee's folder contents (must specify the mentee's id and folder name)
+export const getMenteeFiles = async (id, folderName) => {
+  try {
+    const folder = await axios.get(`${url}/getMenteeFiles/id=${id}/folder=${folderName}`);
+    return folder;
+  } catch (error) {
+    console.log(error.message);
+    console.log(`could not get files in mentee folder ${folderName}`);
+  }
+  return null;
+};
+
+export const addMenteeFile = async (id, folderName, data, type) => {
+  try {
+    const updatedMentee = await axios.post(`${url}/addMenteeFile`, {
+      id, folderName, data, type,
+    });
+    return updatedMentee;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update mentees');
+  }
+  return null;
+};
+
+export const uploadFile = async (files) => {
+  try {
+    console.log(files);
+    const formData = new FormData();
+    formData.append('file', this.file);
+    const fileURL = await axios.post(`${url}/uploadFile`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return fileURL;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not upload file');
+  }
+  return null;
+};
 // gets all user profiles
 //
 // to use this function to get all profiles, put the following in a useEffect:
@@ -62,6 +163,19 @@ export const updateModuleChildren = async (id, data) => {
   return null;
 };
 
+// gets modules, filtered by role
+export const getModules = async (currRole) => {
+  try {
+    // currRole are sent as route parameters
+    const modules = await axios.get(`${url}/getModules/${currRole}`);
+    return modules;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get modules');
+  }
+  return null;
+};
+
 // gets a module and its children, filtered by role
 export const getModulebyId = async (id, currRole) => {
   try {
@@ -73,6 +187,24 @@ export const getModulebyId = async (id, currRole) => {
     console.error('could not get module by ID');
   }
   return null;
+};
+
+export const deleteModule = async (moduleID) => {
+  try {
+    await axios.delete(`${url}/deleteModule/${moduleID}`);
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete modules');
+  }
+};
+
+export const deleteFile = async (moduleID, fileToDelete) => {
+  try {
+    await axios.delete(`${url}/deleteFile`, { data: { moduleID, fileToDelete } });
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete file');
+  }
 };
 
 // gets google email
@@ -88,6 +220,17 @@ export const getGoogleaccount = async (googleEmail) => {
   return null;
 };
 
+export const updateTextField = async (inputText, id, field) => {
+  try {
+    const updatedText = await axios.get(`${url}/updateTextField/${inputText}/${id}/${field}`);
+    return updatedText;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update text field');
+  }
+  return null;
+};
+
 export const getUsernames = async () => {
   try {
     const user = await axios.get(`${url}/getUsernames`);
@@ -95,6 +238,17 @@ export const getUsernames = async () => {
   } catch (error) {
     console.log(error.message);
     console.log('could not get list of usernames from profiles');
+  }
+  return null;
+};
+
+export const addModule = async (data) => {
+  try {
+    const moduleRef = await axios.post(`${url}/addModule`, { data });
+    return moduleRef;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not add module');
   }
   return null;
 };
