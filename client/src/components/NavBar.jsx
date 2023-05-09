@@ -54,7 +54,7 @@ function NavBar({ profile, updateAppProfile }) {
               Resources
             </Link>
             {/* TODO: have requests link instead for admin */}
-            <Link to="/resources" className={styles.btn_info}>
+            <Link to="/mentees" className={styles.btn_info}>
               <img src={MenteesIcon} alt="mentees icon" />
               My Mentees
             </Link>

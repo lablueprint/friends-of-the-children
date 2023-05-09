@@ -12,7 +12,6 @@ import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
 import { storage } from './firebase';
 import * as api from '../api';
-// import styles from '../styles/Mentees.module.css';
 
 function ExpandedMentee({ profile }) {
   const location = useLocation();
@@ -22,10 +21,11 @@ function ExpandedMentee({ profile }) {
   const [recents, setRecents] = useState([]);
   const [folderArray, setFolderArray] = useState([]);
   const [open, setOpen] = useState(false);
-  const [open2, setOpen2] = useState(false);
+  const [fileUploadOpen, setfileUploadOpen] = useState(false);
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
 
+  // called upon submitting the form that adds a new folder
   const addFolder = async (e) => {
     e.preventDefault();
     const name = e.target.folderName.value;
@@ -37,6 +37,7 @@ function ExpandedMentee({ profile }) {
     });
   };
 
+  // have all of the mentees' folders and root files display on page
   useEffect(() => {
     api.getMenteeFolders(id).then((folders) => {
       setFolderArray(folders.data);
@@ -46,6 +47,7 @@ function ExpandedMentee({ profile }) {
     });
   }, []);
 
+  // called upon submitting the form that uploads new files
   const addMedia = (e) => {
     e.preventDefault();
     const title = e.target.title.value;
@@ -53,12 +55,10 @@ function ExpandedMentee({ profile }) {
     let fileName;
     let fileType;
 
-    console.log(folderName);
     if (isFile) {
       const files = e.target.files.files[0];
       fileName = files.name;
       fileType = files.type;
-
       const storageRef = ref(storage, `/images/${fileName}`);
       uploadBytes(storageRef, files).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
@@ -75,7 +75,7 @@ function ExpandedMentee({ profile }) {
           .then((data) => {
             console.log(data);
             api.addMenteeFile(id, folderName, data, fileType);
-            setOpen2(false);
+            setfileUploadOpen(false);
             e.target.reset();
           });
       });
@@ -91,66 +91,31 @@ function ExpandedMentee({ profile }) {
       tempArr.push(data);
       setRecents(tempArr);
       api.addMenteeFile(id, folderName, data, fileType);
-      setOpen2(false);
+      setfileUploadOpen(false);
       e.target.reset();
     }
-
-    // api.getMenteeFiles(id, folderName).then((folderFiles) => {
-    //   const mediaArray = folderFiles.data;
-    //   if (isFile) {
-    //     const files = e.target.files.files[0];
-    //     fileName = files.name;
-    //     fileType = files.type;
-    //     const storageRef = ref(storage, `/images/${fileName}`);
-    //     uploadBytes(storageRef, files).then((snapshot) => {
-    //       getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
-    //         const data = {
-    //           title,
-    //           fileUrl: url,
-    //           fileType,
-    //         };
-    //         mediaArray.push(data);
-    //         return data;
-    //       })
-    //         .then((data) => {
-    //           console.log(data);
-    //           api.addMenteeFile(id, folderName, mediaArray, data, fileType);
-    //           setOpen2(false);
-    //           e.target.reset();
-    //         });
-    //     });
-    //   } else if (isLink) { // reading text input for links, not file input
-    //     fileName = title;
-    //     fileType = 'link';
-    //     const data = {
-    //       title,
-    //       fileUrl: e.target.link.value,
-    //       fileType,
-    //     };
-    //     mediaArray.push(data);
-    //     api.addMenteeFile(id, folderName, mediaArray, data, fileType);
-    //   }
-    // });
-    // setOpen2(false);
-    // e.target.reset();
   };
 
-  const handleClickOpen = () => {
+  // when click on add new folder button
+  const addNewFolder = () => {
     setOpen(true);
   };
 
+  // when close add new folder popup
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleClickOpen2 = () => {
+  // when click on upload file button
+  const addNewFile = () => {
     setIsFile(false);
     setIsLink(false);
-    setOpen2(true);
+    setfileUploadOpen(true);
   };
 
-  const handleClose2 = () => {
-    setOpen2(false);
+  // when close upload file popup
+  const closeFileUpload = () => {
+    setfileUploadOpen(false);
   };
 
   return (
@@ -191,7 +156,7 @@ function ExpandedMentee({ profile }) {
             </p>
           </div>
 
-          <Button variant="contained" onClick={handleClickOpen2}>
+          <Button variant="contained" onClick={addNewFile}>
             + Upload File
           </Button>
         </div>
@@ -218,7 +183,7 @@ function ExpandedMentee({ profile }) {
             </div>
           )
         ))}
-        <Button variant="outlined" onClick={handleClickOpen}>
+        <Button variant="outlined" onClick={addNewFolder}>
           + Add a New Folder
         </Button>
       </div>
@@ -271,7 +236,7 @@ function ExpandedMentee({ profile }) {
 
       {/* add file */}
       <div>
-        <Dialog open={open2} onClose={handleClose2}>
+        <Dialog open={fileUploadOpen} onClose={closeFileUpload}>
           <DialogContent>
             {!isFile && !isLink && (
             <div>
@@ -320,14 +285,13 @@ function ExpandedMentee({ profile }) {
               </div>
               )}
               <DialogActions>
-                <Button onClick={handleClose2}>Cancel</Button>
+                <Button onClick={closeFileUpload}>Cancel</Button>
                 <Button type="submit">Save</Button>
               </DialogActions>
             </form>
           </DialogContent>
         </Dialog>
       </div>
-
     </div>
   );
 }

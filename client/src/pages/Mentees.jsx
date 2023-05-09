@@ -58,8 +58,6 @@ function Mentees({ profile }) {
     });
   };
 
-  console.log(mentees);
-
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -75,7 +73,7 @@ function Mentees({ profile }) {
         Add Child :D
       </Button>
 
-      {/* {mentees.length === 0 && (<img src={MenteeImage} alt="mentees" />)} */}
+      {/* {(mentees.length === 0) && (<img src={MenteeImage} alt="mentees" />)} */}
 
       <div className={styles.mentees_container}>
         {mentees.map((mentee) => (
@@ -83,7 +81,7 @@ function Mentees({ profile }) {
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiver, folders: mentee.folders,
+                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders,
               }}
             >
               <div className={styles.card}>
