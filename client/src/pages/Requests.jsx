@@ -15,8 +15,8 @@ function Requests({ profile }) {
     async function fetchProfiles() {
       // ask jerry how to get the data sorted
       const { data } = await api.getProfilesSortedByDate();
-      // filter array of profile objects
-      const unapprovedUsers = data.filter((user) => (('approved' in user) && (user.approved === false)));
+      // filter array of profile objects (also make sure they all have approved and date fields in firebase)
+      const unapprovedUsers = data.filter((user) => (('approved' in user) && ('date' in user) && (user.approved === false)));
       const reducedUsers = unapprovedUsers.map((user) => {
         const myDate = new Date(user.date.seconds * 1000);
         return ({
