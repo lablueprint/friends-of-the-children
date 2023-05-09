@@ -16,7 +16,6 @@ function Module(props) {
   } = props;
 
   const [files, setFiles] = useState([]);
-  // const [value, setValue] = useState('');
   const [titleText, setTitleText] = useState('');
   const [bodyText, setBodyText] = useState('');
   const [editText, setEditText] = useState(false); // toggles edit button
