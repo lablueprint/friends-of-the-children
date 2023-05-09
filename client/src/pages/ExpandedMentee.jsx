@@ -292,7 +292,6 @@ function ExpandedMentee({ profile }) {
           </DialogContent>
         </Dialog>
       </div>
-
     </div>
   );
 }

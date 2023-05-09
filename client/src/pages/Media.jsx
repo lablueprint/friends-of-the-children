@@ -12,15 +12,18 @@ import * as api from '../api';
 
 function Media({ profile }) {
   const location = useLocation();
+  // media is the string of file links in this folder
   const {
     id, folderName, firstName, lastName, age, caregiver,
   } = location.state;
+  // parse media string to an array
   const [open, setOpen] = useState(false);
   // this is the array of file links
   const [mediaArray, setMediaArray] = useState([]);
-  // states for dialog opening/closing views
+  // media states for dialog opening/closing views
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
+  console.log(mediaArray);
 
   // get the current folder contents on first load
   useEffect(() => {

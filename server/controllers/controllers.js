@@ -4,8 +4,9 @@ import {
   collection, addDoc, getDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
 import {
-  ref, uploadBytes, getDownloadURL,
+  getStorage, ref, uploadBytes, getDownloadURL,
 } from 'firebase/storage';
+
 import crypto from 'crypto';
 import { uuid } from 'uuidv4';
 // eslint-disable-next-line import/extensions
@@ -316,7 +317,18 @@ const updateModuleChildren = async (req, res) => {
     await updateDoc(moduleRef, {
       children: arrayUnion(docRef.id),
     });
-    res.status(200).json('success');
+    res.status(202).json(docRef.id);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const addModule = async (req, res) => {
+  try {
+    const { data } = req.body;
+    const dataRef = await db.collection('modules').add(data);
+    const { id } = dataRef; // newly added module's id
+    res.status(202).json(id);
   } catch (error) {
     res.status(400).json(error);
   }
@@ -381,6 +393,29 @@ const deleteModule = async (req, res) => {
   }
 };
 
+const deleteFile = async (req, res) => {
+  try {
+    // delete path from module files array field
+    const { moduleID, fileToDelete } = req.body;
+    const moduleRef = await db.collection('modules').doc(moduleID);
+    const moduleRefSnapshot = await moduleRef.get();
+    const currModule = moduleRefSnapshot.data();
+    console.log('currModule is ', currModule);
+    const updateFileLinkField = currModule.fileLinks.filter((id) => id !== fileToDelete);
+    console.log('updatefilelinkfield is ', updateFileLinkField);
+    await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
+      console.log(currModule.fileLinks);
+    });
+
+    const storage = getStorage();
+    const fileRef = ref(storage, fileToDelete);
+    await deleteObject(fileRef);
+    res.status(202).json('successfully deleted module');
+  } catch (error) {
+    res.status(400).json('could not delete file');
+  }
+};
+
 // finds a matching profile in firebase, given a google account email
 const getGoogleaccount = async (req, res) => {
   try {
@@ -401,6 +436,31 @@ const getGoogleaccount = async (req, res) => {
       res.status(400).json('no existing user!');
     }
     res.status(202).json(googleData);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const updateTextField = async (req, res) => {
+  try {
+    const { inputText, id, field } = req.params;
+    if (field === 'body') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ body: inputText })
+        .catch((error) => {
+        // setUpdateProfileMessage('We ran into an error updating your text field!');
+          console.log(error);
+        });
+    } else if (field === 'title') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ title: inputText })
+        .catch((error) => {
+          // setUpdateProfileMessage('We ran into an error updating your text field!');
+          console.log(error);
+        });
+    }
   } catch (error) {
     res.status(400).json(error);
   }
@@ -620,6 +680,7 @@ export {
   getModules,
   getModulebyId,
   getGoogleaccount,
+  updateTextField,
   getUsernames,
   getMessages,
   addToMailchimpList,
@@ -627,4 +688,6 @@ export {
   sendMailchimpEmails,
   updateModuleChildren,
   deleteModule,
+  deleteFile,
+  addModule,
 };

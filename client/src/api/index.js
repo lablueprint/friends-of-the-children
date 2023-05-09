@@ -198,6 +198,15 @@ export const deleteModule = async (moduleID) => {
   }
 };
 
+export const deleteFile = async (moduleID, fileToDelete) => {
+  try {
+    await axios.delete(`${url}/deleteFile`, { data: { moduleID, fileToDelete } });
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete file');
+  }
+};
+
 // gets google email
 export const getGoogleaccount = async (googleEmail) => {
   try {
@@ -211,6 +220,17 @@ export const getGoogleaccount = async (googleEmail) => {
   return null;
 };
 
+export const updateTextField = async (inputText, id, field) => {
+  try {
+    const updatedText = await axios.get(`${url}/updateTextField/${inputText}/${id}/${field}`);
+    return updatedText;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update text field');
+  }
+  return null;
+};
+
 export const getUsernames = async () => {
   try {
     const user = await axios.get(`${url}/getUsernames`);
@@ -218,6 +238,17 @@ export const getUsernames = async () => {
   } catch (error) {
     console.log(error.message);
     console.log('could not get list of usernames from profiles');
+  }
+  return null;
+};
+
+export const addModule = async (data) => {
+  try {
+    const moduleRef = await axios.post(`${url}/addModule`, { data });
+    return moduleRef;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not add module');
   }
   return null;
 };
