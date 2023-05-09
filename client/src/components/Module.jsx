@@ -7,6 +7,7 @@ import {
 import {
   TextField, Button, Checkbox,
 } from '@mui/material';
+import FilePopup from './FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
@@ -25,6 +26,8 @@ function Module(props) {
   const [editText, setEditText] = useState(false); // toggles edit button
   const [checked, setChecked] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
+  const [fileToDisplay, setFileToDisplay] = useState({});
+  const [open, setOpen] = useState(false);
 
   const handleMouseEnter = (fileId) => {
     setHoveredFile(fileId);
@@ -32,6 +35,15 @@ function Module(props) {
 
   const handleMouseLeave = () => {
     setHoveredFile(null);
+  };
+
+  const handleClickOpen = (file) => {
+    setOpen(true);
+    setFileToDisplay(file);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleCheckboxChange = (event, fileName) => {
@@ -103,11 +115,19 @@ function Module(props) {
       deleteChild(moduleId);
     });
   };
+
+  const clearCheckboxes = () => {
+    setChecked([]);
+  };
+
   const deleteFiles = async (filesToDelete) => {
     api.deleteFiles(id, filesToDelete).then(() => {
-      setFiles(files.filter((file) => !filesToDelete.includes(file)));
+      const tempFiles = [...files.filter((file) => !filesToDelete.includes(file.fileLink))];
+      setFiles(tempFiles); // updates list of presenting files
+      clearCheckboxes(); // resets checked state to be empty, gets rid of "selected" bar on the bottom side of page
     });
   };
+
   return (
     <div>
       <div className={styles.title}>{title}</div>
@@ -157,26 +177,22 @@ function Module(props) {
       {files.map((file) => (
         <div className={styles.file}>
           {(file.fileType.includes('image')) && (
-          <div key={file.url}>
-            <img className={styles.preview} src={file.url} alt={file.fileName} />
+          <div key={file}>
+            <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
+              <img className={styles.displayImg} src={file.url} alt={file.fileName} />
+            </div>
             <div className={styles.description}>
-              {/* {editText ? (
-                <Checkbox
-                  checked={checked.indexOf(file.fileLink) !== -1}
-                  onChange={handleCheckboxChange}
-                  value={file.fileLink}
-                />
-              ) : (<img src={imgIcon} alt="img icon" />)} */}
               <div
                 key={file.fileLink}
                 onMouseEnter={() => handleMouseEnter(file.fileLink)}
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {hoveredFile === file.fileLink ? (
+                {(hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
                     onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                    className={styles.checkbox}
                   />
                 ) : (<img src={imgIcon} alt="img icon" />)}
               </div>
@@ -186,9 +202,11 @@ function Module(props) {
           )}
           {(file.fileType.includes('video')) && (
           <div key={file.url}>
-            <video className={styles.preview} controls src={file.url} alt={file.fileName}>
-              <track default kind="captions" />
-            </video>
+            <div className={styles.preview}>
+              <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
+                <track default kind="captions" />
+              </video>
+            </div>
             <div className={styles.description}>
               <div
                 key={file.fileLink}
@@ -196,10 +214,11 @@ function Module(props) {
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {hoveredFile === file.fileLink ? (
+                {(hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
                     onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                    className={styles.checkbox}
                   />
                 ) : (<img src={vidIcon} alt="video icon" />)}
               </div>
@@ -217,16 +236,24 @@ function Module(props) {
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {hoveredFile === file.fileLink ? (
+                {(hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
                     onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                    className={styles.checkbox}
                   />
                 ) : (<img src={pdfIcon} alt="pdf icon" />)}
               </div>
               <div className={styles.fileName}>{file.fileName}</div>
             </div>
           </div>
+          )}
+          {open && (
+          <FilePopup
+            file={fileToDisplay}
+            open={open}
+            handleClose={handleClose}
+          />
           )}
         </div>
       ))}
@@ -238,7 +265,7 @@ function Module(props) {
                 <h1>{kid.title}</h1>
               </Link>
               {role === 'admin' && (
-              <button type="button" onClick={() => { deleteModule(kid.id); }}>
+              <button className={styles.deleteButton} type="button" onClick={() => { deleteModule(kid.id); }}>
                 {' '}
                 Delete Module
                 {' '}
@@ -264,6 +291,9 @@ function Module(props) {
                   selected
                 </div>
               </div>
+              <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                Cancel
+              </button>
               <button type="button" className={styles.deleteButton} onClick={() => (deleteFiles(checked))}>
                 Delete
               </button>
