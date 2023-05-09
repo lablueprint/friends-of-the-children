@@ -101,7 +101,9 @@
 .signup_button{
     display: block;
     color: white;
-    background: #00AAEE;
+    font-weight: bold;
+    /* background: #00AAEE; */
+    background: #156DBF;
     border-color: transparent;
     border-radius: 5px;
     width: 100%;
@@ -112,7 +114,9 @@
     background: transparent;
     border-radius: 5px;
     border-color: #989898;
-    color: #989898;
+    /* color: #989898; */
+    color: #3F3F3F;
+    font-weight: bold;
     height: 50px;
 }
 

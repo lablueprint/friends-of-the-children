@@ -294,7 +294,7 @@ function Signup({ updateAppProfile }) {
           <p>
             Already have an account?
             {' '}
-            <a href="/login"><b>Log in</b></a>
+            <a href="/login" style={{ color: '#3F3F3F' }}><b>Click here to Login</b></a>
           </p>
         </div>
         {SigninForm}
