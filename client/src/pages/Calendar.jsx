@@ -96,23 +96,14 @@ function Calendar({ profile }) {
   };
   const calendarInfo = getCalendarByRole();
 
-  const createForm = () => {
-    console.log(calendarRef);
-    return currRole === 'admin' // enable add event form iff admin
-      ? <CalendarEventForm profile={profile} calendarRef={() => (calendarRef)} /> : null;
-  };
-
-  const test = () => {
-    console.log('test');
-    console.log(calendarRef);
-  };
+  const createForm = () => (currRole === 'admin' // enable add event form iff admin
+    ? <CalendarEventForm profile={profile} calendarRef={() => (calendarRef)} /> : null);
 
   return (
     <div>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       {createForm()}
       <div className={styles.calendar}>
-        {/* {console.log("calendar ref in cal BEFORE ref" + JSON.stringify(calendarRef))} */}
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
@@ -129,8 +120,6 @@ function Calendar({ profile }) {
           eventSources={calendarInfo}
           eventClick={handleEventClick}
         />
-        <button onClick={test} type="submit">hello </button>
-        {/* {console.log("calendar ref in cal AFTER ref" + JSON.stringify(calendarRef))} */}
       </div>
     </div>
   );
