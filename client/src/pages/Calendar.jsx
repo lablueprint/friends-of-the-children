@@ -97,7 +97,7 @@ function Calendar({ profile }) {
   const calendarInfo = getCalendarByRole();
 
   const createForm = () => (currRole === 'admin' // enable add event form iff admin
-    ? <CalendarEventForm profile={profile} calendarRef={() => (calendarRef)} /> : null);
+    ? <CalendarEventForm profile={profile} getCalendarRef={() => (calendarRef)} /> : null);
 
   return (
     <div>

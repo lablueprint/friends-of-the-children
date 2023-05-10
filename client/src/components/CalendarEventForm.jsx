@@ -7,7 +7,7 @@ import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import * as constants from '../constants';
 
-function CalendarEventForm({ profile, calendarRef }) {
+function CalendarEventForm({ profile, getCalendarRef }) {
   const { serviceArea } = profile;
   // Get default event service area based off user's service area
   const [eventServiceArea, setEventServiceArea] = useState(serviceArea.toUpperCase());
@@ -46,9 +46,11 @@ function CalendarEventForm({ profile, calendarRef }) {
       // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
       event.id = eventID;
       // add event on fullcalendar
-      const calApi = calendarRef().current.getApi(); // GETTING CAUGHT HERE GETaPI
+      const calApi = getCalendarRef().current.getApi(); // GETTING CAUGHT HERE GETaPI
       calApi.addEvent(event);
     });
+    // TODO: remove this manual reload and fix color of calendar bug
+    window.location.reload();
     e.target.reset();
   };
 
@@ -99,6 +101,6 @@ CalendarEventForm.propTypes = {
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
   }).isRequired,
-  calendarRef: PropTypes.func.isRequired,
+  getCalendarRef: PropTypes.func.isRequired,
 };
 export default CalendarEventForm;
