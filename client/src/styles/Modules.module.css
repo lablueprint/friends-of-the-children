@@ -15,7 +15,23 @@
 }
 
 .title {
-    font-size: 30px;
+    font-size: 60px;
+}
+
+.titleContainer {
+    display: flex;
+    flex-direction: row;
+    padding-left: 20em;
+    justify-content: space-between;
+}
+
+.editButton {
+    background-color: white;
+    color: #156DBF;
+    width: 15em;
+    height: 4em;
+    margin: 20px;
+    gap: 8px;
 }
 
 .body {
