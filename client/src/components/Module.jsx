@@ -4,15 +4,21 @@ import { Link } from 'react-router-dom';
 import {
   ref, getStorage, getDownloadURL, getMetadata,
 } from 'firebase/storage';
+import {
+  TextField, Button,
+} from '@mui/material';
 import styles from '../styles/Modules.module.css';
 import * as api from '../api';
 
 function Module(props) {
   const {
-    title, body, child, links, role, deleteChild,
+    title, body, child, links, role, deleteChild, id,
   } = props;
 
   const [files, setFiles] = useState([]);
+  const [titleText, setTitleText] = useState('');
+  const [bodyText, setBodyText] = useState('');
+  const [editText, setEditText] = useState(false); // toggles edit button
 
   const updateImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
     setFiles([]);
@@ -26,7 +32,9 @@ function Module(props) {
         const fileType = file.contentType;
         const url = await getDownloadURL(spaceRef);
         const fileName = file.name;
-        fileContents.push({ url, fileType, fileName });
+        fileContents.push({
+          url, fileType, fileName, fileLink,
+        });
       }));
       // sorting files alphabetically TODO: is this how you want it?
       fileContents.sort((a, b) => {
@@ -41,8 +49,24 @@ function Module(props) {
       setFiles(fileContents);
     }
   };
-
+  const setValueofBodyandTitle = (b, t) => {
+    setBodyText(b);
+    setTitleText(t);
+  };
   useEffect(() => { updateImageURL(links); }, [links]);
+  // Since page does not refresh when showing expanded module from root module, must manually change the text displayed when body/title changes
+  useEffect(() => { setValueofBodyandTitle(body, title); }, [body, title]);
+  const toggleEdit = async (save) => {
+    setEditText(!editText);
+    if (save) {
+      // Only call firebase if edits were made
+      if (bodyText !== body) {
+        await api.updateTextField(bodyText, id, 'body');
+      } else if (titleText !== title) {
+        await api.updateTextField(titleText, id, 'title');
+      }
+    }
+  };
 
   const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
     api.deleteModule(moduleId).then(() => {
@@ -50,10 +74,56 @@ function Module(props) {
       deleteChild(moduleId);
     });
   };
+  const deleteFile = async (fileToDelete) => {
+    api.deleteFile(id, fileToDelete).then(() => {
+      setFiles(files.filter((file) => file.fileLink !== fileToDelete));
+    });
+  };
   return (
     <div>
       <div className={styles.title}>{title}</div>
-      <div className={styles.body}>{body}</div>
+      <div>
+        {editText ? (
+          <>
+            <TextField
+              value={titleText}
+              onChange={(e) => setTitleText(e.target.value)}
+              variant="outlined"
+              multiline={false}
+              className="styles.title" // TODO style title, body
+            />
+            <TextField
+              value={bodyText}
+              onChange={(e) => setBodyText(e.target.value)}
+              variant="outlined"
+              multiline={false}
+              className="styles.body"
+            />
+            <Button onClick={() => toggleEdit(true)}>
+              Save
+            </Button>
+          </>
+        ) : (
+          <>
+            <TextField
+              value={titleText}
+              InputProps={{ readOnly: true }}
+              variant="outlined"
+              multiline={false}
+              className="styles.title"
+            />
+            <TextField
+              value={bodyText}
+              InputProps={{ readOnly: true }}
+              variant="outlined"
+              multiline={false}
+            />
+            <Button onClick={() => toggleEdit(false)}>
+              Edit
+            </Button>
+          </>
+        )}
+      </div>
       {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
       <div>
         {files.map((file) => {
@@ -63,6 +133,7 @@ function Module(props) {
                 {' '}
                 <img src={file.url} alt={file.fileName} width="40%" height="auto" />
                 <br />
+                <button type="button" onClick={() => { deleteFile(file.fileLink); }}> Delete Image</button>
               </div>
             );
           }
@@ -123,6 +194,7 @@ Module.propTypes = {
   links: PropTypes.arrayOf(string),
   role: PropTypes.string.isRequired,
   deleteChild: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
 };
 
 Module.defaultProps = {

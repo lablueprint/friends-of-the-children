@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-// import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -10,7 +10,7 @@ import styles from '../styles/Mentees.module.css';
 import VideoIcon from '../assets/icons/videos_icon.svg';
 import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
-// import { storage } from './firebase';
+import { storage } from './firebase';
 import * as api from '../api';
 
 function ExpandedMentee({ profile }) {
@@ -59,22 +59,26 @@ function ExpandedMentee({ profile }) {
       const files = e.target.files.files[0];
       fileName = files.name;
       fileType = files.type;
-      api.uploadFile(files, fileName).then((url) => { // get url of file through firebase
-        const tempArr = recents;
-        const data = {
-          title,
-          fileUrl: url,
-          fileType,
-        };
-        tempArr.push(data);
-        setRecents(tempArr);
-        return data;
-      })
-        .then((data) => {
-          api.addMenteeFile(id, folderName, data, fileType);
-          setfileUploadOpen(false);
-          e.target.reset();
-        });
+      const storageRef = ref(storage, `/images/${fileName}`);
+      uploadBytes(storageRef, files).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
+          const tempArr = recents;
+          const data = {
+            title,
+            fileUrl: url,
+            fileType,
+          };
+          tempArr.push(data);
+          setRecents(tempArr);
+          return data;
+        })
+          .then((data) => {
+            console.log(data);
+            api.addMenteeFile(id, folderName, data, fileType);
+            setfileUploadOpen(false);
+            e.target.reset();
+          });
+      });
     } else if (isLink) { // reading text input for links, not file input
       fileName = title;
       fileType = 'link';
@@ -288,7 +292,6 @@ function ExpandedMentee({ profile }) {
           </DialogContent>
         </Dialog>
       </div>
-
     </div>
   );
 }

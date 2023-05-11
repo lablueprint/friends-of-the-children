@@ -19,6 +19,7 @@ import {
   getModules,
   getModulebyId,
   getGoogleaccount,
+  updateTextField,
   getUsernames,
   getMessages,
   addToMailchimpList,
@@ -26,6 +27,8 @@ import {
   sendMailchimpEmails,
   updateModuleChildren,
   deleteModule,
+  deleteFile,
+  addModule,
 } from '../controllers/controllers.js';
 
 const router = express.Router();
@@ -76,6 +79,9 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 // gets profile via google email
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
+// updating module's text field
+router.get('/updateTextField/:inputText/:id/:field', updateTextField);
+
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);
 
@@ -85,6 +91,12 @@ router.post('/updateModuleChildren', updateModuleChildren);
 
 // deletes current module and all submodules underneath it
 router.delete('/deleteModule/:moduleID', deleteModule);
+
+// deletes file from module FileLink array field and Firebase storage
+router.delete('/deleteFile', deleteFile);
+
+// adds a module to Firebase, returns dataRef (containing module's id in firebase)
+router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
 
