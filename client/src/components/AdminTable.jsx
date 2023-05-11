@@ -33,26 +33,22 @@ export default function AdminTable({ users }) {
   useEffect(() => {
     setTable(users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status)));
   }, [users]);
-  // setTable(rows);
-  // }, [rows]);
-  // print whenever table is updated
+
   useEffect(() => console.log(table), [table]);
   // useEffect(() => console.log(users), [users]);
 
-  // const rows = [
-  //   createData(false, 'Men Tor', 'menslay', 'menslay@yahoo.com', 'Mentor', '01/01/23', 'Not Approved'),
-  //   createData(false, 'Mi chin nyeon', 'michinnyeon', 'a@a.com', 'Caregiver', '01/01/23', 'Not Approved'),
-  //   createData(false, 'Sarah Chang', 'sarah', 'sarah@gmail.com', 'Mentor', '01/01/23', 'Not Approved'),
-  //   createData(false, 'galen heuer', 'galen', 'galenheuer@gmail.com', 'Caregiver', '01/01/23', 'Approved'),
-  //   createData(false, 'Care Giver', 'caregiver', 'hwang12@ucla.edu', 'Caregiver', '01/01/23', 'Approved'),
-  // ];
-
-  function HandleChange(e, username) {
+  function handleChange(e, username) {
     setTable((prevValue) => prevValue.map((user) => {
       if (user.username === username) {
         return {
           // return the user with the checked state updated
-          name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, checked: !prevValue.checked,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          dateJoined: user.dateJoined,
+          approved: user.approved,
+          checked: !prevValue.checked,
         };
       }
       return user;
@@ -79,7 +75,7 @@ export default function AdminTable({ users }) {
               key={row.username}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <Checkbox align="center" onChange={(event) => { HandleChange(event, row.username); }} />
+              <Checkbox align="center" onChange={(event) => { handleChange(event, row.username); }} />
               <TableCell align="left">{row.name}</TableCell>
               <TableCell align="left">{row.username}</TableCell>
               <TableCell align="left">{row.email}</TableCell>
