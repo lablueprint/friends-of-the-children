@@ -7,6 +7,9 @@ import {
 import {
   TextField, Button, Checkbox,
 } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import FilePopup from './FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
@@ -28,6 +31,7 @@ function Module(props) {
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [open, setOpen] = useState(false);
+  const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
 
   const handleMouseEnter = (fileId) => {
     setHoveredFile(fileId);
@@ -44,6 +48,10 @@ function Module(props) {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleDeleteFilesClose = () => {
+    setOpenDeleteFilesPopup(false);
   };
 
   const handleCheckboxChange = (event, fileName) => {
@@ -97,6 +105,7 @@ function Module(props) {
   useEffect(() => { updateImageURL(links); }, [links]);
   // Since page does not refresh when showing expanded module from root module, must manually change the text displayed when body/title changes
   useEffect(() => { setValueofBodyandTitle(body, title); }, [body, title]);
+
   const toggleEdit = async (save) => {
     setEditText(!editText);
     if (save) {
@@ -114,10 +123,12 @@ function Module(props) {
       // reloads the page
       deleteChild(moduleId);
     });
+    setOpenDeleteFilesPopup(false);
   };
 
   const clearCheckboxes = () => {
     setChecked([]);
+    setOpenDeleteFilesPopup(false);
   };
 
   const deleteFiles = async (filesToDelete) => {
@@ -281,6 +292,41 @@ function Module(props) {
         ))
       }
       <div>
+        { openDeleteFilesPopup && checked.length > 0
+          ? (
+            <div>
+              <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
+                <DialogTitle className={styles.dialogTitle}>
+                  You have chosen to delete
+                  {' '}
+                  {checked.length}
+                  {' '}
+                  {(checked.length) === 1 ? 'file ' : 'files '}
+                  from
+                  {' '}
+                  {title}
+                </DialogTitle>
+                <DialogContent>
+                  <div>
+                    <div className={styles.confirmMessage}>
+                      Are you sure you want to continue with this action?
+                    </div>
+                    <div className={styles.confirmButtons}>
+                      <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                        Cancel
+                      </button>
+                      <button type="button" className={styles.confirmDelete} onClick={() => (deleteFiles(checked))}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )
+          : <div />}
+      </div>
+      <div>
         { checked.length > 0
           ? (
             <div className={styles.deleteFilesBar}>
@@ -296,7 +342,7 @@ function Module(props) {
               <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
                 Cancel
               </button>
-              <button type="button" className={styles.deleteButton} onClick={() => (deleteFiles(checked))}>
+              <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
                 Delete
               </button>
             </div>

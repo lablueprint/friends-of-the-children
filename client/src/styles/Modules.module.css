@@ -93,6 +93,11 @@
     padding-top: 0.4%;
 }
 
+.dialogTitle {
+    font-weight: 700px;
+    font-size: 24px;
+}
+
 .cancelButton {
     box-sizing: border-box;
 
@@ -133,6 +138,69 @@
     right: 13.09%;
     top: 34.87%;
     bottom: 36.18%;
+
+    /* coral */
+
+    background: #FF5522;
+    border-radius: 10px;
+    border: 0px;
+    font-weight: 700px;
+}
+
+.confirmMessage {
+    margin-bottom: 80px;
+    margin-right: 180px;
+}
+
+.confirmDeleteBody {
+    display: flex;
+    flex-direction: row;
+    width: 800px;
+    height: 800px;
+    border-radius: 10px;
+}
+
+.confirmButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 50px;
+}
+
+.confirmCancel {
+    /* position: absolute;
+    width: 53px;
+    height: 19px;
+    left: 474px;
+    top: 192px;
+
+    font-family: 'News Gothic';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 19px; */
+    /* identical to box height */
+
+    text-decoration-line: underline;
+    background-color: white;
+    border-width: 0;
+
+    /* text */
+
+    color: #3F3F3F;
+}
+
+.confirmDelete {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 39px;
+    gap: 12px;
+    color: white;
+
+    width: 116px;
+    height: 44px;
 
     /* coral */
 
