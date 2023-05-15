@@ -254,8 +254,6 @@ const batchUpdateProfile = async (req, res) => {
 
     const { profileUpdates } = req.body;
 
-    console.log(req.body);
-
     profileUpdates.forEach((element) => {
       const ref = db.collection('profiles').doc(element.id);
       const updates = element.fields;

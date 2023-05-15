@@ -1,16 +1,28 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import {
+  Tab, Tabs,
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import TabPanel from '../components/TabPanel';
 import AdminTable from '../components/AdminTable';
 import * as api from '../api';
 
-function Requests({ profile }) {
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+function Requests() {
   // pull new users from firebase and show them in the correct order
   // console.log the entire object, look for a field called data to see if there's any kind of time stamp included in the metadata
   // allow admin to modify the user's approved status
 
-  // gets all user profiles
   const [pendingUsers, setPendingUsers] = useState([]);
+
+  const [value, setValue] = useState(0);
 
   const [numChecked, setNumChecked] = useState(0);
 
@@ -19,6 +31,19 @@ function Requests({ profile }) {
   const [approveButton, setApproveButton] = useState(false);
 
   const [deleteButton, setDeleteButton] = useState(false);
+
+  const [currentAccounts, setCurrentAccounts] = useState([]);
+
+  const [allUsers, setAllUsers] = useState([]);
+
+  const handleTabChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const HomeTab = styled((props) => <Tab disableRipple {...props} />)(() => ({
+    textTransform: 'none',
+
+  }));
 
   function HandleCancelClick() {
     setNumChecked(0);
@@ -36,12 +61,21 @@ function Requests({ profile }) {
   }
 
   useEffect(() => {
+    if (value === 0) {
+      setCurrentAccounts(pendingUsers);
+    } else if (value === 1) {
+      setCurrentAccounts(allUsers);
+    }
+  }, [value]);
+
+  useEffect(() => {
     async function fetchProfiles() {
       // ask jerry how to get the data sorted
       const { data } = await api.getProfilesSortedByDate();
-      // filter array of profile objects
-      const unapprovedUsers = data.filter((user) => (('approved' in user) && (user.approved === false)));
-      const reducedUsers = unapprovedUsers.map((user) => {
+
+      // filter array of profile objects (also make sure they all have approved and date fields in firebase)
+      const users = data.filter((user) => (('approved' in user) && ('date' in user)) && (user.role.toLowerCase() !== 'admin'));
+      const reducedAllUsers = users.map((user) => {
         const myDate = new Date(user.date.seconds * 1000);
         return ({
           name: `${user.firstName} ${user.lastName}`,
@@ -49,11 +83,28 @@ function Requests({ profile }) {
           email: user.email,
           role: user.role,
           epochDate: myDate.toLocaleString(),
-          status: user.status,
+          status: user.approved,
           id: user.id,
         });
       });
-      setPendingUsers(reducedUsers);
+
+      const unapprovedUsers = users.filter((user) => ((user.approved === false)));
+      const reducedUnapprovedUsers = unapprovedUsers.map((user) => {
+        const myDate = new Date(user.date.seconds * 1000);
+        return ({
+          name: `${user.firstName} ${user.lastName}`,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          epochDate: myDate.toLocaleString(),
+          status: user.approved,
+          id: user.id,
+        });
+      });
+
+      setAllUsers(reducedAllUsers);
+      setPendingUsers(reducedUnapprovedUsers);
+      setCurrentAccounts(reducedUnapprovedUsers);
     }
     fetchProfiles();
   }, []);
@@ -63,7 +114,22 @@ function Requests({ profile }) {
       <h1>
         Requests
       </h1>
-      { pendingUsers && <AdminTable users={pendingUsers} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+      <Tabs
+        value={value}
+        onChange={handleTabChange}
+        aria-label="basic tabs example"
+      >
+        <HomeTab label="New Users" {...a11yProps(1)} />
+        <HomeTab label="All Users" {...a11yProps(2)} />
+      </Tabs>
+      <TabPanel value={value} index={0}>
+        {currentAccounts
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        {currentAccounts
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+      </TabPanel>
       <p>
         {numChecked}
         {' '}

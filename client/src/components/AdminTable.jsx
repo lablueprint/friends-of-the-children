@@ -95,15 +95,7 @@ export default function AdminTable({
 
   // useEffect(() => console.log(table), [table]);
 
-  // const rows = [
-  //   createData(false, 'Men Tor', 'menslay', 'menslay@yahoo.com', 'Mentor', '01/01/23', 'Not Approved'),
-  //   createData(false, 'Mi chin nyeon', 'michinnyeon', 'a@a.com', 'Caregiver', '01/01/23', 'Not Approved'),
-  //   createData(false, 'Sarah Chang', 'sarah', 'sarah@gmail.com', 'Mentor', '01/01/23', 'Not Approved'),
-  //   createData(false, 'galen heuer', 'galen', 'galenheuer@gmail.com', 'Caregiver', '01/01/23', 'Approved'),
-  //   createData(false, 'Care Giver', 'caregiver', 'hwang12@ucla.edu', 'Caregiver', '01/01/23', 'Approved'),
-  // ];
-
-  function HandleChange(e, username) {
+  function handleChange(e, username) {
     setTable((prevValue) => prevValue.map((user) => {
       // console.log(prevValue.checked);
       if (user.username === username) {
@@ -136,7 +128,7 @@ export default function AdminTable({
               key={row.username}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <Checkbox align="center" checked={row.checked} onChange={(event) => { HandleChange(event, row.username); }} />
+              <Checkbox align="center" checked={row.checked} onChange={(event) => { handleChange(event, row.username); }} />
               <TableCell align="left">{row.name}</TableCell>
               <TableCell align="left">{row.username}</TableCell>
               <TableCell align="left">{row.email}</TableCell>
