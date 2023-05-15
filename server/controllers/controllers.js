@@ -248,6 +248,52 @@ const getProfilesSortedByDate = async (req, res) => {
   }
 };
 
+const batchUpdateProfile = async (req, res) => {
+  try {
+    const batch = db.batch();
+
+    const { profileUpdates } = req.body;
+
+    console.log(req.body);
+
+    profileUpdates.forEach((element) => {
+      const ref = db.collection('profiles').doc(element.id);
+      const updates = element.fields;
+
+      batch.update(ref, updates);
+    });
+
+    await batch.commit();
+
+    res.status(202).json('Profiles Successfully Updated');
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchDeleteProfile = async (req, res) => {
+  try {
+    const batch = db.batch();
+
+    const { profileDeletes } = req.body;
+
+    console.log(`profiles to be deleted are: ${profileDeletes}`);
+
+    profileDeletes.forEach((element) => {
+      const ref = db.collection('profiles').doc(element);
+
+      batch.delete(ref);
+    });
+
+    await batch.commit();
+
+    res.status(202).json('Profiles Successfully Deleted');
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
 // mailchimp controllers
 
 const addToMailchimpList = async (req, res) => {
@@ -394,4 +440,6 @@ export {
   sendMailchimpEmails,
   updateModuleChildren,
   getProfilesSortedByDate,
+  batchUpdateProfile,
+  batchDeleteProfile,
 };

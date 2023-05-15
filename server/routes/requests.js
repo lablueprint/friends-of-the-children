@@ -17,6 +17,8 @@ import {
   sendMailchimpEmails,
   updateModuleChildren,
   getProfilesSortedByDate,
+  batchUpdateProfile,
+  batchDeleteProfile,
 } from '../controllers/controllers.js';
 
 const router = express.Router();
@@ -51,6 +53,10 @@ router.get('/getMessages', getMessages);
 
 //
 router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
+
+router.post('/batchUpdateProfile', batchUpdateProfile);
+
+router.post('/batchDeleteProfile', batchDeleteProfile);
 
 // mailchimp routes
 router.post('/mailchimp/addToList', addToMailchimpList);

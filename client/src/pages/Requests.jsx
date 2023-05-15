@@ -11,6 +11,30 @@ function Requests({ profile }) {
 
   // gets all user profiles
   const [pendingUsers, setPendingUsers] = useState([]);
+
+  const [numChecked, setNumChecked] = useState(0);
+
+  const [cancelButton, setCancelButton] = useState(false);
+
+  const [approveButton, setApproveButton] = useState(false);
+
+  const [deleteButton, setDeleteButton] = useState(false);
+
+  function HandleCancelClick() {
+    setNumChecked(0);
+    setCancelButton(true);
+  }
+
+  function HandleApproveClick() {
+    setNumChecked(0);
+    setApproveButton(true);
+  }
+
+  function HandleDeleteClick() {
+    setNumChecked(0);
+    setDeleteButton(true);
+  }
+
   useEffect(() => {
     async function fetchProfiles() {
       // ask jerry how to get the data sorted
@@ -26,6 +50,7 @@ function Requests({ profile }) {
           role: user.role,
           epochDate: myDate.toLocaleString(),
           status: user.status,
+          id: user.id,
         });
       });
       setPendingUsers(reducedUsers);
@@ -38,8 +63,16 @@ function Requests({ profile }) {
       <h1>
         Requests
       </h1>
-      { pendingUsers && <AdminTable users={pendingUsers} />}
-      <button type="button">Submit</button>
+      { pendingUsers && <AdminTable users={pendingUsers} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+      <p>
+        {numChecked}
+        {' '}
+        rows are selected
+      </p>
+      {/* <button type="button">Submit</button> */}
+      <button type="button" onClick={HandleCancelClick}>Cancel</button>
+      <button type="button" onClick={HandleApproveClick}>Approve</button>
+      <button type="button" onClick={HandleDeleteClick}>Delete</button>
       {/* <p>{numApproved}</p> */}
     </div>
   );

@@ -10,34 +10,90 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 import PropTypes from 'prop-types';
+import * as api from '../api';
 
-export default function AdminTable({ users }) {
-  const [numChecked, setNumChecked] = useState(0);
+export default function AdminTable({
+  users, setRowsSelected, cancelButton, setCancelButton, approveButton, setApproveButton, deleteButton, setDeleteButton,
+}) {
   const [table, setTable] = useState([]);
 
-  function createData(checked, name, username, email, role, dateJoined, status) {
+  function createData(checked, name, username, email, role, dateJoined, status, id) {
     let approved = '';
-    console.log(dateJoined);
     const desiredDate = dateJoined.split(',')[0];
-    console.log(desiredDate);
     if (status) {
       approved = 'Approved';
     } else {
       approved = 'Not Approved';
     }
     return {
-      checked, name, username, email, role, dateJoined: desiredDate, approved,
+      checked, name, username, email, role, dateJoined: desiredDate, approved, id,
     };
   }
 
   useEffect(() => {
-    setTable(users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status)));
+    setTable(users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status, user.id)));
   }, [users]);
+
   // setTable(rows);
   // }, [rows]);
+
   // print whenever table is updated
-  useEffect(() => console.log(table), [table]);
-  // useEffect(() => console.log(users), [users]);
+  useEffect(() => {
+    const num = table.reduce((accum, user) => {
+      if (user.checked) { return accum + 1; }
+      return accum;
+    }, 0);
+    setRowsSelected(num);
+  }, [table]);
+
+  useEffect(() => {
+    if (cancelButton) {
+      setTable((prevValue) => prevValue.map((user) => ({
+        name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, id: user.id, checked: false,
+      })));
+      setCancelButton(false);
+    }
+  }, [cancelButton]);
+
+  useEffect(() => {
+    async function ApproveButtonHandler() {
+      const approvedAccounts = [];
+      if (approveButton) {
+        table.forEach((user) => {
+          if (user.checked) {
+            approvedAccounts.push({ id: user.id, fields: { approved: true } });
+          }
+        });
+
+        api.batchUpdateProfile(approvedAccounts);
+        setTimeout(() => { window.location.reload(); }, 800);
+        setApproveButton(false);
+      }
+    }
+
+    ApproveButtonHandler();
+  }, [approveButton]);
+
+  useEffect(() => {
+    async function DeleteButtonHandler() {
+      const selectedAccounts = [];
+      if (deleteButton) {
+        table.forEach((user) => {
+          if (user.checked) {
+            selectedAccounts.push(user.id);
+          }
+        });
+
+        api.batchDeleteProfile(selectedAccounts);
+        // setTimeout(() => { window.location.reload(); }, 800);
+        setDeleteButton(false);
+      }
+    }
+
+    DeleteButtonHandler();
+  }, [deleteButton]);
+
+  // useEffect(() => console.log(table), [table]);
 
   // const rows = [
   //   createData(false, 'Men Tor', 'menslay', 'menslay@yahoo.com', 'Mentor', '01/01/23', 'Not Approved'),
@@ -49,10 +105,11 @@ export default function AdminTable({ users }) {
 
   function HandleChange(e, username) {
     setTable((prevValue) => prevValue.map((user) => {
+      // console.log(prevValue.checked);
       if (user.username === username) {
         return {
           // return the user with the checked state updated
-          name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, checked: !prevValue.checked,
+          name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, checked: !user.checked, id: user.id,
         };
       }
       return user;
@@ -79,7 +136,7 @@ export default function AdminTable({ users }) {
               key={row.username}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <Checkbox align="center" onChange={(event) => { HandleChange(event, row.username); }} />
+              <Checkbox align="center" checked={row.checked} onChange={(event) => { HandleChange(event, row.username); }} />
               <TableCell align="left">{row.name}</TableCell>
               <TableCell align="left">{row.username}</TableCell>
               <TableCell align="left">{row.email}</TableCell>
@@ -102,5 +159,13 @@ AdminTable.propTypes = {
     role: PropTypes.string,
     date: PropTypes.string,
     status: PropTypes.bool,
+    id: PropTypes.string,
   })).isRequired,
+  setRowsSelected: PropTypes.func.isRequired,
+  cancelButton: PropTypes.bool.isRequired,
+  setCancelButton: PropTypes.func.isRequired,
+  approveButton: PropTypes.bool.isRequired,
+  setApproveButton: PropTypes.func.isRequired,
+  deleteButton: PropTypes.bool.isRequired,
+  setDeleteButton: PropTypes.func.isRequired,
 };

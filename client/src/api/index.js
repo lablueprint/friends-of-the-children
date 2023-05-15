@@ -200,3 +200,29 @@ export const getProfilesSortedByDate = async () => {
   }
   return null;
 };
+
+// profile object should have the following fields:
+// [{id: number, fields:{fieldName: fieldValue}}]
+export const batchUpdateProfile = async (data) => {
+  try {
+    const payload = { profileUpdates: data };
+    const response = await axios.post(`${url}/batchUpdateProfile`, payload);
+    console.log('updateProfile endpoint returns', response);
+    return response;
+  } catch (error) {
+    console.error(`error occured in updateProfile endpoint:${error.message}`);
+  }
+  return null;
+};
+
+export const batchDeleteProfile = async (data) => {
+  try {
+    const payload = { profileDeletes: data };
+    const response = await axios.post(`${url}/batchDeleteProfile`, payload);
+    console.log('updateProfile endpoint returns', response);
+    return response;
+  } catch (error) {
+    console.error(`error occured in updateProfile endpoint:${error.message}`);
+  }
+  return null;
+};
