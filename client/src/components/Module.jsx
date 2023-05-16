@@ -145,45 +145,49 @@ function Module(props) {
   return (
     <div>
       <div className={styles.titleContainer}>
-        <div>
-          <IconButton>
-            {parent != null ? (
-              <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-                <ArrowBackIcon />
-              </Link>
+        <div className={styles.backAndTitle}>
+          <div className={styles.backContainer}>
+            <IconButton>
+              {parent != null ? (
+                <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+                  <ArrowBackIcon />
+                </Link>
+              ) : (
+                <Link to="/resources" className={styles.backButton}>
+                  <ArrowBackIcon />
+                </Link>
+              )}
+            </IconButton>
+          </div>
+          <div>
+            {editText ? (
+              <TextField
+                value={titleText}
+                onChange={(e) => setTitleText(e.target.value)}
+                variant="outlined"
+                multiline={false}
+                className={styles.title}
+              />
             ) : (
-              <Link to="/resources">
-                <ArrowBackIcon />
-              </Link>
+              <div className={styles.title}>{title}</div>
             )}
-          </IconButton>
+          </div>
         </div>
-        <div>
-          {editText ? (
-            <TextField
-              value={titleText}
-              onChange={(e) => setTitleText(e.target.value)}
-              variant="outlined"
-              multiline={false}
-              className="styles.title"
-            />
-          ) : (
-            <div className={styles.title}>{title}</div>
-          )}
+        <div className={styles.editAndAddFile}>
+          <Button variant="outlined" className={styles.editButton} onClick={() => toggleEdit(editText)}>
+            <ModeIcon />
+            {editText ? ('Save') : ('Edit Text')}
+          </Button>
         </div>
-        <Button variant="outlined" className={styles.editButton} onClick={() => toggleEdit(editText)}>
-          <ModeIcon />
-          {editText ? ('Save') : ('Edit Text')}
-        </Button>
       </div>
-      <div>
+      <div className={styles.bodyContainer}>
         {editText ? (
           <TextField
             value={bodyText}
             onChange={(e) => setBodyText(e.target.value)}
             variant="outlined"
             multiline={false}
-            className="styles.body"
+            className={styles.body}
           />
         ) : (
           <TextField
@@ -191,6 +195,7 @@ function Module(props) {
             InputProps={{ readOnly: true }}
             variant="outlined"
             multiline={false}
+            className={styles.body}
           />
         )}
       </div>
@@ -198,17 +203,18 @@ function Module(props) {
       {files.map((file) => (
         <div className={styles.file}>
           {(file.fileType.includes('image')) && (
-          <div key={file}>
+          <div key={file} className={styles.descriptionBar}>
             <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
               <img className={styles.displayImg} src={file.url} alt={file.fileName} />
             </div>
-            <div className={styles.description}>
+            <div>
               <div
                 key={file.fileLink}
                 onMouseEnter={() => handleMouseEnter(file.fileLink)}
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
+                {/* <div className={styles.descriptionBar}> */}
                 {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
@@ -216,8 +222,9 @@ function Module(props) {
                     className={styles.checkbox}
                   />
                 ) : (<img src={imgIcon} alt="img icon" />)}
+                {/* </div> */}
+                <div className={styles.fileName}>{file.fileName}</div>
               </div>
-              <div className={styles.fileName}>{file.fileName}</div>
             </div>
           </div>
           )}
