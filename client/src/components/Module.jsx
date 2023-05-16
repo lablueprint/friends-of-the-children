@@ -209,7 +209,7 @@ function Module(props) {
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {(hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
                     onChange={(event) => handleCheckboxChange(event, file.fileLink)}
@@ -235,7 +235,7 @@ function Module(props) {
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {(hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
                     onChange={(event) => handleCheckboxChange(event, file.fileLink)}
@@ -259,7 +259,7 @@ function Module(props) {
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {(hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
                     onChange={(event) => handleCheckboxChange(event, file.fileLink)}

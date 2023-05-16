@@ -1,11 +1,9 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, getDoc, arrayUnion, updateDoc, doc,
+  collection, addDoc, getDoc, arrayUnion, updateDoc, doc, FieldValue,
 } from 'firebase/firestore';
-import {
-  getStorage, ref, uploadBytes, getDownloadURL,
-} from 'firebase/storage';
+import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 import crypto from 'crypto';
 import { uuid } from 'uuidv4';
@@ -395,22 +393,33 @@ const deleteModule = async (req, res) => {
 
 const deleteFiles = async (req, res) => {
   try {
-    const storage = getStorage();
+    const currStorage = getStorage();
     // delete path from module files array field
     const { moduleID, filesToDelete } = req.body;
+    console.log(filesToDelete);
     const moduleRef = await db.collection('modules').doc(moduleID);
     const moduleRefSnapshot = await moduleRef.get();
     const currModule = moduleRefSnapshot.data();
     console.log('currModule is ', currModule);
+    // let filesArray = currModule.fileLinks;
     filesToDelete.forEach(async (file) => {
-      const updateFileLinkField = currModule.fileLinks.filter((id) => id !== file);
-      console.log('updatefilelinkfield is ', updateFileLinkField);
-      await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
-        console.log(currModule.fileLinks);
-      });
-      const fileRef = ref(storage, file);
+      // const updateFileLinkField = filesArray.filter((id) => id !== file);
+      // console.log('updatefilelinkfield is ', updateFileLinkField);
+      // await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
+      //   console.log(currModule.fileLinks);
+      // });
+      // filesArray = updateFileLinkField;
+      const fileRef = ref(currStorage, file);
       await deleteObject(fileRef);
     });
+    moduleRef.update({
+      yourArrayField: FieldValue.arrayRemove(...filesToDelete),
+    }).then(() => {
+      console.log('Array items removed successfully.');
+    })
+      .catch((error) => {
+        console.error('Error removing array items:', error);
+      });
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete file');

@@ -21,7 +21,7 @@
 .titleContainer {
     display: flex;
     flex-direction: row;
-    padding-left: 20em;
+    padding-left: 0em;
     justify-content: space-between;
 }
 
