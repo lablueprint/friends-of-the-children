@@ -11,6 +11,7 @@ import { db, storage } from './firebase';
 import * as api from '../api';
 import UserIcon from '../assets/icons/user_icon.svg';
 import LocationIcon from '../assets/icons/location_icon.svg';
+import { serviceAreas } from '../constants';
 
 // Allows users to see and change their profile properties
 function UserProfile({ profile, updateAppProfile }) {
@@ -109,132 +110,136 @@ function UserProfile({ profile, updateAppProfile }) {
       </div>
       <p>{updateProfileMessage}</p>
 
-      <h4 className={styles.info_label}>Basic Information</h4>
-      {profile && profile.firstName && (
-      <div className={styles.labels_container}>
-        {!editProfile && <p>First Name:</p>}
-        <TextField
-          sx={{
-            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-          }}
-          disabled={!editProfile}
-          label={editProfile ? 'First Name' : ''}
-          id="firstName"
-          className={!editProfile ? styles.label : styles.label2}
-          value={updatedProfile.firstName}
-          InputProps={{
-            readOnly: !editProfile,
-          }}
-          onChange={(event) => HandleChange(event, 'firstName')}
-        />
-      </div>
-      )}
-      {profile && profile.lastName && (
-      <div className={styles.labels_container}>
-        {!editProfile && <p>Last Name:</p>}
-        <TextField
-          sx={{
-            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-          }}
-          disabled={!editProfile}
-          label={editProfile ? 'Last Name' : ''}
-          id="lastName"
-          className={!editProfile ? styles.label : styles.label2}
-          value={updatedProfile.lastName}
-          InputProps={{
-            readOnly: !editProfile,
-          }}
-          onChange={(event) => HandleChange(event, 'lastName')}
-        />
-      </div>
-      )}
-      {profile && profile.email && (
-      <div className={styles.labels_container}>
-        {!editProfile && <p>Email:</p>}
-        <TextField
-          sx={{
-            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-          }}
-          disabled={!editProfile}
-          label={editProfile ? 'Email' : ''}
-          id="email"
-          className={!editProfile ? styles.label : styles.label2}
-          value={updatedProfile.email}
-          InputProps={{
-            readOnly: !editProfile,
-          }}
-          onChange={(event) => HandleChange(event, 'email')}
-        />
-      </div>
-      )}
+      <div className={styles.info_flex}>
+        <div className={styles.info_flex_left}>
+          <h4 className={styles.info_label}>Basic Information</h4>
+          {profile && profile.firstName && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>First Name:</p>}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'First Name' : ''}
+              id="firstName"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.firstName}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'firstName')}
+            />
+          </div>
+          )}
+          {profile && profile.lastName && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Last Name:</p>}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'Last Name' : ''}
+              id="lastName"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.lastName}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'lastName')}
+            />
+          </div>
+          )}
+          {profile && profile.email && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Email:</p>}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'Email' : ''}
+              id="email"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.email}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'email')}
+            />
+          </div>
+          )}
 
-      <h4 className={styles.info_label}>Login Information</h4>
-      {profile && profile.role && (
-      <div className={styles.labels_container}>
-        {!editProfile && <p>Role:</p>}
-        <FormControl>
-          {editProfile && <InputLabel>Role</InputLabel>}
-          <Select
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            label={editProfile ? 'Role' : ''}
-            id="role"
-            className={!editProfile ? styles.label : styles.label2}
-            defaultValue={profile.role}
-            value={updatedProfile.role}
-            disabled={!editProfile}
-            onChange={(event) => HandleChange(event, 'role')}
-          >
-            <MenuItem value="Caregiver">Caregiver</MenuItem>
-            <MenuItem value="Mentor">Mentor</MenuItem>
-            <MenuItem value="Admin">Admin</MenuItem>
-          </Select>
-        </FormControl>
+          <h4 className={styles.info_label}>Login Information</h4>
+          {profile && profile.role && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Role:</p>}
+            <FormControl>
+              {editProfile && <InputLabel>Role</InputLabel>}
+              <Select
+                sx={{
+                  fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+                }}
+                label={editProfile ? 'Role' : ''}
+                id="role"
+                className={!editProfile ? styles.label : styles.label2}
+                defaultValue={profile.role}
+                value={updatedProfile.role}
+                disabled={!editProfile}
+                onChange={(event) => HandleChange(event, 'role')}
+              >
+                <MenuItem value="Caregiver">Caregiver</MenuItem>
+                <MenuItem value="Mentor">Mentor</MenuItem>
+                <MenuItem value="Admin">Admin</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+          )}
+          {profile && profile.serviceArea && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Service Area:</p>}
+            <FormControl>
+              {editProfile && <InputLabel>Service Area</InputLabel>}
+              <Select
+                sx={{
+                  fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+                }}
+                label={editProfile ? 'Service Area' : ''}
+                id="serviceArea"
+                className={!editProfile ? styles.label : styles.label2}
+                defaultValue={profile.serviceArea}
+                value={updatedProfile.serviceArea}
+                disabled={!editProfile}
+                onChange={(event) => HandleChange(event, 'serviceArea')}
+              >
+                {serviceAreas.map((area) => <MenuItem value={area}>{area}</MenuItem>)}
+              </Select>
+            </FormControl>
+          </div>
+          )}
+          {profile && profile.username && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Username:</p>}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'Username' : ''}
+              id="username"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.username}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'username')}
+            />
+          </div>
+          )}
+          <div className={styles.info_container_right} />
+        </div>
       </div>
-      )}
-      {profile && profile.serviceArea && (
-      <div className={styles.labels_container}>
-        {!editProfile && <p>Service Area:</p>}
-        <FormControl>
-          {editProfile && <InputLabel>Service Area</InputLabel>}
-          <Select
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            label={editProfile ? 'Service Area' : ''}
-            id="serviceArea"
-            className={!editProfile ? styles.label : styles.label2}
-            defaultValue={profile.serviceArea}
-            value={updatedProfile.serviceArea}
-            disabled={!editProfile}
-            onChange={(event) => HandleChange(event, 'serviceArea')}
-          >
-            <MenuItem value="AV">AV</MenuItem>
-            <MenuItem value="MS">MS</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-      )}
-      {profile && profile.username && (
-      <div className={styles.labels_container}>
-        {!editProfile && <p>Username:</p>}
-        <TextField
-          sx={{
-            fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-          }}
-          disabled={!editProfile}
-          label={editProfile ? 'Username' : ''}
-          id="username"
-          className={!editProfile ? styles.label : styles.label2}
-          value={updatedProfile.username}
-          InputProps={{
-            readOnly: !editProfile,
-          }}
-          onChange={(event) => HandleChange(event, 'username')}
-        />
-      </div>
-      )}
     </div>
   );
 }

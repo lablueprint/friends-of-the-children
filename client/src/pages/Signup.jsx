@@ -14,6 +14,7 @@ import UpperRight from '../assets/images/upperRight.svg';
 import BottomLeft from '../assets/images/bottomLeft.svg';
 import GoogleLogo from '../assets/images/google_logo.svg';
 import * as api from '../api';
+import { serviceAreas } from '../constants';
 
 /**
  Page used to create a new account for new users
@@ -34,7 +35,7 @@ function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [serviceArea, setServiceArea] = useState('AV');
+  const [serviceArea, setServiceArea] = useState(serviceAreas[0]);
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
   const [usernames, setUsernames] = useState(); // specifically for reducing firebase calls, saving all usernames
@@ -161,7 +162,7 @@ function Signup({ updateAppProfile }) {
       setFirstName('');
       setLastName('');
       setEmail('');
-      setServiceArea('AV');
+      setServiceArea(serviceAreas[0]);
       setRole('');
       setUsername('');
       setPassword('');
@@ -247,13 +248,12 @@ function Signup({ updateAppProfile }) {
               <Select
                 id="serviceArea"
                 label="Service Area"
-                defaultValue="AV"
+                defaultValue={serviceAreas[0]}
                 value={serviceArea}
                 onChange={(e) => setServiceArea(e.target.value)}
                 className={styles.textfield}
               >
-                <MenuItem value="AV">AV</MenuItem>
-                <MenuItem value="MS">MS</MenuItem>
+                {serviceAreas.map((area) => <MenuItem value={area}>{area}</MenuItem>)}
               </Select>
             </FormControl>
           </div>
