@@ -5,11 +5,13 @@ import {
   ref, getStorage, getDownloadURL, getMetadata,
 } from 'firebase/storage';
 import {
-  TextField, Button, Checkbox,
+  TextField, Button, Checkbox, IconButton,
 } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+// import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ModeIcon from '@mui/icons-material/Mode';
 import FilePopup from './FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
@@ -19,7 +21,7 @@ import * as api from '../api';
 
 function Module(props) {
   const {
-    title, body, child, links, role, deleteChild, id,
+    title, body, child, links, role, deleteChild, id, parent,
   } = props;
 
   const [files, setFiles] = useState([]);
@@ -107,6 +109,7 @@ function Module(props) {
 
   const toggleEdit = async (save) => {
     setEditText(!editText);
+    console.log('save is ', save);
     if (save) {
       // Only call firebase if edits were made
       if (bodyText !== body) {
@@ -140,47 +143,52 @@ function Module(props) {
 
   return (
     <div>
-      <div className={styles.title}>{title}</div>
-      <div>
-        {editText ? (
-          <>
+      <div className={styles.titleContainer}>
+        <div>
+          <IconButton>
+            {parent != null ? (
+              <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+                Back
+              </Link>
+            ) : (
+              <Link to="/resources">
+                Back
+              </Link>
+            )}
+          </IconButton>
+          {editText ? (
             <TextField
               value={titleText}
               onChange={(e) => setTitleText(e.target.value)}
               variant="outlined"
               multiline={false}
-              className="styles.title" // TODO style title, body
-            />
-            <TextField
-              value={bodyText}
-              onChange={(e) => setBodyText(e.target.value)}
-              variant="outlined"
-              multiline={false}
-              className="styles.body"
-            />
-            <Button onClick={() => toggleEdit(true)}>
-              Save
-            </Button>
-          </>
-        ) : (
-          <>
-            <TextField
-              value={titleText}
-              InputProps={{ readOnly: true }}
-              variant="outlined"
-              multiline={false}
               className="styles.title"
             />
-            <TextField
-              value={bodyText}
-              InputProps={{ readOnly: true }}
-              variant="outlined"
-              multiline={false}
-            />
-            <Button onClick={() => toggleEdit(false)}>
-              Edit
-            </Button>
-          </>
+          ) : (
+            <div className={styles.title}>{title}</div>
+          )}
+        </div>
+        <Button variant="outlined" className={styles.editButton} onClick={() => toggleEdit(editText)}>
+          <ModeIcon />
+          {editText ? ('Save') : ('Edit Text')}
+        </Button>
+      </div>
+      <div>
+        {editText ? (
+          <TextField
+            value={bodyText}
+            onChange={(e) => setBodyText(e.target.value)}
+            variant="outlined"
+            multiline={false}
+            className="styles.body"
+          />
+        ) : (
+          <TextField
+            value={bodyText}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            multiline={false}
+          />
         )}
       </div>
       {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
@@ -364,6 +372,7 @@ Module.propTypes = {
   role: PropTypes.string.isRequired,
   deleteChild: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
+  parent: PropTypes.string.isRequired,
 };
 
 Module.defaultProps = {
