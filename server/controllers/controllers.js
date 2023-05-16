@@ -33,7 +33,7 @@ const createEvent = async (req, res) => {
   try {
     // obtain data from client side
     const {
-      title, description, location, attachments, start, end,
+      title, description, location, attachments, start, end, calendarId,
     } = req.body;
     // set required auth credentials to use gcal api
     oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
@@ -41,7 +41,7 @@ const createEvent = async (req, res) => {
     // call gcal api's "insert" method w valid json object
     const response = await calendar.events.insert({
       auth: oauth2Client,
-      calendarId: 'primary',
+      calendarId,
       supportsAttachments: true,
       requestBody: {
         summary: title,
