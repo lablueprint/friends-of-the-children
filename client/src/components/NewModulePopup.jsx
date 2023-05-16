@@ -22,7 +22,6 @@ export default function NewModulePopup(props) {
   } = props;
 
   const roles = [];
-  // const [percent, setPercent] = useState(0);
   const [fileLinks, setFileLinks] = useState([]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');

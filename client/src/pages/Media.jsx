@@ -58,7 +58,6 @@ function Media({ profile }) {
           return data;
         })
           .then((data) => {
-            console.log(data);
             api.addMenteeFile(id, folderName, data, fileType);
             setOpen(false);
             e.target.reset();
