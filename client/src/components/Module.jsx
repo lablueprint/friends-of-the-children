@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 // import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ModeIcon from '@mui/icons-material/Mode';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FilePopup from './FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
@@ -138,14 +139,16 @@ function Module(props) {
           <IconButton>
             {parent != null ? (
               <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-                Back
+                <ArrowBackIcon />
               </Link>
             ) : (
               <Link to="/resources">
-                Back
+                <ArrowBackIcon />
               </Link>
             )}
           </IconButton>
+        </div>
+        <div>
           {editText ? (
             <TextField
               value={titleText}
