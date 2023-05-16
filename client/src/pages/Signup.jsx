@@ -141,7 +141,6 @@ function Signup({ updateAppProfile }) {
         db.collection('profiles').doc().set(data);
         navigate('/unapproved', { state: { ...data } });
       }
-
       // reset forms
       setFirstName('');
       setLastName('');
