@@ -13,13 +13,19 @@ import UserIcon from '../assets/icons/user_icon.svg';
 import LocationIcon from '../assets/icons/location_icon.svg';
 import { Input, InputAdornment, IconButton } from "@material-ui/core";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
+import bcrypt from 'bcryptjs';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/sliceAuth';
 
 // Allows users to see and change their profile properties
 function UserProfile({ profile, updateAppProfile }) {
   const [editProfile, setEditProfile] = useState(false);
-  const [updatedProfile, setUpdatedProfile] = useState(profile);
   const [updateProfileMessage, setUpdateProfileMessage] = useState('');
   const [imageUrl, setImageUrl] = useState(profile.image);
+  const [updatedProfile, setUpdatedProfile] = useState({ // same as profile except password is empty
+    ...profile,
+    password: ''
+  });
 
   const handleUpload = async (image) => {
     console.log('target:', image.name);
@@ -61,6 +67,7 @@ function UserProfile({ profile, updateAppProfile }) {
           firstName: updatedProfile.firstName,
           lastName: updatedProfile.lastName,
           bio: updatedProfile.bio,
+          password: updatedProfile.password,
         };
         api.updateList(payload);
         setUpdateProfileMessage('Profile Successfully Updated!');
@@ -82,12 +89,63 @@ function UserProfile({ profile, updateAppProfile }) {
   };
 
   // Fxs for password visibility toggling
-  const [showPassword, setShowPassword] = useState(false);
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const handleClickShowOldPassword = () => {
+    setShowOldPassword(!showOldPassword);
   };
-  const handleMouseDownPassword = (event) => {
+  const handleMouseDownOldPassword = (event) => {
     event.preventDefault();
+  };
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const handleClickShowNewPassword = () => {
+    setShowNewPassword(!showNewPassword);
+  };
+  const handleMouseDownNewPassword = (event) => {
+    event.preventDefault();
+  };
+  // Stuff for checking old password is correct + updating new password
+  // Checking if inputted password matches profile's password from Firebase
+  // Called whenever inputted profile info gets updated or when user's existing profile is updated
+  const dispatch = useDispatch();
+  const checkPassword = (pass) => {
+    // Check the hash password only if profile is not empty
+    if (profile !== null) {
+      if (!profile.google) {
+        bcrypt.compare(pass, profile.password) // compare passwords
+          .then((isValid) => {
+            if (isValid) { // check whether it is a valid credential
+              dispatch(login(profile)); // pass in profile to redux
+              updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+            } else {
+              console.error('invalid credentials'); // TODO: is this needed? technically we have a message that pops up in the UI
+            }
+          })
+          // Handle Errors here
+          .catch((e) => {
+            console.error(e);
+          });
+      } else {
+        dispatch(login(profile));
+        updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+      }
+    }
+  };
+
+  const [oldPassword, setOldPassword] = useState("");
+  // Can only edit new password if old password matches
+  const [newPasswordAllowed, setNewPasswordAllowed] = useState(false);
+  const handleOldPasswordChange = (event) => {
+    setOldPassword(event.target.value);
+  };
+  const verifyOldPasswordMatches = (event) => {
+    event.preventDefault();
+    console.log("pressed enter key");
+    setNewPasswordAllowed(true);
+  };
+  const [newPassword, setNewPassword] = useState("");
+  const handleNewPasswordChange = (event) => {
+    setNewPassword(event.target.value); // update state var for onscreen rendering
+    HandleChange(event, 'password'); // call fx to update in airtable
   };
 
   return (
@@ -200,35 +258,73 @@ function UserProfile({ profile, updateAppProfile }) {
           />
         </div>
       )}
-      {profile && profile.password && ( /* password */
-        <div className={styles.labels_container}>
-          {!editProfile && <p>Password:</p>}
-          <Input
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            disabled={!editProfile}
-            label={editProfile ? 'Password' : ''}
-            id="password"
-            className={!editProfile ? styles.label : styles.label2}
-            value={updatedProfile.password}
-            inputProps={{
-              readOnly: !editProfile,
-            }}
-            type={showPassword ? "text" : "password"}
-            onChange={(event) => HandleChange(event, 'password')}
-            endAdornment= {
-            <InputAdornment position="end">
-              <IconButton
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-              >
-                {showPassword ? <Visibility /> : <VisibilityOff />}
-              </IconButton>
-            </InputAdornment>
-            }
-          />
+      {/* Password start, old + new passwords only shows when editing */}
+      {profile && /*editProfile && */ (
+        <div>
+          <div className={styles.labels_container}>
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={'Verify your old Password'}
+              id="password"
+              className={!editProfile ? styles.label : styles.label2}
+              value={oldPassword}
+              InputProps={{
+                readOnly: !editProfile,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowOldPassword}
+                      onMouseDown={handleMouseDownOldPassword}
+                      edge="end"
+                    >
+                      {showOldPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              type={showOldPassword ? "text" : "password"}
+              onChange={(event) => handleOldPasswordChange(event)}
+              onKeyDown={(ev) => {
+                if (ev.key === 'Enter') {
+                  verifyOldPasswordMatches(ev);
+                }
+                console.log(newPasswordAllowed);
+              }}
+            />
+          </div>
+          <div className={styles.labels_container}> { /* New password */ }
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!newPasswordAllowed}
+              label={'New Password'}
+              id="password"
+              className={!editProfile ? styles.label : styles.label2}
+              value={newPassword}
+              InputProps={{
+                readOnly: !editProfile,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowNewPassword}
+                      onMouseDown={handleMouseDownNewPassword}
+                      edge="end"
+                    >
+                      {showNewPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              type={showNewPassword ? "text" : "password"}
+              onChange={(event) => handleNewPasswordChange(event)}
+            />
+          </div>
         </div>
+        
       )}
       {profile && (
         <div className={styles.labels_container}>
