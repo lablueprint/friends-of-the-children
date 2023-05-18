@@ -85,7 +85,7 @@ function UserProfile({ profile, updateAppProfile }) {
         <div>
           <div className={styles.pfp}>
             <img src={imageUrl} alt="profile pic" className={styles.profile_pic} />
-            <label htmlFor="uploadImage" className={styles.custom_file_upload}>
+            <label htmlFor={uploadImage} className={styles.custom_file_upload}>
               <input type="file" accept=".png,.jpg,.svg,.gif" onChange={uploadImage} />
             </label>
           </div>
@@ -237,8 +237,29 @@ function UserProfile({ profile, updateAppProfile }) {
             />
           </div>
           )}
-          <div className={styles.info_container_right} />
         </div>
+
+        <div className={styles.info_container_right}>
+          <h4 className={styles.info_label}>Bio</h4>
+          <div className={styles.labels_container}>
+            {!editProfile && <br />}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'Bio' : ''}
+              id="bio"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.bio}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'bio')}
+            />
+          </div>
+        </div>
+
       </div>
     </div>
   );
