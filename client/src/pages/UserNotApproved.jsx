@@ -7,26 +7,9 @@ import { logout } from '../redux/sliceAuth';
 import * as api from '../api';
 
 function UserNotApproved({ updateAppProfile, profile }) {
-  const { state } = useLocation();
+  // const { state } = useLocation();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const approved = false;
-  console.log(state);
-  if (approved) {
-    updateAppProfile(state);
-
-    // mailchimp- update list on signup
-    const payload = {
-      email_address: state.email,
-      firstName: state.firstName,
-      lastName: state.lastName,
-      role: state.role,
-      serviceArea: state.serviceArea,
-    };
-    api.addToList(payload);
-    navigate('/unapproved');
-  }
-
+  // console.log(state);
   const handleLogout = () => {
     updateAppProfile(null);
     dispatch(logout(profile));
