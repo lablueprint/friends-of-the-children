@@ -1,7 +1,7 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, getDoc, arrayUnion, updateDoc, doc, FieldValue,
+  collection, addDoc, getDoc, arrayUnion, updateDoc, doc, arrayRemove,
 } from 'firebase/firestore';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 
@@ -401,19 +401,12 @@ const deleteFiles = async (req, res) => {
     const moduleRefSnapshot = await moduleRef.get();
     const currModule = moduleRefSnapshot.data();
     console.log('currModule is ', currModule);
-    // let filesArray = currModule.fileLinks;
     filesToDelete.forEach(async (file) => {
-      // const updateFileLinkField = filesArray.filter((id) => id !== file);
-      // console.log('updatefilelinkfield is ', updateFileLinkField);
-      // await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
-      //   console.log(currModule.fileLinks);
-      // });
-      // filesArray = updateFileLinkField;
       const fileRef = ref(currStorage, file);
       await deleteObject(fileRef);
     });
     moduleRef.update({
-      yourArrayField: FieldValue.arrayRemove(...filesToDelete),
+      fileLinks: arrayRemove(...filesToDelete),
     }).then(() => {
       console.log('Array items removed successfully.');
     })
