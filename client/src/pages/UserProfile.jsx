@@ -6,15 +6,15 @@ import {
 } from '@mui/material';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
+import { Input, InputAdornment, IconButton } from '@material-ui/core';
+import { NotificationsOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
+import bcrypt from 'bcryptjs';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from '../styles/UserProfile.module.css';
 import { db, storage } from './firebase';
 import * as api from '../api';
 import UserIcon from '../assets/icons/user_icon.svg';
 import LocationIcon from '../assets/icons/location_icon.svg';
-import { Input, InputAdornment, IconButton } from "@material-ui/core";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
-import bcrypt from 'bcryptjs';
-import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../redux/sliceAuth';
 
 // Allows users to see and change their profile properties
@@ -24,18 +24,16 @@ function UserProfile({ profile, updateAppProfile }) {
   const [imageUrl, setImageUrl] = useState(profile.image);
   const [updatedProfile, setUpdatedProfile] = useState({ // same as profile except password is empty
     ...profile,
-    password: ''
+    password: '',
   });
 
   const handleUpload = async (image) => {
-    console.log('target:', image.name);
     const imageName = image.name;
     const storageRef = ref(storage, `/images/${imageName}`);
 
     uploadBytes(storageRef, image).then((snapshot) => {
       getDownloadURL(snapshot.ref).then(async (url) => {
         setImageUrl(url);
-        console.log(url);
         const docRef = doc(db, 'profiles', profile.id);
         await updateDoc(docRef, {
           image: url,
@@ -54,7 +52,19 @@ function UserProfile({ profile, updateAppProfile }) {
     setUpdateProfileMessage('');
   }
 
-  function HandleSubmit() {
+  async function HandleSubmit() {
+    const hashedNewPassword = await new Promise((resolve, reject) => {
+      bcrypt.hash(updatedProfile.password, 10, (err, hash) => {
+        if (err) reject(err);
+        resolve(hash);
+        updatedProfile.password = hash;
+        setUpdatedProfile({
+          ...profile,
+          password: hash,
+        });
+      });
+    });
+
     db.collection('profiles')
       .doc(profile.id)
       .update(updatedProfile)
@@ -67,7 +77,7 @@ function UserProfile({ profile, updateAppProfile }) {
           firstName: updatedProfile.firstName,
           lastName: updatedProfile.lastName,
           bio: updatedProfile.bio,
-          password: updatedProfile.password,
+          password: hashedNewPassword,
         };
         api.updateList(payload);
         setUpdateProfileMessage('Profile Successfully Updated!');
@@ -76,7 +86,7 @@ function UserProfile({ profile, updateAppProfile }) {
       })
       .catch((error) => {
         setUpdateProfileMessage('We ran into an error updating your profile!');
-        console.log(error);
+        console.error(error);
       });
   }
 
@@ -103,35 +113,31 @@ function UserProfile({ profile, updateAppProfile }) {
   const handleMouseDownNewPassword = (event) => {
     event.preventDefault();
   };
-  // Stuff for checking old password is correct + updating new password
+
   // Checking if inputted password matches profile's password from Firebase
   // Called whenever inputted profile info gets updated or when user's existing profile is updated
   const dispatch = useDispatch();
+  const oldPasswordReference = profile.password; // original password from db
   const checkPassword = (pass) => {
     // Check the hash password only if profile is not empty
-    if (profile !== null) {
-      if (!profile.google) {
-        bcrypt.compare(pass, profile.password) // compare passwords
-          .then((isValid) => {
-            if (isValid) { // check whether it is a valid credential
-              dispatch(login(profile)); // pass in profile to redux
-              updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-            } else {
-              console.error('invalid credentials'); // TODO: is this needed? technically we have a message that pops up in the UI
-            }
-          })
-          // Handle Errors here
-          .catch((e) => {
-            console.error(e);
-          });
-      } else {
-        dispatch(login(profile));
-        updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
-      }
+    if (!profile.google) {
+      return bcrypt.compare(pass, oldPasswordReference) // compare passwords
+        .then((isValid) => {
+          if (isValid) {
+            return true;
+          }
+          console.error(`${pass} doesn't match ${oldPasswordReference}`);
+          return false;
+        })
+        .catch((e) => {
+          console.error(e);
+          return false;
+        });
     }
+    return Promise.resolve(false);
   };
 
-  const [oldPassword, setOldPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState('');
   // Can only edit new password if old password matches
   const [newPasswordAllowed, setNewPasswordAllowed] = useState(false);
   const handleOldPasswordChange = (event) => {
@@ -139,10 +145,11 @@ function UserProfile({ profile, updateAppProfile }) {
   };
   const verifyOldPasswordMatches = (event) => {
     event.preventDefault();
-    console.log("pressed enter key");
-    setNewPasswordAllowed(true);
+    if (checkPassword(event.target.value)) {
+      setNewPasswordAllowed(true);
+    }
   };
-  const [newPassword, setNewPassword] = useState("");
+  const [newPassword, setNewPassword] = useState('');
   const handleNewPasswordChange = (event) => {
     setNewPassword(event.target.value); // update state var for onscreen rendering
     HandleChange(event, 'password'); // call fx to update in airtable
@@ -259,7 +266,7 @@ function UserProfile({ profile, updateAppProfile }) {
         </div>
       )}
       {/* Password start, old + new passwords only shows when editing */}
-      {profile && /*editProfile && */ (
+      {profile && editProfile && (
         <div>
           <div className={styles.labels_container}>
             <TextField
@@ -267,7 +274,7 @@ function UserProfile({ profile, updateAppProfile }) {
                 fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
               }}
               disabled={!editProfile}
-              label={'Verify your old Password'}
+              label="Verify your old Password"
               id="password"
               className={!editProfile ? styles.label : styles.label2}
               value={oldPassword}
@@ -285,23 +292,23 @@ function UserProfile({ profile, updateAppProfile }) {
                   </InputAdornment>
                 ),
               }}
-              type={showOldPassword ? "text" : "password"}
+              type={showOldPassword ? 'text' : 'password'}
               onChange={(event) => handleOldPasswordChange(event)}
               onKeyDown={(ev) => {
                 if (ev.key === 'Enter') {
                   verifyOldPasswordMatches(ev);
                 }
-                console.log(newPasswordAllowed);
               }}
             />
           </div>
-          <div className={styles.labels_container}> { /* New password */ }
+          <div className={styles.labels_container}>
+            { /* New password */ }
             <TextField
               sx={{
                 fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
               }}
               disabled={!newPasswordAllowed}
-              label={'New Password'}
+              label="New Password"
               id="password"
               className={!editProfile ? styles.label : styles.label2}
               value={newPassword}
@@ -319,12 +326,12 @@ function UserProfile({ profile, updateAppProfile }) {
                   </InputAdornment>
                 ),
               }}
-              type={showNewPassword ? "text" : "password"}
+              type={showNewPassword ? 'text' : 'password'}
               onChange={(event) => handleNewPasswordChange(event)}
             />
           </div>
         </div>
-        
+
       )}
       {profile && (
         <div className={styles.labels_container}>
@@ -361,6 +368,7 @@ UserProfile.propTypes = {
     image: PropTypes.string.isRequired,
     bio: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,
 };
