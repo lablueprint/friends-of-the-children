@@ -17,7 +17,7 @@ export default function AdminTable({
 }) {
   const [table, setTable] = useState([]);
 
-  function createData(checked, name, username, email, role, dateJoined, status, id) {
+  function createData(checked, name, username, email, role, dateJoined, status, id, serviceArea) {
     let approved = '';
     const desiredDate = dateJoined.split(',')[0];
     if (status) {
@@ -26,12 +26,12 @@ export default function AdminTable({
       approved = 'Not Approved';
     }
     return {
-      checked, name, username, email, role, dateJoined: desiredDate, approved, id,
+      checked, name, username, email, role, dateJoined: desiredDate, approved, id, serviceArea,
     };
   }
 
   useEffect(() => {
-    setTable(users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status, user.id)));
+    setTable(users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status, user.id, user.serviceArea)));
   }, [users]);
 
   // setTable(rows);
@@ -49,7 +49,7 @@ export default function AdminTable({
   useEffect(() => {
     if (cancelButton) {
       setTable((prevValue) => prevValue.map((user) => ({
-        name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, id: user.id, checked: false,
+        name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, id: user.id, serviceArea: user.serviceArea, checked: false,
       })));
       setCancelButton(false);
     }
@@ -57,15 +57,31 @@ export default function AdminTable({
 
   useEffect(() => {
     async function ApproveButtonHandler() {
+      const approvedPayloadToMailchimp = [];
       const approvedAccounts = [];
       if (approveButton) {
         table.forEach((user) => {
           if (user.checked) {
             approvedAccounts.push({ id: user.id, fields: { approved: true } });
+
+            const payload = {
+              email_address: user.email,
+              firstName: user.name.split(' ')[0],
+              lastName: user.name.split(' ')[1],
+              role: user.role,
+              serviceArea: user.serviceArea,
+            };
+            approvedPayloadToMailchimp.push({});
           }
         });
 
-        api.batchUpdateProfile(approvedAccounts);
+        const payload = {
+
+        };
+
+        await api.batchUpdateProfile(approvedAccounts);
+
+        api.addToList(payload);
         setTimeout(() => { window.location.reload(); }, 800);
         setApproveButton(false);
       }

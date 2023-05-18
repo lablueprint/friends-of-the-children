@@ -84,6 +84,7 @@ function Requests() {
           role: user.role,
           epochDate: myDate.toLocaleString(),
           status: user.approved,
+          serviceArea: user.serviceArea,
           id: user.id,
         });
       });
@@ -98,6 +99,7 @@ function Requests() {
           role: user.role,
           epochDate: myDate.toLocaleString(),
           status: user.approved,
+          serviceArea: user.serviceArea,
           id: user.id,
         });
       });

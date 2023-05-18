@@ -100,11 +100,11 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   // Defaults main page to be modules if user is already logged in
   if (isLoggedIn) {
-    console.log(profile);
     if (!profile.approved) {
-      return navigate('/unapproved');
+      navigate('/unapproved');
+    } else {
+      navigate('/modules');
     }
-    // return navigate('/modules');
   }
 
   // Sets profile state with inputted profile info

@@ -36,10 +36,10 @@ function App() {
       ? (
         <div className="App">
           <div className={styles.wrapper}>
-            <NavBar profile={currUser} updateAppProfile={updateProfile} />
+            {currUser.approved && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
             <div className={styles.mainContent}>
               <Routes>
-                <Route path="/" element={(<Modules profile={currUser} />)} />
+                {currUser.approved ? <Route path="/" element={(<Modules profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
                 <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
                 <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
                 <Route path="/example" element={(<Example profile={currUser} />)} />
@@ -49,7 +49,7 @@ function App() {
                 <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
                 <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                 <Route path="/requests" element={(<Requests profile={currUser} />)} />
-                <Route path="/unapproved" element={(<UserNotApproved />)} />
+                <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />
               </Routes>
             </div>
           </div>
