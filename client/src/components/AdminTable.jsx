@@ -101,7 +101,7 @@ export default function AdminTable({
         });
 
         api.batchDeleteProfile(selectedAccounts);
-        // setTimeout(() => { window.location.reload(); }, 800);
+        setTimeout(() => { window.location.reload(); }, 800);
         setDeleteButton(false);
       }
     }
