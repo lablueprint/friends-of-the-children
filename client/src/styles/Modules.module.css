@@ -66,11 +66,11 @@
     border-radius: 10px;
 }
 
-.file {
+.fileContainer {
     display: inline-block;
     vertical-align: middle;
-    /* width: 250px;
-    height: auto; */
+    width: 250px;
+    height: auto;
     background-color: #DEF1FF;
     border-radius: 10px;
     padding: 10px 10px 10px 10px;
@@ -96,12 +96,14 @@
     height: 100%;
 } */
 
-.description {
+.descriptionContainer {
     display: flex;
     flex-direction: row;
     gap: 10px;
     font-weight: 700;
     margin-top: 10px;
+    width: 100%; /* Make the image fill the width of the container */
+    height: 100%; /* Make the image fill the height of the container */
 }
 
 .fileName {
@@ -118,27 +120,26 @@
     background: #F6F9FA;
     box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.1);
     font-weight: bold;
-    /* padding-top: 1em; */
-    padding-left: 13%;
+    display: flex;
+    flex-direction: row;
+    gap: 42%;
+    align-items: center;
 }
 
 .totalSelected {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    padding-left: 7%;
-    margin-top: 1.5em;
+    padding-left: 5em;
+    padding-right: 5em;
+    align-items: center;
 }
 
 .selectedNumber {
     background: #00AAEE;
-    border-radius: 10px;
-    padding: 0.5% 0.8% 0.5% 0.8%;
+    border-radius: 8px;
+    padding: 2% 7% 2% 7%;
     color: white;
-}
-
-.selectedText {
-    padding-top: 0.4%;
 }
 
 .dialogTitle {
@@ -146,30 +147,29 @@
     font-size: 24px;
 }
 
+.cancelOrDelete {
+    display: flex;
+    flex-direction: row;
+    gap: 10%;
+    font-weight: bold;
+    padding-right: 5em;
+    padding-left: 5em;
+}
+
 .cancelButton {
-    box-sizing: border-box;
-
-    /* Auto layout */
-
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 15px 39px;
-    gap: 12px;
-
-    position: absolute;
-    left: 69.44%;
-    right: 22.97%;
-    top: 35.53%;
-    bottom: 35.53%;
+    width: 7em;
 
     background: #FFFFFF;
-    /* blue */
 
-    border: 2px solid #00AAEE;
+    border: 0.125em solid #00AAEE;
     border-radius: 10px;
     color: #00AAEE;
+    height: 2.5em;
+    font-weight: bold;
 }
 
 .deleteButton {
@@ -177,22 +177,14 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 15px 39px;
-    gap: 12px;
+    width: 7.125em;
     color: white;
-
-    position: absolute;
-    left: 79.32%;
-    right: 13.09%;
-    top: 34.87%;
-    bottom: 36.18%;
-
-    /* coral */
+    height: 2.625em;
 
     background: #FF5522;
     border-radius: 10px;
     border: 0px;
-    font-weight: 700px;
+    font-weight: bold;
 }
 
 .confirmMessage {
@@ -216,25 +208,9 @@
 }
 
 .confirmCancel {
-    /* position: absolute;
-    width: 53px;
-    height: 19px;
-    left: 474px;
-    top: 192px;
-
-    font-family: 'News Gothic';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 19px; */
-    /* identical to box height */
-
     text-decoration-line: underline;
     background-color: white;
     border-width: 0;
-
-    /* text */
-
     color: #3F3F3F;
 }
 
@@ -264,8 +240,3 @@
     height: 22.94px;
     width: 22.94px;
 }
-
-/* .pdf {
-    height: 50%;
-    width: auto;
-} */

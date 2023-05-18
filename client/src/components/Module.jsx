@@ -126,7 +126,7 @@ function Module(props) {
       // reloads the page
       deleteChild(moduleId);
     });
-    setOpenDeleteFilesPopup(false);
+    // setOpenDeleteFilesPopup(false);
   };
 
   const clearCheckboxes = () => {
@@ -140,6 +140,7 @@ function Module(props) {
       setFiles(tempFiles); // updates list of presenting files
       clearCheckboxes(); // resets checked state to be empty, gets rid of "selected" bar on the bottom side of page
     });
+    setOpenDeleteFilesPopup(false);
   };
 
   return (
@@ -201,20 +202,19 @@ function Module(props) {
       </div>
       {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
       {files.map((file) => (
-        <div className={styles.file}>
+        <div className={styles.fileContainer}>
           {(file.fileType.includes('image')) && (
-          <div key={file} className={styles.descriptionBar}>
+          <div key={file.url}>
             <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
               <img className={styles.displayImg} src={file.url} alt={file.fileName} />
             </div>
-            <div>
+            <div className={styles.descriptionContainer}>
               <div
                 key={file.fileLink}
                 onMouseEnter={() => handleMouseEnter(file.fileLink)}
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {/* <div className={styles.descriptionBar}> */}
                 {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                   <Checkbox
                     checked={checked.includes(file.fileLink)}
@@ -222,9 +222,8 @@ function Module(props) {
                     className={styles.checkbox}
                   />
                 ) : (<img src={imgIcon} alt="img icon" />)}
-                {/* </div> */}
-                <div className={styles.fileName}>{file.fileName}</div>
               </div>
+              <div className={styles.fileName}>{file.fileName}</div>
             </div>
           </div>
           )}
@@ -235,7 +234,7 @@ function Module(props) {
                 <track default kind="captions" />
               </video>
             </div>
-            <div className={styles.description}>
+            <div className={styles.descriptionContainer}>
               <div
                 key={file.fileLink}
                 onMouseEnter={() => handleMouseEnter(file.fileLink)}
@@ -255,11 +254,11 @@ function Module(props) {
           </div>
           )}
           {(file.fileType.includes('pdf')) && (
-          <div key={file.url} className="pdf">
+          <div key={file.url}>
             <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
               <embed className={styles.preview} src={file.url} alt={file.fileName} />
             </div>
-            <div className={styles.description}>
+            <div className={styles.descriptionContainer}>
               <div
                 key={file.fileLink}
                 onMouseEnter={() => handleMouseEnter(file.fileLink)}
@@ -356,12 +355,14 @@ function Module(props) {
                   selected
                 </div>
               </div>
-              <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
-                Cancel
-              </button>
-              <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
-                Delete
-              </button>
+              <div className={styles.cancelOrDelete}>
+                <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                  Cancel
+                </button>
+                <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                  Delete
+                </button>
+              </div>
             </div>
           )
           : <div />}
