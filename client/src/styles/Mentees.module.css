@@ -1,0 +1,141 @@
+a{
+    text-decoration: none;
+    /* color: black; */
+}
+
+.mentees_page{
+    text-align: left;
+    padding: 50px 0px 50px 100px;
+}
+
+.folders_page{
+    background-image: url('../assets/images/banner.svg');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    padding: 50px 0px 50px 80px;
+    text-align: left;
+}
+
+.folders_page h3{
+    font-weight: 500;
+    font-size: 1.3rem;
+    margin-top: 80px;
+    margin-bottom: 30px;
+}
+
+.mentees_container{
+    text-align: left;
+}
+
+.card_container{
+    display: inline-block;
+    margin: 30px 50px 0 0;
+    width: 300px;
+}
+
+.card{
+    padding: 15px;
+    background: #156DBF;
+    border: 0.5px solid #CCCCCC;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.card p{
+    padding: 0 !important;
+    margin: 0 !important;
+    font-weight: 700;
+    color: white;
+    font-size: 1.3rem;
+}
+
+.imageCard{
+    margin-bottom: 10px;
+    height: 100px;
+    border-radius: 10px;
+    background: white;
+}
+
+.folders_map{
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.folder_container{
+    display: inline-block;
+    padding: 50px 0px 50px 40px;
+    width: 270px;
+    margin-left: -20px;
+    background-image: url(../assets/images/folder.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.folder_container img{
+    display: inline-block;
+    width: 70px;
+    margin-right: 1.5vw;
+}
+
+.folder_container p{
+    color: black;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.img_container{
+    display: inline-block;
+    vertical-align: middle;
+    width: 250px;
+    height: 250px;
+}
+
+.img_container li{
+    margin-right: 20px;
+    word-wrap: break-word;
+}
+
+.media_image{
+    width: 230px;
+    height: 230px;
+}
+
+.profile_container{
+    display: grid;
+    flex-wrap: wrap;
+    column-gap: 15vw;
+    row-gap: 5vw;
+    align-items: flex-end;
+    margin-bottom: 3vw;
+}
+
+.profile_container h1{
+    font-weight: 700;
+}
+
+.pfp{
+    display: inline-block;
+    margin-right: 2.5vw;
+}
+
+.profile_pic{
+    background: bisque;
+    border-radius: 50%;
+    width: 150px;
+}
+
+.user_info{
+    display: inline-block;
+    margin-right: 2.5vw;
+    vertical-align: bottom;
+}
+
+.service_area{
+    display: inline-block;
+    margin-right: 2.5vw;
+}
+
+.mediaForm p{
+    margin-bottom: 0 !important;
+}

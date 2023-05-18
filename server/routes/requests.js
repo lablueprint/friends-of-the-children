@@ -7,9 +7,19 @@ import mailchimp from '../mailchimp.js';
 import {
   createEvent,
   patchEvent,
+  getMentees,
+  createMentee,
+  addMentee,
+  getMenteeFolders,
+  addMenteeFolder,
+  getMenteeFiles,
+  addMenteeFile,
+  uploadFile,
   getAllProfiles,
+  getModules,
   getModulebyId,
   getGoogleaccount,
+  updateTextField,
   getUsernames,
   getMessages,
   addToMailchimpList,
@@ -19,6 +29,9 @@ import {
   getProfilesSortedByDate,
   batchUpdateProfile,
   batchDeleteProfile,
+  deleteModule,
+  deleteFile,
+  addModule,
 } from '../controllers/controllers.js';
 
 const router = express.Router();
@@ -33,8 +46,35 @@ router.post('/createEvent', createEvent);
 // updates an event on google calendar
 router.patch('/patchEvent', patchEvent);
 
+// gets all the mentees
+router.get('/getMentees/profileID=:profileID', getMentees);
+
+// gets the mentee's folders
+router.get('/getMenteeFolders/id=:id', getMenteeFolders);
+
+// creates a new mentee doc
+router.post('/createMentee', createMentee);
+
+// add a new mentee (link to mentor + create default folders)
+router.post('/addMentee/profileID=:profileID/menteeID=:menteeID', addMentee);
+
+// creates a new mentee folder
+router.post('/addMenteeFolder/id=:id/folder=:folderName', addMenteeFolder);
+
+// gets the mentee's folder contents
+router.get('/getMenteeFiles/id=:id/folder=:folderName', getMenteeFiles);
+
+// updates the mentee's folder with the new file
+router.post('/addMenteeFile', addMenteeFile);
+
+// uploads a file to firebase
+router.post('/uploadFile', uploadFile);
+
 // gets all profiles from firebase collection "profiles"
 router.get('/getAllProfiles', getAllProfiles);
+
+// gets all modules from firebase collection "modules"
+router.get('/getModules/:currRole', getModules);
 
 // gets a module by ID, and returns that module and all of its direct children
 router.get('/getModulebyId/:id/:currRole', getModulebyId);
@@ -42,12 +82,24 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 // gets profile via google email
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
+// updating module's text field
+router.get('/updateTextField/:inputText/:id/:field', updateTextField);
+
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);
 
 // adds a module to firebase
 // then adds new module to the parent's children array
 router.post('/updateModuleChildren', updateModuleChildren);
+
+// deletes current module and all submodules underneath it
+router.delete('/deleteModule/:moduleID', deleteModule);
+
+// deletes file from module FileLink array field and Firebase storage
+router.delete('/deleteFile', deleteFile);
+
+// adds a module to Firebase, returns dataRef (containing module's id in firebase)
+router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
 

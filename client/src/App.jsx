@@ -8,8 +8,11 @@ import {
   Example,
   Login,
   MessageWall,
+  Mentees,
+  ExpandedMentee,
+  Media,
   Signup,
-  Modules,
+  Resources,
   Calendar,
   ExpandedModule,
   NotFound,
@@ -39,13 +42,16 @@ function App() {
             {currUser.approved && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
             <div className={styles.mainContent}>
               <Routes>
-                {currUser.approved ? <Route path="/" element={(<Modules profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
+                {currUser.approved ? <Route path="/" element={(<ExpandedModule profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
                 <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
                 <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
+                <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
+                <Route path="/mentees/:menteeSlug" element={(<ExpandedMentee profile={currUser} />)} />
+                <Route path="/mentees/:menteeSlug/:folderSlug" element={(<Media profile={currUser} />)} />
                 <Route path="/example" element={(<Example profile={currUser} />)} />
                 <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
                 <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
-                <Route path="/modules" element={(<Modules profile={currUser} />)} />
+                <Route path="/resources" element={(<Resources profile={currUser} />)} />
                 <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
                 <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                 <Route path="/requests" element={(<Requests profile={currUser} />)} />

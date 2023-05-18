@@ -1,16 +1,18 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, arrayUnion, updateDoc, doc,
+  collection, addDoc, getDoc, arrayUnion, updateDoc, doc,
 } from 'firebase/firestore';
+import {
+  getStorage, ref, uploadBytes, getDownloadURL,
+} from 'firebase/storage';
 
 import crypto from 'crypto';
 import { uuid } from 'uuidv4';
 // eslint-disable-next-line import/extensions
-import { db } from '../firebase.js';
+import { db, storage } from '../firebase.js';
 // eslint-disable-next-line import/extensions
 import mailchimp from '../mailchimp.js';
-
 // import google api
 const require = createRequire(import.meta.url);
 const { google } = require('googleapis');
@@ -31,7 +33,7 @@ const createEvent = async (req, res) => {
   try {
     // obtain data from client side
     const {
-      title, description, location, attachments, start, end,
+      title, description, location, attachments, start, end, calendarId,
     } = req.body;
     // set required auth credentials to use gcal api
     oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
@@ -39,7 +41,7 @@ const createEvent = async (req, res) => {
     // call gcal api's "insert" method w valid json object
     const response = await calendar.events.insert({
       auth: oauth2Client,
-      calendarId: 'primary',
+      calendarId,
       supportsAttachments: true,
       requestBody: {
         summary: title,
@@ -89,6 +91,202 @@ const patchEvent = async (req, res) => {
   }
 };
 
+// returns an array of filtered mentees
+const getMentees = async (req, res) => {
+  try {
+    const { profileID } = req.params;
+    const docRef = doc(db, 'profiles', profileID);
+    const allMentees = (await getDoc(docRef)).data().mentees;
+    db.collection('mentees').get().then((sc) => {
+      const tempMentees = [];
+      sc.forEach((snap) => {
+        const data = snap.data();
+        const { id } = snap;
+        if (allMentees && allMentees.includes(id)) {
+          const data2 = {
+            ...data,
+            id,
+          };
+          tempMentees.push(data2);
+        }
+      });
+      res.status(202).json(tempMentees);
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// adds new mentee doc to firebase mentees collection & returns its doc id
+const createMentee = async (req, res) => {
+  try {
+    const mentee = await db.collection('mentees').add(req.body);
+    res.status(202).json(mentee.id);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// update mentor's profile by adding the new mentee to mentee array field & create default folders
+const addMentee = async (req, res) => {
+  try {
+    const { profileID, menteeID } = req.params;
+    const mentorRef = doc(db, 'profiles', profileID);
+    await updateDoc(mentorRef, {
+      mentees: arrayUnion(menteeID),
+    });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Root')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Videos')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Flyers')
+      .set({
+        files: [],
+      });
+
+    await db.collection('mentees').doc(menteeID).collection('folders').doc('Links')
+      .set({
+        files: [],
+      });
+    res.status(202).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// returns array of the specified mentee's folders
+const getMenteeFolders = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tempFolders = [];
+    db.collection('mentees').doc(id).collection('folders').get()
+      .then((sc) => {
+        if (sc.empty) {
+          return;
+        }
+        sc.forEach((currDoc) => {
+          const folderName = currDoc.id;
+          if (folderName !== 'Root') { tempFolders.push(folderName); }
+        });
+      })
+      .then(() => {
+        res.status(202).json(tempFolders);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// adds a new folder doc to the mentee's folders collection
+const addMenteeFolder = async (req, res) => {
+  try {
+    const { id, folderName } = req.params;
+    await db.collection('mentees').doc(id).collection('folders').doc(folderName)
+      .set({
+        files: [],
+      });
+    res.status(200).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// returns a mentee's folder contents (all its files/images/links)
+const getMenteeFiles = async (req, res) => {
+  try {
+    const { id, folderName } = req.params;
+    if (folderName !== '') {
+      db.collection('mentees').doc(id).collection('folders').doc(folderName)
+        .get()
+        .then((sc) => {
+          const data = sc.data();
+          if (data) {
+            const { files } = data;
+            res.status(202).json(files);
+          }
+        });
+    }
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+// adds file in respective firebase folders (if type image -> Image folder too, etc)
+const addMenteeFile = async (req, res) => {
+  try {
+    const {
+      id, folderName, data, type,
+    } = req.body;
+
+    if (folderName !== 'Root') {
+      await db.collection('mentees').doc(id).collection('folders').doc(folderName)
+        .update({
+          files: arrayUnion(data),
+        });
+    }
+    await db.collection('mentees').doc(id).collection('folders').doc('Root')
+      .update({
+        files: arrayUnion(data),
+      });
+
+    if (type.includes('image')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Images')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type.includes('video')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Videos')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type === 'link') {
+      await db.collection('mentees').doc(id).collection('folders').doc('Links')
+        .update({
+          files: arrayUnion(data),
+        });
+    } else if (type.includes('pdf')) {
+      await db.collection('mentees').doc(id).collection('folders').doc('Flyers')
+        .update({
+          files: arrayUnion(data),
+        });
+    }
+    res.status(200).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const uploadFile = async (req, res) => {
+  try {
+    console.log('HERE', req.files);
+    const { files } = req.body;
+    console.log(files.name);
+    console.log('REQBODY:', req.body);
+    const storageRef = ref(storage, `/images/${files.name}`);
+
+    uploadBytes(storageRef, files).then((snapshot) => {
+      console.log('jhkjhjkhjkhjh');
+      getDownloadURL(snapshot.ref).then((url) => {
+        res.status(202).json(url);
+      });
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // returns an array of all existing user profiles
 const getAllProfiles = async (req, res) => {
   try {
@@ -119,7 +317,18 @@ const updateModuleChildren = async (req, res) => {
     await updateDoc(moduleRef, {
       children: arrayUnion(docRef.id),
     });
-    res.status(200).json('success');
+    res.status(202).json(docRef.id);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const addModule = async (req, res) => {
+  try {
+    const { data } = req.body;
+    const dataRef = await db.collection('modules').add(data);
+    const { id } = dataRef; // newly added module's id
+    res.status(202).json(id);
   } catch (error) {
     res.status(400).json(error);
   }
@@ -151,6 +360,62 @@ const getModulebyId = async (req, res) => {
   }
 };
 
+const recursivelyDeletemodules = async (moduleID) => {
+  try {
+    const moduleRef = await db.collection('modules').doc(moduleID).get();
+    const currModule = moduleRef.data();
+    if (Array.isArray(currModule.children) && currModule.children.length > 0) {
+      // if there are submodules, recursively delete them
+      for (const child of currModule.children) {
+        await recursivelyDeletemodules(child);
+      }
+    }
+    if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
+      const parentRef = db.collection('modules').doc(currModule.parent);
+      const parentRefSnapshot = await parentRef.get();
+      const currParent = parentRefSnapshot.data();
+      const updatedChildren = currParent.children.filter((id) => id !== moduleID);
+      await parentRef.update({ children: updatedChildren }).then();
+    }
+    await db.collection('modules').doc(moduleID).delete(); // delete the current module
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteModule = async (req, res) => {
+  try {
+    const { moduleID } = req.params;
+    await recursivelyDeletemodules(moduleID);
+    res.status(202).json('successfully deleted module');
+  } catch (error) {
+    res.status(400).json('could not delete module');
+  }
+};
+
+const deleteFile = async (req, res) => {
+  try {
+    // delete path from module files array field
+    const { moduleID, fileToDelete } = req.body;
+    const moduleRef = await db.collection('modules').doc(moduleID);
+    const moduleRefSnapshot = await moduleRef.get();
+    const currModule = moduleRefSnapshot.data();
+    console.log('currModule is ', currModule);
+    const updateFileLinkField = currModule.fileLinks.filter((id) => id !== fileToDelete);
+    console.log('updatefilelinkfield is ', updateFileLinkField);
+    await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
+      console.log(currModule.fileLinks);
+    });
+
+    const storage = getStorage();
+    const fileRef = ref(storage, fileToDelete);
+    await deleteObject(fileRef);
+    res.status(202).json('successfully deleted module');
+  } catch (error) {
+    res.status(400).json('could not delete file');
+  }
+};
+
 // finds a matching profile in firebase, given a google account email
 const getGoogleaccount = async (req, res) => {
   try {
@@ -160,17 +425,42 @@ const getGoogleaccount = async (req, res) => {
     let googleData;
     await db.collection('profiles').where('email', '==', googleAccount).get().then(async (sc) => {
       // TODO: check that there is only one user with usernameSearch (error message if it does not exist)
-      for (const doc of sc.docs) {
-        const data = await doc.data();
-        data.id = doc.id;
+      sc.docs.forEach(async (tempDoc) => {
+        const data = await tempDoc.data();
+        data.id = tempDoc.id;
         googleData = data;
-      }
+      });
     });
     // error message if user doesn't exist (when data is undefined)
     if (googleData === undefined) {
       res.status(400).json('no existing user!');
     }
     res.status(202).json(googleData);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const updateTextField = async (req, res) => {
+  try {
+    const { inputText, id, field } = req.params;
+    if (field === 'body') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ body: inputText })
+        .catch((error) => {
+        // setUpdateProfileMessage('We ran into an error updating your text field!');
+          console.log(error);
+        });
+    } else if (field === 'title') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ title: inputText })
+        .catch((error) => {
+          // setUpdateProfileMessage('We ran into an error updating your text field!');
+          console.log(error);
+        });
+    }
   } catch (error) {
     res.status(400).json(error);
   }
@@ -188,6 +478,28 @@ const getUsernames = async (req, res) => {
         }
       });
       res.status(202).json(usernames);
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const getModules = async (req, res) => {
+  try {
+    const { currRole } = req.params;
+    const modules = [];
+    db.collection('modules').get().then((sc) => {
+      sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
+        const data = module.data();
+        if (data && data.role) {
+          data.id = module.id;
+          // fetching parent-level modules that we have permission to view
+          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
+            modules.push(data);
+          }
+        }
+      });
+      res.status(202).json(modules);
     });
   } catch (error) {
     res.status(400).json(error);
@@ -428,9 +740,19 @@ const sendMailchimpEmails = async (req, res) => {
 export {
   createEvent,
   patchEvent,
+  getMentees,
+  createMentee,
+  addMentee,
+  getMenteeFolders,
+  addMenteeFolder,
+  getMenteeFiles,
+  addMenteeFile,
+  uploadFile,
   getAllProfiles,
+  getModules,
   getModulebyId,
   getGoogleaccount,
+  updateTextField,
   getUsernames,
   getMessages,
   addToMailchimpList,
@@ -440,4 +762,7 @@ export {
   getProfilesSortedByDate,
   batchUpdateProfile,
   batchDeleteProfile,
+  deleteModule,
+  deleteFile,
+  addModule,
 };

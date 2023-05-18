@@ -1,8 +1,11 @@
 import Example from './Example';
 import Login from './Login';
 import MessageWall from './MessageWall';
+import Mentees from './Mentees';
+import ExpandedMentee from './ExpandedMentee';
+import Media from './Media';
 import Signup from './Signup';
-import Modules from './Modules';
+import Resources from './Resources';
 import Calendar from './Calendar';
 import ExpandedModule from './ExpandedModule';
 import NotFound from './NotFound';
@@ -14,7 +17,11 @@ export {
   Example,
   Login, Signup,
   MessageWall,
-  Modules, ExpandedModule,
+  Mentees,
+  ExpandedMentee,
+  Media,
+  ExpandedModule,
+  Resources,
   Calendar,
   NotFound,
   UserProfile,
