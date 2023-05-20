@@ -29,6 +29,8 @@ import {
   getProfilesSortedByDate,
   batchUpdateProfile,
   batchDeleteProfile,
+  batchAddToList,
+  batchDeleteFromList,
   deleteModule,
   deleteFile,
   addModule,
@@ -109,6 +111,10 @@ router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
 router.post('/batchUpdateProfile', batchUpdateProfile);
 
 router.post('/batchDeleteProfile', batchDeleteProfile);
+
+router.post('/batchAddToList', batchAddToList);
+
+router.post('/batchDeleteFromList', batchDeleteFromList);
 
 // mailchimp routes
 router.post('/mailchimp/addToList', addToMailchimpList);

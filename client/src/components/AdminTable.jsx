@@ -71,17 +71,13 @@ export default function AdminTable({
               role: user.role,
               serviceArea: user.serviceArea,
             };
-            approvedPayloadToMailchimp.push({});
+            approvedPayloadToMailchimp.push(payload);
           }
         });
 
-        const payload = {
-
-        };
-
         await api.batchUpdateProfile(approvedAccounts);
+        await api.batchAddToList(approvedPayloadToMailchimp);
 
-        api.addToList(payload);
         setTimeout(() => { window.location.reload(); }, 800);
         setApproveButton(false);
       }
@@ -92,15 +88,26 @@ export default function AdminTable({
 
   useEffect(() => {
     async function DeleteButtonHandler() {
+      // const deletedPayloadToMailchimp = [];
       const selectedAccounts = [];
       if (deleteButton) {
         table.forEach((user) => {
           if (user.checked) {
             selectedAccounts.push(user.id);
+            const payload = {
+              email_address: user.email,
+              firstName: user.name.split(' ')[0],
+              lastName: user.name.split(' ')[1],
+              role: user.role,
+              serviceArea: user.serviceArea,
+            };
+            // deletedPayloadToMailchimp.push(payload);
           }
         });
 
         api.batchDeleteProfile(selectedAccounts);
+        // await api.batchDeleteFromList(deletedPayloadToMailchimp);
+
         setTimeout(() => { window.location.reload(); }, 800);
         setDeleteButton(false);
       }

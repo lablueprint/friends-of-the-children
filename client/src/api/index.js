@@ -373,10 +373,34 @@ export const batchDeleteProfile = async (data) => {
   try {
     const payload = { profileDeletes: data };
     const response = await axios.post(`${url}/batchDeleteProfile`, payload);
-    console.log('updateProfile endpoint returns', response);
+    console.log('batchDeleteProfile endpoint returns', response);
     return response;
   } catch (error) {
-    console.error(`error occured in updateProfile endpoint:${error.message}`);
+    console.error(`error occured in batchDeleteProfile endpoint:${error.message}`);
+  }
+  return null;
+};
+
+export const batchAddToList = async (data) => {
+  try {
+    const payload = { listUpdates: data };
+    const response = await axios.post(`${url}/batchAddToList`, payload);
+    console.log('batchAddToList endpoint returns', response);
+    return response;
+  } catch (error) {
+    console.error(`error occured in batchAddToList endpoint:${error.message}`);
+  }
+  return null;
+};
+
+export const batchDeleteFromList = async (data) => {
+  try {
+    const payload = { listDeletes: data };
+    const response = await axios.post(`${url}/batchDeleteFromList`, payload);
+    console.log('batchDeleteFromList endpoint returns', response);
+    return response;
+  } catch (error) {
+    console.error(`error occured in batchDeleteFromList endpoint:${error.message}`);
   }
   return null;
 };

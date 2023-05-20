@@ -567,10 +567,10 @@ const batchUpdateProfile = async (req, res) => {
     const { profileUpdates } = req.body;
 
     profileUpdates.forEach((element) => {
-      const ref = db.collection('profiles').doc(element.id);
+      const updateRef = db.collection('profiles').doc(element.id);
       const updates = element.fields;
 
-      batch.update(ref, updates);
+      batch.update(updateRef, updates);
     });
 
     await batch.commit();
@@ -588,12 +588,10 @@ const batchDeleteProfile = async (req, res) => {
 
     const { profileDeletes } = req.body;
 
-    console.log(`profiles to be deleted are: ${profileDeletes}`);
-
     profileDeletes.forEach((element) => {
-      const ref = db.collection('profiles').doc(element);
+      const delRef = db.collection('profiles').doc(element);
 
-      batch.delete(ref);
+      batch.delete(delRef);
     });
 
     await batch.commit();
@@ -604,6 +602,61 @@ const batchDeleteProfile = async (req, res) => {
     res.status(400).json(error);
   }
 };
+
+const batchAddToList = async (req, res) => {
+  try {
+    const { listUpdates } = req.body;
+
+    const memberList = listUpdates.map((element) => ({
+      email_address: element.email_address,
+      status: 'subscribed',
+      merge_fields: {
+        FNAME: element.firstName,
+        LNAME: element.lastName,
+        ROLE: element.role,
+        SAREA: element.serviceArea,
+      },
+    }));
+
+    const response = await mailchimp.lists.batchListMembers(process.env.MAILCHIMP_AUDIENCE_ID, {
+      members: memberList,
+    });
+
+    res.status(202).json(response);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchDeleteFromList = async (req, res) => {
+  try {
+    const { listDeletes } = req.body;
+
+    console.log(`lists to be deleted are: ${listDeletes}`);
+
+    const memberList = listDeletes.map((element) => ({
+      email_address: element.email_address,
+      status: 'archived',
+      merge_fields: {
+        FNAME: element.firstName,
+        LNAME: element.lastName,
+        ROLE: element.role,
+        SAREA: element.serviceArea,
+      },
+    }));
+
+    const response = await mailchimp.lists.batchListMember(process.env.MAILCHIMP_AUDIENCE_ID, {
+      members: memberList,
+    });
+
+    res.status(202).json(response);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
 // mailchimp controllers
 
 const addToMailchimpList = async (req, res) => {
@@ -762,6 +815,8 @@ export {
   getProfilesSortedByDate,
   batchUpdateProfile,
   batchDeleteProfile,
+  batchAddToList,
+  batchDeleteFromList,
   deleteModule,
   deleteFile,
   addModule,

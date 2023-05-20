@@ -124,7 +124,7 @@ function Signup({ updateAppProfile }) {
               date: app.firebase.firestore.Timestamp.fromDate(new Date()),
             };
             db.collection('profiles').doc().set(data);
-            navigate('/unapproved', { state: { ...data } });
+            navigate('/unapproved');
           });
       } else {
         const data = {
@@ -139,7 +139,7 @@ function Signup({ updateAppProfile }) {
           date: app.firebase.firestore.Timestamp.fromDate(new Date()),
         };
         db.collection('profiles').doc().set(data);
-        navigate('/unapproved', { state: { ...data } });
+        navigate('/unapproved');
       }
       // reset forms
       setFirstName('');
