@@ -91,6 +91,20 @@ const patchEvent = async (req, res) => {
   }
 };
 
+// update medical clearance
+const updateClearance = async (req, res) => {
+  try {
+    const { id, clearance } = req.body;
+    await db.collection('mentees').doc(id)
+      .update({
+        medicalClearance: !clearance,
+      });
+    res.status(202).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // returns an array of filtered mentees
 const getMentees = async (req, res) => {
   try {
@@ -130,8 +144,22 @@ const createMentee = async (req, res) => {
 // update mentor's profile by adding the new mentee to mentee array field & create default folders
 const addMentee = async (req, res) => {
   try {
-    const { profileID, menteeID } = req.params;
+    const { profileID, menteeID, caregiverEmail } = req.params;
     const mentorRef = doc(db, 'profiles', profileID);
+
+    // add mentee ID to the caregiver's mentee array (based on the caregiver email)
+    await db.collection('profiles').where('email', '==', caregiverEmail).where('role', '==', 'Caregiver')
+      .get()
+      .then((sc) => {
+        sc.forEach((dc) => {
+          db.collection('profiles').doc(dc.id)
+            .update({
+              mentees: arrayUnion(menteeID),
+            });
+        });
+      });
+
+    // add mentee ID to the mentor's mentee array
     await updateDoc(mentorRef, {
       mentees: arrayUnion(menteeID),
     });
@@ -273,7 +301,7 @@ const uploadFile = async (req, res) => {
     console.log('HERE', req.files);
     const { files } = req.body;
     console.log(files.name);
-    console.log('REQBODY:', req.body);
+    // console.log('REQBODY:', req.body);
     const storageRef = ref(storage, `/images/${files.name}`);
 
     uploadBytes(storageRef, files).then((snapshot) => {
@@ -669,6 +697,7 @@ export {
   createEvent,
   patchEvent,
   getMentees,
+  updateClearance,
   createMentee,
   addMentee,
   getMenteeFolders,
