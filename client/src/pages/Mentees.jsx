@@ -15,7 +15,9 @@ function Mentees({ profile }) {
 
   useEffect(() => {
     api.getMentees(profile.id).then((tempMentees) => {
-      setMentees(tempMentees.data);
+      if (tempMentees) {
+        setMentees(tempMentees.data);
+      }
     });
   }, []);
 
