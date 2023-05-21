@@ -37,8 +37,8 @@ function ExpandedModule({ profile }) {
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
-  // const [refresh, setRefresh] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openFilePopup, setOpenFilePopup] = useState(false);
 
   const [currModuleFiles, setCurrModuleFiles] = useState([]);
 
@@ -73,13 +73,27 @@ function ExpandedModule({ profile }) {
     setChildren([...children, data]);
   };
 
-  const handleClickOpen = (file) => {
+  // opening add module popup
+  const handleClickOpen = () => {
     setOpen(true);
+  };
+
+  // opening file popup
+  const handleClickOpenFilePopup = (file) => {
+    setOpenFilePopup(true);
     setFileToDisplay(file);
   };
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleCloseFilePopup = () => {
+    setOpenFilePopup(false);
+  };
+
+  const handleDeleteFilesClose = () => {
+    setOpenDeleteFilesPopup(false);
   };
 
   useEffect(getModule, [id, currRole]); // possible TODO: refresh in dependency list
@@ -94,10 +108,6 @@ function ExpandedModule({ profile }) {
 
   const handleMouseLeave = () => {
     setHoveredFile(null);
-  };
-
-  const handleDeleteFilesClose = () => {
-    setOpenDeleteFilesPopup(false);
   };
 
   const handleCheckboxChange = (event, fileName) => {
@@ -263,7 +273,7 @@ function ExpandedModule({ profile }) {
           <div className={styles.fileContainer}>
             {(file.fileType.includes('image')) && (
             <div key={file.url}>
-              <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
+              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <img className={styles.displayImg} src={file.url} alt={file.fileName} />
               </div>
               <div className={styles.descriptionContainer}>
@@ -287,7 +297,7 @@ function ExpandedModule({ profile }) {
             )}
             {(file.fileType.includes('video')) && (
             <div key={file.url}>
-              <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
+              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
                   <track default kind="captions" />
                 </video>
@@ -313,7 +323,7 @@ function ExpandedModule({ profile }) {
             )}
             {(file.fileType.includes('pdf')) && (
             <div key={file.url}>
-              <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
+              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <embed className={styles.preview} src={file.url} alt={file.fileName} />
               </div>
               <div className={styles.descriptionContainer}>
@@ -335,11 +345,11 @@ function ExpandedModule({ profile }) {
               </div>
             </div>
             )}
-            {open && (
+            {openFilePopup && (
             <FilePopup
               file={fileToDisplay}
-              open={open}
-              handleClose={handleClose}
+              open={openFilePopup}
+              handleClose={handleCloseFilePopup}
             />
             )}
           </div>
