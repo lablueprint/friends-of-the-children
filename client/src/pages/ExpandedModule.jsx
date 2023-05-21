@@ -49,7 +49,6 @@ function ExpandedModule({ profile }) {
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
-  const [fileOpen, setFileOpen] = useState(false);
 
   const getModulebyIdfunc = async (tempId, tempcurrRole) => {
     // data object structured as {data, children_array}
@@ -73,22 +72,15 @@ function ExpandedModule({ profile }) {
     setChildren([...children, data]);
   };
 
-  const handleClickOpen = () => {
+  const handleClickOpen = (file) => {
     setOpen(true);
+    setFileToDisplay(file);
   };
 
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleClickOpenFile = (file) => {
-    setFileOpen(true);
-    setFileToDisplay(file);
-  };
-
-  const handleCloseFile = () => {
-    setFileOpen(false);
-  };
   useEffect(getModule, [id, currRole]); // possible TODO: refresh in dependency list
 
   const deleteChild = (childId) => {
@@ -267,20 +259,19 @@ function ExpandedModule({ profile }) {
         </div>
         {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
         {files.map((file) => (
-          <div className={styles.file}>
+          <div className={styles.fileContainer}>
             {(file.fileType.includes('image')) && (
-            <div key={file} className={styles.descriptionBar}>
-              <div className={styles.preview} onClick={() => (handleClickOpenFile(file))} role="presentation">
+            <div key={file.url}>
+              <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
                 <img className={styles.displayImg} src={file.url} alt={file.fileName} />
               </div>
-              <div>
+              <div className={styles.descriptionContainer}>
                 <div
                   key={file.fileLink}
                   onMouseEnter={() => handleMouseEnter(file.fileLink)}
                   onMouseLeave={handleMouseLeave}
                 >
                   <img src={file.imageSrc} alt={file.name} />
-                  {/* <div className={styles.descriptionBar}> */}
                   {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
                     <Checkbox
                       checked={checked.includes(file.fileLink)}
@@ -288,20 +279,19 @@ function ExpandedModule({ profile }) {
                       className={styles.checkbox}
                     />
                   ) : (<img src={imgIcon} alt="img icon" />)}
-                  {/* </div> */}
-                  <div className={styles.fileName}>{file.fileName}</div>
                 </div>
+                <div className={styles.fileName}>{file.fileName}</div>
               </div>
             </div>
             )}
             {(file.fileType.includes('video')) && (
             <div key={file.url}>
-              <div className={styles.preview} onClick={() => (handleClickOpenFile(file))} role="presentation">
+              <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
                 <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
                   <track default kind="captions" />
                 </video>
               </div>
-              <div className={styles.description}>
+              <div className={styles.descriptionContainer}>
                 <div
                   key={file.fileLink}
                   onMouseEnter={() => handleMouseEnter(file.fileLink)}
@@ -321,11 +311,11 @@ function ExpandedModule({ profile }) {
             </div>
             )}
             {(file.fileType.includes('pdf')) && (
-            <div key={file.url} className="pdf">
-              <div className={styles.preview} onClick={() => (handleClickOpenFile(file))} role="presentation">
+            <div key={file.url}>
+              <div className={styles.preview} onClick={() => (handleClickOpen(file))} role="presentation">
                 <embed className={styles.preview} src={file.url} alt={file.fileName} />
               </div>
-              <div className={styles.description}>
+              <div className={styles.descriptionContainer}>
                 <div
                   key={file.fileLink}
                   onMouseEnter={() => handleMouseEnter(file.fileLink)}
@@ -344,11 +334,11 @@ function ExpandedModule({ profile }) {
               </div>
             </div>
             )}
-            {fileOpen && (
+            {open && (
             <FilePopup
               file={fileToDisplay}
-              open={fileOpen}
-              handleClose={handleCloseFile}
+              open={open}
+              handleClose={handleClose}
             />
             )}
           </div>
@@ -422,12 +412,14 @@ function ExpandedModule({ profile }) {
                     selected
                   </div>
                 </div>
-                <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
-                  Cancel
-                </button>
-                <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
-                  Delete
-                </button>
+                <div className={styles.cancelOrDelete}>
+                  <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                    Cancel
+                  </button>
+                  <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                    Delete
+                  </button>
+                </div>
               </div>
             )
             : <div />}
