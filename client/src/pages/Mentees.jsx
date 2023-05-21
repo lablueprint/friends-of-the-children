@@ -14,11 +14,13 @@ function Mentees({ profile, updateAppProfile }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    api.getMentees(profile.id).then((tempMentees) => {
-      if (tempMentees) {
-        setMentees(tempMentees.data);
-      }
-    });
+    if (profile.role === 'Admin') {
+      api.getMentees().then((tempMentees) => {
+        if (tempMentees) {
+          setMentees(tempMentees.data);
+        }
+      });
+    }
   }, []);
 
   const addChild = async (e) => {
@@ -56,7 +58,11 @@ function Mentees({ profile, updateAppProfile }) {
 
       const newProfile = {
         ...profile,
-        mentees: [...profile.mentees, menteeID],
+        // mentees: [...profile.mentees, menteeID],
+
+        // checks if profile.mentees is an array, if it is, it creates a new array with existing values
+        // and the new 'menteeID', if profile.mentees is not an array, creates a new array with just menteeid
+        mentees: Array.isArray(profile.mentees) ? [...profile.mentees, menteeID] : [menteeID],
       };
       updateAppProfile(newProfile);
 
