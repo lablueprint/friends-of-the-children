@@ -24,6 +24,7 @@ import pdfIcon from '../assets/icons/file_pdf.svg';
 import styles from '../styles/Modules.module.css';
 
 import NewModulePopup from '../components/NewModulePopup';
+import Module from '../components/Module';
 import * as api from '../api';
 
 // Loads additional modules once user clicks into a root module
@@ -356,7 +357,7 @@ function ExpandedModule({ profile }) {
         {
         children.map((kid) => (
           <div>
-            <div className={styles.card}>
+            {/* <div className={styles.card}>
               <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
                 <h1>{kid.title}</h1>
               </Link>
@@ -369,8 +370,8 @@ function ExpandedModule({ profile }) {
                 {' '}
               </button>
               )}
-            </div>
-
+            </div> */}
+            <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} />
           </div>
         ))
       }
