@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import NewModulePopup from '../components/NewModulePopup';
-import styles from '../styles/Modules.module.css';
+import Module from '../components/Module';
 import * as api from '../api';
 
 function Resources({ profile }) {
@@ -45,18 +44,7 @@ function Resources({ profile }) {
     return (
       <div>
         {modules.map((card) => (
-          <div key={card.id} className={styles.card}>
-            <Link
-              to="/expanded-module"
-              state={{ id: card.id }}
-            >
-              <div>
-                <h1>{card.title}</h1>
-              </div>
-            </Link>
-            <button type="button" onClick={() => { deleteModule(card.id); }}> Delete Module </button>
-
-          </div>
+          <Module title={card.title} id={card.id} role={currRole} deleteModule={deleteModule} />
         ))}
         <Button variant="outlined" onClick={handleClickOpen}>
           Add module
@@ -73,16 +61,8 @@ function Resources({ profile }) {
   return (
     <div>
       {modules.map((card) => (
-        <div key={card.id}>
-          <Link
-            to="/expanded-module"
-            state={{ id: card.id }}
-          >
-            <div className={styles.card}>
-              <h1>{card.title}</h1>
-            </div>
-          </Link>
-        </div>
+        <Module title={card.title} id={card.id} role={currRole} deleteModule={deleteModule} />
+
       ))}
     </div>
   );
