@@ -376,6 +376,7 @@ UserProfile.propTypes = {
     bio: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
     google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,
 };
