@@ -16,6 +16,7 @@ import * as api from '../api';
 import UserIcon from '../assets/icons/user_icon.svg';
 import LocationIcon from '../assets/icons/location_icon.svg';
 import { login } from '../redux/sliceAuth';
+import { serviceAreas } from '../constants';
 
 // Allows users to see and change their profile properties
 function UserProfile({ profile, updateAppProfile }) {
@@ -161,7 +162,7 @@ function UserProfile({ profile, updateAppProfile }) {
         <div>
           <div className={styles.pfp}>
             <img src={imageUrl} alt="profile pic" className={styles.profile_pic} />
-            <label htmlFor="uploadImage" className={styles.custom_file_upload}>
+            <label htmlFor={uploadImage} className={styles.custom_file_upload}>
               <input type="file" accept=".png,.jpg,.svg,.gif" onChange={uploadImage} />
             </label>
           </div>
@@ -334,6 +335,8 @@ function UserProfile({ profile, updateAppProfile }) {
 
       )}
       {profile && (
+      <div className={styles.info_container_right}>
+        <h4 className={styles.info_label}>Bio</h4>
         <div className={styles.labels_container}>
           {!editProfile && <p>Bio:</p>}
           <TextField
@@ -351,6 +354,7 @@ function UserProfile({ profile, updateAppProfile }) {
             onChange={(event) => HandleChange(event, 'bio')}
           />
         </div>
+      </div>
       )}
     </div>
   );

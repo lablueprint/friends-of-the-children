@@ -9,13 +9,15 @@ import styles from '../styles/Mentees.module.css';
 import * as api from '../api';
 // import MenteeImage from '../assets/images/empty_mentees.svg';
 
-function Mentees({ profile }) {
+function Mentees({ profile, updateAppProfile }) {
   const [mentees, setMentees] = useState([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     api.getMentees(profile.id).then((tempMentees) => {
-      setMentees(tempMentees.data);
+      if (tempMentees) {
+        setMentees(tempMentees.data);
+      }
     });
   }, []);
 
@@ -51,6 +53,12 @@ function Mentees({ profile }) {
       setMentees(tempMentees);
 
       api.addMentee(profile.id, menteeID);
+
+      const newProfile = {
+        ...profile,
+        mentees: [...profile.mentees, menteeID],
+      };
+      updateAppProfile(newProfile);
 
       setOpen(false);
       e.target.reset();
@@ -140,8 +148,9 @@ Mentees.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
-    mentees: PropTypes.arrayOf.isRequired,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
+  updateAppProfile: PropTypes.func.isRequired,
 };
 
 export default Mentees;
