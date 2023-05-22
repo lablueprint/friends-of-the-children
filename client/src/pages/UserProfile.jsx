@@ -186,176 +186,179 @@ function UserProfile({ profile, updateAppProfile }) {
         </div>
       </div>
       <p>{updateProfileMessage}</p>
-
-      <h4 className={styles.info_label}>Basic Information</h4>
-      {profile && profile.firstName && (
-        <div className={styles.labels_container}>
-          {!editProfile && <p>First Name:</p>}
-          <TextField
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            disabled={!editProfile}
-            label={editProfile ? 'First Name' : ''}
-            id="firstName"
-            className={!editProfile ? styles.label : styles.label2}
-            value={updatedProfile.firstName}
-            InputProps={{
-              readOnly: !editProfile,
-            }}
-            onChange={(event) => HandleChange(event, 'firstName')}
-          />
-        </div>
-      )}
-      {profile && profile.lastName && (
-        <div className={styles.labels_container}>
-          {!editProfile && <p>Last Name:</p>}
-          <TextField
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            disabled={!editProfile}
-            label={editProfile ? 'Last Name' : ''}
-            id="lastName"
-            className={!editProfile ? styles.label : styles.label2}
-            value={updatedProfile.lastName}
-            InputProps={{
-              readOnly: !editProfile,
-            }}
-            onChange={(event) => HandleChange(event, 'lastName')}
-          />
-        </div>
-      )}
-      {profile && profile.email && (
-        <div className={styles.labels_container}>
-          {!editProfile && <p>Email:</p>}
-          <TextField
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            disabled={!editProfile}
-            label={editProfile ? 'Email' : ''}
-            id="email"
-            className={!editProfile ? styles.label : styles.label2}
-            value={updatedProfile.email}
-            InputProps={{
-              readOnly: !editProfile,
-            }}
-            onChange={(event) => HandleChange(event, 'email')}
-          />
-        </div>
-      )}
-
-      <h4 className={styles.info_label}>Login Information</h4>
-      {profile && profile.username && (
-        <div className={styles.labels_container}>
-          {!editProfile && <p>Username:</p>}
-          <TextField
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            disabled={!editProfile}
-            label={editProfile ? 'Username' : ''}
-            id="username"
-            className={!editProfile ? styles.label : styles.label2}
-            value={updatedProfile.username}
-            InputProps={{
-              readOnly: !editProfile,
-            }}
-            onChange={(event) => HandleChange(event, 'username')}
-          />
-        </div>
-      )}
-      {/* Password start, old + new passwords only shows when editing */}
-      {profile && editProfile && (
-        <div>
+      <div className={styles.info_flex}>
+        <div className={styles.info_flex_left}>
+          <h4 className={styles.info_label}>Basic Information</h4>
+          {profile && profile.firstName && (
           <div className={styles.labels_container}>
+            {!editProfile && <p>First Name:</p>}
             <TextField
               sx={{
                 fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
               }}
               disabled={!editProfile}
-              label="Verify your old Password"
-              id="password"
+              label={editProfile ? 'First Name' : ''}
+              id="firstName"
               className={!editProfile ? styles.label : styles.label2}
-              value={oldPassword}
+              value={updatedProfile.firstName}
               InputProps={{
                 readOnly: !editProfile,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowOldPassword}
-                      onMouseDown={handleMouseDownOldPassword}
-                      edge="end"
-                    >
-                      {showOldPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
               }}
-              type={showOldPassword ? 'text' : 'password'}
-              onChange={(event) => handleOldPasswordChange(event)}
-              onKeyDown={(ev) => {
-                if (ev.key === 'Enter') {
-                  verifyOldPasswordMatches(ev);
-                }
-              }}
+              onChange={(event) => HandleChange(event, 'firstName')}
             />
           </div>
+          )}
+          {profile && profile.lastName && (
           <div className={styles.labels_container}>
-            { /* New password */ }
+            {!editProfile && <p>Last Name:</p>}
             <TextField
               sx={{
                 fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
               }}
-              disabled={!newPasswordAllowed}
-              label="New Password"
-              id="password"
+              disabled={!editProfile}
+              label={editProfile ? 'Last Name' : ''}
+              id="lastName"
               className={!editProfile ? styles.label : styles.label2}
-              value={newPassword}
+              value={updatedProfile.lastName}
               InputProps={{
                 readOnly: !editProfile,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowNewPassword}
-                      onMouseDown={handleMouseDownNewPassword}
-                      edge="end"
-                    >
-                      {showNewPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
               }}
-              type={showNewPassword ? 'text' : 'password'}
-              onChange={(event) => handleNewPasswordChange(event)}
+              onChange={(event) => HandleChange(event, 'lastName')}
+            />
+          </div>
+          )}
+          {profile && profile.email && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Email:</p>}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'Email' : ''}
+              id="email"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.email}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'email')}
+            />
+          </div>
+          )}
+
+          <h4 className={styles.info_label}>Login Information</h4>
+          {profile && profile.username && (
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Username:</p>}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'Username' : ''}
+              id="username"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.username}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'username')}
+            />
+          </div>
+          )}
+          {/* Password start, old + new passwords only shows when editing */}
+          {profile && editProfile && (
+          <div>
+            <div className={styles.labels_container}>
+              <TextField
+                sx={{
+                  fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+                }}
+                disabled={!editProfile}
+                label="Verify your old Password"
+                id="password"
+                className={!editProfile ? styles.label : styles.label2}
+                value={oldPassword}
+                InputProps={{
+                  readOnly: !editProfile,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleClickShowOldPassword}
+                        onMouseDown={handleMouseDownOldPassword}
+                        edge="end"
+                      >
+                        {showOldPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                type={showOldPassword ? 'text' : 'password'}
+                onChange={(event) => handleOldPasswordChange(event)}
+                // TODO: change this to be more intuitive or make checking instructions explicit
+                onKeyDown={(ev) => {
+                  if (ev.key === 'Enter') {
+                    verifyOldPasswordMatches(ev);
+                  }
+                }}
+              />
+            </div>
+            <div className={styles.labels_container}>
+              { /* New password */ }
+              <TextField
+                sx={{
+                  fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+                }}
+                disabled={!newPasswordAllowed}
+                label="New Password"
+                id="password"
+                className={!editProfile ? styles.label : styles.label2}
+                value={newPassword}
+                InputProps={{
+                  readOnly: !editProfile,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleClickShowNewPassword}
+                        onMouseDown={handleMouseDownNewPassword}
+                        edge="end"
+                      >
+                        {showNewPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                type={showNewPassword ? 'text' : 'password'}
+                onChange={(event) => handleNewPasswordChange(event)}
+              />
+            </div>
+          </div>
+          )}
+        </div>
+        {profile && (
+        <div className={styles.info_container_right}>
+          <h4 className={styles.info_label}>Bio</h4>
+          <div className={styles.labels_container}>
+            {!editProfile && <p>Bio:</p>}
+            <TextField
+              sx={{
+                fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
+              }}
+              disabled={!editProfile}
+              label={editProfile ? 'Bio' : ''}
+              id="bio"
+              className={!editProfile ? styles.label : styles.label2}
+              value={updatedProfile.bio}
+              InputProps={{
+                readOnly: !editProfile,
+              }}
+              onChange={(event) => HandleChange(event, 'bio')}
             />
           </div>
         </div>
-
-      )}
-      {profile && (
-      <div className={styles.info_container_right}>
-        <h4 className={styles.info_label}>Bio</h4>
-        <div className={styles.labels_container}>
-          {!editProfile && <p>Bio:</p>}
-          <TextField
-            sx={{
-              fieldset: { borderColor: editProfile ? '#156DBF !important' : 'transparent !important' },
-            }}
-            disabled={!editProfile}
-            label={editProfile ? 'Bio' : ''}
-            id="bio"
-            className={!editProfile ? styles.label : styles.label2}
-            value={updatedProfile.bio}
-            InputProps={{
-              readOnly: !editProfile,
-            }}
-            onChange={(event) => HandleChange(event, 'bio')}
-          />
-        </div>
+        )}
       </div>
-      )}
     </div>
   );
 }
