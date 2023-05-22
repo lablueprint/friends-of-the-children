@@ -1,22 +1,33 @@
+.container{
+    padding-left: 5rem;
+    padding-right: 5rem;
+    padding-top: 1.5rem;
+}
+
 .bigtitle{
-    position: absolute;
     width: 217px;
-    height: 57px;
-    left: 360px;
-    top: 64px;
+    height: 3.56rem;
+    left: 22.5rem;
+    top: 4rem;
 
     font-family: 'News Gothic';
     font-style: normal;
     font-weight: 700;
-    font-size: 48px;
-    line-height: 57px;
-    /* identical to box height */
-    
-    /* text */
+    font-size: 3rem;
     color: #3F3F3F;
 }
 
 .button_width{
     margin: 0;
     margin-bottom: 20px !important;
+}
+
+.line {
+    width: 93%;
+    height: 1px;
+    background: #989898;
+  }
+
+.tabs {
+    padding-left: 6rem;
 }

@@ -123,18 +123,21 @@ function Requests() {
   }, []);
 
   return (
-    <div>
-      <h1 className={styles.bigTitle}>
+    <div className={styles.container}>
+      <h1 className={styles.bigtitle}>
         Requests
       </h1>
-      <Tabs
-        value={value}
-        onChange={handleTabChange}
-        aria-label="basic tabs example"
-      >
-        <HomeTab label="New Users" {...a11yProps(1)} />
-        <HomeTab label="All Users" {...a11yProps(2)} />
-      </Tabs>
+      <div>
+        <Tabs
+          value={value}
+          onChange={handleTabChange}
+          aria-label="basic tabs example"
+        >
+          <HomeTab label="New Users" {...a11yProps(1)} />
+          <HomeTab label="All Users" {...a11yProps(2)} />
+        </Tabs>
+        <div className={styles.line} />
+      </div>
       <TabPanel value={value} index={0}>
         {currentAccounts
             && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
