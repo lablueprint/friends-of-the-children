@@ -56,6 +56,7 @@ function App() {
                 <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                 <Route path="/requests" element={(<Requests profile={currUser} />)} />
                 <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />
+                <Route path="*" element={(<NotFound isLoggedIn={isLoggedIn} />)} />
               </Routes>
             </div>
           </div>
@@ -69,7 +70,7 @@ function App() {
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
             <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />
-            <Route path="*" element={(<NotFound />)} />
+            <Route path="*" element={(<NotFound isLoggedIn={isLoggedIn} />)} />
           </Routes>
         </div>
       )

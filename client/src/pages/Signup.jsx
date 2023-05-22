@@ -122,6 +122,7 @@ function Signup({ updateAppProfile }) {
               image: 'https://i.pinimg.com/550x/18/b9/ff/18b9ffb2a8a791d50213a9d595c4dd52.jpg',
               approved: false,
               date: app.firebase.firestore.Timestamp.fromDate(new Date()),
+              mentees: [],
             };
             db.collection('profiles').doc().set(data);
             navigate('/unapproved');
@@ -137,6 +138,7 @@ function Signup({ updateAppProfile }) {
           google: true,
           approved: false,
           date: app.firebase.firestore.Timestamp.fromDate(new Date()),
+          mentees: [],
         };
         db.collection('profiles').doc().set(data);
         navigate('/unapproved');

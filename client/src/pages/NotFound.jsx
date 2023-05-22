@@ -5,11 +5,18 @@
 // route that wasn't defined by any previous routes such as login, signup, etc.
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default function NotFound() {
+export default function NotFound({ isLoggedIn }) {
   return (
     <div>
-      <h1>Page not accesible. Please login first!</h1>
+      {isLoggedIn
+        ? <h1>404 Page Not Found. Please contact the system administrator if you believe you are seeing this page in error.</h1>
+        : <h1>Page not accesible. Please login first!</h1>}
     </div>
   );
 }
+
+NotFound.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
+};
