@@ -81,7 +81,6 @@ function Requests() {
 
   useEffect(() => {
     async function fetchProfiles() {
-      // ask jerry how to get the data sorted
       const { data } = await api.getProfilesSortedByDate();
 
       // filter array of profile objects (also make sure they all have approved and date fields in firebase)

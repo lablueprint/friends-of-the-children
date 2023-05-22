@@ -34,9 +34,6 @@ export default function AdminTable({
     setTable(users.map((user) => createData(false, user.name, user.username, user.email, user.role, user.epochDate, user.status, user.id, user.serviceArea)));
   }, [users]);
 
-  // setTable(rows);
-  // }, [rows]);
-
   // print whenever table is updated
   useEffect(() => {
     const num = table.reduce((accum, user) => {
@@ -116,11 +113,8 @@ export default function AdminTable({
     DeleteButtonHandler();
   }, [deleteButton]);
 
-  // useEffect(() => console.log(table), [table]);
-
   function handleChange(e, username) {
     setTable((prevValue) => prevValue.map((user) => {
-      // console.log(prevValue.checked);
       if (user.username === username) {
         return {
           // return the user with the checked state updated
