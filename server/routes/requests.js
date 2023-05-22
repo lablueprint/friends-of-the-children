@@ -8,6 +8,7 @@ import {
   createEvent,
   patchEvent,
   getMentees,
+  updateClearance,
   createMentee,
   addMentee,
   getAllMentees,
@@ -52,11 +53,14 @@ router.get('/getAllMentees', getAllMentees);
 // gets the mentee's folders
 router.get('/getMenteeFolders/id=:id', getMenteeFolders);
 
+// update clearance
+router.post('/updateClearance', updateClearance);
+
 // creates a new mentee doc
 router.post('/createMentee', createMentee);
 
 // add a new mentee (link to mentor + create default folders)
-router.post('/addMentee/profileID=:profileID/menteeID=:menteeID', addMentee);
+router.post('/addMentee/profileID=:profileID/menteeID=:menteeID/caregiverEmail=:caregiverEmail', addMentee);
 
 // creates a new mentee folder
 router.post('/addMenteeFolder/id=:id/folder=:folderName', addMenteeFolder);

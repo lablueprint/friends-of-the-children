@@ -30,10 +30,22 @@ export const patchEvent = async (eventData) => {
   return null;
 };
 
-// get a profile's mentees
-export const getMentees = async () => {
+// get all mentees
+export const getAllMentees = async () => {
   try {
     const mentees = await axios.get(`${url}/getAllMentees`);
+    return mentees;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get mentees');
+  }
+  return null;
+};
+
+// get a profile's specific mentees
+export const getMentees = async (profileID) => {
+  try {
+    const mentees = await axios.get(`${url}/getMentees/profileID=${profileID}`);
     return mentees;
   } catch (error) {
     console.error(error.message);
@@ -53,10 +65,23 @@ export const createMentee = async (stuff) => {
   }
   return null;
 };
-// add a new mentee (link to mentor + create default folders)
-export const addMentee = async (profileID, menteeID) => {
+
+// update medical clearance of a mentee
+export const updateClearance = async (id, clearance) => {
   try {
-    const newMentee = await axios.post(`${url}/addMentee/profileID=${profileID}/menteeID=${menteeID}`);
+    const med = await axios.post(`${url}/updateClearance`, { id, clearance });
+    return med;
+  } catch (error) {
+    console.log(error.message);
+    console.log('could not update medical clearance');
+  }
+  return null;
+};
+
+// add a new mentee (link to mentor + create default folders)
+export const addMentee = async (profileID, menteeID, caregiverEmail) => {
+  try {
+    const newMentee = await axios.post(`${url}/addMentee/profileID=${profileID}/menteeID=${menteeID}/caregiverEmail=${caregiverEmail}`);
     return newMentee;
   } catch (error) {
     console.error(error.message);

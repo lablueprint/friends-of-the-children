@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import {
+  MenuItem, FormControl, InputLabel, Select,
+} from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -9,13 +12,30 @@ import styles from '../styles/Mentees.module.css';
 import * as api from '../api';
 // import MenteeImage from '../assets/images/empty_mentees.svg';
 
-function Mentees({ profile, updateAppProfile }) {
+function Mentees({ profile }) {
   const [mentees, setMentees] = useState([]);
   const [open, setOpen] = useState(false);
+  const role = (profile.role).toLowerCase();
+
+  // useEffect(() => {
+  //   if (role === 'admin') {
+  //     api.getMentees().then((tempMentees) => {
+  //       if (tempMentees) {
+  //         setMentees(tempMentees.data);
+  //       }
+  //     });
+  //   }
+  // }, []);
 
   useEffect(() => {
-    if (profile.role === 'Admin') {
-      api.getMentees().then((tempMentees) => {
+    if (role === 'admin') {
+      api.getAllMentees().then((tempMentees) => {
+        if (tempMentees) {
+          setMentees(tempMentees.data);
+        }
+      });
+    } else {
+      api.getMentees(profile.id).then((tempMentees) => {
         if (tempMentees) {
           setMentees(tempMentees.data);
         }
@@ -32,6 +52,13 @@ function Mentees({ profile, updateAppProfile }) {
     const caregiverFirstName = e.target.caregiverFirstName.value;
     const caregiverLastName = e.target.caregiverLastName.value;
     const caregiverEmail = e.target.caregiverEmail.value;
+    let medicalClearance = e.target.medicalClearance.value;
+
+    if (medicalClearance === 'false') {
+      medicalClearance = false;
+    } else {
+      medicalClearance = true;
+    }
 
     const data = {
       firstName,
@@ -41,6 +68,7 @@ function Mentees({ profile, updateAppProfile }) {
       caregiverFirstName,
       caregiverLastName,
       caregiverEmail,
+      medicalClearance,
     };
 
     // add new mentee object to mentees collection on firebase
@@ -54,17 +82,17 @@ function Mentees({ profile, updateAppProfile }) {
       const tempMentees = [...mentees, data2];
       setMentees(tempMentees);
 
-      api.addMentee(profile.id, menteeID);
+      api.addMentee(profile.id, menteeID, caregiverEmail);
 
-      const newProfile = {
-        ...profile,
-        // mentees: [...profile.mentees, menteeID],
+      // const newProfile = {
+      //   ...profile,
+      //   // mentees: [...profile.mentees, menteeID],
 
-        // checks if profile.mentees is an array, if it is, it creates a new array with existing values
-        // and the new 'menteeID', if profile.mentees is not an array, creates a new array with just menteeid
-        mentees: Array.isArray(profile.mentees) ? [...profile.mentees, menteeID] : [menteeID],
-      };
-      updateAppProfile(newProfile);
+      //   // checks if profile.mentees is an array, if it is, it creates a new array with existing values
+      //   // and the new 'menteeID', if profile.mentees is not an array, creates a new array with just menteeid
+      //   mentees: Array.isArray(profile.mentees) ? [...profile.mentees, menteeID] : [menteeID],
+      // };
+      // updateAppProfile(newProfile);
 
       setOpen(false);
       e.target.reset();
@@ -82,10 +110,12 @@ function Mentees({ profile, updateAppProfile }) {
 
   return (
     <div className={styles.mentees_page}>
-      <h1>My Mentees</h1>
+      <h1>My Youth</h1>
+      {role === 'mentor' && (
       <Button variant="contained" onClick={handleClickOpen}>
-        Add Child :D
+        Add Youth
       </Button>
+      )}
 
       {/* {(mentees.length === 0) && (<img src={MenteeImage} alt="mentees" />)} */}
 
@@ -95,7 +125,7 @@ function Mentees({ profile, updateAppProfile }) {
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders,
+                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders, medicalClearance: mentee.medicalClearance,
               }}
             >
               <div className={styles.card}>
@@ -132,6 +162,21 @@ function Mentees({ profile, updateAppProfile }) {
               <br />
               Email:
               <input type="text" name="caregiverEmail" required />
+              <br />
+              <br />
+              <FormControl sx={{ width: '100%' }}>
+                <InputLabel>Medical Clearance</InputLabel>
+                <Select
+                  id="med"
+                  label="Medical Clearance"
+                  name="medicalClearance"
+                  defaultValue="False"
+                  required
+                >
+                  <MenuItem value="false">Not Cleared</MenuItem>
+                  <MenuItem value="true">Cleared</MenuItem>
+                </Select>
+              </FormControl>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
                 <Button type="submit">Add Child</Button>
@@ -156,7 +201,7 @@ Mentees.propTypes = {
     serviceArea: PropTypes.string.isRequired,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  updateAppProfile: PropTypes.func.isRequired,
+  // updateAppProfile: PropTypes.func.isRequired,
 };
 
 export default Mentees;
