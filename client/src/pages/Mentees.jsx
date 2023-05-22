@@ -12,20 +12,10 @@ import styles from '../styles/Mentees.module.css';
 import * as api from '../api';
 // import MenteeImage from '../assets/images/empty_mentees.svg';
 
-function Mentees({ profile }) {
+function Mentees({ profile, updateAppProfile }) {
   const [mentees, setMentees] = useState([]);
   const [open, setOpen] = useState(false);
   const role = (profile.role).toLowerCase();
-
-  // useEffect(() => {
-  //   if (role === 'admin') {
-  //     api.getMentees().then((tempMentees) => {
-  //       if (tempMentees) {
-  //         setMentees(tempMentees.data);
-  //       }
-  //     });
-  //   }
-  // }, []);
 
   useEffect(() => {
     if (role === 'admin') {
@@ -84,15 +74,11 @@ function Mentees({ profile }) {
 
       api.addMentee(profile.id, menteeID, caregiverEmail);
 
-      // const newProfile = {
-      //   ...profile,
-      //   // mentees: [...profile.mentees, menteeID],
-
-      //   // checks if profile.mentees is an array, if it is, it creates a new array with existing values
-      //   // and the new 'menteeID', if profile.mentees is not an array, creates a new array with just menteeid
-      //   mentees: Array.isArray(profile.mentees) ? [...profile.mentees, menteeID] : [menteeID],
-      // };
-      // updateAppProfile(newProfile);
+      const newProfile = {
+        ...profile,
+        mentees: [...profile.mentees, menteeID],
+      };
+      updateAppProfile(newProfile);
 
       setOpen(false);
       e.target.reset();
@@ -204,7 +190,7 @@ Mentees.propTypes = {
     google: PropTypes.bool,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  // updateAppProfile: PropTypes.func.isRequired,
+  updateAppProfile: PropTypes.func.isRequired,
 };
 
 export default Mentees;
