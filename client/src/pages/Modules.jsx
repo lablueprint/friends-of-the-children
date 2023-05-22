@@ -177,6 +177,11 @@ Modules.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
 export default Modules;
