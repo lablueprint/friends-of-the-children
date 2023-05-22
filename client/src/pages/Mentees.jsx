@@ -12,7 +12,7 @@ import styles from '../styles/Mentees.module.css';
 import * as api from '../api';
 // import MenteeImage from '../assets/images/empty_mentees.svg';
 
-function Mentees({ profile }) {
+function Mentees({ profile, updateAppProfile }) {
   const [mentees, setMentees] = useState([]);
   const [open, setOpen] = useState(false);
   const role = (profile.role).toLowerCase();
@@ -65,6 +65,12 @@ function Mentees({ profile }) {
       setMentees(tempMentees);
 
       api.addMentee(profile.id, menteeID, caregiverEmail);
+
+      const newProfile = {
+        ...profile,
+        mentees: [...profile.mentees, menteeID],
+      };
+      updateAppProfile(newProfile);
 
       setOpen(false);
       e.target.reset();
@@ -164,15 +170,19 @@ function Mentees({ profile }) {
 
 Mentees.propTypes = {
   profile: PropTypes.shape({
-    id: PropTypes.string.isRequired,
     firstName: PropTypes.string.isRequired,
     lastName: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
+  updateAppProfile: PropTypes.func.isRequired,
 };
 
 export default Mentees;

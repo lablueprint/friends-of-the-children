@@ -8,37 +8,64 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: center;
     height: 97vh;
 }
+
+.container > * {
+    flex: 1 1 300px;
+  }
 
 .left_column{
     display: flex;
     justify-content: center;
     flex-direction: column;
-    width: 500px;
-    /* flex: 50% */
 }
 
 .signinForm{
     display: flex;
     justify-content: center;
     flex-direction: column;
-    max-width: 500px;
     text-align: left;
-    /* margin-left: 30px !important; */
-    /* flex: 50% */
 }
+
+@media screen and (max-width: 650px) {
+    .signinForm{
+        margin: 50px !important;
+    }
+    .signinForm div{
+        width: 100% !important;
+    }
+    .family_img{
+        margin-top: 150px !important;
+        width: 75vw !important;
+    }
+    .left_column{
+        margin: 0 50px 0 50px !important;
+    }
+    .design_bottom{
+        bottom: -100vw !important;
+    }
+    .design_bottom2{
+        bottom: -50vw !important;
+    }
+    .username2{
+        display: block !important;
+        margin-top: 30px !important;
+    }
+  }
 
 .signinForm p{
     margin: 10px 0 10px 0 !important;
 }
 
+.username, .username2{
+    display: inline;
+}
+
 .family_img{
-    max-width: 85%;
-    /* width: 30vw;
-    margin-left: 60px;
-    margin-bottom: 20px; */
+    max-width: 100%;
+    width: 35vw;
 }
 
 .design_top{
@@ -77,7 +104,6 @@
 
 .textfield{
     box-sizing: border-box;
-    /* border: 1.5px solid #D5D5D5 !important; */
     border-radius: 8px;
 }
 
@@ -101,7 +127,9 @@
 .signup_button{
     display: block;
     color: white;
-    background: #00AAEE;
+    font-weight: bold;
+    /* background: #00AAEE; */
+    background: #156DBF;
     border-color: transparent;
     border-radius: 5px;
     width: 100%;
@@ -112,7 +140,9 @@
     background: transparent;
     border-radius: 5px;
     border-color: #989898;
-    color: #989898;
+    /* color: #989898; */
+    color: #3F3F3F;
+    font-weight: bold;
     height: 50px;
 }
 
@@ -126,7 +156,8 @@
     justify-content: space-between;
     align-items: center;
     color: #989898;
-    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-bottom: 30px;
 }
 
 .or p{

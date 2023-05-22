@@ -99,8 +99,13 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   }, []);
 
   // Defaults main page to be resources if user is already logged in
+  // TODO: might be unnecessary
   if (isLoggedIn) {
-    return navigate('/resources');
+    if (!profile.approved) {
+      navigate('/unapproved');
+    } else {
+      navigate('/resources');
+    }
   }
 
   // Sets profile state with inputted profile info
@@ -170,7 +175,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
             <div className={styles.full_width}>
               <label className={styles.button_width} htmlFor="Submit">
                 <br />
-                <input className={styles.signup_button} type="submit" value="Log In" />
+                <input className={styles.signup_button} type="submit" value="Login" />
               </label>
               <div className={styles.or}>
                 <div className={styles.line} />
@@ -179,12 +184,12 @@ function Login({ updateAppProfile }) { // deconstruct the function props
               </div>
               <button type="button" onClick={signInWithGoogle} className={`${styles.button_width} ${styles.google_button}`}>
                 <img src={GoogleLogo} alt="google logo" className={styles.google_logo} />
-                Continue with Google
+                Sign In with Google
               </button>
               <p style={{ textAlign: 'center' }}>
                 {'Don\'t have an account?'}
                 {' '}
-                <a href="/signup"><b>Sign Up</b></a>
+                <a href="/signup" style={{ color: 'black' }}><b>Sign Up</b></a>
               </p>
             </div>
           </form>

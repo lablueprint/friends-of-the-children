@@ -27,6 +27,11 @@ import {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  getProfilesSortedByDate,
+  batchUpdateProfile,
+  batchDeleteProfile,
+  batchAddToList,
+  batchDeleteFromList,
   deleteModule,
   deleteFile,
   addModule,
@@ -103,6 +108,17 @@ router.delete('/deleteFile', deleteFile);
 router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
+
+//
+router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
+
+router.post('/batchUpdateProfile', batchUpdateProfile);
+
+router.post('/batchDeleteProfile', batchDeleteProfile);
+
+router.post('/batchAddToList', batchAddToList);
+
+router.post('/batchDeleteFromList', batchDeleteFromList);
 
 // mailchimp routes
 router.post('/mailchimp/addToList', addToMailchimpList);

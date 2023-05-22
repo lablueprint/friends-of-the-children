@@ -10,6 +10,7 @@ import MenteesIcon from '../assets/icons/mentees_icon.svg';
 import MessageIcon from '../assets/icons/message_icon.svg';
 import CalendarIcon from '../assets/icons/calendar_icon.svg';
 import UserIcon from '../assets/icons/user_icon.svg';
+import RequestsIcon from '../assets/icons/requests_icon.svg';
 
 // Navigation Bar component used to navigate to different pages
 
@@ -53,7 +54,6 @@ function NavBar({ profile, updateAppProfile }) {
               <img src={ResourcesIcon} alt="resources icon" />
               Resources
             </Link>
-            {/* TODO: have requests link instead for admin */}
             <Link to="/mentees" className={styles.btn_info}>
               <img src={MenteesIcon} alt="mentees icon" />
               My Youth
@@ -66,6 +66,13 @@ function NavBar({ profile, updateAppProfile }) {
               <img src={MessageIcon} alt="message icon" />
               Messages
             </Link>
+            {profile.role === 'Admin'
+            && (
+            <Link to="/requests" className={styles.btn_info}>
+              <img src={RequestsIcon} alt="requests icon" />
+              Requests
+            </Link>
+            )}
             <Link to="/profile" className={styles.btn_info}>
               <img src={UserIcon} alt="profile icon" />
               Profile
@@ -86,6 +93,11 @@ NavBar.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,
 };

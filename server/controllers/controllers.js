@@ -560,6 +560,131 @@ const getMessages = async (req, res) => {
   }
 };
 
+const getProfilesSortedByDate = async (req, res) => {
+  try {
+    // await user profile data from firebase
+    const sc = await db.collection('profiles').get();
+    const profiles = [];
+    // push each profile into response array
+    sc.forEach((dc) => {
+      const data = dc.data();
+      data.id = dc.id;
+      profiles.push(data);
+    });
+
+    profiles.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;
+      }
+      if (a.date > b.date) {
+        return 1;
+      }
+      return 0;
+    });
+
+    res.status(202).json(profiles);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const batchUpdateProfile = async (req, res) => {
+  try {
+    const batch = db.batch();
+
+    const { profileUpdates } = req.body;
+
+    profileUpdates.forEach((element) => {
+      const updateRef = db.collection('profiles').doc(element.id);
+      const updates = element.fields;
+
+      batch.update(updateRef, updates);
+    });
+
+    await batch.commit();
+
+    res.status(202).json('Profiles Successfully Updated');
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchDeleteProfile = async (req, res) => {
+  try {
+    const batch = db.batch();
+
+    const { profileDeletes } = req.body;
+
+    profileDeletes.forEach((element) => {
+      const delRef = db.collection('profiles').doc(element);
+
+      batch.delete(delRef);
+    });
+
+    await batch.commit();
+
+    res.status(202).json('Profiles Successfully Deleted');
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchAddToList = async (req, res) => {
+  try {
+    const { listUpdates } = req.body;
+
+    const memberList = listUpdates.map((element) => ({
+      email_address: element.email_address,
+      status: 'subscribed',
+      merge_fields: {
+        FNAME: element.firstName,
+        LNAME: element.lastName,
+        ROLE: element.role,
+        SAREA: element.serviceArea,
+      },
+    }));
+
+    const response = await mailchimp.lists.batchListMembers(process.env.MAILCHIMP_AUDIENCE_ID, {
+      members: memberList,
+    });
+
+    res.status(202).json(response);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchDeleteFromList = async (req, res) => {
+  try {
+    const { listDeletes } = req.body;
+
+    console.log(`lists to be deleted are: ${listDeletes}`);
+
+    const memberList = listDeletes.map((element) => ({
+      email_address: element.email_address,
+      status: 'archived',
+      merge_fields: {
+        FNAME: element.firstName,
+        LNAME: element.lastName,
+        ROLE: element.role,
+        SAREA: element.serviceArea,
+      },
+    }));
+
+    const response = await mailchimp.lists.batchListMember(process.env.MAILCHIMP_AUDIENCE_ID, {
+      members: memberList,
+    });
+
+    res.status(202).json(response);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
 // mailchimp controllers
 
 const addToMailchimpList = async (req, res) => {
@@ -716,6 +841,11 @@ export {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  getProfilesSortedByDate,
+  batchUpdateProfile,
+  batchDeleteProfile,
+  batchAddToList,
+  batchDeleteFromList,
   deleteModule,
   deleteFile,
   addModule,
