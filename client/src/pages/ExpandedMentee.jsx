@@ -10,13 +10,16 @@ import styles from '../styles/Mentees.module.css';
 import VideoIcon from '../assets/icons/videos_icon.svg';
 import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
+import YouthIcon from '../assets/icons/youth_icon.svg';
+import LinkIcon from '../assets/icons/link_icon.svg';
+import ClearedIcon from '../assets/icons/cleared.svg';
 import { storage } from './firebase';
 import * as api from '../api';
 
 function ExpandedMentee({ profile }) {
   const location = useLocation();
   const {
-    id, firstName, lastName, age, caregiver,
+    id, firstName, lastName, age, caregiver, medicalClearance,
   } = location.state;
   const [recents, setRecents] = useState([]);
   const [folderArray, setFolderArray] = useState([]);
@@ -24,6 +27,8 @@ function ExpandedMentee({ profile }) {
   const [fileUploadOpen, setfileUploadOpen] = useState(false);
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
+  const [cleared, setCleared] = useState(medicalClearance);
+  const role = (profile.role).toLowerCase();
 
   // called upon submitting the form that adds a new folder
   const addFolder = async (e) => {
@@ -118,11 +123,17 @@ function ExpandedMentee({ profile }) {
     setfileUploadOpen(false);
   };
 
+  // update the medical clearance
+  const updateClearance = () => {
+    api.updateClearance(id, cleared);
+    setCleared(!cleared);
+  };
+
   return (
     <div className={styles.folders_page}>
       <div>
         <p>
-          {'My Mentees > '}
+          {'My Youth > '}
           <b>
             {`${firstName} ${lastName}`}
           </b>
@@ -138,7 +149,7 @@ function ExpandedMentee({ profile }) {
       <div className={styles.profile_container}>
         <div>
           <div className={styles.pfp}>
-            <img className={styles.profile_pic} src="https://i.pinimg.com/564x/a0/8e/a5/a08ea58c5ea6000579249c7ccbfa99b0.jpg" alt="" />
+            <img className={styles.profile_pic} src={YouthIcon} alt="" />
           </div>
 
           <div className={styles.user_info}>
@@ -151,14 +162,20 @@ function ExpandedMentee({ profile }) {
           </div>
 
           <div className={styles.service_area}>
+            <button type="button" onClick={updateClearance}>
+              {cleared && <img alt="medical clearance cleared" src={ClearedIcon} />}
+              {!cleared && <p>NOT CLEARED</p>}
+            </button>
             <p>
               {profile.serviceArea}
             </p>
           </div>
 
+          {role === 'mentor' && (
           <Button variant="contained" onClick={addNewFile}>
             + Upload File
           </Button>
+          )}
         </div>
       </div>
 
@@ -170,22 +187,24 @@ function ExpandedMentee({ profile }) {
               <Link
                 to={`./folder_${folder}`}
                 state={{
-                  id, folderName: folder, firstName, lastName, age, caregiver,
+                  id, folderName: folder, firstName, lastName, age, caregiver, medicalClearance,
                 }}
               >
                 {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
                 {folder === 'Images' && <img src={ImageIcon} alt="images icon" />}
                 {folder === 'Flyers' && <img src={FlyerIcon} alt="flyer icon" />}
-                {folder === 'Links' && <img src={FlyerIcon} alt="links icon" />}
+                {folder === 'Links' && <img src={LinkIcon} alt="links icon" />}
 
                 <p>{folder}</p>
               </Link>
             </div>
           )
         ))}
+        {role === 'mentor' && (
         <Button variant="outlined" onClick={addNewFolder}>
           + Add a New Folder
         </Button>
+        )}
       </div>
 
       <h3>Recent Uploads</h3>

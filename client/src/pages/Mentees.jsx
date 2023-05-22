@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import {
+  MenuItem, FormControl, InputLabel, Select,
+} from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -12,6 +15,7 @@ import * as api from '../api';
 function Mentees({ profile, updateAppProfile }) {
   const [mentees, setMentees] = useState([]);
   const [open, setOpen] = useState(false);
+  const role = (profile.role).toLowerCase();
 
   useEffect(() => {
     api.getMentees(profile.id).then((tempMentees) => {
@@ -30,6 +34,13 @@ function Mentees({ profile, updateAppProfile }) {
     const caregiverFirstName = e.target.caregiverFirstName.value;
     const caregiverLastName = e.target.caregiverLastName.value;
     const caregiverEmail = e.target.caregiverEmail.value;
+    let medicalClearance = e.target.medicalClearance.value;
+
+    if (medicalClearance === 'false') {
+      medicalClearance = false;
+    } else {
+      medicalClearance = true;
+    }
 
     const data = {
       firstName,
@@ -39,6 +50,7 @@ function Mentees({ profile, updateAppProfile }) {
       caregiverFirstName,
       caregiverLastName,
       caregiverEmail,
+      medicalClearance,
     };
 
     // add new mentee object to mentees collection on firebase
@@ -52,7 +64,7 @@ function Mentees({ profile, updateAppProfile }) {
       const tempMentees = [...mentees, data2];
       setMentees(tempMentees);
 
-      api.addMentee(profile.id, menteeID);
+      api.addMentee(profile.id, menteeID, caregiverEmail);
 
       const newProfile = {
         ...profile,
@@ -76,10 +88,12 @@ function Mentees({ profile, updateAppProfile }) {
 
   return (
     <div className={styles.mentees_page}>
-      <h1>My Mentees</h1>
+      <h1>My Youth</h1>
+      {role === 'mentor' && (
       <Button variant="contained" onClick={handleClickOpen}>
-        Add Child :D
+        Add Youth
       </Button>
+      )}
 
       {/* {(mentees.length === 0) && (<img src={MenteeImage} alt="mentees" />)} */}
 
@@ -89,7 +103,7 @@ function Mentees({ profile, updateAppProfile }) {
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders,
+                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders, medicalClearance: mentee.medicalClearance,
               }}
             >
               <div className={styles.card}>
@@ -126,6 +140,21 @@ function Mentees({ profile, updateAppProfile }) {
               <br />
               Email:
               <input type="text" name="caregiverEmail" required />
+              <br />
+              <br />
+              <FormControl sx={{ width: '100%' }}>
+                <InputLabel>Medical Clearance</InputLabel>
+                <Select
+                  id="med"
+                  label="Medical Clearance"
+                  name="medicalClearance"
+                  defaultValue="False"
+                  required
+                >
+                  <MenuItem value="false">Not Cleared</MenuItem>
+                  <MenuItem value="true">Cleared</MenuItem>
+                </Select>
+              </FormControl>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
                 <Button type="submit">Add Child</Button>

@@ -56,7 +56,7 @@ function NavBar({ profile, updateAppProfile }) {
             </Link>
             <Link to="/mentees" className={styles.btn_info}>
               <img src={MenteesIcon} alt="mentees icon" />
-              My Mentees
+              My Youth
             </Link>
             <Link to="/calendar" className={styles.btn_info}>
               <img src={CalendarIcon} alt="calendar icon" />
