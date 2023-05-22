@@ -1,5 +1,22 @@
+.bigtitle{
+    position: absolute;
+    width: 217px;
+    height: 57px;
+    left: 360px;
+    top: 64px;
+
+    font-family: 'News Gothic';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 57px;
+    /* identical to box height */
+    
+    /* text */
+    color: #3F3F3F;
+}
+
 .button_width{
     margin: 0;
-    margin-left: 10px;
     margin-bottom: 20px !important;
 }

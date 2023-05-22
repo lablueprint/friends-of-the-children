@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import TabPanel from '../components/TabPanel';
 import AdminTable from '../components/AdminTable';
 import * as api from '../api';
+import styles from '../styles/Requests.module.css';
 
 function a11yProps(index) {
   return {
@@ -32,6 +33,8 @@ function Requests() {
 
   const [deleteButton, setDeleteButton] = useState(false);
 
+  const [selectMode, setSelectMode] = useState(false);
+
   const [currentAccounts, setCurrentAccounts] = useState([]);
 
   const [allUsers, setAllUsers] = useState([]);
@@ -45,19 +48,27 @@ function Requests() {
 
   }));
 
+  function HandleSelectClick() {
+    setNumChecked(0);
+    setSelectMode(true);
+  }
+
   function HandleCancelClick() {
     setNumChecked(0);
     setCancelButton(true);
+    setSelectMode(false);
   }
 
   function HandleApproveClick() {
     setNumChecked(0);
     setApproveButton(true);
+    setSelectMode(false);
   }
 
   function HandleDeleteClick() {
     setNumChecked(0);
     setDeleteButton(true);
+    setSelectMode(false);
   }
 
   useEffect(() => {
@@ -113,7 +124,7 @@ function Requests() {
 
   return (
     <div>
-      <h1>
+      <h1 className={styles.bigTitle}>
         Requests
       </h1>
       <Tabs
@@ -132,16 +143,24 @@ function Requests() {
         {currentAccounts
             && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
       </TabPanel>
-      <p>
-        {numChecked}
-        {' '}
-        rows are selected
-      </p>
-      {/* <button type="button">Submit</button> */}
-      <button type="button" onClick={HandleCancelClick}>Cancel</button>
-      <button type="button" onClick={HandleApproveClick}>Approve</button>
-      <button type="button" onClick={HandleDeleteClick}>Delete</button>
-      {/* <p>{numApproved}</p> */}
+      <div>
+        { selectMode
+          ? (
+            <div>
+              <p>
+                {numChecked}
+                {' '}
+                Selected
+              </p>
+              <div>
+                <button type="button" onClick={HandleCancelClick}>Cancel</button>
+                <button type="button" onClick={HandleApproveClick}>Approve</button>
+                <button type="button" onClick={HandleDeleteClick}>Delete</button>
+              </div>
+            </div>
+          )
+          : (<button type="button" onClick={HandleSelectClick}>Select</button>)}
+      </div>
     </div>
   );
 }
