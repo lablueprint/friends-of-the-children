@@ -99,8 +99,13 @@ function Login({ updateAppProfile }) { // deconstruct the function props
   }, []);
 
   // Defaults main page to be resources if user is already logged in
+  // TODO: might be unnecessary
   if (isLoggedIn) {
-    return navigate('/resources');
+    if (!profile.approved) {
+      navigate('/unapproved');
+    } else {
+      navigate('/resources');
+    }
   }
 
   // Sets profile state with inputted profile info

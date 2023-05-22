@@ -15,7 +15,9 @@ function Mentees({ profile, updateAppProfile }) {
 
   useEffect(() => {
     api.getMentees(profile.id).then((tempMentees) => {
-      setMentees(tempMentees.data);
+      if (tempMentees) {
+        setMentees(tempMentees.data);
+      }
     });
   }, []);
 
@@ -146,7 +148,7 @@ Mentees.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
-    mentees: PropTypes.arrayOf.isRequired,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,
 };

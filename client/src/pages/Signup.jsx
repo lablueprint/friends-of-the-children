@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Popup from '../components/Popup';
-import { db } from './firebase';
+import { app, db } from './firebase';
 import styles from '../styles/Login.module.css';
 import LoginFamily from '../assets/images/login_family.svg';
 import UpperRight from '../assets/images/upperRight.svg';
@@ -31,6 +31,7 @@ import { serviceAreas } from '../constants';
   ...
  */
 
+// eslint-disable-next-line no-unused-vars
 function Signup({ updateAppProfile }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -120,19 +121,11 @@ function Signup({ updateAppProfile }) {
               password: hashedPassword,
               google: false,
               image: 'https://i.pinimg.com/550x/18/b9/ff/18b9ffb2a8a791d50213a9d595c4dd52.jpg',
+              approved: false,
+              date: app.firebase.firestore.Timestamp.fromDate(new Date()),
             };
             db.collection('profiles').doc().set(data);
-            updateAppProfile(data);
-
-            // mailchimp- update list on signup
-            const payload = {
-              email_address: data.email,
-              firstName: data.firstName,
-              lastName: data.lastName,
-              role: data.role,
-              serviceArea: data.serviceArea,
-            };
-            api.addToList(payload);
+            navigate('/unapproved');
           });
       } else {
         const data = {
@@ -143,21 +136,12 @@ function Signup({ updateAppProfile }) {
           role,
           username,
           google: true,
+          approved: false,
+          date: app.firebase.firestore.Timestamp.fromDate(new Date()),
         };
         db.collection('profiles').doc().set(data);
-        updateAppProfile(data);
-
-        // mailchimp- update list on signup
-        const payload = {
-          email_address: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          role: data.role,
-          serviceArea: data.serviceArea,
-        };
-        api.addToList(payload);
+        navigate('/unapproved');
       }
-      navigate('/resources');
       // reset forms
       setFirstName('');
       setLastName('');
