@@ -27,6 +27,8 @@
     border-radius: 10px;
     border-color: #156DBF;
     display:flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .resourcetext {
@@ -44,13 +46,13 @@
 .resourcelink{
     display:flex;
     align-items: center;
+    margin-left: 1em;
 }
 
 .fileIcon {
-  font-size: 4em;
+  font-size: large;
   color:#156DBF;
-  height: 100%;
-  transform: scale(1.8);
+  transform: scale(2);
 }
 .backContainer {
     padding-top: 3%;
