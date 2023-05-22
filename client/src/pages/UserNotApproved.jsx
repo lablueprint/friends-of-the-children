@@ -8,20 +8,20 @@ import styles from '../styles/UserNotApproved.module.css';
 import LoginFamily from '../assets/images/login_family.svg';
 
 function UserNotApproved({ updateAppProfile, profile }) {
-  let pendingMessage = '';
+  const pendingMessage = 'Your request to become a caregiver has been received and is awaiting approval. We will send you an email once your account has been approved.';
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     updateAppProfile(null);
     dispatch(logout(profile));
   };
-
+  /*
   if (profile.role.toLowerCase() === 'mentor') {
     pendingMessage = 'Your request to become a mentor has been received and is awaiting approval. We will send you an email once your account has been approved.';
   } else {
     pendingMessage = 'Your request to become a caregiver has been received and is awaiting approval. We will send you an email once your account has been approved.';
   }
-
+  */
   return (
     <div>
       <div>

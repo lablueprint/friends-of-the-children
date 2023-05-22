@@ -2,26 +2,26 @@
     position: absolute;
     width: 432px;
     height: 451px;
-    left: 586px;
-    top: 373px;
+    left: 400px;
+    top: 225px;
 }
 
 .request_pending_message {
-    /* Your request to become a mentor has been received and is awaiting approval. We will send you an email once your account has been approved. */
+    /* Your request to become a mentor has been received and is awaiting approval.
+    We will send you an email once your account has been approved. */
+    
+    position: absolute;
+    width: 597px;
+    height: 44px;
+    left: 400px;
+    top: 150px;
 
+    font-family: 'News Gothic';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px;
+    text-align: center;
 
-position: absolute;
-width: 597px;
-height: 44px;
-left: 566px;
-top: 275px;
-
-font-family: 'News Gothic';
-font-style: normal;
-font-weight: 500;
-font-size: 18px;
-line-height: 22px;
-text-align: center;
-
-color: #000000;
+    color: #000000;
 }
