@@ -116,13 +116,7 @@ function ExpandedModule({ profile }) {
       return;
     }
 
-    const isChecked = event.target.checked;
-    setChecked(() => {
-      if (isChecked) {
-        return [...checked, fileName];
-      }
-      return checked.filter((file) => id !== file);
-    });
+    setChecked([...checked, fileName]);
   };
 
   const updateImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
@@ -357,20 +351,6 @@ function ExpandedModule({ profile }) {
         {
         children.map((kid) => (
           <div>
-            {/* <div className={styles.card}>
-              <Link to="/expanded-module" state={{ id: kid.id }} key={kid.id}>
-                <h1>{kid.title}</h1>
-              </Link>
-              {currRole === 'admin' && (
-              <button className={styles.deleteButton} type="button" onClick={() => { deleteModule(kid.id); }}>
-                {' '}
-                Delete Module
-                {' '}
-                {kid.id}
-                {' '}
-              </button>
-              )}
-            </div> */}
             <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} />
           </div>
         ))

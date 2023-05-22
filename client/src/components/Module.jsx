@@ -7,16 +7,16 @@ import styles from '../styles/Modules.module.css';
 
 function Module(props) {
   const {
-    title, id, role, deleteModule, checkboxes,
+    title, id, role, deleteModule, editable, checked, handleCheckboxChange,
   } = props;
 
   return (
     <div>
       <div className={styles.filecard}>
-        {checkboxes ? (
+        {editable ? (
           <Checkbox
-            checked={false} // dunno how to go about this
-            // onChange={}
+            checked={checked.includes(id)} // dunno how to go about this
+            onChange={(event) => handleCheckboxChange(event, id)}
             className={styles.checkbox}
           />
         ) : (<FolderIcon className={styles.fileIcon} />)}
@@ -39,7 +39,7 @@ function Module(props) {
 }
 
 Module.defaultProps = {
-  checkboxes: false,
+  editable: false,
 };
 
 Module.propTypes = {
@@ -47,7 +47,9 @@ Module.propTypes = {
   id: PropTypes.string.isRequired,
   role: PropTypes.string.isRequired,
   deleteModule: PropTypes.func.isRequired,
-  checkboxes: PropTypes.bool,
+  handleCheckboxChange: PropTypes.func.isRequired,
+  editable: PropTypes.bool,
+  checked: PropTypes.arrayOf.isRequired,
 };
 
 export default Module;

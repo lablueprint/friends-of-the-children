@@ -50,20 +50,14 @@ function Resources({ profile }) {
   //   });
   // };
 
-  // const handleCheckboxChange = (event, fileName) => {
-  //   if (checked.includes(fileName)) {
-  //     setChecked(checked.filter((file) => (file !== fileName)));
-  //     return;
-  //   }
+  const handleCheckboxChange = (event, moduleId) => {
+    if (checked.includes(moduleId)) {
+      setChecked(checked.filter((module) => (module !== moduleId)));
+      return;
+    }
 
-  //   const isChecked = event.target.checked;
-  //   setChecked(() => {
-  //     if (isChecked) {
-  //       return [...checked, fileName];
-  //     }
-  //     return checked.filter((file) => id !== file);
-  //   });
-  // };
+    setChecked([...checked, moduleId]);
+  };
 
   const clearCheckboxes = () => {
     setChecked([]);
@@ -76,6 +70,20 @@ function Resources({ profile }) {
 
   const handleDeleteModulesClose = () => {
     setOpenDeleteModulesPopup(false);
+  };
+
+  const deleteModules = async () => { // calls deleteModule for each id in checked
+    const deletionPromises = checked.map((moduleId) => deleteModule(moduleId));
+    try {
+      await Promise.all(deletionPromises);
+      console.log('All modules deleted successfully.');
+    } catch (error) {
+      console.error('An error occurred while deleting modules:', error);
+    }
+    // for each moduleID in checked, removed the modules in Modules that has a field called moduleId
+    const tempModules = modules.filter((modid) => !checked.includes(modid.id));
+    setModules(tempModules);
+    clearCheckboxes();
   };
 
   // empty dependency array means getModules is only being called on page load
@@ -117,7 +125,7 @@ function Resources({ profile }) {
         <div className={styles.resourcesContainer}>
           <div className={styles.resourcesDisplay}>
             {modules.map((card) => (
-              <Module title={card.title} id={card.id} role={currRole} deleteModule={deleteModule} checkboxes={editModule} />
+              <Module title={card.title} id={card.id} role={currRole} deleteModule={deleteModule} editable={editModule} checked={checked} handleCheckboxChange={handleCheckboxChange} />
             ))}
           </div>
         </div>
@@ -131,7 +139,7 @@ function Resources({ profile }) {
                     {' '}
                     {checked.length}
                     {' '}
-                    {(checked.length) === 1 ? 'file ' : 'files '}
+                    {(checked.length) === 1 ? 'module ' : 'modules '}
                     from
                     {' '}
                     {/* {title} TODO: include the name of the main folder */}
@@ -145,9 +153,9 @@ function Resources({ profile }) {
                         <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
                           Cancel
                         </button>
-                        {/* <button type="button" className={styles.confirmDelete} onClick={() => (deleteFiles(checked))}>
+                        <button type="button" className={styles.confirmDelete} onClick={() => (deleteModules(checked))}>
                           Delete
-                        </button> */}
+                        </button>
                       </div>
                     </div>
                   </DialogContent>
