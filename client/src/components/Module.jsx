@@ -7,7 +7,7 @@ import styles from '../styles/Modules.module.css';
 
 function Module(props) {
   const {
-    title, id, role, deleteModule, editable, checked, handleCheckboxChange,
+    title, id, editable, checked, handleCheckboxChange,
   } = props;
 
   return (
@@ -24,7 +24,7 @@ function Module(props) {
         <Link className={styles.resourcelink} to="/expanded-module" state={{ id }} key={id}>
           <h3 className={styles.resourcetext}>{title}</h3>
         </Link>
-        {role === 'admin' && (
+        {/* {role === 'admin' && (
         <button className={styles.deleteButton} type="button" onClick={() => { deleteModule(id); }}>
           {' '}
           Delete Module
@@ -32,7 +32,7 @@ function Module(props) {
           {id}
           {' '}
         </button>
-        )}
+        )} */}
       </div>
     </div>
   );
@@ -45,8 +45,8 @@ Module.defaultProps = {
 Module.propTypes = {
   title: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  role: PropTypes.string.isRequired,
-  deleteModule: PropTypes.func.isRequired,
+  // role: PropTypes.string.isRequired,
+  // deleteModule: PropTypes.func.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
   editable: PropTypes.bool,
   checked: PropTypes.arrayOf.isRequired,

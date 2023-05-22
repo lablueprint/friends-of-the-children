@@ -49,9 +49,11 @@
 .fileIcon {
   font-size: 4em;
   color:#156DBF;
+  height: 100%;
+  transform: scale(1.8);
 }
 .backContainer {
-    padding-top: 15%;
+    padding-top: 3%;
     /* padding-bottom: 20%; */
 }
 

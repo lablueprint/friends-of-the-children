@@ -204,11 +204,11 @@ export default function NewModulePopup(props) {
             <FormLabel>Attachments:</FormLabel>
             <br />
             <input type="file" onChange={handleFileChange} multiple />
-            <p>
+            {/* <p>
               XXX UPLOADING XXX
               {' '}
               % done
-            </p>
+            </p> */}
           </DialogContent>
           <DialogActions>
             <Button

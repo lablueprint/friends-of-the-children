@@ -125,7 +125,7 @@ function Resources({ profile }) {
         <div className={styles.resourcesContainer}>
           <div className={styles.resourcesDisplay}>
             {modules.map((card) => (
-              <Module title={card.title} id={card.id} role={currRole} deleteModule={deleteModule} editable={editModule} checked={checked} handleCheckboxChange={handleCheckboxChange} />
+              <Module title={card.title} id={card.id} editable={editModule} checked={checked} handleCheckboxChange={handleCheckboxChange} />
             ))}
           </div>
         </div>
@@ -196,7 +196,7 @@ function Resources({ profile }) {
     <div className={styles.resourcesContainer}>
       <div className={styles.resourcesDisplay}>
         {modules.map((card) => (
-          <Module title={card.title} id={card.id} role={currRole} deleteModule={deleteModule} />
+          <Module title={card.title} id={card.id} />
         ))}
       </div>
     </div>
