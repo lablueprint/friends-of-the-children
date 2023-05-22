@@ -18,11 +18,19 @@ function Mentees({ profile, updateAppProfile }) {
   const role = (profile.role).toLowerCase();
 
   useEffect(() => {
-    api.getMentees(profile.id).then((tempMentees) => {
-      if (tempMentees) {
-        setMentees(tempMentees.data);
-      }
-    });
+    if (role === 'admin') {
+      api.getAllMentees().then((tempMentees) => {
+        if (tempMentees) {
+          setMentees(tempMentees.data);
+        }
+      });
+    } else {
+      api.getMentees(profile.id).then((tempMentees) => {
+        if (tempMentees) {
+          setMentees(tempMentees.data);
+        }
+      });
+    }
   }, []);
 
   const addChild = async (e) => {

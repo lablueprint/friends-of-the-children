@@ -11,6 +11,7 @@ import {
   updateClearance,
   createMentee,
   addMentee,
+  getAllMentees,
   getMenteeFolders,
   addMenteeFolder,
   getMenteeFiles,
@@ -51,6 +52,8 @@ router.patch('/patchEvent', patchEvent);
 
 // gets all the mentees
 router.get('/getMentees/profileID=:profileID', getMentees);
+
+router.get('/getAllMentees', getAllMentees);
 
 // gets the mentee's folders
 router.get('/getMenteeFolders/id=:id', getMenteeFolders);

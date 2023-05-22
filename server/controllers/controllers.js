@@ -131,6 +131,24 @@ const getMentees = async (req, res) => {
   }
 };
 
+// returns an array of all existing mentees
+const getAllMentees = async (req, res) => {
+  try {
+    // await user profile data from firebase
+    const sc = await db.collection('mentees').get();
+    const mentees = [];
+    // push each profile into response array
+    sc.forEach((dc) => {
+      const data = dc.data();
+      data.id = dc.id;
+      mentees.push(data);
+    });
+    res.status(202).json(mentees);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // adds new mentee doc to firebase mentees collection & returns its doc id
 const createMentee = async (req, res) => {
   try {
@@ -829,6 +847,7 @@ export {
   addMenteeFolder,
   getMenteeFiles,
   addMenteeFile,
+  getAllMentees,
   uploadFile,
   getAllProfiles,
   getModules,

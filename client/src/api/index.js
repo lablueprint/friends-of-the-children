@@ -30,7 +30,19 @@ export const patchEvent = async (eventData) => {
   return null;
 };
 
-// get a profile's mentees
+// get all mentees
+export const getAllMentees = async () => {
+  try {
+    const mentees = await axios.get(`${url}/getAllMentees`);
+    return mentees;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get mentees');
+  }
+  return null;
+};
+
+// get a profile's specific mentees
 export const getMentees = async (profileID) => {
   try {
     const mentees = await axios.get(`${url}/getMentees/profileID=${profileID}`);
