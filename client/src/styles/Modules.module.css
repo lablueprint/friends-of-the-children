@@ -88,9 +88,31 @@
 }
 
 .editButton {
-    width: 15em;
+    /* width: 15em;
     background-color: #FFFFFF;
     border: 2px solid #156DBF;
+    gap: 8px; */
+
+    background: #FFFFFF;
+    border: 2px solid #156DBF;
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0.25em 1.5em 0.25em 1.5em;
+    gap: 8px;
+}
+
+.editButton:hover {
+    background: #FFFFFF;
+    border: 2px solid #156DBF;
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0.25em 1.5em 0.25em 1.5em;
     gap: 8px;
 }
 
@@ -292,26 +314,83 @@
     gap: 2em;
     width: 95%;
     margin: 0 auto;
-    /* justify-content: space-between; */
 }
 
 .header {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: space-between;
+}
+
+.pageTitle {
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 57px;
+    color: #000000;
+    padding-top: 1em;
+    padding-left: 1em;
+}
+
+.editOrAddModule {
+    display: flex;
+    gap: 10%;
+    font-family: 'News Gothic';
+    font-weight: 700px;
+    font-size: 18px;
+    padding-right: 3em;
+    padding-top: 2em;
+} 
+
+.editModuleContainer {
+    display: flex;
 }
 
 .editModule {
     background: #FFFFFF;
-    /* dark blue for nav bar */
     border: 2px solid #156DBF;
     border-radius: 12px;
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0.25em 1.5em 0.25em 1.5em;
+}
+
+.editModule:hover {
+    background: #FFFFFF;
+    border: 2px solid #156DBF;
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0.25em 1.5em 0.25em 1.5em;
 }
 
 .addModule {
     background: #156DBF;
-    border-radius: 12px;
     color: white;
+    display: flex;
+    border-radius: 12px;
+    flex-wrap: nowrap;
+    box-shadow: none;
+    border: none;
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0.25em 1.5em 0.25em 1.5em;
+}
+
+.addModule:hover {
+    background: #156DBF;
+    color: white;
+    display: flex;
+    border-radius: 12px;
+    flex-wrap: nowrap;
+    box-shadow: none;
+    border: none;
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0.25em 1.5em 0.25em 1.5em;
 }
 
 .cancelOrSave {

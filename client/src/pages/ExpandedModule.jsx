@@ -241,6 +241,7 @@ function ExpandedModule({ profile }) {
               <ModeIcon />
               {editText ? ('Save') : ('Edit Text')}
             </Button>
+            {/* TODO:  add the add file functionality */}
           </div>
         </div>
         <div className={styles.bodyContainer}>

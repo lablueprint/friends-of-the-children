@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -8,6 +8,7 @@ import NewModulePopup from '../components/NewModulePopup';
 import Module from '../components/Module';
 import * as api from '../api';
 import styles from '../styles/Modules.module.css';
+import editIcon from '../assets/icons/editicon.svg';
 
 function Resources({ profile }) {
   const [modules, setModules] = useState([]);
@@ -17,6 +18,8 @@ function Resources({ profile }) {
   const [openDeleteModulesPopup, setOpenDeleteModulesPopup] = useState(false);
   const { role } = profile;
   const currRole = role.toLowerCase();
+
+  const title = 'Resources';
 
   // getting all modules relevant to current user
   const fetchData = async () => {
@@ -96,6 +99,9 @@ function Resources({ profile }) {
     return (
       <div>
         <div className={styles.header}>
+          <div className={styles.pageTitle}>
+            {title}
+          </div>
           {editModule ? (
             <div className={styles.cancelOrSave}>
               <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
@@ -106,13 +112,16 @@ function Resources({ profile }) {
               </button>
             </div>
           ) : (
-            <div>
-              <Button variant="outlined" onClick={displayCheckBoxes} className={styles.editModule}>
-                Edit Module
-              </Button>
-              <Button variant="outlined" onClick={handleClickOpen} className={styles.addModule}>
-                Add module
-              </Button>
+            <div className={styles.editOrAddModule}>
+              <div className={styles.editModuleContainer}>
+                <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
+                  <img src={editIcon} alt="edit icon" />
+                  Edit Module
+                </button>
+              </div>
+              <button type="button" onClick={handleClickOpen} className={styles.addModule}>
+                + New Upload
+              </button>
               <NewModulePopup
                 updateModule={updateModule}
                 open={open}
@@ -142,7 +151,7 @@ function Resources({ profile }) {
                     {(checked.length) === 1 ? 'module ' : 'modules '}
                     from
                     {' '}
-                    {/* {title} TODO: include the name of the main folder */}
+                    {title}
                   </DialogTitle>
                   <DialogContent>
                     <div>
