@@ -64,7 +64,7 @@ function NavBar({ profile, updateAppProfile }) {
             </Link>
             <Link to="/message-wall" className={styles.btn_info}>
               <img src={MessageIcon} alt="message icon" />
-              Messages
+              Notices
             </Link>
             {profile.role === 'Admin'
             && (
