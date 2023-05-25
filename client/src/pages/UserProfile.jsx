@@ -2,14 +2,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  TextField, Select, MenuItem, FormControl, InputLabel,
+  TextField, InputAdornment, IconButton,
 } from '@mui/material';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
-import { Input, InputAdornment, IconButton } from '@material-ui/core';
-import { NotificationsOutlined, Visibility, VisibilityOff } from '@material-ui/icons';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import bcrypt from 'bcryptjs';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styles from '../styles/UserProfile.module.css';
 import { db, storage } from './firebase';
 import * as api from '../api';
