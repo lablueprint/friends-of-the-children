@@ -24,15 +24,6 @@ function Module(props) {
         <Link className={styles.resourcelink} to="/expanded-module" state={{ id }} key={id}>
           <h3 className={styles.resourcetext}>{title}</h3>
         </Link>
-        {/* {role === 'admin' && (
-        <button className={styles.deleteButton} type="button" onClick={() => { deleteModule(id); }}>
-          {' '}
-          Delete Module
-          {' '}
-          {id}
-          {' '}
-        </button>
-        )} */}
       </div>
     </div>
   );

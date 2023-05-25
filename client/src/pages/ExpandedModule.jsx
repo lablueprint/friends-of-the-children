@@ -15,12 +15,13 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 // import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import ModeIcon from '@mui/icons-material/Mode';
+// import ModeIcon from '@mui/icons-material/Mode';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FilePopup from '../components/FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+import editIcon from '../assets/icons/editicon.svg';
 import styles from '../styles/Modules.module.css';
 
 import NewModulePopup from '../components/NewModulePopup';
@@ -45,7 +46,7 @@ function ExpandedModule({ profile }) {
   const [files, setFiles] = useState([]);
   const [titleText, setTitleText] = useState('');
   const [bodyText, setBodyText] = useState('');
-  const [editText, setEditText] = useState(false); // toggles edit button
+  const [editModule, setEditModule] = useState(false); // toggles edit button
   const [checked, setChecked] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
@@ -152,34 +153,44 @@ function ExpandedModule({ profile }) {
     setBodyText(b);
     setTitleText(t);
   };
+
+  const displayCheckBoxes = () => {
+    setEditModule(true);
+    // toggleEdit(editModule);
+  };
+
   useEffect(() => { updateImageURL(currModuleFiles); }, [currModuleFiles]);
   // Since page does not refresh when showing expanded module from root module, must manually change the text displayed when body/title changes
   useEffect(() => { setValueofBodyandTitle(body, title); }, [body, title]);
 
-  const toggleEdit = async (save) => {
-    setEditText(!editText);
-    console.log('save is ', save);
-    if (save) {
-      // Only call firebase if edits were made
-      if (bodyText !== body) {
-        await api.updateTextField(bodyText, id, 'body');
-      } else if (titleText !== title) {
-        await api.updateTextField(titleText, id, 'title');
-      }
-    }
-  };
+  // const toggleEdit = async (save) => {
+  //   setEditModule(true);
+  //   console.log('save is ', save);
+  //   if (save) {
+  //     // Only call firebase if edits were made
+  //     if (bodyText !== body) {
+  //       await api.updateTextField(bodyText, id, 'body');
+  //     } else if (titleText !== title) {
+  //       await api.updateTextField(titleText, id, 'title');
+  //     }
+  //   }
+  // };
 
   const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
-    api.deleteModule(moduleId).then(() => {
-      // reloads the page
-      deleteChild(moduleId);
-    });
+    if (checked.length > 0) {
+      api.deleteModule(moduleId).then(() => {
+        // reloads the page
+        deleteChild(moduleId);
+      });
+    }
     setOpenDeleteFilesPopup(false);
+    setEditModule(false);
   };
 
   const clearCheckboxes = () => {
     setChecked([]);
     setOpenDeleteFilesPopup(false);
+    setEditModule(false);
   };
 
   const deleteFiles = async (filesToDelete) => {
@@ -193,7 +204,7 @@ function ExpandedModule({ profile }) {
   const ExpandedModuleForm = (
     <div>
       <Button variant="outlined" onClick={handleClickOpen}>
-        Add module
+        hello
       </Button>
       <NewModulePopup
         updateModule={updateModule}
@@ -202,28 +213,66 @@ function ExpandedModule({ profile }) {
         parentID={id}
       />
     </div>
+  );
+    <div className={styles.titleContainer}>
+      <div className={styles.backAndTitle}>
+        <div className={styles.backContainer}>
+          <IconButton>
+            {parent != null ? (
+              <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+                <ArrowBackIcon />
+              </Link>
+            ) : (
+              <Link to="/resources" className={styles.backButton}>
+                <ArrowBackIcon />
+              </Link>
+            )}
+          </IconButton>
+        </div>
+        <div>
+          {editModule ? (
+            <TextField
+              value={titleText}
+              onChange={(e) => setTitleText(e.target.value)}
+              variant="outlined"
+              multiline={false}
+              className={styles.title}
+            />
+          ) : (
+            <div className={styles.title}>{title}</div>
+          )}
+        </div>
+      </div>
+      <div className={styles.editAndAddFile}>
+        {/* <Button variant="outlined" className={styles.editButton} onClick={() => toggleEdit(editModule)}>
+          <ModeIcon />
+          {editModule ? ('Save') : ('Edit Text')}
+        </Button> */}
+        {/* add file functionality */}
+      </div>
+    </div>;
 
-  ); return (
-    <div>
+    return (
       <div>
-        {/* <Module title={title} body={body} child={children} links={currModuleFiles} role={currRole} deleteChild={deleteChild} id={id} parent={parent} /> */}
-        <div className={styles.titleContainer}>
-          <div className={styles.backAndTitle}>
-            <div className={styles.backContainer}>
-              <IconButton>
-                {parent != null ? (
-                  <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-                    <ArrowBackIcon />
-                  </Link>
-                ) : (
-                  <Link to="/resources" className={styles.backButton}>
-                    <ArrowBackIcon />
-                  </Link>
-                )}
-              </IconButton>
+        <div>
+          <div className={styles.header}>
+            <div className={styles.backAndTitle}>
+              <div className={styles.backContainer}>
+                <IconButton>
+                  {parent != null ? (
+                    <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+                      <ArrowBackIcon />
+                    </Link>
+                  ) : (
+                    <Link to="/resources" className={styles.backButton}>
+                      <ArrowBackIcon />
+                    </Link>
+                  )}
+                </IconButton>
+              </div>
             </div>
             <div>
-              {editText ? (
+              {editModule ? (
                 <TextField
                   value={titleText}
                   onChange={(e) => setTitleText(e.target.value)}
@@ -235,194 +284,214 @@ function ExpandedModule({ profile }) {
                 <div className={styles.title}>{title}</div>
               )}
             </div>
-          </div>
-          <div className={styles.editAndAddFile}>
-            <Button variant="outlined" className={styles.editButton} onClick={() => toggleEdit(editText)}>
-              <ModeIcon />
-              {editText ? ('Save') : ('Edit Text')}
-            </Button>
-            {/* TODO:  add the add file functionality */}
-          </div>
-        </div>
-        <div className={styles.bodyContainer}>
-          {editText ? (
-            <TextField
-              value={bodyText}
-              onChange={(e) => setBodyText(e.target.value)}
-              variant="outlined"
-              multiline={false}
-              className={styles.body}
-            />
-          ) : (
-            <TextField
-              value={bodyText}
-              InputProps={{ readOnly: true }}
-              variant="outlined"
-              multiline={false}
-              className={styles.body}
-            />
-          )}
-        </div>
-        {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
-        {files.map((file) => (
-          <div className={styles.fileContainer}>
-            {(file.fileType.includes('image')) && (
-            <div key={file.url}>
-              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                <img className={styles.displayImg} src={file.url} alt={file.fileName} />
+            {editModule ? (
+              <div className={styles.cancelOrSave}>
+                <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
+                  Cancel
+                </button>
+                <button type="button" className={styles.saveModuleChanges} onClick={() => (deleteModule(checked))}>
+                  Save
+                </button>
               </div>
-              <div className={styles.descriptionContainer}>
-                <div
-                  key={file.fileLink}
-                  onMouseEnter={() => handleMouseEnter(file.fileLink)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <img src={file.imageSrc} alt={file.name} />
-                  {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
-                    <Checkbox
-                      checked={checked.includes(file.fileLink)}
-                      onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                      className={styles.checkbox}
-                    />
-                  ) : (<img src={imgIcon} alt="img icon" />)}
+            ) : (
+              <div className={styles.editOrAddModule}>
+                <div className={styles.editModuleContainer}>
+                  <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
+                    <img src={editIcon} alt="edit icon" />
+                    Edit Module
+                  </button>
                 </div>
-                <div className={styles.fileName}>{file.fileName}</div>
+                <button type="button" onClick={handleClickOpen} className={styles.addModule}>
+                  + New Upload
+                </button>
+                <NewModulePopup
+                  updateModule={updateModule}
+                  open={open}
+                  handleClose={handleClose}
+                  parentID={id}
+                />
               </div>
-            </div>
-            )}
-            {(file.fileType.includes('video')) && (
-            <div key={file.url}>
-              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
-                  <track default kind="captions" />
-                </video>
-              </div>
-              <div className={styles.descriptionContainer}>
-                <div
-                  key={file.fileLink}
-                  onMouseEnter={() => handleMouseEnter(file.fileLink)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <img src={file.imageSrc} alt={file.name} />
-                  {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
-                    <Checkbox
-                      checked={checked.includes(file.fileLink)}
-                      onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                      className={styles.checkbox}
-                    />
-                  ) : (<img src={vidIcon} alt="video icon" />)}
-                </div>
-                <div className={styles.fileName}>{file.fileName}</div>
-              </div>
-            </div>
-            )}
-            {(file.fileType.includes('pdf')) && (
-            <div key={file.url}>
-              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                <embed className={styles.preview} src={file.url} alt={file.fileName} />
-              </div>
-              <div className={styles.descriptionContainer}>
-                <div
-                  key={file.fileLink}
-                  onMouseEnter={() => handleMouseEnter(file.fileLink)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <img src={file.imageSrc} alt={file.name} />
-                  {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
-                    <Checkbox
-                      checked={checked.includes(file.fileLink)}
-                      onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                      className={styles.checkbox}
-                    />
-                  ) : (<img src={pdfIcon} alt="pdf icon" />)}
-                </div>
-                <div className={styles.fileName}>{file.fileName}</div>
-              </div>
-            </div>
-            )}
-            {openFilePopup && (
-            <FilePopup
-              file={fileToDisplay}
-              open={openFilePopup}
-              handleClose={handleCloseFilePopup}
-            />
             )}
           </div>
-        ))}
-        {
+          <div className={styles.bodyContainer}>
+            {editModule ? (
+              <TextField
+                value={bodyText}
+                onChange={(e) => setBodyText(e.target.value)}
+                variant="outlined"
+                multiline={false}
+                className={styles.body}
+              />
+            ) : (
+              <TextField
+                value={bodyText}
+                InputProps={{ readOnly: true }}
+                variant="outlined"
+                multiline={false}
+                className={styles.body}
+              />
+            )}
+          </div>
+          {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
+          {files.map((file) => (
+            <div className={styles.fileContainer}>
+              {(file.fileType.includes('image')) && (
+              <div key={file.url}>
+                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <img className={styles.displayImg} src={file.url} alt={file.fileName} />
+                </div>
+                <div className={styles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={styles.checkbox}
+                      />
+                    ) : (<img src={imgIcon} alt="img icon" />)}
+                  </div>
+                  <div className={styles.fileName}>{file.fileName}</div>
+                </div>
+              </div>
+              )}
+              {(file.fileType.includes('video')) && (
+              <div key={file.url}>
+                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
+                    <track default kind="captions" />
+                  </video>
+                </div>
+                <div className={styles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={styles.checkbox}
+                      />
+                    ) : (<img src={vidIcon} alt="video icon" />)}
+                  </div>
+                  <div className={styles.fileName}>{file.fileName}</div>
+                </div>
+              </div>
+              )}
+              {(file.fileType.includes('pdf')) && (
+              <div key={file.url}>
+                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <embed className={styles.preview} src={file.url} alt={file.fileName} />
+                </div>
+                <div className={styles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={styles.checkbox}
+                      />
+                    ) : (<img src={pdfIcon} alt="pdf icon" />)}
+                  </div>
+                  <div className={styles.fileName}>{file.fileName}</div>
+                </div>
+              </div>
+              )}
+              {openFilePopup && (
+              <FilePopup
+                file={fileToDisplay}
+                open={openFilePopup}
+                handleClose={handleCloseFilePopup}
+              />
+              )}
+            </div>
+          ))}
+          {
         children.map((kid) => (
           <div>
             <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} />
           </div>
         ))
       }
-        <div>
-          { openDeleteFilesPopup && checked.length > 0
-            ? (
-              <div>
-                <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
-                  <DialogTitle className={styles.dialogTitle}>
-                    You have chosen to delete
-                    {' '}
-                    {checked.length}
-                    {' '}
-                    {(checked.length) === 1 ? 'file ' : 'files '}
-                    from
-                    {' '}
-                    {title}
-                  </DialogTitle>
-                  <DialogContent>
-                    <div>
-                      <div className={styles.confirmMessage}>
-                        Are you sure you want to continue with this action?
+          <div>
+            { openDeleteFilesPopup && checked.length > 0
+              ? (
+                <div>
+                  <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
+                    <DialogTitle className={styles.dialogTitle}>
+                      You have chosen to delete
+                      {' '}
+                      {checked.length}
+                      {' '}
+                      {(checked.length) === 1 ? 'file ' : 'files '}
+                      from
+                      {' '}
+                      {title}
+                    </DialogTitle>
+                    <DialogContent>
+                      <div>
+                        <div className={styles.confirmMessage}>
+                          Are you sure you want to continue with this action?
+                        </div>
+                        <div className={styles.confirmButtons}>
+                          <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                            Cancel
+                          </button>
+                          <button type="button" className={styles.confirmDelete} onClick={() => (deleteFiles(checked))}>
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                      <div className={styles.confirmButtons}>
-                        <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
-                          Cancel
-                        </button>
-                        <button type="button" className={styles.confirmDelete} onClick={() => (deleteFiles(checked))}>
-                          Delete
-                        </button>
-                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              )
+              : <div />}
+          </div>
+          <div>
+            { checked.length > 0
+              ? (
+                <div className={styles.deleteFilesBar}>
+                  <div className={styles.totalSelected}>
+                    <div className={styles.selectedNumber}>
+                      {checked.length}
                     </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            )
-            : <div />}
+                    <div className={styles.selectedText}>
+                      {' '}
+                      selected
+                    </div>
+                  </div>
+                  <div className={styles.cancelOrDelete}>
+                    <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                      Cancel
+                    </button>
+                    <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )
+              : <div />}
+          </div>
         </div>
         <div>
-          { checked.length > 0
-            ? (
-              <div className={styles.deleteFilesBar}>
-                <div className={styles.totalSelected}>
-                  <div className={styles.selectedNumber}>
-                    {checked.length}
-                  </div>
-                  <div className={styles.selectedText}>
-                    {' '}
-                    selected
-                  </div>
-                </div>
-                <div className={styles.cancelOrDelete}>
-                  <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
-                    Cancel
-                  </button>
-                  <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )
-            : <div />}
+          {currRole === 'admin' && ExpandedModuleForm}
+
         </div>
       </div>
-      <div>
-        {currRole === 'admin' && ExpandedModuleForm}
-
-      </div>
-    </div>
-  );
+    );
 }
 
 ExpandedModule.propTypes = {
