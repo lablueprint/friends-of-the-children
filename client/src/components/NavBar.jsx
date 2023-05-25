@@ -6,8 +6,8 @@ import { logout } from '../redux/sliceAuth';
 import fotcLogo from '../assets/images/fotc_logo.svg';
 import styles from '../styles/NavBar.module.css';
 import ResourcesIcon from '../assets/icons/resources_icon.svg';
-import MenteesIcon from '../assets/icons/mentees_icon.svg';
-import MessageIcon from '../assets/icons/message_icon.svg';
+import YouthIcon from '../assets/icons/youth_icon.svg';
+import NoticesIcon from '../assets/icons/notices_icon.svg';
 import CalendarIcon from '../assets/icons/calendar_icon.svg';
 import UserIcon from '../assets/icons/user_icon.svg';
 
@@ -55,16 +55,16 @@ function NavBar({ profile, updateAppProfile }) {
             </Link>
             {/* TODO: have requests link instead for admin */}
             <Link to="/mentees" className={styles.btn_info}>
-              <img src={MenteesIcon} alt="mentees icon" />
-              My Mentees
+              <img src={YouthIcon} alt="mentees icon" />
+              My Youth
             </Link>
             <Link to="/calendar" className={styles.btn_info}>
               <img src={CalendarIcon} alt="calendar icon" />
               Calendar
             </Link>
             <Link to="/message-wall" className={styles.btn_info}>
-              <img src={MessageIcon} alt="message icon" />
-              Messages
+              <img src={NoticesIcon} alt="message icon" />
+              Notices
             </Link>
             <Link to="/profile" className={styles.btn_info}>
               <img src={UserIcon} alt="profile icon" />
