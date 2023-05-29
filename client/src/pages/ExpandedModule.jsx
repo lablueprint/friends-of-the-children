@@ -6,7 +6,7 @@ import {
 } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 // import Module from '../components/Module';
 import {
   TextField, Checkbox, IconButton,
@@ -25,6 +25,7 @@ import editIcon from '../assets/icons/editicon.svg';
 import styles from '../styles/Modules.module.css';
 
 import NewModulePopup from '../components/NewModulePopup';
+import NewFilePopup from '../components/NewFilePopup';
 import Module from '../components/Module';
 import * as api from '../api';
 
@@ -38,7 +39,9 @@ function ExpandedModule({ profile }) {
   const [parent, setParent] = useState();
   const [children, setChildren] = useState([]);
   const currRole = role.toLowerCase();
-  const [open, setOpen] = useState(false);
+  const [openNewUploadPopup, setOpenNewUploadPopup] = useState(false);
+  const [openNewModulePopup, setOpenNewModulePopup] = useState(false);
+  const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
   const [openFilePopup, setOpenFilePopup] = useState(false);
 
   const [currModuleFiles, setCurrModuleFiles] = useState([]);
@@ -76,7 +79,15 @@ function ExpandedModule({ profile }) {
 
   // opening add module popup
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpenNewUploadPopup(true);
+  };
+
+  const handleClickOpenNewModule = () => {
+    setOpenNewModulePopup(true);
+  };
+
+  const handleClickOpenNewFile = () => {
+    setOpenNewFilePopup(true);
   };
 
   // opening file popup
@@ -86,8 +97,18 @@ function ExpandedModule({ profile }) {
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpenNewUploadPopup(false);
+    setOpenNewModulePopup(false);
+    setOpenNewFilePopup(false);
   };
+
+  // const handleCloseNewModulePopup = () => {
+  //   setOpenNewModulePopup(false);
+  // };
+
+  // const handleCloseNewFilePopup = () => {
+  //   setOpenNewFilePopup(false);
+  // };
 
   const handleCloseFilePopup = () => {
     setOpenFilePopup(false);
@@ -150,6 +171,13 @@ function ExpandedModule({ profile }) {
     }
   };
   const setValueofBodyandTitle = (b, t) => {
+    // TODO: figure this out
+    // if (bodyText !== b) {
+    //   await api.updateTextField(bodyText, id, 'body');
+    // } else if (titleText !== t) {
+    //   await api.updateTextField(titleText, id, 'title');
+    // }
+
     setBodyText(b);
     setTitleText(t);
   };
@@ -162,19 +190,6 @@ function ExpandedModule({ profile }) {
   useEffect(() => { updateImageURL(currModuleFiles); }, [currModuleFiles]);
   // Since page does not refresh when showing expanded module from root module, must manually change the text displayed when body/title changes
   useEffect(() => { setValueofBodyandTitle(body, title); }, [body, title]);
-
-  // const toggleEdit = async (save) => {
-  //   setEditModule(true);
-  //   console.log('save is ', save);
-  //   if (save) {
-  //     // Only call firebase if edits were made
-  //     if (bodyText !== body) {
-  //       await api.updateTextField(bodyText, id, 'body');
-  //     } else if (titleText !== title) {
-  //       await api.updateTextField(titleText, id, 'title');
-  //     }
-  //   }
-  // };
 
   const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
     if (checked.length > 0) {
@@ -201,141 +216,125 @@ function ExpandedModule({ profile }) {
     });
   };
 
-  const ExpandedModuleForm = (
-    <div>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        hello
-      </Button>
-      <NewModulePopup
-        updateModule={updateModule}
-        open={open}
-        handleClose={handleClose}
-        parentID={id}
-      />
-    </div>
-  );
-    <div className={styles.titleContainer}>
-      <div className={styles.backAndTitle}>
-        <div className={styles.backContainer}>
-          <IconButton>
-            {parent != null ? (
-              <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-                <ArrowBackIcon />
-              </Link>
-            ) : (
-              <Link to="/resources" className={styles.backButton}>
-                <ArrowBackIcon />
-              </Link>
-            )}
-          </IconButton>
-        </div>
-        <div>
-          {editModule ? (
-            <TextField
-              value={titleText}
-              onChange={(e) => setTitleText(e.target.value)}
-              variant="outlined"
-              multiline={false}
-              className={styles.title}
-            />
-          ) : (
-            <div className={styles.title}>{title}</div>
-          )}
-        </div>
-      </div>
-      <div className={styles.editAndAddFile}>
-        {/* <Button variant="outlined" className={styles.editButton} onClick={() => toggleEdit(editModule)}>
-          <ModeIcon />
-          {editModule ? ('Save') : ('Edit Text')}
-        </Button> */}
-        {/* add file functionality */}
-      </div>
-    </div>;
+  // const ExpandedModuleForm = (
+  //   <div>
+  //     <Button variant="outlined" onClick={handleClickOpen}>
+  //       hello
+  //     </Button>
+  //     <NewModulePopup
+  //       updateModule={updateModule}
+  //       open={openNewUploadPopup}
+  //       handleClose={handleClose}
+  //       parentID={id}
+  //     />
+  //   </div>
+  // );
 
-    return (
+  return (
+    <div>
       <div>
-        <div>
-          <div className={styles.header}>
-            <div className={styles.backAndTitle}>
-              <div className={styles.backContainer}>
-                <IconButton>
-                  {parent != null ? (
-                    <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
-                      <ArrowBackIcon />
-                    </Link>
-                  ) : (
-                    <Link to="/resources" className={styles.backButton}>
-                      <ArrowBackIcon />
-                    </Link>
-                  )}
-                </IconButton>
-              </div>
+        <div className={styles.header}>
+          <div className={styles.backAndTitle}>
+            <div className={styles.backContainer}>
+              <IconButton>
+                {parent != null ? (
+                  <Link to="/expanded-module" state={{ id: parent }} className={styles.backButton}>
+                    <ArrowBackIcon />
+                  </Link>
+                ) : (
+                  <Link to="/resources" className={styles.backButton}>
+                    <ArrowBackIcon />
+                  </Link>
+                )}
+              </IconButton>
             </div>
-            <div>
+            <div className={styles.title}>
               {editModule ? (
                 <TextField
                   value={titleText}
                   onChange={(e) => setTitleText(e.target.value)}
                   variant="outlined"
                   multiline={false}
-                  className={styles.title}
                 />
               ) : (
-                <div className={styles.title}>{title}</div>
+                <div>{title}</div>
               )}
             </div>
-            {editModule ? (
-              <div className={styles.cancelOrSave}>
-                <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
-                  Cancel
-                </button>
-                <button type="button" className={styles.saveModuleChanges} onClick={() => (deleteModule(checked))}>
-                  Save
+          </div>
+          {editModule ? (
+            <div className={styles.cancelOrSave}>
+              <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
+                Cancel
+              </button>
+              <button type="button" className={styles.saveModuleChanges} onClick={() => (deleteModule(checked))}>
+                Save
+              </button>
+            </div>
+          ) : (
+            <div className={styles.editOrAddModule}>
+              <div className={styles.editModuleContainer}>
+                <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
+                  <img src={editIcon} alt="edit icon" />
+                  Edit Module
                 </button>
               </div>
-            ) : (
-              <div className={styles.editOrAddModule}>
-                <div className={styles.editModuleContainer}>
-                  <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
-                    <img src={editIcon} alt="edit icon" />
-                    Edit Module
+              <button type="button" onClick={handleClickOpen} className={styles.addModule}>
+                + New Upload
+              </button>
+              <Dialog
+                open={openNewUploadPopup}
+                onClose={handleClose}
+                aria-labelledby="parent-modal-title"
+                aria-describedby="parent-modal-description"
+              >
+                <DialogContent>
+                  <button type="button" onClick={handleClickOpenNewFile} className={styles.addModule}>
+                    New File
                   </button>
-                </div>
-                <button type="button" onClick={handleClickOpen} className={styles.addModule}>
-                  + New Upload
-                </button>
-                <NewModulePopup
+                  <NewFilePopup open={openNewFilePopup} handleClose={handleClose} />
+                  <button type="button" onClick={handleClickOpenNewModule} className={styles.addModule}>
+                    New Folder
+                  </button>
+                  <NewModulePopup
+                    updateModule={updateModule}
+                    open={openNewModulePopup}
+                    handleClose={handleClose}
+                    parentID={id}
+                  />
+                </DialogContent>
+              </Dialog>
+              {/* <NewModulePopup
                   updateModule={updateModule}
-                  open={open}
+                  open={openNewModulePopup}
                   handleClose={handleClose}
                   parentID={id}
-                />
-              </div>
-            )}
-          </div>
-          <div className={styles.bodyContainer}>
-            {editModule ? (
-              <TextField
-                value={bodyText}
-                onChange={(e) => setBodyText(e.target.value)}
-                variant="outlined"
-                multiline={false}
-                className={styles.body}
-              />
-            ) : (
-              <TextField
-                value={bodyText}
-                InputProps={{ readOnly: true }}
-                variant="outlined"
-                multiline={false}
-                className={styles.body}
-              />
-            )}
-          </div>
-          {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
-          {files.map((file) => (
-            <div className={styles.fileContainer}>
-              {(file.fileType.includes('image')) && (
+                /> */}
+            </div>
+          )}
+        </div>
+        <div className={styles.bodyContainer}>
+          {editModule ? (
+            <TextField
+              value={bodyText}
+              onChange={(e) => setBodyText(e.target.value)}
+              variant="outlined"
+              multiline={false}
+              className={styles.body}
+            />
+          ) : (
+            <TextField
+              value={bodyText}
+              InputProps={{ readOnly: true }}
+              variant="outlined"
+              multiline={false}
+              className={styles.body}
+            />
+          )}
+        </div>
+        {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
+        {files.map((file) => (
+          <div className={styles.fileContainer}>
+            {(file.fileType.includes('image')) && (
               <div key={file.url}>
                 <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                   <img className={styles.displayImg} src={file.url} alt={file.fileName} />
@@ -358,8 +357,8 @@ function ExpandedModule({ profile }) {
                   <div className={styles.fileName}>{file.fileName}</div>
                 </div>
               </div>
-              )}
-              {(file.fileType.includes('video')) && (
+            )}
+            {(file.fileType.includes('video')) && (
               <div key={file.url}>
                 <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                   <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
@@ -384,8 +383,8 @@ function ExpandedModule({ profile }) {
                   <div className={styles.fileName}>{file.fileName}</div>
                 </div>
               </div>
-              )}
-              {(file.fileType.includes('pdf')) && (
+            )}
+            {(file.fileType.includes('pdf')) && (
               <div key={file.url}>
                 <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                   <embed className={styles.preview} src={file.url} alt={file.fileName} />
@@ -408,90 +407,90 @@ function ExpandedModule({ profile }) {
                   <div className={styles.fileName}>{file.fileName}</div>
                 </div>
               </div>
-              )}
-              {openFilePopup && (
+            )}
+            {openFilePopup && (
               <FilePopup
                 file={fileToDisplay}
                 open={openFilePopup}
                 handleClose={handleCloseFilePopup}
               />
-              )}
-            </div>
-          ))}
-          {
+            )}
+          </div>
+        ))}
+        {
         children.map((kid) => (
           <div>
             <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} />
           </div>
         ))
       }
-          <div>
-            { openDeleteFilesPopup && checked.length > 0
-              ? (
-                <div>
-                  <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
-                    <DialogTitle className={styles.dialogTitle}>
-                      You have chosen to delete
-                      {' '}
-                      {checked.length}
-                      {' '}
-                      {(checked.length) === 1 ? 'file ' : 'files '}
-                      from
-                      {' '}
-                      {title}
-                    </DialogTitle>
-                    <DialogContent>
-                      <div>
-                        <div className={styles.confirmMessage}>
-                          Are you sure you want to continue with this action?
-                        </div>
-                        <div className={styles.confirmButtons}>
-                          <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
-                            Cancel
-                          </button>
-                          <button type="button" className={styles.confirmDelete} onClick={() => (deleteFiles(checked))}>
-                            Delete
-                          </button>
-                        </div>
+        <div>
+          { openDeleteFilesPopup && checked.length > 0
+            ? (
+              <div>
+                <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
+                  <DialogTitle className={styles.dialogTitle}>
+                    You have chosen to delete
+                    {' '}
+                    {checked.length}
+                    {' '}
+                    {(checked.length) === 1 ? 'file ' : 'files '}
+                    from
+                    {' '}
+                    {title}
+                  </DialogTitle>
+                  <DialogContent>
+                    <div>
+                      <div className={styles.confirmMessage}>
+                        Are you sure you want to continue with this action?
                       </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              )
-              : <div />}
-          </div>
-          <div>
-            { checked.length > 0
-              ? (
-                <div className={styles.deleteFilesBar}>
-                  <div className={styles.totalSelected}>
-                    <div className={styles.selectedNumber}>
-                      {checked.length}
+                      <div className={styles.confirmButtons}>
+                        <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                          Cancel
+                        </button>
+                        <button type="button" className={styles.confirmDelete} onClick={() => (deleteFiles(checked))}>
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                    <div className={styles.selectedText}>
-                      {' '}
-                      selected
-                    </div>
-                  </div>
-                  <div className={styles.cancelOrDelete}>
-                    <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
-                      Cancel
-                    </button>
-                    <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )
-              : <div />}
-          </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )
+            : <div />}
         </div>
         <div>
-          {currRole === 'admin' && ExpandedModuleForm}
-
+          { checked.length > 0
+            ? (
+              <div className={styles.deleteFilesBar}>
+                <div className={styles.totalSelected}>
+                  <div className={styles.selectedNumber}>
+                    {checked.length}
+                  </div>
+                  <div className={styles.selectedText}>
+                    {' '}
+                    selected
+                  </div>
+                </div>
+                <div className={styles.cancelOrDelete}>
+                  <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                    Cancel
+                  </button>
+                  <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )
+            : <div />}
         </div>
       </div>
-    );
+      <div>
+        {/* {currRole === 'admin' && ExpandedModuleForm} */}
+
+      </div>
+    </div>
+  );
 }
 
 ExpandedModule.propTypes = {

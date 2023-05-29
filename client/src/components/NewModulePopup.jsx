@@ -29,9 +29,6 @@ export default function NewModulePopup(props) {
   const [caregiver, setCaregiver] = useState(false);
   const [serviceAreaToSelected, setServiceAreaToSelected] = useState({});
 
-  // serviceAreas = ['AV', 'MS']
-  // serviceAreaToSelected = {AV: false}
-
   // add permissions to view module. order doesn't matter
   if (mentor) {
     roles.push('mentor');
@@ -133,9 +130,9 @@ export default function NewModulePopup(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={submitForm}>
-          <DialogTitle>New Module: </DialogTitle>
+          <DialogTitle>New Folder</DialogTitle>
           <DialogContent>
-            <FormLabel>Title</FormLabel>
+            <FormLabel>Title: </FormLabel>
             <TextField
               autoFocus
               margin="dense"
@@ -145,7 +142,7 @@ export default function NewModulePopup(props) {
               onChange={(e) => setTitle(e.target.value)}
               required
             />
-            <FormLabel>Body</FormLabel>
+            <FormLabel>Body: </FormLabel>
             <TextField
               margin="dense"
               label="Body"
