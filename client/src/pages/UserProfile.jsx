@@ -248,6 +248,7 @@ UserProfile.propTypes = {
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
     id: PropTypes.string.isRequired,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,
