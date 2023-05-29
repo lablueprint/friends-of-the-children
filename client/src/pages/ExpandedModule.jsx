@@ -418,7 +418,7 @@ function ExpandedModule({ profile }) {
         </div>
       </div>
       <div>
-        {currRole === 'admin' && ExpandedModuleForm}
+        {(currRole === 'admin' || currRole === 'mentor') && ExpandedModuleForm}
 
       </div>
     </div>

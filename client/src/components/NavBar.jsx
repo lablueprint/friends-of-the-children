@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/sliceAuth';
 import fotcLogo from '../assets/images/fotc_logo.svg';
@@ -16,6 +16,9 @@ import UserIcon from '../assets/icons/user_icon.svg';
 function NavBar({ profile, updateAppProfile }) {
   // uses React Redux to log user out and
   // remove profile info from localStorage
+  const location = useLocation();
+  const locationPath = location.pathname;
+
   const dispatch = useDispatch();
   const handleLogout = () => {
     updateAppProfile(null);
@@ -49,24 +52,24 @@ function NavBar({ profile, updateAppProfile }) {
                 alt="fotc logo"
               />
             </a>
-            <Link to="/resources" className={styles.btn_info}>
+            <Link to="/resources" className={`${styles.btn_info} ${locationPath === '/resources' ? styles.btn_selected : ''}`}>
               <img src={ResourcesIcon} alt="resources icon" />
               Resources
             </Link>
             {/* TODO: have requests link instead for admin */}
-            <Link to="/mentees" className={styles.btn_info}>
+            <Link to="/mentees" className={`${styles.btn_info} ${locationPath === '/mentees' ? styles.btn_selected : ''}`}>
               <img src={YouthIcon} alt="mentees icon" />
               My Youth
             </Link>
-            <Link to="/calendar" className={styles.btn_info}>
+            <Link to="/calendar" className={`${styles.btn_info} ${locationPath === '/calendar' ? styles.btn_selected : ''}`}>
               <img src={CalendarIcon} alt="calendar icon" />
               Calendar
             </Link>
-            <Link to="/message-wall" className={styles.btn_info}>
+            <Link to="/message-wall" className={`${styles.btn_info} ${locationPath === '/message-wall' ? styles.btn_selected : ''}`}>
               <img src={NoticesIcon} alt="message icon" />
               Notices
             </Link>
-            <Link to="/profile" className={styles.btn_info}>
+            <Link to="/profile" className={`${styles.btn_info} ${locationPath === '/profile' ? styles.btn_selected : ''}`}>
               <img src={UserIcon} alt="profile icon" />
               Profile
             </Link>
