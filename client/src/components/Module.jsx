@@ -15,7 +15,7 @@ function Module(props) {
       <div className={styles.filecard}>
         {editable ? (
           <Checkbox
-            checked={checked.includes(id)} // dunno how to go about this
+            checked={checked.includes(id)}
             onChange={(event) => handleCheckboxChange(event, id)}
             className={styles.checkbox}
           />
@@ -24,15 +24,6 @@ function Module(props) {
         <Link className={styles.resourcelink} to={`/resources/${title}`} state={{ id, parentTitle: title }} key={id}>
           <h3 className={styles.resourcetext}>{title}</h3>
         </Link>
-        {/* {role === 'admin' && (
-        <button className={styles.deleteButton} type="button" onClick={() => { deleteModule(id); }}>
-          {' '}
-          Delete Module
-          {' '}
-          {id}
-          {' '}
-        </button>
-        )} */}
       </div>
     </div>
   );
