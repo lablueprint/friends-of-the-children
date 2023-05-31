@@ -116,8 +116,8 @@ function Modules({ profile }) {
         {modules.map((card) => (
           <div key={card.id}>
             <Link
-              to="/expanded-module"
-              state={{ id: card.id }}
+              to={`/resources/${card.title}`}
+              state={{ id: card.id, parentTitle: title }}
             >
               <div className={styles.card}>
                 <h1>{card.title}</h1>
@@ -156,8 +156,8 @@ function Modules({ profile }) {
       {modules.map((card) => (
         <div key={card.id}>
           <Link
-            to="/expanded-module"
-            state={{ id: card.id }}
+            to={`/resources/${card.title}`}
+            state={{ id: card.id, parentTitle: title }}
           >
             <div className={styles.card}>
               <h1>{card.title}</h1>

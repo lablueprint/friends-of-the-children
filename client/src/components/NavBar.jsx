@@ -52,28 +52,28 @@ function NavBar({ profile, updateAppProfile }) {
                 alt="fotc logo"
               />
             </a>
-            <Link to="/resources" className={`${styles.btn_info} ${locationPath === '/resources' ? styles.btn_selected : ''}`}>
+            <Link to="/resources/All" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/' || locationPath.includes('/resources') ? styles.btn_selected : ''}`}>
               <img src={ResourcesIcon} alt="resources icon" />
               Resources
             </Link>
             {/* TODO: have requests link instead for admin */}
-            <Link to="/mentees" className={`${styles.btn_info} ${locationPath === '/mentees' ? styles.btn_selected : ''}`}>
+            <Link to="/mentees" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/mentees' ? styles.btn_selected : ''}`}>
               <img src={YouthIcon} alt="mentees icon" />
               My Youth
             </Link>
-            <Link to="/calendar" className={`${styles.btn_info} ${locationPath === '/calendar' ? styles.btn_selected : ''}`}>
+            <Link to="/calendar" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/calendar' ? styles.btn_selected : ''}`}>
               <img src={CalendarIcon} alt="calendar icon" />
               Calendar
             </Link>
-            <Link to="/message-wall" className={`${styles.btn_info} ${locationPath === '/message-wall' ? styles.btn_selected : ''}`}>
+            <Link to="/message-wall" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/message-wall' ? styles.btn_selected : ''}`}>
               <img src={NoticesIcon} alt="message icon" />
               Notices
             </Link>
-            <Link to="/profile" className={`${styles.btn_info} ${locationPath === '/profile' ? styles.btn_selected : ''}`}>
+            <Link to="/profile" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/profile' ? styles.btn_selected : ''}`}>
               <img src={UserIcon} alt="profile icon" />
               Profile
             </Link>
-            <Link to="/" className={`${styles.btn_info} ${styles.btn_danger}`} onClick={handleLogout}> Log Out </Link>
+            <Link to="/" className={`${styles.btn_info} ${styles.main_btn_info} ${styles.btn_danger}`} onClick={handleLogout}> Log Out </Link>
           </div>
         )}
     </div>

@@ -19,7 +19,7 @@ function Resources({ profile }) {
   const { role } = profile;
   const currRole = role.toLowerCase();
 
-  const title = 'Resources';
+  const title = 'All Resources';
 
   // getting all modules relevant to current user
   const fetchData = async () => {

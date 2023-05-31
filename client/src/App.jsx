@@ -19,7 +19,7 @@ import {
   UserProfile,
 } from './pages';
 import NavBar from './components/NavBar';
-import NavBar2 from './components/NavBar2';
+import ModuleNav from './components/ModuleNav';
 
 function App() {
   const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
@@ -41,11 +41,11 @@ function App() {
         <div className="App">
           <div className={styles.wrapper}>
             <NavBar profile={currUser} updateAppProfile={updateProfile} />
-            <div className={styles.mainContent}>
-              {(locationPath === '/resources' || locationPath === '/expanded-module') && (
-                <NavBar2 />
+            <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+              {(locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/') && (
+                <ModuleNav profile={currUser} />
               )}
-              <div className={styles.mainContent}>
+              <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
                 <Routes>
                   <Route path="/" element={(<Resources profile={currUser} />)} />
                   <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
@@ -57,7 +57,8 @@ function App() {
                   <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
                   <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
                   <Route path="/resources" element={(<Resources profile={currUser} />)} />
-                  <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
+                  <Route path="/resources/All" element={(<Resources profile={currUser} />)} />
+                  <Route path="/resources/:resourceSlug" element={(<ExpandedModule profile={currUser} />)} />
                   <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                 </Routes>
               </div>

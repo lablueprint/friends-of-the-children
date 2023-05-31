@@ -133,7 +133,7 @@ export default function NewModulePopup(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={submitForm}>
-          <DialogTitle>New Module: </DialogTitle>
+          <DialogTitle>New Folder: </DialogTitle>
           <DialogContent>
             <FormLabel>Title</FormLabel>
             <TextField

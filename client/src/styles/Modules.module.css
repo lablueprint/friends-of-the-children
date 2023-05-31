@@ -15,7 +15,7 @@
 }
 
 .filecard {
-    width: 354px;
+    width: 300px;
     height: 92px;
     margin: auto;
     margin-top: 5px;
@@ -31,16 +31,34 @@
     justify-content: center;
 }
 
+.content_container{
+    padding: 0 0 0 50px;
+    text-align: left;
+}
+
+.cards_container{
+    display: flex;
+    margin-bottom: 30px;
+    flex-direction: row;
+    gap: 30px;
+    text-align: left;
+}
+
+.filecards{
+
+}
+
 .resourcetext {
+    font-size: 1.5rem;
     font-weight: bold;
     color: black;
     font-family: Inter;
     display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-bottom: 0;
-  padding: 2em;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0;
+    padding: 2em;
 }
 
 .resourcelink{
@@ -54,6 +72,7 @@
   color:#156DBF;
   transform: scale(2);
 }
+
 .backContainer {
     padding-top: 3%;
     /* padding-bottom: 20%; */
@@ -68,6 +87,7 @@
 }
 
 .titleContainer {
+    padding: 20px 0 20px 0;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -77,7 +97,9 @@
     display: flex;
     flex-direction: row;
     gap: 1em;
-    padding: 2.5%;
+    vertical-align: middle;
+    align-items: center;
+    padding: 3%;
 }
 
 .editAndAddFile {
@@ -85,6 +107,7 @@
     flex-direction: row;
     gap: 1em;
     padding: 5%;
+    height: 110px !important;
 }
 
 .editButton {
@@ -100,11 +123,11 @@
     flex-wrap: nowrap;
     white-space: nowrap;
     display: inline-block;
-    padding: 0.25em 1.5em 0.25em 1.5em;
+    padding: 0.5em 1.5em 0.5em 1.5em;
     gap: 8px;
 }
 
-.editButton:hover {
+/* .editButton:hover {
     background: #FFFFFF;
     border: 2px solid #156DBF;
     border-radius: 12px;
@@ -114,7 +137,7 @@
     display: inline-block;
     padding: 0.25em 1.5em 0.25em 1.5em;
     gap: 8px;
-}
+} */
 
 .body {
     font-size: 20px;
@@ -329,6 +352,10 @@
     color: #000000;
     padding-top: 1em;
     padding-left: 1em;
+}
+
+.moduleTitle{
+    padding: 0;
 }
 
 .editOrAddModule {
