@@ -50,7 +50,8 @@ function ExpandedModule({ profile }) {
   const [files, setFiles] = useState([]);
   const [titleText, setTitleText] = useState('');
   const [bodyText, setBodyText] = useState('');
-  const [editModule, setEditModule] = useState(false); // toggles edit button
+  const [editModule, setEditModule] = useState(false);
+  // const [saveModuleChanges, setSaveModuleChanges] = useState(false);
   const [checked, setChecked] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
@@ -109,14 +110,6 @@ function ExpandedModule({ profile }) {
     setOpenNewModulePopup(false);
     setOpenNewFilePopup(false);
   };
-
-  // const handleCloseNewModulePopup = () => {
-  //   setOpenNewModulePopup(false);
-  // };
-
-  // const handleCloseNewFilePopup = () => {
-  //   setOpenNewFilePopup(false);
-  // };
 
   const handleCloseFilePopup = () => {
     setOpenFilePopup(false);
@@ -178,26 +171,26 @@ function ExpandedModule({ profile }) {
       setFiles(fileContents);
     }
   };
-  const setValueofBodyandTitle = (b, t) => {
-    // TODO: figure this out
-    // if (bodyText !== b) {
-    //   await api.updateTextField(bodyText, id, 'body');
-    // } else if (titleText !== t) {
-    //   await api.updateTextField(titleText, id, 'title');
-    // }
 
-    setBodyText(b);
-    setTitleText(t);
+  const updateBodyAndTitleFirebase = async () => {
+    // Only call firebase if edits were made
+    if (titleText !== title && bodyText !== body) {
+      await Promise.all([api.updateTextField(titleText, id, 'title'), api.updateTextField(bodyText, id, 'body')]);
+    } else if (titleText !== title) {
+      await api.updateTextField(titleText, id, 'title');
+    } else if (bodyText !== body) {
+      await api.updateTextField(bodyText, id, 'body');
+    }
   };
 
   const displayCheckBoxes = () => {
     setEditModule(true);
-    // toggleEdit(editModule);
   };
 
   useEffect(() => { updateImageURL(currModuleFiles); }, [currModuleFiles]);
   // Since page does not refresh when showing expanded module from root module, must manually change the text displayed when body/title changes
-  useEffect(() => { setValueofBodyandTitle(body, title); }, [body, title]);
+  useEffect(() => { setBodyText(body); }, [body]);
+  useEffect(() => { setTitleText(title); }, [title]);
 
   const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
     if (checked.length > 0) {
@@ -250,7 +243,7 @@ function ExpandedModule({ profile }) {
                 multiline={false}
               />
             ) : (
-              <div>{title}</div>
+              <div>{titleText}</div>
             )}
           </div>
         </div>
@@ -259,7 +252,14 @@ function ExpandedModule({ profile }) {
             <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
               Cancel
             </button>
-            <button type="button" className={styles.saveModuleChanges} onClick={() => (deleteModule(checked))}>
+            <button
+              type="button"
+              className={styles.saveModuleChanges}
+              onClick={() => {
+                deleteModule(checked);
+                updateBodyAndTitleFirebase();
+              }}
+            >
               Save
             </button>
           </div>
@@ -284,7 +284,7 @@ function ExpandedModule({ profile }) {
                 <button type="button" onClick={handleClickOpenNewFile} className={styles.addModule}>
                   New File
                 </button>
-                <NewFilePopup open={openNewFilePopup} handleClose={handleClose} />
+                <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={currModuleFiles} id={id} />
                 <button type="button" onClick={handleClickOpenNewModule} className={styles.addModule}>
                   New Folder
                 </button>
@@ -296,12 +296,6 @@ function ExpandedModule({ profile }) {
                 />
               </DialogContent>
             </Dialog>
-            {/* <NewModulePopup
-                  updateModule={updateModule}
-                  open={openNewModulePopup}
-                  handleClose={handleClose}
-                  parentID={id}
-                /> */}
           </div>
         )}
       </div>

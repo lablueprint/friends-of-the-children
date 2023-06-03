@@ -231,6 +231,17 @@ export const updateTextField = async (inputText, id, field) => {
   return null;
 };
 
+export const updateFileLinksField = async (inputFileLinks, fileLinks, id, field) => {
+  try {
+    const updatedFileLinks = await axios.get(`${url}/updateFileLinksField/${inputFileLinks}/${fileLinks}/${id}/${field}`);
+    return updatedFileLinks;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update file links field');
+  }
+  return null;
+};
+
 export const getUsernames = async () => {
   try {
     const user = await axios.get(`${url}/getUsernames`);
