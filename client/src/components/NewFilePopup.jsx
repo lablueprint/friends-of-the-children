@@ -17,7 +17,7 @@ export default function NewFilePopup(props) {
     open, handleClose, currModuleFiles, id,
   } = props;
 
-  const [fileLinks, setFileLinks] = useState([]);
+  const [fileLinks, setFileLinks] = useState(currModuleFiles);
 
   const handleUpload = (file) => {
     const fileName = file.name;
@@ -44,11 +44,11 @@ export default function NewFilePopup(props) {
   const handleFileChange = (e) => {
     const urls = [];
     Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
-    setFileLinks(urls);
+    setFileLinks((links) => [...links, urls]);
   };
 
   const updateFileLinksFirebase = async () => {
-    await api.updateTextField(fileLinks, currModuleFiles, id, 'title');
+    await api.updateTextField(fileLinks, id, 'fileLinks');
     console.log(fileLinks);
     console.log(id);
     // // Only call firebase if edits were made

@@ -29,17 +29,13 @@ function Module(props) {
   );
 }
 
-Module.defaultProps = {
-  editable: false,
-};
-
 Module.propTypes = {
   title: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   // role: PropTypes.string.isRequired,
   // deleteModule: PropTypes.func.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
-  editable: PropTypes.bool,
+  editable: PropTypes.bool.isRequired,
   checked: PropTypes.arrayOf.isRequired,
 };
 

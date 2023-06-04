@@ -472,12 +472,12 @@ const updateTextField = async (req, res) => {
 const updateFileLinksField = async (req, res) => {
   try {
     const {
-      inputFileLinks, fileLinks, id, field,
+      newFileLinks, id, field,
     } = req.params;
     if (field === 'fileLinks') {
       await db.collection('modules')
         .doc(id)
-        .update({ fileLinks: [...fileLinks, inputFileLinks] })
+        .update({ fileLinks: newFileLinks })
         .catch((error) => {
         // setUpdateProfileMessage('We ran into an error updating your text field!');
           console.log(error);

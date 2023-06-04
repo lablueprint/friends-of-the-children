@@ -53,6 +53,7 @@ function ExpandedModule({ profile }) {
   const [editModule, setEditModule] = useState(false);
   // const [saveModuleChanges, setSaveModuleChanges] = useState(false);
   const [checked, setChecked] = useState([]);
+  const [checkedModules, setCheckedModules] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
@@ -142,6 +143,15 @@ function ExpandedModule({ profile }) {
     setChecked([...checked, fileName]);
   };
 
+  const handleModuleCheckboxChange = (event, moduleId) => {
+    if (checkedModules.includes(moduleId)) {
+      setCheckedModules(checkedModules.filter((module) => (module !== moduleId)));
+      return;
+    }
+
+    setCheckedModules([...checkedModules, moduleId]);
+  };
+
   const updateImageURL = async (fileLinks) => { // i'm gonna be slow bc i contain a Promise function!
     setFiles([]);
     const fileContents = [];
@@ -193,7 +203,7 @@ function ExpandedModule({ profile }) {
   useEffect(() => { setTitleText(title); }, [title]);
 
   const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
-    if (checked.length > 0) {
+    if (checkedModules.length > 0) {
       api.deleteModule(moduleId).then(() => {
         // reloads the page
         deleteChild(moduleId);
@@ -205,8 +215,10 @@ function ExpandedModule({ profile }) {
 
   const clearCheckboxes = () => {
     setChecked([]);
+    setCheckedModules([]);
     setOpenDeleteFilesPopup(false);
     setEditModule(false);
+    console.log(children);
   };
 
   const deleteFiles = async (filesToDelete) => {
@@ -215,6 +227,22 @@ function ExpandedModule({ profile }) {
       setFiles(tempFiles); // updates list of presenting files
       clearCheckboxes(); // resets checked state to be empty, gets rid of "selected" bar on the bottom side of page
     });
+  };
+
+  const deleteModules = async () => { // calls deleteModule for each id in checked
+    console.log(checkedModules);
+    console.log(children);
+    const deletionPromises = checkedModules.map((moduleId) => deleteModule(moduleId));
+    try {
+      await Promise.all(deletionPromises);
+      console.log('All modules deleted successfully.');
+    } catch (error) {
+      console.error('An error occurred while deleting modules:', error);
+    }
+    // for each moduleID in checked, removed the modules in Modules that has a field called moduleId
+    const tempModules = children.filter((modid) => !checked.includes(modid.id));
+    setChildren(tempModules);
+    clearCheckboxes();
   };
 
   return (
@@ -285,6 +313,7 @@ function ExpandedModule({ profile }) {
                   New File
                 </button>
                 <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={currModuleFiles} id={id} />
+                {/* {console.log(currModuleFiles)} */}
                 <button type="button" onClick={handleClickOpenNewModule} className={styles.addModule}>
                   New Folder
                 </button>
@@ -305,7 +334,7 @@ function ExpandedModule({ profile }) {
           {
             children.map((kid) => (
               <div className={styles.filecards}>
-                <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} />
+                <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} editable={editModule} checked={checkedModules} handleCheckboxChange={handleModuleCheckboxChange} />
               </div>
             ))
           }
@@ -419,7 +448,7 @@ function ExpandedModule({ profile }) {
       </div>
 
       <div>
-        { openDeleteFilesPopup && checked.length > 0
+        { openDeleteFilesPopup && (checked.length > 0 || checkedModules.length > 0)
           ? (
             <div>
               <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
@@ -429,6 +458,11 @@ function ExpandedModule({ profile }) {
                   {checked.length}
                   {' '}
                   {(checked.length) === 1 ? 'file ' : 'files '}
+                  and
+                  {' '}
+                  {checkedModules.length}
+                  {' '}
+                  {(checkedModules.length) === 1 ? 'module ' : 'modules '}
                   from
                   {' '}
                   {title}
@@ -442,7 +476,7 @@ function ExpandedModule({ profile }) {
                       <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
                         Cancel
                       </button>
-                      <button type="button" className={styles.confirmDelete} onClick={() => (deleteFiles(checked))}>
+                      <button type="button" className={styles.confirmDelete} onClick={() => { deleteFiles(checked); deleteModules(checkedModules); }}>
                         Delete
                       </button>
                     </div>
@@ -454,12 +488,12 @@ function ExpandedModule({ profile }) {
           : <div />}
       </div>
       <div>
-        { checked.length > 0
+        { (checked.length > 0 || checkedModules.length > 0)
           ? (
             <div className={styles.deleteFilesBar}>
               <div className={styles.totalSelected}>
                 <div className={styles.selectedNumber}>
-                  {checked.length}
+                  {checked.length + checkedModules.length}
                 </div>
                 <div className={styles.selectedText}>
                   {' '}

@@ -84,7 +84,7 @@ router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 router.get('/updateTextField/:inputText/:id/:field', updateTextField);
 
 // updating module's file links field
-router.get('/updateFileLinksField/:inputFileLinks/:fileLinks/:id/:field', updateFileLinksField);
+router.get('/updateFileLinksField/:newFileLinks/:id/:field', updateFileLinksField);
 
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);

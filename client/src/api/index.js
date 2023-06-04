@@ -231,9 +231,9 @@ export const updateTextField = async (inputText, id, field) => {
   return null;
 };
 
-export const updateFileLinksField = async (inputFileLinks, fileLinks, id, field) => {
+export const updateFileLinksField = async (newFileLinks, id, field) => {
   try {
-    const updatedFileLinks = await axios.get(`${url}/updateFileLinksField/${inputFileLinks}/${fileLinks}/${id}/${field}`);
+    const updatedFileLinks = await axios.get(`${url}/updateFileLinksField/${newFileLinks}/${id}/${field}`);
     return updatedFileLinks;
   } catch (error) {
     console.error(error.message);
