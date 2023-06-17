@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
-import styles from '../styles/NavBar.module.css';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import * as api from '../api';
+import NewModulePopup from './NewModulePopup';
+import styles from '../styles/NavBar.module.css';
+import editIcon from '../assets/icons/edit_pencil.svg';
+import addIcon from '../assets/icons/add_icon.svg';
 
 // Navigation Bar component used to navigate to different pages
 
@@ -11,8 +16,13 @@ function ModuleNav({ profile }) {
   // remove profile info from localStorage
   const location = useLocation();
   const locationPath = location.pathname;
+  // const { root } = location.state;
   const role = profile.role.toLowerCase();
   const [modules, setModules] = useState([{ title: 'All' }]);
+  const [openNewUploadPopup, setOpenNewUploadPopup] = useState(false);
+  // const [checked, setChecked] = useState([]);
+  // const [editModule, setEditModule] = useState(false); // toggles edit button
+  // const [hoveredFile, setHoveredFile] = useState(null);
 
   useEffect(() => {
     api.getModules(role).then((temp) => {
@@ -21,6 +31,64 @@ function ModuleNav({ profile }) {
   }, []);
 
   console.log(modules);
+
+  const updateModule = () => {
+    // setChildren([...children, data]);
+  };
+
+  // opening add module popup
+  const handleClickOpen = () => {
+    setOpenNewUploadPopup(true);
+  };
+
+  const handleClose = () => {
+    setOpenNewUploadPopup(false);
+  };
+
+  // const deleteChild = (childId) => {
+  //   setChildren(children.filter((child) => child.id !== childId));
+  // };
+
+  // const handleMouseEnter = (fileId) => {
+  //   setHoveredFile(fileId);
+  // };
+
+  // const handleMouseLeave = () => {
+  //   setHoveredFile(null);
+  // };
+
+  // const handleCheckboxChange = (event, fileName) => {
+  //   if (checked.includes(fileName)) {
+  //     setChecked(checked.filter((file) => (file !== fileName)));
+  //     return;
+  //   }
+
+  //   setChecked([...checked, fileName]);
+  // };
+
+  const displayCheckBoxes = () => {
+    // setEditModule(true);
+    // toggleEdit(editModule);
+  };
+
+  // const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
+  //   if (checked.length > 0) {
+  //     api.deleteModule(moduleId).then(() => {
+  //       // reloads the page
+  //       deleteChild(moduleId);
+  //     });
+  //   }
+  //   setEditModule(false);
+  // };
+
+  // const clearCheckboxes = () => {
+  //   setChecked([]);
+  //   setEditModule(false);
+  // };
+
+  // const deleteFiles = async (filesToDelete) => {
+
+  // };
 
   return (
     <div>
@@ -41,6 +109,36 @@ function ModuleNav({ profile }) {
           </div>
         ))}
         {/* TODO: have requests link instead for admin */}
+        {role === 'admin'
+        && (
+        <div>
+          <div className={styles.line} />
+          <div className={styles.navEditAdd}>
+            <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
+              <img src={editIcon} alt="edit icon" />
+              Edit
+            </button>
+            <button type="button" onClick={handleClickOpen} className={styles.editModule}>
+              <img src={addIcon} alt="add icon" />
+              Add
+            </button>
+            <Dialog
+              open={openNewUploadPopup}
+              onClose={handleClose}
+              aria-labelledby="parent-modal-title"
+              aria-describedby="parent-modal-description"
+            >
+              <DialogContent>
+                <NewModulePopup
+                  updateModule={updateModule}
+                  open={openNewUploadPopup}
+                  handleClose={handleClose}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+        ) }
       </div>
     </div>
   );

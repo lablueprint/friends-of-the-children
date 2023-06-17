@@ -130,7 +130,7 @@ export default function NewModulePopup(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={submitForm}>
-          <DialogTitle>New Folder</DialogTitle>
+          <DialogTitle>Create New Folder</DialogTitle>
           <DialogContent>
             <FormLabel>Title: </FormLabel>
             <TextField
@@ -151,7 +151,6 @@ export default function NewModulePopup(props) {
               rows={4}
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              required
             />
             <FormLabel>Target Audience: </FormLabel>
             <br />

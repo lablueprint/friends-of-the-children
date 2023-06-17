@@ -21,7 +21,7 @@ function Module(props) {
           />
         ) : (<FolderIcon className={styles.fileIcon} />)}
 
-        <Link className={styles.resourcelink} to={`/resources/${title}`} state={{ id, parentTitle: title }} key={id}>
+        <Link className={styles.resourcelink} to={`/resources/${title}`} state={{ id, root: title }} key={id}>
           <h3 className={styles.resourcetext}>{title}</h3>
         </Link>
       </div>
