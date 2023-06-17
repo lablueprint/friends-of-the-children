@@ -1,4 +1,4 @@
-import { React } from 'react';
+import { React, useState } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -10,12 +10,14 @@ import {
   ref, uploadBytesResumable,
 } from 'firebase/storage';
 import { storage } from '../pages/firebase';
-// import * as api from '../api';
+import * as api from '../api';
 
 export default function NewFilePopup(props) {
   const {
-    open, handleClose,
+    open, handleClose, currModuleFiles, id,
   } = props;
+
+  const [fileLinks, setFileLinks] = useState(currModuleFiles);
 
   const handleUpload = (file) => {
     const fileName = file.name;
@@ -42,12 +44,25 @@ export default function NewFilePopup(props) {
   const handleFileChange = (e) => {
     const urls = [];
     Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
-    console.log(urls);
-    // setFileLinks(urls);
+    setFileLinks((links) => [...links, urls]);
+  };
+
+  const updateFileLinksFirebase = async () => {
+    await api.updateTextField(fileLinks, id, 'fileLinks');
+    console.log(fileLinks);
+    console.log(id);
+    // // Only call firebase if edits were made
+    // if (titleText !== title && bodyText !== body) {
+    //   await Promise.all([api.updateTextField(titleText, id, 'title'), api.updateTextField(bodyText, id, 'body')]);
+    // } else if (titleText !== title) {
+    //   await api.updateTextField(titleText, id, 'title');
+    // } else if (bodyText !== body) {
+    //   await api.updateTextField(bodyText, id, 'body');
+    // }
   };
 
   const submitForm = async () => { // adds a module to the root module page
-    console.log('hi');
+    updateFileLinksFirebase();
     handleClose(); // closes add module popup
   };
 
@@ -82,7 +97,8 @@ export default function NewFilePopup(props) {
 }
 
 NewFilePopup.propTypes = {
-//   id: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
+  currModuleFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

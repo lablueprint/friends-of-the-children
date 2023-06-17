@@ -471,6 +471,25 @@ const updateTextField = async (req, res) => {
   }
 };
 
+const updateFileLinksField = async (req, res) => {
+  try {
+    const {
+      newFileLinks, id, field,
+    } = req.params;
+    if (field === 'fileLinks') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ fileLinks: newFileLinks })
+        .catch((error) => {
+        // setUpdateProfileMessage('We ran into an error updating your text field!');
+          console.log(error);
+        });
+    }
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // checking if the username already exists in database (new user signing up)
 const getUsernames = async (req, res) => {
   try {
@@ -686,6 +705,7 @@ export {
   getModulebyId,
   getGoogleaccount,
   updateTextField,
+  updateFileLinksField,
   getUsernames,
   getMessages,
   addToMailchimpList,
