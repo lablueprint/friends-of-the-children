@@ -6,16 +6,12 @@ import {
 } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
-// import Button from '@mui/material/Button';
-// import Module from '../components/Module';
 import {
   TextField, Checkbox, IconButton,
 } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-// import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-// import ModeIcon from '@mui/icons-material/Mode';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FilePopup from '../components/FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
@@ -23,7 +19,6 @@ import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
 import editIcon from '../assets/icons/editicon.svg';
 import styles from '../styles/Modules.module.css';
-
 import NewModulePopup from '../components/NewModulePopup';
 import NewFilePopup from '../components/NewFilePopup';
 import Module from '../components/Module';
@@ -51,7 +46,6 @@ function ExpandedModule({ profile }) {
   const [titleText, setTitleText] = useState('');
   const [bodyText, setBodyText] = useState('');
   const [editModule, setEditModule] = useState(false);
-  // const [saveModuleChanges, setSaveModuleChanges] = useState(false);
   const [checked, setChecked] = useState([]);
   const [checkedModules, setCheckedModules] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
