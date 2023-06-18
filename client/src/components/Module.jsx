@@ -97,11 +97,11 @@ function Module(props) {
       deleteChild(moduleId);
     });
   };
-  const deleteFile = async (fileToDelete) => {
-    api.deleteFile(id, fileToDelete).then(() => {
-      setFiles(files.filter((file) => file.fileLink !== fileToDelete));
-    });
-  };
+  // const deleteFile = async (fileToDelete) => {
+  //   api.deleteFile(id, fileToDelete).then(() => {
+  //     setFiles(files.filter((file) => file.fileLink !== fileToDelete));
+  //   });
+  // };
   return (
     <div>
       <div className={styles.title}>{title}</div>
