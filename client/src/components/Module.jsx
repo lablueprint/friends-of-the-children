@@ -32,8 +32,6 @@ function Module(props) {
 Module.propTypes = {
   title: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  // role: PropTypes.string.isRequired,
-  // deleteModule: PropTypes.func.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
   editable: PropTypes.bool.isRequired,
   checked: PropTypes.arrayOf.isRequired,
