@@ -3,8 +3,10 @@ import { createRequire } from 'module';
 import {
   collection, addDoc, getDoc, arrayUnion, updateDoc, doc, arrayRemove,
 } from 'firebase/firestore';
-import { getStorage, ref, deleteObject } from 'firebase/storage';
-
+import {
+  getStorage, ref, deleteObject,
+  uploadBytes, getDownloadURL,
+} from 'firebase/storage';
 import crypto from 'crypto';
 import { uuid } from 'uuidv4';
 // eslint-disable-next-line import/extensions
@@ -364,9 +366,9 @@ const recursivelyDeletemodules = async (moduleID) => {
     const currModule = moduleRef.data();
     if (Array.isArray(currModule.children) && currModule.children.length > 0) {
       // if there are submodules, recursively delete them
-      for (const child of currModule.children) {
+      currModule.children.forEach(async (child) => {
         await recursivelyDeletemodules(child);
-      }
+      });
     }
     if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
       const parentRef = db.collection('modules').doc(currModule.parent);

@@ -28,7 +28,7 @@ import * as api from '../api';
 function ExpandedModule({ profile }) {
   const { role } = profile;
   const location = useLocation();
-  const { id } = location.state;
+  const { id, root } = location.state;
   const [title, setTitle] = useState('');
   const [ParentTitle, setParentTitle] = useState('');
   const [body, setBody] = useState('');
@@ -246,7 +246,7 @@ function ExpandedModule({ profile }) {
           <div className={styles.backContainer}>
             <IconButton>
               {parent != null ? (
-                <Link to={`/resources/${ParentTitle}`} state={{ id: parent, parentTitle: ParentTitle }} className={styles.backButton}>
+                <Link to={`/resources/${ParentTitle}`} state={{ id: parent, parentTitle: ParentTitle, root }} className={styles.backButton}>
                   <ArrowBackIcon />
                 </Link>
               ) : (
