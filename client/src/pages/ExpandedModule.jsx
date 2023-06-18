@@ -212,7 +212,6 @@ function ExpandedModule({ profile }) {
     setCheckedModules([]);
     setOpenDeleteFilesPopup(false);
     setEditModule(false);
-    console.log(children);
   };
 
   const deleteFiles = async (filesToDelete) => {
@@ -224,12 +223,9 @@ function ExpandedModule({ profile }) {
   };
 
   const deleteModules = async () => { // calls deleteModule for each id in checked
-    console.log(checkedModules);
-    console.log(children);
     const deletionPromises = checkedModules.map((moduleId) => deleteModule(moduleId));
     try {
       await Promise.all(deletionPromises);
-      console.log('All modules deleted successfully.');
     } catch (error) {
       console.error('An error occurred while deleting modules:', error);
     }
@@ -307,7 +303,6 @@ function ExpandedModule({ profile }) {
                   New File
                 </button>
                 <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={currModuleFiles} id={id} />
-                {/* {console.log(currModuleFiles)} */}
                 <button type="button" onClick={handleClickOpenNewModule} className={styles.addModule}>
                   New Folder
                 </button>
