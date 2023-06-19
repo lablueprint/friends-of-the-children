@@ -55,7 +55,7 @@ function App() {
                 <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
                 <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                 <Route path="/requests" element={(<Requests profile={currUser} />)} />
-                <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />
+                <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />
               </Routes>
             </div>
           </div>
