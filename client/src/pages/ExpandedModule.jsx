@@ -176,6 +176,7 @@ function ExpandedModule({ profile }) {
     }
   };
 
+  // Updates firebase backend with api calls after user edits module text/body and saves
   const updateBodyAndTitleFirebase = async () => {
     // Only call firebase if edits were made
     if (titleText !== title && bodyText !== body) {

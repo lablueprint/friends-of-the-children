@@ -9,6 +9,8 @@ import * as api from '../api';
 import styles from '../styles/Modules.module.css';
 import editIcon from '../assets/icons/editicon.svg';
 
+// root page for all modules, displays Module components to the user
+// admin can select Modules to delete or edit, or add new Modules
 function Resources({ profile }) {
   const [modules, setModules] = useState([]);
   const [open, setOpen] = useState(false);

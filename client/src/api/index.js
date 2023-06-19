@@ -189,6 +189,7 @@ export const getModulebyId = async (id, currRole) => {
   return null;
 };
 
+// deletes a module with moduleID
 export const deleteModule = async (moduleID) => {
   try {
     await axios.delete(`${url}/deleteModule/${moduleID}`);
@@ -198,6 +199,7 @@ export const deleteModule = async (moduleID) => {
   }
 };
 
+// deletes all files within array filesToDelete belonging to module moduleID
 export const deleteFiles = async (moduleID, filesToDelete) => {
   try {
     await axios.delete(`${url}/deleteFiles`, { data: { moduleID, filesToDelete } });
@@ -220,6 +222,7 @@ export const getGoogleaccount = async (googleEmail) => {
   return null;
 };
 
+// updates title, body text in a module with id
 export const updateTextField = async (inputText, id, field) => {
   try {
     const updatedText = await axios.get(`${url}/updateTextField/${inputText}/${id}/${field}`);
@@ -231,6 +234,7 @@ export const updateTextField = async (inputText, id, field) => {
   return null;
 };
 
+// updates file links array in module with id
 export const updateFileLinksField = async (newFileLinks, id, field) => {
   try {
     const updatedFileLinks = await axios.get(`${url}/updateFileLinksField/${newFileLinks}/${id}/${field}`);
@@ -253,6 +257,7 @@ export const getUsernames = async () => {
   return null;
 };
 
+// adds module to firebase
 export const addModule = async (data) => {
   try {
     const moduleRef = await axios.post(`${url}/addModule`, { data });

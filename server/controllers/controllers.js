@@ -268,16 +268,13 @@ const addMenteeFile = async (req, res) => {
   }
 };
 
+// uploads file to firebase storage
 const uploadFile = async (req, res) => {
   try {
-    console.log('HERE', req.files);
     const { files } = req.body;
-    console.log(files.name);
-    console.log('REQBODY:', req.body);
     const storageRef = ref(storage, `/images/${files.name}`);
 
     uploadBytes(storageRef, files).then((snapshot) => {
-      console.log('jhkjhjkhjkhjh');
       getDownloadURL(snapshot.ref).then((url) => {
         res.status(202).json(url);
       });
@@ -323,6 +320,7 @@ const updateModuleChildren = async (req, res) => {
   }
 };
 
+// adds module to firebase db
 const addModule = async (req, res) => {
   try {
     const { data } = req.body;
@@ -360,6 +358,7 @@ const getModulebyId = async (req, res) => {
   }
 };
 
+// deletes a module and all of its children from firebase
 const recursivelyDeletemodules = async (moduleID) => {
   try {
     const moduleRef = await db.collection('modules').doc(moduleID).get();
@@ -383,10 +382,11 @@ const recursivelyDeletemodules = async (moduleID) => {
   }
 };
 
+// deletes a module, and all of its children from firebase db
 const deleteModule = async (req, res) => {
   try {
     const { moduleID } = req.params;
-    await recursivelyDeletemodules(moduleID);
+    await recursivelyDeletemodules(moduleID); // helper function
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete module');
