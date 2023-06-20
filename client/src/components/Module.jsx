@@ -37,7 +37,7 @@ Module.propTypes = {
   id: PropTypes.string.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
   editable: PropTypes.bool.isRequired,
-  checked: PropTypes.arrayOf.isRequired,
+  checked: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default Module;

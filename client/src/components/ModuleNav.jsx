@@ -15,7 +15,7 @@ function ModuleNav({ profile }) {
   // uses React Redux to log user out and
   // remove profile info from localStorage
   const location = useLocation();
-  const locationPath = location.pathname;
+  const locationPath = location.pathname.split('/');
   // const { root } = location.state;
   const role = profile.role.toLowerCase();
   const [modules, setModules] = useState([{ title: 'All' }]);
@@ -30,7 +30,7 @@ function ModuleNav({ profile }) {
     });
   }, []);
 
-  console.log(modules);
+  // console.log(modules);
 
   const updateModule = () => {
     // setChildren([...children, data]);
@@ -94,7 +94,7 @@ function ModuleNav({ profile }) {
     <div>
       <div className={styles.second_container}>
         {modules.map((module) => (
-          <div className={styles.nav2_btn_container}>
+          <div className={styles.nav2_btn_container} key={module.title}>
             <div className={`${locationPath.includes(module.title) ? styles.nav2_btn_top : styles.nav2_btn_blue}`}>
               <div className={styles.nav2_btn_top_round} />
             </div>

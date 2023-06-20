@@ -351,9 +351,9 @@ function ExpandedModule({ profile }) {
 
         {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
         {files.map((file) => (
-          <div className={styles.fileContainer}>
+          <div key={file.url} className={styles.fileContainer}>
             {(file.fileType.includes('image')) && (
-            <div key={file.url}>
+            <div>
               <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <img className={styles.displayImg} src={file.url} alt={file.fileName} />
               </div>
@@ -377,7 +377,7 @@ function ExpandedModule({ profile }) {
             </div>
             )}
             {(file.fileType.includes('video')) && (
-            <div key={file.url}>
+            <div>
               <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
                   <track default kind="captions" />
@@ -403,7 +403,7 @@ function ExpandedModule({ profile }) {
             </div>
             )}
             {(file.fileType.includes('pdf')) && (
-            <div key={file.url}>
+            <div>
               <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <embed className={styles.preview} src={file.url} alt={file.fileName} />
               </div>

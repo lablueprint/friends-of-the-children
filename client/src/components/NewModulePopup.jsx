@@ -181,6 +181,7 @@ export default function NewModulePopup(props) {
             <br />
             {serviceAreas.map((SA) => (
               <FormControlLabel
+                key={SA}
                 control={(
                   <Checkbox
                     checked={serviceAreaToSelected[SA]}
