@@ -8,8 +8,10 @@ import {
   createEvent,
   patchEvent,
   getMentees,
+  updateClearance,
   createMentee,
   addMentee,
+  getAllMentees,
   getMenteeFolders,
   addMenteeFolder,
   getMenteeFiles,
@@ -27,6 +29,11 @@ import {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  getProfilesSortedByDate,
+  batchUpdateProfile,
+  batchDeleteProfile,
+  batchAddToList,
+  batchDeleteFromList,
   deleteModule,
   deleteFiles,
   addModule,
@@ -47,14 +54,19 @@ router.patch('/patchEvent', patchEvent);
 // gets all the mentees
 router.get('/getMentees/profileID=:profileID', getMentees);
 
+router.get('/getAllMentees', getAllMentees);
+
 // gets the mentee's folders
 router.get('/getMenteeFolders/id=:id', getMenteeFolders);
+
+// update clearance
+router.post('/updateClearance', updateClearance);
 
 // creates a new mentee doc
 router.post('/createMentee', createMentee);
 
 // add a new mentee (link to mentor + create default folders)
-router.post('/addMentee/profileID=:profileID/menteeID=:menteeID', addMentee);
+router.post('/addMentee/profileID=:profileID/menteeID=:menteeID/caregiverEmail=:caregiverEmail', addMentee);
 
 // creates a new mentee folder
 router.post('/addMenteeFolder/id=:id/folder=:folderName', addMenteeFolder);
@@ -103,6 +115,17 @@ router.delete('/deleteFiles', deleteFiles);
 router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
+
+//
+router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
+
+router.post('/batchUpdateProfile', batchUpdateProfile);
+
+router.post('/batchDeleteProfile', batchDeleteProfile);
+
+router.post('/batchAddToList', batchAddToList);
+
+router.post('/batchDeleteFromList', batchDeleteFromList);
 
 // mailchimp routes
 router.post('/mailchimp/addToList', addToMailchimpList);

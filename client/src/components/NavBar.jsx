@@ -10,6 +10,7 @@ import YouthIcon from '../assets/icons/youth_icon.svg';
 import NoticesIcon from '../assets/icons/notices_icon.svg';
 import CalendarIcon from '../assets/icons/calendar_icon.svg';
 import UserIcon from '../assets/icons/user_icon.svg';
+import RequestsIcon from '../assets/icons/requests_icon.svg';
 
 // Navigation Bar component used to navigate to different pages
 
@@ -69,6 +70,13 @@ function NavBar({ profile, updateAppProfile }) {
               <img src={NoticesIcon} alt="message icon" />
               Notices
             </Link>
+            {profile.role === 'Admin'
+            && (
+            <Link to="/requests" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/profile' ? styles.btn_selected : ''}`}>
+              <img src={RequestsIcon} alt="requests icon" />
+              Requests
+            </Link>
+            )}
             <Link to="/profile" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/profile' ? styles.btn_selected : ''}`}>
               <img src={UserIcon} alt="profile icon" />
               Profile
@@ -89,6 +97,11 @@ NavBar.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,
 };

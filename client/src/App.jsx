@@ -17,6 +17,8 @@ import {
   ExpandedModule,
   NotFound,
   UserProfile,
+  Requests,
+  UserNotApproved,
 } from './pages';
 import NavBar from './components/NavBar';
 import ModuleNav from './components/ModuleNav';
@@ -40,14 +42,14 @@ function App() {
       ? (
         <div className="App">
           <div className={styles.wrapper}>
-            <NavBar profile={currUser} updateAppProfile={updateProfile} />
+            {(currUser.role === 'Admin' || currUser.approved) && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
             <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
               {(locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/') && (
                 <ModuleNav profile={currUser} />
               )}
               <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
                 <Routes>
-                  <Route path="/" element={(<Resources profile={currUser} />)} />
+                  {currUser.role === 'Admin' || currUser.approved ? <Route path="/" element={(<Resources profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
                   <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
                   <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
                   <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
@@ -60,6 +62,7 @@ function App() {
                   <Route path="/resources/All" element={(<Resources profile={currUser} />)} />
                   <Route path="/resources/:resourceSlug" element={(<ExpandedModule profile={currUser} />)} />
                   <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
+                  <Route path="/requests" element={(<Requests profile={currUser} />)} />
                 </Routes>
               </div>
             </div>
@@ -73,6 +76,7 @@ function App() {
             <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
+            <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />
             <Route path="*" element={(<NotFound />)} />
           </Routes>
         </div>

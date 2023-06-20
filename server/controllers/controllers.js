@@ -33,7 +33,7 @@ const createEvent = async (req, res) => {
   try {
     // obtain data from client side
     const {
-      title, description, location, attachments, start, end,
+      title, description, location, attachments, start, end, calendarId,
     } = req.body;
     // set required auth credentials to use gcal api
     oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
@@ -41,7 +41,7 @@ const createEvent = async (req, res) => {
     // call gcal api's "insert" method w valid json object
     const response = await calendar.events.insert({
       auth: oauth2Client,
-      calendarId: 'primary',
+      calendarId,
       supportsAttachments: true,
       requestBody: {
         summary: title,
@@ -91,6 +91,20 @@ const patchEvent = async (req, res) => {
   }
 };
 
+// update medical clearance
+const updateClearance = async (req, res) => {
+  try {
+    const { id, clearance } = req.body;
+    await db.collection('mentees').doc(id)
+      .update({
+        medicalClearance: !clearance,
+      });
+    res.status(202).json('success');
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // returns an array of filtered mentees
 const getMentees = async (req, res) => {
   try {
@@ -117,6 +131,24 @@ const getMentees = async (req, res) => {
   }
 };
 
+// returns an array of all existing mentees
+const getAllMentees = async (req, res) => {
+  try {
+    // await user profile data from firebase
+    const sc = await db.collection('mentees').get();
+    const mentees = [];
+    // push each profile into response array
+    sc.forEach((dc) => {
+      const data = dc.data();
+      data.id = dc.id;
+      mentees.push(data);
+    });
+    res.status(202).json(mentees);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 // adds new mentee doc to firebase mentees collection & returns its doc id
 const createMentee = async (req, res) => {
   try {
@@ -130,8 +162,22 @@ const createMentee = async (req, res) => {
 // update mentor's profile by adding the new mentee to mentee array field & create default folders
 const addMentee = async (req, res) => {
   try {
-    const { profileID, menteeID } = req.params;
+    const { profileID, menteeID, caregiverEmail } = req.params;
     const mentorRef = doc(db, 'profiles', profileID);
+
+    // add mentee ID to the caregiver's mentee array (based on the caregiver email)
+    await db.collection('profiles').where('email', '==', caregiverEmail).where('role', '==', 'Caregiver')
+      .get()
+      .then((sc) => {
+        sc.forEach((dc) => {
+          db.collection('profiles').doc(dc.id)
+            .update({
+              mentees: arrayUnion(menteeID),
+            });
+        });
+      });
+
+    // add mentee ID to the mentor's mentee array
     await updateDoc(mentorRef, {
       mentees: arrayUnion(menteeID),
     });
@@ -272,6 +318,8 @@ const addMenteeFile = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const { files } = req.body;
+    // console.log(files.name);
+    // console.log('REQBODY:', req.body);
     const storageRef = ref(storage, `/images/${files.name}`);
 
     uploadBytes(storageRef, files).then((snapshot) => {
@@ -556,6 +604,131 @@ const getMessages = async (req, res) => {
   }
 };
 
+const getProfilesSortedByDate = async (req, res) => {
+  try {
+    // await user profile data from firebase
+    const sc = await db.collection('profiles').get();
+    const profiles = [];
+    // push each profile into response array
+    sc.forEach((dc) => {
+      const data = dc.data();
+      data.id = dc.id;
+      profiles.push(data);
+    });
+
+    profiles.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;
+      }
+      if (a.date > b.date) {
+        return 1;
+      }
+      return 0;
+    });
+
+    res.status(202).json(profiles);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const batchUpdateProfile = async (req, res) => {
+  try {
+    const batch = db.batch();
+
+    const { profileUpdates } = req.body;
+
+    profileUpdates.forEach((element) => {
+      const updateRef = db.collection('profiles').doc(element.id);
+      const updates = element.fields;
+
+      batch.update(updateRef, updates);
+    });
+
+    await batch.commit();
+
+    res.status(202).json('Profiles Successfully Updated');
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchDeleteProfile = async (req, res) => {
+  try {
+    const batch = db.batch();
+
+    const { profileDeletes } = req.body;
+
+    profileDeletes.forEach((element) => {
+      const delRef = db.collection('profiles').doc(element);
+
+      batch.delete(delRef);
+    });
+
+    await batch.commit();
+
+    res.status(202).json('Profiles Successfully Deleted');
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchAddToList = async (req, res) => {
+  try {
+    const { listUpdates } = req.body;
+
+    const memberList = listUpdates.map((element) => ({
+      email_address: element.email_address,
+      status: 'subscribed',
+      merge_fields: {
+        FNAME: element.firstName,
+        LNAME: element.lastName,
+        ROLE: element.role,
+        SAREA: element.serviceArea,
+      },
+    }));
+
+    const response = await mailchimp.lists.batchListMembers(process.env.MAILCHIMP_AUDIENCE_ID, {
+      members: memberList,
+    });
+
+    res.status(202).json(response);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
+const batchDeleteFromList = async (req, res) => {
+  try {
+    const { listDeletes } = req.body;
+
+    console.log(`lists to be deleted are: ${listDeletes}`);
+
+    const memberList = listDeletes.map((element) => ({
+      email_address: element.email_address,
+      status: 'archived',
+      merge_fields: {
+        FNAME: element.firstName,
+        LNAME: element.lastName,
+        ROLE: element.role,
+        SAREA: element.serviceArea,
+      },
+    }));
+
+    const response = await mailchimp.lists.batchListMember(process.env.MAILCHIMP_AUDIENCE_ID, {
+      members: memberList,
+    });
+
+    res.status(202).json(response);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json(error);
+  }
+};
+
 // mailchimp controllers
 
 const addToMailchimpList = async (req, res) => {
@@ -693,12 +866,14 @@ export {
   createEvent,
   patchEvent,
   getMentees,
+  updateClearance,
   createMentee,
   addMentee,
   getMenteeFolders,
   addMenteeFolder,
   getMenteeFiles,
   addMenteeFile,
+  getAllMentees,
   uploadFile,
   getAllProfiles,
   getModules,
@@ -712,6 +887,11 @@ export {
   updateMailchimpList,
   sendMailchimpEmails,
   updateModuleChildren,
+  getProfilesSortedByDate,
+  batchUpdateProfile,
+  batchDeleteProfile,
+  batchAddToList,
+  batchDeleteFromList,
   deleteModule,
   deleteFiles,
   addModule,
