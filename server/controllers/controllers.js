@@ -496,7 +496,8 @@ const getGoogleaccount = async (req, res) => {
 
 const updateTextField = async (req, res) => {
   try {
-    const { inputText, id, field } = req.params;
+    const { id, field } = req.params;
+    const { inputText } = req.body;
     if (field === 'body') {
       await db.collection('modules')
         .doc(id)
@@ -522,8 +523,9 @@ const updateTextField = async (req, res) => {
 const updateFileLinksField = async (req, res) => {
   try {
     const {
-      newFileLinks, id, field,
+      id, field,
     } = req.params;
+    const newFileLinks = req.body;
     if (field === 'fileLinks') {
       await db.collection('modules')
         .doc(id)

@@ -250,7 +250,7 @@ export const getGoogleaccount = async (googleEmail) => {
 // updates title, body text in a module with id
 export const updateTextField = async (inputText, id, field) => {
   try {
-    const updatedText = await axios.get(`${url}/updateTextField/${inputText}/${id}/${field}`);
+    const updatedText = await axios.post(`${url}/updateTextField/${id}/${field}`, inputText);
     return updatedText;
   } catch (error) {
     console.error(error.message);
@@ -262,7 +262,7 @@ export const updateTextField = async (inputText, id, field) => {
 // updates file links array in module with id
 export const updateFileLinksField = async (newFileLinks, id, field) => {
   try {
-    const updatedFileLinks = await axios.get(`${url}/updateFileLinksField/${newFileLinks}/${id}/${field}`);
+    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}`, newFileLinks);
     return updatedFileLinks;
   } catch (error) {
     console.error(error.message);

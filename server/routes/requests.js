@@ -93,10 +93,10 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
 // updating module's text field
-router.get('/updateTextField/:inputText/:id/:field', updateTextField);
+router.post('/updateTextField/:id/:field', updateTextField);
 
 // updating module's file links field
-router.get('/updateFileLinksField/:newFileLinks/:id/:field', updateFileLinksField);
+router.post('/updateFileLinksField/:id/:field', updateFileLinksField);
 
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);
