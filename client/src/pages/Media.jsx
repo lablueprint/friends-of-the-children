@@ -23,7 +23,7 @@ function Media({ profile }) {
   // media states for dialog opening/closing views
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
-  console.log(mediaArray);
+  const role = (profile.role).toLowerCase();
 
   // get the current folder contents on first load
   useEffect(() => {
@@ -94,7 +94,7 @@ function Media({ profile }) {
     <div className={styles.folders_page}>
       <div>
         <p>
-          {`My Mentees > ${firstName} ${lastName} > `}
+          {`My Youth > ${firstName} ${lastName} > `}
           <b>
             {`${folderName}`}
           </b>
@@ -130,7 +130,7 @@ function Media({ profile }) {
           <h3>{`${folderName}`}</h3>
 
           {/* users cannot directly add into the images/videos/flyers folders? */}
-          {folderName !== 'Images' && folderName !== 'Videos' && folderName !== 'Flyers' && folderName !== 'Links' && (
+          {role === 'mentor' && folderName !== 'Images' && folderName !== 'Videos' && folderName !== 'Flyers' && folderName !== 'Links' && (
           <Button variant="contained" onClick={handleClickOpen}>
             + Add Media
           </Button>
@@ -224,7 +224,7 @@ Media.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
-    mentees: PropTypes.arrayOf.isRequired,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
 

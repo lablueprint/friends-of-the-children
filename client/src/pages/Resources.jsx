@@ -9,6 +9,8 @@ import * as api from '../api';
 import styles from '../styles/Modules.module.css';
 import editIcon from '../assets/icons/editicon.svg';
 
+// root page for all modules, displays Module components to the user
+// admin can select Modules to delete or edit, or add new Modules
 function Resources({ profile }) {
   const [modules, setModules] = useState([]);
   const [open, setOpen] = useState(false);
@@ -133,7 +135,7 @@ function Resources({ profile }) {
         <div className={styles.resourcesContainer}>
           <div className={styles.resourcesDisplay}>
             {modules.map((card) => (
-              <Module title={card.title} id={card.id} editable={editModule} checked={checked} handleCheckboxChange={handleCheckboxChange} />
+              <Module key={card.id} title={card.title} id={card.id} editable={editModule} checked={checked} handleCheckboxChange={handleCheckboxChange} />
             ))}
           </div>
         </div>
@@ -204,7 +206,7 @@ function Resources({ profile }) {
     <div className={styles.resourcesContainer}>
       <div className={styles.resourcesDisplay}>
         {modules.map((card) => (
-          <Module title={card.title} id={card.id} root={card.title} />
+          <Module title={card.title} id={card.id} key={card.id} root={card.title} />
         ))}
       </div>
     </div>
@@ -219,6 +221,11 @@ Resources.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
 export default Resources;

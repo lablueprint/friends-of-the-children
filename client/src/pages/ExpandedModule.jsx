@@ -6,16 +6,12 @@ import {
 } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import { useLocation, Link } from 'react-router-dom';
-// import Button from '@mui/material/Button';
-// import Module from '../components/Module';
 import {
   TextField, Checkbox, IconButton,
 } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-// import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-// import ModeIcon from '@mui/icons-material/Mode';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FilePopup from '../components/FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
@@ -23,7 +19,6 @@ import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
 import editIcon from '../assets/icons/editicon.svg';
 import styles from '../styles/Modules.module.css';
-
 import NewModulePopup from '../components/NewModulePopup';
 import NewFilePopup from '../components/NewFilePopup';
 import Module from '../components/Module';
@@ -51,7 +46,6 @@ function ExpandedModule({ profile }) {
   const [titleText, setTitleText] = useState('');
   const [bodyText, setBodyText] = useState('');
   const [editModule, setEditModule] = useState(false);
-  // const [saveModuleChanges, setSaveModuleChanges] = useState(false);
   const [checked, setChecked] = useState([]);
   const [checkedModules, setCheckedModules] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
@@ -182,6 +176,7 @@ function ExpandedModule({ profile }) {
     }
   };
 
+  // Updates firebase backend with api calls after user edits module text/body and saves
   const updateBodyAndTitleFirebase = async () => {
     // Only call firebase if edits were made
     if (titleText !== title && bodyText !== body) {
@@ -218,7 +213,6 @@ function ExpandedModule({ profile }) {
     setCheckedModules([]);
     setOpenDeleteFilesPopup(false);
     setEditModule(false);
-    console.log(children);
   };
 
   const deleteFiles = async (filesToDelete) => {
@@ -230,12 +224,9 @@ function ExpandedModule({ profile }) {
   };
 
   const deleteModules = async () => { // calls deleteModule for each id in checked
-    console.log(checkedModules);
-    console.log(children);
     const deletionPromises = checkedModules.map((moduleId) => deleteModule(moduleId));
     try {
       await Promise.all(deletionPromises);
-      console.log('All modules deleted successfully.');
     } catch (error) {
       console.error('An error occurred while deleting modules:', error);
     }
@@ -313,7 +304,6 @@ function ExpandedModule({ profile }) {
                   New File
                 </button>
                 <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={currModuleFiles} id={id} />
-                {/* {console.log(currModuleFiles)} */}
                 <button type="button" onClick={handleClickOpenNewModule} className={styles.addModule}>
                   New Folder
                 </button>
@@ -361,9 +351,9 @@ function ExpandedModule({ profile }) {
 
         {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
         {files.map((file) => (
-          <div className={styles.fileContainer}>
+          <div key={file.url} className={styles.fileContainer}>
             {(file.fileType.includes('image')) && (
-            <div key={file.url}>
+            <div>
               <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <img className={styles.displayImg} src={file.url} alt={file.fileName} />
               </div>
@@ -387,7 +377,7 @@ function ExpandedModule({ profile }) {
             </div>
             )}
             {(file.fileType.includes('video')) && (
-            <div key={file.url}>
+            <div>
               <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
                   <track default kind="captions" />
@@ -413,7 +403,7 @@ function ExpandedModule({ profile }) {
             </div>
             )}
             {(file.fileType.includes('pdf')) && (
-            <div key={file.url}>
+            <div>
               <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
                 <embed className={styles.preview} src={file.url} alt={file.fileName} />
               </div>
@@ -524,6 +514,11 @@ ExpandedModule.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
 export default ExpandedModule;

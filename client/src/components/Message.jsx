@@ -14,9 +14,9 @@ function Message(props) {
   return (
     <div className={pinned ? styles.pinnedmessage : styles.message}>
       <div className={styles.titlediv}>
-        <p1 className={styles.title_css}>
+        <h1 className={styles.title_css}>
           {title}
-        </p1>
+        </h1>
         <button type="button" className={pinned ? styles.pinnedbutton : styles.button} onClick={update}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button>
       </div>
 

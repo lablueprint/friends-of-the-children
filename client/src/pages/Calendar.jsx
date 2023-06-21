@@ -1,4 +1,4 @@
-import { React, createRef } from 'react';
+import { React, useRef } from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
@@ -7,6 +7,8 @@ import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
+import * as constants from '../constants';
+import CalendarEventForm from '../components/CalendarEventForm';
 
 /*
 
@@ -24,59 +26,15 @@ TODO: Export calendar functionality?
 */
 
 function Calendar({ profile }) {
-  const { role } = profile;
+  const { role, serviceArea } = profile;
   const currRole = role.toLowerCase();
   const {
     REACT_APP_FIREBASE_CALENDAR_ID,
   } = process.env;
 
-  const calendarRef = createRef();
+  const calendarRef = useRef();
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
-    // alert('a day has been clicked');
-    console.log(eventInfo.event.title);
-    if (eventInfo.event.extendedProps.location) {
-      console.log('Location: ', eventInfo.event.extendedProps.location);
-    } else {
-      console.log('Location: No Location');
-    }
-    console.log('Start time: ', eventInfo.event.start);
-    console.log('End time: ', eventInfo.event.end);
-  };
-
-  const addEvent = (e) => {
-    e.preventDefault();
-
-    const title = e.target.title.value;
-    const description = e.target.description.value;
-    const location = e.target.location.value;
-    const attachments = [];
-    const fileUrl = e.target.attachments.value;
-    const start = e.target.start.value;
-    const end = e.target.end.value;
-    // check if user inputs an attachment
-    if (e.target.attachments.value) {
-      attachments.push({ fileUrl, title: 'an attachment!' });
-    }
-    // create json event object
-    const event = {
-      title,
-      description,
-      location,
-      start,
-      end,
-      attachments,
-    };
-    // add event to actual google calendar
-    api.createEvent(event).then((eventID) => {
-      // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
-      event.id = eventID;
-      // add event on fullcalendar interface
-      const calApi = calendarRef.current.getApi();
-      calApi.addEvent(event);
-      console.log(event.end);
-    });
-    e.target.reset();
   };
 
   const dropEvent = (info) => {
@@ -96,74 +54,70 @@ function Calendar({ profile }) {
     api.patchEvent(eventData);
   };
 
-  if (currRole === 'admin') {
-    return (
-      <div>
-        <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
-        <div>
-          <form onSubmit={(e) => addEvent(e)}>
-            <h1>FOTC Calendar</h1>
-            Title:
-            <input type="text" name="title" required />
-            Description:
-            <input type="text" name="description" />
-            Location:
-            <input type="text" name="location" />
-            Attachments (Google link):
-            <input type="text" name="attachments" />
-            Start Time:
-            <input type="datetime-local" name="start" required />
-            End Time:
-            <input type="datetime-local" name="end" required />
-            <button type="submit">Add Event</button>
-          </form>
-        </div>
+  // Return cal id(s) based on user role (admin = all cals, non-admin = only their service area)
+  const getCalendarByRole = () => {
+    if (currRole === 'admin') {
+      return [
+        {
+          googleCalendarId: constants.calIdFOTC,
+          className: 'fotc-events',
+          color: 'rgba(0, 170, 238, 0.2)',
+        },
+        {
+          googleCalendarId: constants.calIdAV,
+          className: 'av-events',
+          color: 'rgba(238, 187, 17, 0.2)',
+        },
+        {
+          googleCalendarId: constants.calIdMS,
+          className: 'ms-events',
+          color: 'rgba(255, 85, 34, 0.2)',
+        },
+      ];
+    }
+    if (serviceArea.toLowerCase() === 'av') {
+      return [{
+        googleCalendarId: constants.calIdAV,
+        className: 'av-events',
+        color: 'rgba(238, 187, 17, 0.2)',
+      }];
+    } if (serviceArea.toLowerCase() === 'ms') {
+      return [{
+        googleCalendarId: constants.calIdMS,
+        className: 'ms-events',
+        color: 'rgba(255, 85, 34, 0.2)',
+      }];
+    }
+    return [{
+      googleCalendarId: constants.calIdFOTC,
+      className: 'fotc-events',
+      color: 'rgba(0, 170, 238, 0.2)',
+    }];
+  };
+  const calendarInfo = getCalendarByRole();
 
-        <div className={styles.calendar}>
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            selectable
-            editable
-            // update event when you drag & drop an event on the interface (for admin only)
-            eventDrop={dropEvent}
-            selectMirror
-            dayMaxEvents
-            eventColor="rgba(0, 170, 238, 0.2)"
-            eventTextColor="black"
-            fixedWeekCount={false}
-            googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
-            events={{
-              googleCalendarId: 'fofthechildren@gmail.com',
-              className: 'gcal-event',
-            }}
-            eventClick={handleEventClick}
-          />
-        </div>
-      </div>
-    );
-  }
+  const createForm = () => (currRole === 'admin' // enable add event form iff admin
+    ? <CalendarEventForm profile={profile} getCalendarRef={() => (calendarRef)} /> : null);
 
   return (
     <div>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
+      {createForm()}
       <div className={styles.calendar}>
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           selectable
+          editable={currRole === 'admin'}
+          eventDrop={currRole === 'admin' ? dropEvent : null}
           selectMirror
           dayMaxEvents
           eventColor="rgba(0, 170, 238, 0.2)"
           eventTextColor="black"
           fixedWeekCount={false}
           googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
-          events={{
-            googleCalendarId: 'fofthechildren@gmail.com',
-            className: 'gcal-event',
-          }}
+          eventSources={calendarInfo}
           eventClick={handleEventClick}
         />
       </div>
@@ -179,6 +133,11 @@ Calendar.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
 export default Calendar;

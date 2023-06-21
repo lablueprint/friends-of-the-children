@@ -5,6 +5,9 @@ import PropTypes from 'prop-types';
 import FolderIcon from '@mui/icons-material/Folder';
 import styles from '../styles/Modules.module.css';
 
+// Module component for Resources page
+// Inputs:
+// title: title of module, id: module id, editable: boolean for displaying checkboxes, checked: array of checked checkboxes, handleCheckboxChange: checks/unchecks checkboxes
 function Module(props) {
   const {
     title, id, editable, checked, handleCheckboxChange, root,
@@ -34,11 +37,9 @@ function Module(props) {
 Module.propTypes = {
   title: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  // role: PropTypes.string.isRequired,
-  // deleteModule: PropTypes.func.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
   editable: PropTypes.bool.isRequired,
-  checked: PropTypes.arrayOf.isRequired,
+  checked: PropTypes.arrayOf(PropTypes.string).isRequired,
   root: PropTypes.string.isRequired,
 };
 
