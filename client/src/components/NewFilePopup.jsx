@@ -65,6 +65,7 @@ export default function NewFilePopup(props) {
     event.preventDefault();
     updateFileLinksFirebase();
     handleClose(); // closes add module popup
+    window.location.reload(false);
   };
 
   return (
