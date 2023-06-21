@@ -64,6 +64,7 @@ function App() {
                   <Route path="/resources/:resourceSlug/:ls" element={(<ExpandedModule profile={currUser} />)} />
                   <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                   <Route path="/requests" element={(<Requests profile={currUser} />)} />
+                  <Route path="*" element={(<NotFound />)} />
                 </Routes>
               </div>
             </div>

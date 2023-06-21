@@ -5,11 +5,13 @@
 // route that wasn't defined by any previous routes such as login, signup, etc.
 
 import React from 'react';
+import styles from '../styles/NotFound.module.css';
 
 export default function NotFound() {
   return (
-    <div>
-      <h1>Page not accesible. Please login first!</h1>
+    <div className={styles.not_found_page}>
+      <h1 className={styles.title}>Page Not Found</h1>
+      <p className={styles.body}>Sorry, this page doesn&apos;t exist! Check if there is a typo in your URL.</p>
     </div>
   );
 }
