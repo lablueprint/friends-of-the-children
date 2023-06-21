@@ -252,7 +252,7 @@ function ExpandedModule({ profile }) {
           <div className={styles.backContainer}>
             <IconButton>
               {parent != null ? (
-                <Link to={`/resources/${ParentTitle}`} state={{ id: parent, parentTitle: ParentTitle, root }} className={styles.backButton}>
+                <Link to={`/resources/${root}/${ParentTitle}`} state={{ id: parent, parentTitle: ParentTitle, root }} className={styles.backButton}>
                   <ArrowBackIcon />
                 </Link>
               ) : (
@@ -334,7 +334,7 @@ function ExpandedModule({ profile }) {
           {
             children.map((kid) => (
               <div className={styles.filecards}>
-                <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} editable={editModule} checked={checkedModules} handleCheckboxChange={handleModuleCheckboxChange} />
+                <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} editable={editModule} checked={checkedModules} handleCheckboxChange={handleModuleCheckboxChange} root={root} />
               </div>
             ))
           }

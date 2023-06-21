@@ -7,8 +7,10 @@ import styles from '../styles/Modules.module.css';
 
 function Module(props) {
   const {
-    title, id, editable, checked, handleCheckboxChange,
+    title, id, editable, checked, handleCheckboxChange, root,
   } = props;
+
+  console.log(root);
 
   return (
     <div>
@@ -21,7 +23,7 @@ function Module(props) {
           />
         ) : (<FolderIcon className={styles.fileIcon} />)}
 
-        <Link className={styles.resourcelink} to={`/resources/${title}`} state={{ id, root: title }} key={id}>
+        <Link className={styles.resourcelink} to={`/resources/${root}/${title}`} state={{ id, root }} key={id}>
           <h3 className={styles.resourcetext}>{title}</h3>
         </Link>
       </div>
@@ -37,6 +39,7 @@ Module.propTypes = {
   handleCheckboxChange: PropTypes.func.isRequired,
   editable: PropTypes.bool.isRequired,
   checked: PropTypes.arrayOf.isRequired,
+  root: PropTypes.string.isRequired,
 };
 
 export default Module;

@@ -204,7 +204,7 @@ function Resources({ profile }) {
     <div className={styles.resourcesContainer}>
       <div className={styles.resourcesDisplay}>
         {modules.map((card) => (
-          <Module title={card.title} id={card.id} />
+          <Module title={card.title} id={card.id} root={card.title} />
         ))}
       </div>
     </div>

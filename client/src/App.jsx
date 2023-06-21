@@ -59,6 +59,7 @@ function App() {
                   <Route path="/resources" element={(<Resources profile={currUser} />)} />
                   <Route path="/resources/All" element={(<Resources profile={currUser} />)} />
                   <Route path="/resources/:resourceSlug" element={(<ExpandedModule profile={currUser} />)} />
+                  <Route path="/resources/:resourceSlug/:ls" element={(<ExpandedModule profile={currUser} />)} />
                   <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
                 </Routes>
               </div>
