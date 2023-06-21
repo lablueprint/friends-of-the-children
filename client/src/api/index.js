@@ -156,6 +156,7 @@ export const uploadFile = async (files) => {
   }
   return null;
 };
+
 // gets all user profiles
 //
 // to use this function to get all profiles, put the following in a useEffect:

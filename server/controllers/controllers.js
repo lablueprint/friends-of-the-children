@@ -362,6 +362,20 @@ const updateModuleChildren = async (req, res) => {
     await updateDoc(moduleRef, {
       children: arrayUnion(docRef.id),
     });
+
+    // add files to root doc of modules
+    const rootRef = db.collection('modules').doc('root');
+    const rootDoc = await rootRef.get();
+    const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
+    const newFileLinks = req.body.data.fileLinks || [];
+    const updatedFiles = currentFiles.concat(newFileLinks);
+
+    if (rootDoc.exists) {
+      await rootRef.update({ files: updatedFiles });
+    } else {
+      await rootRef.set({ files: updatedFiles });
+    }
+
     res.status(202).json(docRef.id);
   } catch (error) {
     res.status(400).json(error);
@@ -374,6 +388,20 @@ const addModule = async (req, res) => {
     const { data } = req.body;
     const dataRef = await db.collection('modules').add(data);
     const { id } = dataRef; // newly added module's id
+
+    // add files to root doc of modules
+    const docRef = db.collection('modules').doc('root');
+    const rootDoc = await docRef.get();
+    const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
+    const newFileLinks = req.body.data.fileLinks || [];
+    const updatedFiles = currentFiles.concat(newFileLinks);
+
+    if (rootDoc.exists) {
+      await docRef.update({ files: updatedFiles });
+    } else {
+      await docRef.set({ files: updatedFiles });
+    }
+
     res.status(202).json(id);
   } catch (error) {
     res.status(400).json(error);
@@ -526,14 +554,30 @@ const updateFileLinksField = async (req, res) => {
       id, field,
     } = req.params;
     const newFileLinks = req.body;
+
     if (field === 'fileLinks') {
-      await db.collection('modules')
-        .doc(id)
-        .update({ fileLinks: newFileLinks })
+      const currRef = db.collection('modules').doc(id);
+      const currDoc = await currRef.get();
+      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+      const currLinks = newFileLinks || [];
+      const updatedLinks = currFiles.concat(currLinks);
+      await currRef
+        .update({ fileLinks: updatedLinks })
         .catch((error) => {
-        // setUpdateProfileMessage('We ran into an error updating your text field!');
           console.log(error);
         });
+
+      // add files to root doc of modules
+      const docRef = db.collection('modules').doc('root');
+      const rootDoc = await docRef.get();
+      const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
+      const updatedFiles = currentFiles.concat(currLinks);
+
+      if (rootDoc.exists) {
+        await docRef.update({ files: updatedFiles });
+      } else {
+        await docRef.set({ files: updatedFiles });
+      }
     }
   } catch (error) {
     res.status(400).json(error);

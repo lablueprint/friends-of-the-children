@@ -44,7 +44,7 @@ export default function NewFilePopup(props) {
   const handleFileChange = (e) => {
     const urls = [];
     Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
-    setFileLinks((links) => [...links, ...urls]);
+    setFileLinks(urls);
   };
 
   const updateFileLinksFirebase = async () => {
@@ -61,10 +61,10 @@ export default function NewFilePopup(props) {
     // }
   };
 
-  const submitForm = async (event) => { // adds a module to the root module page
+  const submitForm = async (event) => {
     event.preventDefault();
     updateFileLinksFirebase();
-    handleClose(); // closes add module popup
+    handleClose();
   };
 
   return (
