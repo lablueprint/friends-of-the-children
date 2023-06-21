@@ -2,16 +2,23 @@
 .wrapper{
     display: flex;
     position: relative;
-    background-color: #F6FAFF;
+    /* background-color: #F6FAFF; */
     height: 80vw;
 }
 
 /* any content to the right of navbar */
 .mainContent{
-    width: 100%;
+    width: 85%;
     justify-content: center;
     margin-left: 15%;
+    background-color: #F6FAFF;
     /* margin-top: 20px; */
+}
+
+.mainContent2{
+    width: 90%;
+    justify-content: center;
+    margin-left: 9%;
 }
 
 /* navbar container */
@@ -29,18 +36,34 @@
 
 .btn_info{
     display: inline-block;
-    /* padding: 1rem; */
-    width: 70%;
+    padding: .7rem;
+    padding-left: 30px;
+    width: 100%;
     font-weight: 700;
-    /* font-size: 1.1rem; */
     color: #000;
     text-align: left;
     text-decoration: none;
     vertical-align: middle;
-    margin-bottom: 50px;
+    
     letter-spacing: 0.08rem;
-    border-radius: 0.25rem;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    
+    border-radius: 2rem;
+    background-color: #F6FAFF;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    color:black !important;
+}
+
+.main_btn_info{
+    border-radius: 0;
+    background-color: white;
+    margin-bottom: 35px;
+}
+
+.btn_selected{
+    background-color: #DEF1FF;
+    color: #156DBF;
 }
 
 .btn_info img{
@@ -49,8 +72,113 @@
 }
 
 .btn_danger{
-    color: #fff;
-    background-color: #dc3545;
+    width: 90%;
+    color: #fff !important;
+    background-color: #FF5522;
     text-align: center;
+    vertical-align: middle;
     padding: 0.375rem 0.75rem;
+    border-radius: 10px;
+    width: 80%;
+    height: 40px;
+}
+
+.second_container{
+    height: 100%; /* 100% Full-height */
+    position: fixed; /* Stay in place */
+    z-index: 100;
+    width: 12%;
+    top: 0; /* Stay at the top */
+    background: #1D2366;
+    padding-top: 40px; /* Place content 40px from the top */
+    box-shadow: 7px 4px 30px 2px rgba(165, 217, 255, 0.2);
+}
+
+.secondNav{
+    background-color: #1D2366;
+    height: 100vh;
+}
+
+.nav2_btn{
+    background-color: #F6FAFF;
+    font-size: 1.1rem;
+    padding: 1rem;
+    color: white;
+    padding-left: 25px;
+}
+
+/* second nav bar */
+.nav2_btn_container {
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 1rem;
+    width: 100%;
+}
+
+.nav2_btn_top, .nav2_btn_bottom {
+    background-color: #F6FAFF;
+    width: 1rem;
+    height: 2rem;
+    width: 100%;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out;
+}
+
+.nav2_btn_top_round, .nav2_btn_bottom_round {
+    width: 100%;
+    height: 100%;
+    background-color: #1D2366;
+}
+
+.nav2_btn_top_round {
+    border-bottom-right-radius: 100px;
+}
+
+.nav2_btn_bottom_round {
+    border-top-right-radius: 100px;
+}
+
+.nav2_btn_blue{
+    width: 1rem;
+    height: 2rem;
+    width: 100%;
+}
+
+.nav2_btn_selected{
+    background-color: #1D2366;
+    color: white !important;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out;
+}
+
+.editModule{
+    background: transparent;
+    border: none;
+    color: white;
+    margin-right: 20%;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 1.1rem;
+    padding: .2rem;
+    color: white;
+}
+
+.editModule img{
+    padding: 10px;
+}
+
+.navEditAdd {
+    margin-top: 25px;
+}
+
+.line{
+    margin-top: 70px;
+    width: 100%;
+    height: 0px;
+    left: 230px;
+    top: 904px;
+    /* background: white; */
+    border: 1.3px solid rgba(246, 250, 255, 0.49);
 }

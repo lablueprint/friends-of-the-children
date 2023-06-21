@@ -1,12 +1,12 @@
 // code functionalities for all the api routes
 import { createRequire } from 'module';
 import {
-  collection, addDoc, getDoc, arrayUnion, updateDoc, doc,
+  collection, addDoc, getDoc, arrayUnion, updateDoc, doc, arrayRemove,
 } from 'firebase/firestore';
 import {
-  getStorage, ref, uploadBytes, getDownloadURL,
+  getStorage, ref, deleteObject,
+  uploadBytes, getDownloadURL,
 } from 'firebase/storage';
-
 import crypto from 'crypto';
 import { uuid } from 'uuidv4';
 // eslint-disable-next-line import/extensions
@@ -314,16 +314,15 @@ const addMenteeFile = async (req, res) => {
   }
 };
 
+// uploads file to firebase storage
 const uploadFile = async (req, res) => {
   try {
-    console.log('HERE', req.files);
     const { files } = req.body;
-    console.log(files.name);
+    // console.log(files.name);
     // console.log('REQBODY:', req.body);
     const storageRef = ref(storage, `/images/${files.name}`);
 
     uploadBytes(storageRef, files).then((snapshot) => {
-      console.log('jhkjhjkhjkhjh');
       getDownloadURL(snapshot.ref).then((url) => {
         res.status(202).json(url);
       });
@@ -369,6 +368,7 @@ const updateModuleChildren = async (req, res) => {
   }
 };
 
+// adds module to firebase db
 const addModule = async (req, res) => {
   try {
     const { data } = req.body;
@@ -406,15 +406,16 @@ const getModulebyId = async (req, res) => {
   }
 };
 
+// deletes a module and all of its children from firebase
 const recursivelyDeletemodules = async (moduleID) => {
   try {
     const moduleRef = await db.collection('modules').doc(moduleID).get();
     const currModule = moduleRef.data();
     if (Array.isArray(currModule.children) && currModule.children.length > 0) {
       // if there are submodules, recursively delete them
-      for (const child of currModule.children) {
+      currModule.children.forEach(async (child) => {
         await recursivelyDeletemodules(child);
-      }
+      });
     }
     if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
       const parentRef = db.collection('modules').doc(currModule.parent);
@@ -429,33 +430,39 @@ const recursivelyDeletemodules = async (moduleID) => {
   }
 };
 
+// deletes a module, and all of its children from firebase db
 const deleteModule = async (req, res) => {
   try {
     const { moduleID } = req.params;
-    await recursivelyDeletemodules(moduleID);
+    await recursivelyDeletemodules(moduleID); // helper function
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete module');
   }
 };
 
-const deleteFile = async (req, res) => {
+const deleteFiles = async (req, res) => {
   try {
+    const currStorage = getStorage();
     // delete path from module files array field
-    const { moduleID, fileToDelete } = req.body;
+    const { moduleID, filesToDelete } = req.body;
+    console.log(filesToDelete);
     const moduleRef = await db.collection('modules').doc(moduleID);
     const moduleRefSnapshot = await moduleRef.get();
     const currModule = moduleRefSnapshot.data();
     console.log('currModule is ', currModule);
-    const updateFileLinkField = currModule.fileLinks.filter((id) => id !== fileToDelete);
-    console.log('updatefilelinkfield is ', updateFileLinkField);
-    await moduleRef.update({ fileLinks: updateFileLinkField }).then(() => {
-      console.log(currModule.fileLinks);
+    filesToDelete.forEach(async (file) => {
+      const fileRef = ref(currStorage, file);
+      await deleteObject(fileRef);
     });
-
-    const storage = getStorage();
-    const fileRef = ref(storage, fileToDelete);
-    await deleteObject(fileRef);
+    moduleRef.update({
+      fileLinks: arrayRemove(...filesToDelete),
+    }).then(() => {
+      console.log('Array items removed successfully.');
+    })
+      .catch((error) => {
+        console.error('Error removing array items:', error);
+      });
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete file');
@@ -489,7 +496,8 @@ const getGoogleaccount = async (req, res) => {
 
 const updateTextField = async (req, res) => {
   try {
-    const { inputText, id, field } = req.params;
+    const { id, field } = req.params;
+    const { inputText } = req.body;
     if (field === 'body') {
       await db.collection('modules')
         .doc(id)
@@ -504,6 +512,26 @@ const updateTextField = async (req, res) => {
         .update({ title: inputText })
         .catch((error) => {
           // setUpdateProfileMessage('We ran into an error updating your text field!');
+          console.log(error);
+        });
+    }
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const updateFileLinksField = async (req, res) => {
+  try {
+    const {
+      id, field,
+    } = req.params;
+    const newFileLinks = req.body;
+    if (field === 'fileLinks') {
+      await db.collection('modules')
+        .doc(id)
+        .update({ fileLinks: newFileLinks })
+        .catch((error) => {
+        // setUpdateProfileMessage('We ran into an error updating your text field!');
           console.log(error);
         });
     }
@@ -854,6 +882,7 @@ export {
   getModulebyId,
   getGoogleaccount,
   updateTextField,
+  updateFileLinksField,
   getUsernames,
   getMessages,
   addToMailchimpList,
@@ -866,6 +895,6 @@ export {
   batchAddToList,
   batchDeleteFromList,
   deleteModule,
-  deleteFile,
+  deleteFiles,
   addModule,
 };
