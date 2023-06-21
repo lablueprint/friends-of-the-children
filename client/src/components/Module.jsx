@@ -13,7 +13,7 @@ function Module(props) {
     title, id, editable, checked, handleCheckboxChange, root,
   } = props;
 
-  console.log(root);
+  // console.log(root);
 
   return (
     <div>

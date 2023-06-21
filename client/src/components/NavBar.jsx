@@ -72,7 +72,7 @@ function NavBar({ profile, updateAppProfile }) {
             </Link>
             {profile.role === 'Admin'
             && (
-            <Link to="/requests" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/profile' ? styles.btn_selected : ''}`}>
+            <Link to="/requests" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/requests' ? styles.btn_selected : ''}`}>
               <img src={RequestsIcon} alt="requests icon" />
               Requests
             </Link>
