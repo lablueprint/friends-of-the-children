@@ -13,17 +13,16 @@ function Message(props) {
 
   return (
     <div className={pinned ? styles.pinnedmessage : styles.message}>
-      <h5>
-        Title:
-        {' '}
-        {title}
-      </h5>
-      <p>
-        Body:
-        {' '}
+      <div className={styles.titlediv}>
+        <h1 className={styles.title_css}>
+          {title}
+        </h1>
+        <button type="button" className={pinned ? styles.pinnedbutton : styles.button} onClick={update}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button>
+      </div>
+
+      <h6 className={styles.body_css}>
         {body}
-      </p>
-      <button type="button" className={pinned ? styles.pinnedbutton : styles.button} onClick={update}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button>
+      </h6>
     </div>
   );
 }

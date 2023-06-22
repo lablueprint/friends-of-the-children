@@ -81,7 +81,6 @@ export default function NewModulePopup(props) {
   const submitForm = async (e) => { // adds a module to the root module page
     e.preventDefault();
     const selectedSAs = selectedServiceAreas();
-    console.log(selectedSAs);
     const data = { // this goes into NewModulePopup
       title,
       body,
@@ -98,9 +97,8 @@ export default function NewModulePopup(props) {
       const expandedModuleID = (await api.updateModuleChildren(parentID, data)).data; // pass in id, data to submit
       data.id = expandedModuleID;
     } else {
-      const tempId = (await api.addModule(data)).data; console.log(tempId, 'is tempId');
+      const tempId = (await api.addModule(data)).data;
       data.id = tempId;
-      console.log('added tempid', tempId, 'to data');
     }
     // receive module id
     // TODO: Create api call (move db.collection to backend)
@@ -111,7 +109,6 @@ export default function NewModulePopup(props) {
     // data.id = newId;
 
     // data = await api.
-    console.log('data is ', data);
     updateModule(data);
 
     setTitle('');
@@ -133,9 +130,9 @@ export default function NewModulePopup(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={submitForm}>
-          <DialogTitle>New Module: </DialogTitle>
+          <DialogTitle>Create New Folder</DialogTitle>
           <DialogContent>
-            <FormLabel>Title</FormLabel>
+            <FormLabel>Title: </FormLabel>
             <TextField
               autoFocus
               margin="dense"
@@ -145,7 +142,7 @@ export default function NewModulePopup(props) {
               onChange={(e) => setTitle(e.target.value)}
               required
             />
-            <FormLabel>Body</FormLabel>
+            <FormLabel>Body: </FormLabel>
             <TextField
               margin="dense"
               label="Body"
@@ -154,7 +151,6 @@ export default function NewModulePopup(props) {
               rows={4}
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              required
             />
             <FormLabel>Target Audience: </FormLabel>
             <br />
@@ -185,6 +181,7 @@ export default function NewModulePopup(props) {
             <br />
             {serviceAreas.map((SA) => (
               <FormControlLabel
+                key={SA}
                 control={(
                   <Checkbox
                     checked={serviceAreaToSelected[SA]}
@@ -204,11 +201,11 @@ export default function NewModulePopup(props) {
             <FormLabel>Attachments:</FormLabel>
             <br />
             <input type="file" onChange={handleFileChange} multiple />
-            <p>
+            {/* <p>
               XXX UPLOADING XXX
               {' '}
               % done
-            </p>
+            </p> */}
           </DialogContent>
           <DialogActions>
             <Button
