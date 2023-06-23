@@ -10,6 +10,7 @@ import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
 import * as api from '../api';
 import styles from '../styles/Modules.module.css';
+import NewFilePopup from '../components/NewFilePopup';
 
 // root page for all modules, displays Module components to the user
 // admin can select Modules to delete or edit, or add new Modules
@@ -17,10 +18,10 @@ function Resources({ profile }) {
   const [files, setFiles] = useState([]);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [openFilePopup, setOpenFilePopup] = useState(false);
+  const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
   const { role } = profile;
   const currRole = role.toLowerCase();
 
-  console.log(files);
   const updateImageURL = async (fileLinks) => {
     setFiles([]);
     const fileContents = [];
@@ -46,10 +47,10 @@ function Resources({ profile }) {
       }));
       // sorting files alphabetically
       fileContents.sort((a, b) => {
-        if (a.fileName < b.fileName) {
+        if (a.category < b.category) {
           return -1;
         }
-        if (a.fileName > b.fileName) {
+        if (a.category > b.category) {
           return 1;
         }
         return 0;
@@ -83,6 +84,14 @@ function Resources({ profile }) {
     setOpenFilePopup(false);
   };
 
+  const handleClickOpenNewFile = () => {
+    setOpenNewFilePopup(true);
+  };
+
+  const handleClose = () => {
+    setOpenNewFilePopup(false);
+  };
+
   // empty dependency array means getModules is only being called on page load
   useEffect(() => {
     // saving all the user profiles from Firebase in an array (useProfiles) only on first load
@@ -97,7 +106,16 @@ function Resources({ profile }) {
         <div className={styles.pageTitle}>
           All Resources
         </div>
+        <div className={styles.editOrAddModule}>
+          <div className={styles.editModuleContainer} />
+          {/* ADDING A FILE HERE ADDS TO THE ROOT DOC OF MODULES */}
+          <button type="button" onClick={handleClickOpenNewFile} className={styles.addModule}>
+            + Add Media
+          </button>
+          <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={[]} id="root" />
+        </div>
       </div>
+      <div className={styles.line} />
       <div className={styles.resourcesContainer}>
         <div className={styles.fieldSpan}>
           <h5>File Name</h5>
@@ -121,7 +139,9 @@ function Resources({ profile }) {
                 <div><h5>{file.fileSize}</h5></div>
                 <div><h5>{file.fileDate}</h5></div>
                 <div><h5>{file.category}</h5></div>
-                <img src={heartIcon} alt="heart icon" />
+                <button type="button" className={styles.heart_button}>
+                  <img src={heartIcon} alt="heart icon" />
+                </button>
               </div>
               {openFilePopup && (
               <FilePopup

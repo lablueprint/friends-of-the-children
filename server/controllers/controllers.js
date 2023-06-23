@@ -555,9 +555,9 @@ const updateFileLinksField = async (req, res) => {
     } = req.params;
     const newFileLinks = req.body;
 
-    if (field === 'fileLinks') {
-      const currRef = db.collection('modules').doc(id);
-      const currDoc = await currRef.get();
+    const currRef = db.collection('modules').doc(id);
+    const currDoc = await currRef.get();
+    if (id !== 'root' && field === 'fileLinks') {
       const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
       const currLinks = newFileLinks || [];
       const updatedLinks = currFiles.concat(currLinks);
@@ -566,17 +566,13 @@ const updateFileLinksField = async (req, res) => {
         .catch((error) => {
           console.log(error);
         });
-
+    } else if (id === 'root') {
       // add files to root doc of modules
-      const docRef = db.collection('modules').doc('root');
-      const rootDoc = await docRef.get();
-      const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
-      const updatedFiles = currentFiles.concat(currLinks);
-
-      if (rootDoc.exists) {
-        await docRef.update({ files: updatedFiles });
+      const newFileLink = newFileLinks[0];
+      if (currDoc.exists) {
+        await currRef.update({ files: arrayUnion(newFileLink) });
       } else {
-        await docRef.set({ files: updatedFiles });
+        await currRef.set({ files: newFileLink });
       }
     }
   } catch (error) {
@@ -610,6 +606,14 @@ const getModules = async (req, res) => {
     db.collection('modules').get().then((sc) => {
       sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
         const data = module.data();
+        if (module.id === 'root') {
+          const { files } = data;
+          const category = 'All';
+
+          files.forEach((file) => {
+            rootFiles.push({ file, category });
+          });
+        }
         if (data && data.role) {
           data.id = module.id;
           // fetching parent-level modules that we have permission to view

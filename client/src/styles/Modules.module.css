@@ -519,6 +519,7 @@
     width: 300px;
     text-align: left;
     margin-right: 80px;
+    cursor: pointer;
 }
 
 .spanFile :nth-child(n+3){
@@ -529,4 +530,18 @@
 .spanFile :nth-child(6){
     position: absolute;
     right: 50px;
+}
+
+.heart_button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-left: 10px;
+  }
+
+  .line{
+    margin: 70px 30px 20px 20px;
+    height: 0px;
+    left: 230px;
+    border: 1.3px solid #CCC;
 }
