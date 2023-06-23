@@ -5,6 +5,7 @@ import {
 } from 'firebase/storage';
 import FilePopup from '../components/FilePopup';
 import heartIcon from '../assets/icons/heart.svg';
+import filledHeart from '../assets/icons/filled_heart.svg';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
@@ -17,6 +18,7 @@ import NewFilePopup from '../components/NewFilePopup';
 function Resources({ profile }) {
   const [files, setFiles] = useState([]);
   const [fileToDisplay, setFileToDisplay] = useState({});
+  const [heartFilled, setHeartFilled] = useState(Array(files.length).fill(false));
   const [openFilePopups, setOpenFilePopups] = useState(Array(files.length).fill(false));
   const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
   const { role } = profile;
@@ -62,6 +64,7 @@ function Resources({ profile }) {
   // getting all modules relevant to current user
   const fetchData = async () => {
     const { data } = await api.getModules(currRole);
+    console.log(data.rootFiles);
     updateImageURL(data.rootFiles);
   };
 
@@ -145,8 +148,18 @@ function Resources({ profile }) {
                 <div><h5>{file.fileSize}</h5></div>
                 <div><h5>{file.fileDate}</h5></div>
                 <div><h5>{file.category}</h5></div>
-                <button type="button" className={styles.heart_button}>
-                  <img src={heartIcon} alt="heart icon" />
+                <button
+                  type="button"
+                  className={styles.heart_button}
+                  onClick={() => {
+                    const updatedHearts = [...heartFilled];
+                    console.log(updatedHearts);
+                    updatedHearts[index] = !updatedHearts[index];
+                    console.log(updatedHearts);
+                    setHeartFilled(updatedHearts);
+                  }}
+                >
+                  {heartFilled[index] ? <img src={filledHeart} alt="favorite file" /> : <img src={heartIcon} alt="not a favorite file" /> }
                 </button>
               </div>
               {openFilePopups[index] && (

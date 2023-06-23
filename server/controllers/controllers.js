@@ -364,17 +364,17 @@ const updateModuleChildren = async (req, res) => {
     });
 
     // add files to root doc of modules
-    const rootRef = db.collection('modules').doc('root');
-    const rootDoc = await rootRef.get();
-    const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
-    const newFileLinks = req.body.data.fileLinks || [];
-    const updatedFiles = currentFiles.concat(newFileLinks);
+    // const rootRef = db.collection('modules').doc('root');
+    // const rootDoc = await rootRef.get();
+    // const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
+    // const newFileLinks = req.body.data.fileLinks || [];
+    // const updatedFiles = currentFiles.concat(newFileLinks);
 
-    if (rootDoc.exists) {
-      await rootRef.update({ files: updatedFiles });
-    } else {
-      await rootRef.set({ files: updatedFiles });
-    }
+    // if (rootDoc.exists) {
+    //   await rootRef.update({ files: updatedFiles });
+    // } else {
+    //   await rootRef.set({ files: updatedFiles });
+    // }
 
     res.status(202).json(docRef.id);
   } catch (error) {
@@ -390,17 +390,17 @@ const addModule = async (req, res) => {
     const { id } = dataRef; // newly added module's id
 
     // add files to root doc of modules
-    const docRef = db.collection('modules').doc('root');
-    const rootDoc = await docRef.get();
-    const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
-    const newFileLinks = req.body.data.fileLinks || [];
-    const updatedFiles = currentFiles.concat(newFileLinks);
+    // const docRef = db.collection('modules').doc('root');
+    // const rootDoc = await docRef.get();
+    // const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
+    // const newFileLinks = req.body.data.fileLinks || [];
+    // const updatedFiles = currentFiles.concat(newFileLinks);
 
-    if (rootDoc.exists) {
-      await docRef.update({ files: updatedFiles });
-    } else {
-      await docRef.set({ files: updatedFiles });
-    }
+    // if (rootDoc.exists) {
+    //   await docRef.update({ files: updatedFiles });
+    // } else {
+    //   await docRef.set({ files: updatedFiles });
+    // }
 
     res.status(202).json(id);
   } catch (error) {
@@ -435,24 +435,38 @@ const getModulebyId = async (req, res) => {
 };
 
 // deletes a module and all of its children from firebase
-const recursivelyDeletemodules = async (moduleID) => {
+const recursivelyDeleteModules = async (moduleID) => {
   try {
     const moduleRef = await db.collection('modules').doc(moduleID).get();
     const currModule = moduleRef.data();
-    if (Array.isArray(currModule.children) && currModule.children.length > 0) {
+
+    if (currModule && currModule.children !== undefined && Array.isArray(currModule.children) && currModule.children.length > 0) {
       // if there are submodules, recursively delete them
-      currModule.children.forEach(async (child) => {
-        await recursivelyDeletemodules(child);
-      });
+      await Promise.all(currModule.children.map(async (child) => {
+        await recursivelyDeleteModules(child);
+      }));
     }
-    if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
+
+    if (currModule && currModule.parent !== undefined && currModule.parent) {
       const parentRef = db.collection('modules').doc(currModule.parent);
       const parentRefSnapshot = await parentRef.get();
       const currParent = parentRefSnapshot.data();
-      const updatedChildren = currParent.children.filter((id) => id !== moduleID);
-      await parentRef.update({ children: updatedChildren }).then();
+      if (currParent && currParent.children) {
+        const updatedChildren = currParent.children.filter((id) => id !== moduleID);
+        await parentRef.update({ children: updatedChildren });
+      }
     }
-    await db.collection('modules').doc(moduleID).delete(); // delete the current module
+
+    // delete all files in current module from firebase storage
+    if (currModule && currModule.fileLinks) {
+      await Promise.all(currModule.fileLinks.map(async (fileLink) => {
+        const fileRef = ref(storage, fileLink);
+        await deleteObject(fileRef);
+      }));
+    }
+
+    // delete the current module
+    await db.collection('modules').doc(moduleID).delete();
   } catch (error) {
     console.log(error);
   }
@@ -462,7 +476,7 @@ const recursivelyDeletemodules = async (moduleID) => {
 const deleteModule = async (req, res) => {
   try {
     const { moduleID } = req.params;
-    await recursivelyDeletemodules(moduleID); // helper function
+    await recursivelyDeleteModules(moduleID); // helper function
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete module');

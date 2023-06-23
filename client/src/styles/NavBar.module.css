@@ -102,22 +102,19 @@
 .nav2_btn{
     background-color: #F6FAFF;
     font-size: 1.1rem;
-    padding: 1rem;
+    padding: 1rem .5rem 1rem .5rem;
     color: white;
-    padding-left: 25px;
+    padding-left: 20px;
 }
 
 /* second nav bar */
 .nav2_btn_container {
     display: flex;
-    justify-content: right;
-    align-items: right;
-    flex-direction: column;
+    align-items: center;
     width: 100%;
     box-sizing: border-box;
     padding-left: 1rem;
-    width: 100%;
-}
+  }
 
 .nav2_btn_top, .nav2_btn_bottom {
     background-color: #F6FAFF;
@@ -174,11 +171,55 @@
 }
 
 .line{
-    margin-top: 70px;
+    margin-top: 30px;
     width: 100%;
     height: 0px;
     left: 230px;
-    top: 904px;
-    /* background: white; */
     border: 1.3px solid rgba(246, 250, 255, 0.49);
 }
+
+.deleteIconContainer {
+    margin-right: 0.05rem; /* Adjust the margin as needed */
+}
+
+.deleteIcon {
+    width: 19px;
+}
+
+.nav2_btn_content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.delete_button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-left: 10px;
+  }
+
+  .cancelModuleChanges{
+    display: block;
+    border: none;
+    background: none;
+    padding: 0;
+    color: var(--coral, #F52);
+    font-family: News Gothic;
+    font-weight: 700;
+    text-decoration-line: underline;
+    margin-left: 60px;
+    margin-bottom: 20px;
+  }
+
+  .saveModuleChanges{
+    display: block;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    padding: 5% 30% 5% 30%;
+    color: var(--dark-blue-for-nav-bar, #156DBF);
+    font-family: News Gothic;
+    font-weight: 700;
+    margin-left: 20px;
+  }

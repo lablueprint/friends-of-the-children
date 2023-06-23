@@ -14,23 +14,6 @@
     border-radius: 10px;
 }
 
-.filecard {
-    width: 300px;
-    height: 92px;
-    margin: auto;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding: 1em;
-    background: #FFFFFF;
-    border: 0.5px solid #CCCCCC;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    border-color: #156DBF;
-    display:flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .content_container{
     padding: 0 0 0 50px;
     text-align: left;
@@ -40,34 +23,37 @@
     display: flex;
     margin-bottom: 30px;
     flex-direction: row;
-    gap: 30px;
+    gap: 20px;
     text-align: left;
 }
 
-.filecards{
-
+.filecard {
+    width: 100%;
+    height: 92px;
+    margin: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 1rem 1.5rem 1rem 1.5rem;
+    background: #FFFFFF;
+    border-radius: 15px;
+    border: 1px solid var(--dark-blue-for-nav-bar, #156DBF);
+    display:flex;
+    align-items: center;
 }
 
 .resourcetext {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: black;
+    color: #000;
     font-family: Inter;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+    font-weight: 700 !important;
+    font-size: 20px;
     margin-bottom: 0;
-    padding: 2em;
-}
-
-.resourcelink{
-    display:flex;
-    align-items: center;
-    margin-left: 1em;
+    padding: 1em;
 }
 
 .fileIcon {
+  position: relative;
+  left: 10px;
+  margin-right: 15px;
   font-size: large;
   color:#156DBF;
   transform: scale(2);
@@ -113,11 +99,6 @@
 }
 
 .editButton {
-    /* width: 15em;
-    background-color: #FFFFFF;
-    border: 2px solid #156DBF;
-    gap: 8px; */
-
     background: #FFFFFF;
     border: 2px solid #156DBF;
     border-radius: 12px;
@@ -129,23 +110,11 @@
     gap: 8px;
 }
 
-/* .editButton:hover {
-    background: #FFFFFF;
-    border: 2px solid #156DBF;
-    border-radius: 12px;
-    display: flex;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    display: inline-block;
-    padding: 0.25em 1.5em 0.25em 1.5em;
-    gap: 8px;
-} */
-
 .body {
     font-size: 20px;
     box-sizing: border-box;
 
-    width: 80%;
+    width: 90%;
     background: #FFFFFF;
 
     border-color: transparent;
@@ -155,18 +124,18 @@
 .fileContainer {
     display: inline-block;
     vertical-align: middle;
-    width: 250px;
+    width: 270px;
     height: auto;
     background-color: #DEF1FF;
     border-radius: 10px;
-    padding: 10px 10px 10px 10px;
+    padding: 15px;
     margin: 30px 10px 30px 10px;
     overflow: hidden;
 }
 
 .preview {
     /* display: inline-block; */
-    width: 230px !important;
+    width: 100% !important;
     height: 230px !important;
     border-radius: 10px;
     cursor: pointer;
@@ -239,8 +208,13 @@
 }
 
 .dialogTitle {
-    font-weight: 700px;
-    font-size: 24px;
+    color: var(--text, #3F3F3F);
+    font-size: 24px !important;
+    font-weight: 700 !important;
+}
+
+.dialogContainer{
+    padding: 20px 30px 20px 30px;
 }
 
 .cancelOrDelete {
@@ -284,8 +258,7 @@
 }
 
 .confirmMessage {
-    margin-bottom: 80px;
-    margin-right: 180px;
+    margin-bottom: 50px;
 }
 
 .confirmDeleteBody {
@@ -388,6 +361,9 @@
 
 .editModule {
     background: #FFFFFF;
+    color: var(--dark-blue-for-nav-bar, #156DBF) !important;
+    font-family: News Gothic;
+    font-weight: 700 !important;
     border: 2px solid #156DBF;
     border-radius: 12px;
     display: flex;
@@ -395,6 +371,10 @@
     white-space: nowrap;
     display: inline-block;
     padding: 0.25em 1em 0.25em 1em;
+}
+
+.editModule :first-child{
+    margin-right: 10px;
 }
 
 .editModule:hover {
@@ -409,6 +389,7 @@
 }
 
 .addModule {
+    font-weight: 700;
     background: #156DBF;
     color: white;
     display: flex;
@@ -539,7 +520,7 @@
     margin-left: 10px;
   }
 
-  .line{
+.line{
     margin: 70px 30px 20px 20px;
     height: 0px;
     left: 230px;
