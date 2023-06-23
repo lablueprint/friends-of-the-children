@@ -17,7 +17,7 @@ import NewFilePopup from '../components/NewFilePopup';
 function Resources({ profile }) {
   const [files, setFiles] = useState([]);
   const [fileToDisplay, setFileToDisplay] = useState({});
-  const [openFilePopup, setOpenFilePopup] = useState(false);
+  const [openFilePopups, setOpenFilePopups] = useState(Array(files.length).fill(false));
   const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
   const { role } = profile;
   const currRole = role.toLowerCase();
@@ -76,12 +76,18 @@ function Resources({ profile }) {
 
   // opening file popup
   const handleClickOpenFilePopup = (file) => {
-    setOpenFilePopup(true);
+    const fileIndex = files.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = true;
+    setOpenFilePopups(updatedOpenFilePopups);
     setFileToDisplay(file);
   };
 
-  const handleCloseFilePopup = () => {
-    setOpenFilePopup(false);
+  const handleCloseFilePopup = (file) => {
+    const fileIndex = files.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = false;
+    setOpenFilePopups(updatedOpenFilePopups);
   };
 
   const handleClickOpenNewFile = () => {
@@ -124,7 +130,7 @@ function Resources({ profile }) {
           <h5>Category</h5>
         </div>
         <div className={styles.resourcesDisplay}>
-          {files.map((file) => (
+          {files.map((file, index) => (
             <div key={file.url} className={styles.spanContainer}>
               <div className={styles.spanFile}>
                 {(file.fileType.includes('image'))
@@ -143,11 +149,11 @@ function Resources({ profile }) {
                   <img src={heartIcon} alt="heart icon" />
                 </button>
               </div>
-              {openFilePopup && (
+              {openFilePopups[index] && (
               <FilePopup
                 file={fileToDisplay}
-                open={openFilePopup}
-                handleClose={handleCloseFilePopup}
+                open={openFilePopups[index]}
+                handleClose={() => handleCloseFilePopup(file)}
               />
               )}
             </div>

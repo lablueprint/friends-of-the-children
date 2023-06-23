@@ -38,7 +38,6 @@ function ExpandedModule({ profile }) {
   const [openNewUploadPopup, setOpenNewUploadPopup] = useState(false);
   const [openNewModulePopup, setOpenNewModulePopup] = useState(false);
   const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
-  const [openFilePopup, setOpenFilePopup] = useState(false);
 
   const [currModuleFiles, setCurrModuleFiles] = useState([]);
 
@@ -51,6 +50,7 @@ function ExpandedModule({ profile }) {
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
+  const [openFilePopups, setOpenFilePopups] = useState(Array(files.length).fill(false));
 
   const getModulebyIdfunc = async (tempId, tempcurrRole) => {
     // data object structured as {data, children_array}
@@ -96,18 +96,24 @@ function ExpandedModule({ profile }) {
 
   // opening file popup
   const handleClickOpenFilePopup = (file) => {
-    setOpenFilePopup(true);
+    const fileIndex = files.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = true;
+    setOpenFilePopups(updatedOpenFilePopups);
     setFileToDisplay(file);
+  };
+
+  const handleCloseFilePopup = (file) => {
+    const fileIndex = files.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = false;
+    setOpenFilePopups(updatedOpenFilePopups);
   };
 
   const handleClose = () => {
     setOpenNewUploadPopup(false);
     setOpenNewModulePopup(false);
     setOpenNewFilePopup(false);
-  };
-
-  const handleCloseFilePopup = () => {
-    setOpenFilePopup(false);
   };
 
   const handleDeleteFilesClose = () => {
@@ -350,7 +356,7 @@ function ExpandedModule({ profile }) {
         </div>
 
         {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
-        {files.map((file) => (
+        {files.map((file, index) => (
           <div key={file.url} className={styles.fileContainer}>
             {(file.fileType.includes('image')) && (
             <div>
@@ -426,12 +432,12 @@ function ExpandedModule({ profile }) {
               </div>
             </div>
             )}
-            {openFilePopup && (
-            <FilePopup
-              file={fileToDisplay}
-              open={openFilePopup}
-              handleClose={handleCloseFilePopup}
-            />
+            {openFilePopups[index] && (
+              <FilePopup
+                file={fileToDisplay}
+                open={openFilePopups[index]}
+                handleClose={() => handleCloseFilePopup(file)}
+              />
             )}
           </div>
         ))}

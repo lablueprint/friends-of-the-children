@@ -71,7 +71,7 @@ export default function NewFilePopup(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={submitForm}>
-          <DialogTitle>New File</DialogTitle>
+          <DialogTitle>Add New File(s)</DialogTitle>
           <DialogContent>
             <FormLabel>Attachments:</FormLabel>
             <br />
