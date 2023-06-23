@@ -1,48 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import NewModulePopup from '../components/NewModulePopup';
-import Module from '../components/Module';
+import {
+  ref, getStorage, getDownloadURL, getMetadata,
+} from 'firebase/storage';
+import FilePopup from '../components/FilePopup';
+import heartIcon from '../assets/icons/heart.svg';
+import imgIcon from '../assets/icons/file_img.svg';
+import vidIcon from '../assets/icons/file_vid.svg';
+import pdfIcon from '../assets/icons/file_pdf.svg';
 import * as api from '../api';
 import styles from '../styles/Modules.module.css';
-import editIcon from '../assets/icons/editicon.svg';
 
 // root page for all modules, displays Module components to the user
 // admin can select Modules to delete or edit, or add new Modules
 function Resources({ profile }) {
-  const [modules, setModules] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [checked, setChecked] = useState([]);
-  const [editModule, setEditModule] = useState(false);
-  const [openDeleteModulesPopup, setOpenDeleteModulesPopup] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [fileToDisplay, setFileToDisplay] = useState({});
+  const [openFilePopup, setOpenFilePopup] = useState(false);
   const { role } = profile;
   const currRole = role.toLowerCase();
 
-  const title = 'All Resources';
+  console.log(files);
+  const updateImageURL = async (fileLinks) => {
+    setFiles([]);
+    const fileContents = [];
+    if (fileLinks.length > 0) {
+      await Promise.all(fileLinks.map(async (fileLink) => {
+        const storage = getStorage();
+        const spaceRef = ref(storage, fileLink.file);
+        const file = await getMetadata(spaceRef);
+        const fileType = file.contentType;
+        const url = await getDownloadURL(spaceRef);
+        const fileName = file.name;
+        const fileSize = `${(file.size / 1048576).toFixed(1)} MB`;
+
+        const timeString = file.timeCreated;
+        const date = new Date(timeString);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const fileDate = date.toLocaleString('en-US', options);
+
+        const { category } = fileLink;
+        fileContents.push({
+          url, fileType, fileName, category, fileSize, fileDate,
+        });
+      }));
+      // sorting files alphabetically
+      fileContents.sort((a, b) => {
+        if (a.fileName < b.fileName) {
+          return -1;
+        }
+        if (a.fileName > b.fileName) {
+          return 1;
+        }
+        return 0;
+      });
+      setFiles(fileContents);
+    }
+  };
 
   // getting all modules relevant to current user
   const fetchData = async () => {
     const { data } = await api.getModules(currRole);
-    setModules(data);
-  };
-
-  const updateModule = (data) => {
-    setModules([...modules, data]);
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const deleteModule = async (moduleId) => {
-    await api.deleteModule(moduleId);
-    setModules(modules.filter((module) => module.id !== moduleId));
+    updateImageURL(data.rootFiles);
   };
 
   // TODO: implement deleteModules to delete all modules, not just one at a time
@@ -54,40 +73,14 @@ function Resources({ profile }) {
   //   });
   // };
 
-  const handleCheckboxChange = (event, moduleId) => {
-    if (checked.includes(moduleId)) {
-      setChecked(checked.filter((module) => (module !== moduleId)));
-      return;
-    }
-
-    setChecked([...checked, moduleId]);
+  // opening file popup
+  const handleClickOpenFilePopup = (file) => {
+    setOpenFilePopup(true);
+    setFileToDisplay(file);
   };
 
-  const clearCheckboxes = () => {
-    setChecked([]);
-    setEditModule(false);
-  };
-
-  const displayCheckBoxes = () => {
-    setEditModule(true);
-  };
-
-  const handleDeleteModulesClose = () => {
-    setOpenDeleteModulesPopup(false);
-  };
-
-  const deleteModules = async () => { // calls deleteModule for each id in checked
-    const deletionPromises = checked.map((moduleId) => deleteModule(moduleId));
-    try {
-      await Promise.all(deletionPromises);
-      console.log('All modules deleted successfully.');
-    } catch (error) {
-      console.error('An error occurred while deleting modules:', error);
-    }
-    // for each moduleID in checked, removed the modules in Modules that has a field called moduleId
-    const tempModules = modules.filter((modid) => !checked.includes(modid.id));
-    setModules(tempModules);
-    clearCheckboxes();
+  const handleCloseFilePopup = () => {
+    setOpenFilePopup(false);
   };
 
   // empty dependency array means getModules is only being called on page load
@@ -96,118 +89,50 @@ function Resources({ profile }) {
     fetchData().catch(console.error);
   }, []);
 
-  if (currRole === 'admin') {
-    return (
-      <div>
-        <div className={styles.header}>
-          <div className={styles.pageTitle}>
-            {title}
-          </div>
-          {editModule ? (
-            <div className={styles.cancelOrSave}>
-              <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
-                Cancel
-              </button>
-              <button type="button" className={styles.saveModuleChanges} onClick={() => (deleteModule(checked))}>
-                Save
-              </button>
-            </div>
-          ) : (
-            <div className={styles.editOrAddModule}>
-              <div className={styles.editModuleContainer}>
-                <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
-                  <img src={editIcon} alt="edit icon" />
-                  Edit Module
-                </button>
-              </div>
-              <button type="button" onClick={handleClickOpen} className={styles.addModule}>
-                + New Upload
-              </button>
-              <NewModulePopup
-                updateModule={updateModule}
-                open={open}
-                handleClose={handleClose}
-                parentID={null}
-              />
-            </div>
-          )}
-        </div>
-        <div className={styles.resourcesContainer}>
-          <div className={styles.resourcesDisplay}>
-            {modules.map((card) => (
-              <Module key={card.id} title={card.title} id={card.id} editable={editModule} checked={checked} handleCheckboxChange={handleCheckboxChange} />
-            ))}
-          </div>
-        </div>
-        <div>
-          { openDeleteModulesPopup && checked.length > 0
-            ? (
-              <div>
-                <Dialog open={openDeleteModulesPopup} onClose={handleDeleteModulesClose}>
-                  <DialogTitle className={styles.dialogTitle}>
-                    You have chosen to delete
-                    {' '}
-                    {checked.length}
-                    {' '}
-                    {(checked.length) === 1 ? 'module ' : 'modules '}
-                    from
-                    {' '}
-                    {title}
-                  </DialogTitle>
-                  <DialogContent>
-                    <div>
-                      <div className={styles.confirmMessage}>
-                        Are you sure you want to continue with this action?
-                      </div>
-                      <div className={styles.confirmButtons}>
-                        <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
-                          Cancel
-                        </button>
-                        <button type="button" className={styles.confirmDelete} onClick={() => (deleteModules(checked))}>
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            )
-            : <div />}
-        </div>
-        <div>
-          { checked.length > 0
-            ? (
-              <div className={styles.deleteFilesBar}>
-                <div className={styles.totalSelected}>
-                  <div className={styles.selectedNumber}>
-                    {checked.length}
-                  </div>
-                  <div className={styles.selectedText}>
-                    {' '}
-                    selected
-                  </div>
-                </div>
-                <div className={styles.cancelOrDelete}>
-                  <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
-                    Cancel
-                  </button>
-                  <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteModulesPopup(true))}>
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )
-            : <div />}
+  console.log(files);
+
+  return (
+    <div>
+      <div className={styles.header}>
+        <div className={styles.pageTitle}>
+          All Resources
         </div>
       </div>
-    );
-  }
-  return (
-    <div className={styles.resourcesContainer}>
-      <div className={styles.resourcesDisplay}>
-        {modules.map((card) => (
-          <Module title={card.title} id={card.id} key={card.id} root={card.title} />
-        ))}
+      <div className={styles.resourcesContainer}>
+        <div className={styles.fieldSpan}>
+          <h5>File Name</h5>
+          <h5>File Size</h5>
+          <h5>Date Uploaded</h5>
+          <h5>Category</h5>
+        </div>
+        <div className={styles.resourcesDisplay}>
+          {files.map((file) => (
+            <div key={file.url} className={styles.spanContainer}>
+              <div className={styles.spanFile}>
+                {(file.fileType.includes('image'))
+                  && <img src={imgIcon} alt="img icon" />}
+                {(file.fileType.includes('video'))
+                  && <img src={vidIcon} alt="vid icon" />}
+                {(file.fileType.includes('pdf'))
+                  && <img src={pdfIcon} alt="pdf icon" />}
+                <div onClick={() => (handleClickOpenFilePopup(file))} role="presentation" className={styles.fileName}>
+                  {file.fileName}
+                </div>
+                <div><h5>{file.fileSize}</h5></div>
+                <div><h5>{file.fileDate}</h5></div>
+                <div><h5>{file.category}</h5></div>
+                <img src={heartIcon} alt="heart icon" />
+              </div>
+              {openFilePopup && (
+              <FilePopup
+                file={fileToDisplay}
+                open={openFilePopup}
+                handleClose={handleCloseFilePopup}
+              />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

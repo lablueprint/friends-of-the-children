@@ -405,7 +405,7 @@ function ExpandedModule({ profile }) {
             {(file.fileType.includes('pdf')) && (
             <div>
               <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                <embed className={styles.preview} src={file.url} alt={file.fileName} />
+                <embed className={styles.displayImg} src={`${file.url}`} alt={file.fileName} />
               </div>
               <div className={styles.descriptionContainer}>
                 <div
@@ -422,7 +422,7 @@ function ExpandedModule({ profile }) {
                     />
                   ) : (<img src={pdfIcon} alt="pdf icon" />)}
                 </div>
-                <div className={styles.fileName}>{file.fileName}</div>
+                <div className={`${styles.fileName} ${styles.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
               </div>
             </div>
             )}

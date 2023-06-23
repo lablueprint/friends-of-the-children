@@ -13,8 +13,6 @@ function Module(props) {
     title, id, editable, checked, handleCheckboxChange, root,
   } = props;
 
-  console.log(root);
-
   return (
     <div>
       <div className={styles.filecard}>

@@ -20,17 +20,17 @@ function ModuleNav({ profile }) {
   const role = profile.role.toLowerCase();
   const [modules, setModules] = useState([{ title: 'All' }]);
   const [openNewUploadPopup, setOpenNewUploadPopup] = useState(false);
-  // const [checked, setChecked] = useState([]);
-  // const [editModule, setEditModule] = useState(false); // toggles edit button
+  const [checked, setChecked] = useState([]);
+  const [editModule, setEditModule] = useState(false); // toggles edit button
   // const [hoveredFile, setHoveredFile] = useState(null);
 
   useEffect(() => {
     api.getModules(role).then((temp) => {
-      setModules(modules.concat(temp.data));
+      setModules(modules.concat(temp.data.modules));
     });
   }, []);
 
-  // console.log(modules);
+  console.log(modules);
 
   const updateModule = () => {
     // setChildren([...children, data]);
@@ -44,10 +44,6 @@ function ModuleNav({ profile }) {
   const handleClose = () => {
     setOpenNewUploadPopup(false);
   };
-
-  // const deleteChild = (childId) => {
-  //   setChildren(children.filter((child) => child.id !== childId));
-  // };
 
   // const handleMouseEnter = (fileId) => {
   //   setHoveredFile(fileId);
@@ -66,25 +62,24 @@ function ModuleNav({ profile }) {
   //   setChecked([...checked, fileName]);
   // };
 
+  // if (editModule) {
+  //   return <Redirect to="/resources/All" />;
+  // }
+
   const displayCheckBoxes = () => {
-    // setEditModule(true);
-    // toggleEdit(editModule);
+    setEditModule(true);
+    // router.
   };
 
-  // const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
-  //   if (checked.length > 0) {
-  //     api.deleteModule(moduleId).then(() => {
-  //       // reloads the page
-  //       deleteChild(moduleId);
-  //     });
-  //   }
-  //   setEditModule(false);
-  // };
+  const deleteModule = async (moduleId) => {
+    await api.deleteModule(moduleId);
+    setModules(modules.filter((module) => module.id !== moduleId));
+  };
 
-  // const clearCheckboxes = () => {
-  //   setChecked([]);
-  //   setEditModule(false);
-  // };
+  const clearCheckboxes = () => {
+    setChecked([]);
+    setEditModule(false);
+  };
 
   // const deleteFiles = async (filesToDelete) => {
 
@@ -108,34 +103,48 @@ function ModuleNav({ profile }) {
             </div>
           </div>
         ))}
+
         {/* TODO: have requests link instead for admin */}
         {role === 'admin'
         && (
         <div>
           <div className={styles.line} />
           <div className={styles.navEditAdd}>
-            <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
-              <img src={editIcon} alt="edit icon" />
-              Edit
-            </button>
-            <button type="button" onClick={handleClickOpen} className={styles.editModule}>
-              <img src={addIcon} alt="add icon" />
-              Add
-            </button>
-            <Dialog
-              open={openNewUploadPopup}
-              onClose={handleClose}
-              aria-labelledby="parent-modal-title"
-              aria-describedby="parent-modal-description"
-            >
-              <DialogContent>
-                <NewModulePopup
-                  updateModule={updateModule}
+            {editModule ? (
+              <div className={styles.cancelOrSave}>
+                <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
+                  Cancel
+                </button>
+                <button type="button" className={styles.saveModuleChanges} onClick={() => (deleteModule(checked))}>
+                  Save
+                </button>
+              </div>
+            ) : (
+              <>
+                <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
+                  <img src={editIcon} alt="edit icon" />
+                  Edit
+                </button>
+                <button type="button" onClick={handleClickOpen} className={styles.editModule}>
+                  <img src={addIcon} alt="add icon" />
+                  Add
+                </button>
+                <Dialog
                   open={openNewUploadPopup}
-                  handleClose={handleClose}
-                />
-              </DialogContent>
-            </Dialog>
+                  onClose={handleClose}
+                  aria-labelledby="parent-modal-title"
+                  aria-describedby="parent-modal-description"
+                >
+                  <DialogContent>
+                    <NewModulePopup
+                      updateModule={updateModule}
+                      open={openNewUploadPopup}
+                      handleClose={handleClose}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
           </div>
         </div>
         ) }

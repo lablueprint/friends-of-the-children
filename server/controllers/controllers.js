@@ -606,6 +606,7 @@ const getModules = async (req, res) => {
   try {
     const { currRole } = req.params;
     const modules = [];
+    const rootFiles = [];
     db.collection('modules').get().then((sc) => {
       sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
         const data = module.data();
@@ -614,10 +615,15 @@ const getModules = async (req, res) => {
           // fetching parent-level modules that we have permission to view
           if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
             modules.push(data);
+            const files = data.fileLinks;
+            const category = data.title;
+            files.forEach((file) => {
+              rootFiles.push({ file, category });
+            });
           }
         }
       });
-      res.status(202).json(modules);
+      res.status(202).json({ modules, rootFiles });
     });
   } catch (error) {
     res.status(400).json(error);

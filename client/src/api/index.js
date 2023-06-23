@@ -251,7 +251,7 @@ export const getGoogleaccount = async (googleEmail) => {
 // updates title, body text in a module with id
 export const updateTextField = async (inputText, id, field) => {
   try {
-    const updatedText = await axios.post(`${url}/updateTextField/${id}/${field}`, inputText);
+    const updatedText = await axios.post(`${url}/updateTextField/${id}/${field}`, { inputText });
     return updatedText;
   } catch (error) {
     console.error(error.message);
