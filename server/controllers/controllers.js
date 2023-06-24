@@ -545,11 +545,15 @@ const updateFileLinksField = async (req, res) => {
       const currLinks = newFileLinks || [];
       const updatedLinks = currFiles.concat(currLinks);
       if (field === 'fileLinks') {
-        await currRef
-          .update({ fileLinks: updatedLinks })
-          .catch((error) => {
+        if (currDoc.exists) {
+          await currRef.update({ fileLinks: updatedLinks }).catch((error) => {
             console.log(error);
           });
+        } else {
+          await currRef.set({ fileLinks: updatedLinks }).catch((error) => {
+            console.log(error);
+          });
+        }
       }
     } else if (action === 'removeFile') {
       const currRef = db.collection('modules').doc(id);
