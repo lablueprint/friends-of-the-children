@@ -485,16 +485,16 @@ const deleteModule = async (req, res) => {
 
 const deleteFiles = async (req, res) => {
   try {
-    const currStorage = getStorage();
+    // const currStorage = getStorage();
     // delete path from module files array field
     const { moduleID, filesToDelete } = req.body;
-    console.log(filesToDelete);
+    console.log('TO DELETE: ', filesToDelete);
     const moduleRef = await db.collection('modules').doc(moduleID);
-    const moduleRefSnapshot = await moduleRef.get();
-    const currModule = moduleRefSnapshot.data();
-    console.log('currModule is ', currModule);
+    // const moduleRefSnapshot = await moduleRef.get();
+    // const currModule = moduleRefSnapshot.data();
+    // console.log('currModule is ', currModule);
     filesToDelete.forEach(async (file) => {
-      const fileRef = ref(currStorage, file);
+      const fileRef = ref(storage, file);
       await deleteObject(fileRef);
     });
     moduleRef.update({
@@ -571,23 +571,15 @@ const updateFileLinksField = async (req, res) => {
 
     const currRef = db.collection('modules').doc(id);
     const currDoc = await currRef.get();
-    if (id !== 'root' && field === 'fileLinks') {
-      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
-      const currLinks = newFileLinks || [];
-      const updatedLinks = currFiles.concat(currLinks);
+    const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+    const currLinks = newFileLinks || [];
+    const updatedLinks = currFiles.concat(currLinks);
+    if (field === 'fileLinks') {
       await currRef
         .update({ fileLinks: updatedLinks })
         .catch((error) => {
           console.log(error);
         });
-    } else if (id === 'root') {
-      // add files to root doc of modules
-      const newFileLink = newFileLinks[0];
-      if (currDoc.exists) {
-        await currRef.update({ files: arrayUnion(newFileLink) });
-      } else {
-        await currRef.set({ files: newFileLink });
-      }
     }
   } catch (error) {
     res.status(400).json(error);
@@ -621,22 +613,24 @@ const getModules = async (req, res) => {
       sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
         const data = module.data();
         if (module.id === 'root') {
-          const { files } = data;
+          const { fileLinks } = data;
           const category = 'All';
 
-          files.forEach((file) => {
-            rootFiles.push({ file, category });
+          fileLinks.forEach((file) => {
+            rootFiles.push({ file, category, id: 'root' });
           });
         }
         if (data && data.role) {
           data.id = module.id;
           // fetching parent-level modules that we have permission to view
-          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
-            modules.push(data);
+          if (currRole === 'admin' || data.role.includes(currRole)) {
+            if (data.parent == null) {
+              modules.push(data);
+            }
             const files = data.fileLinks;
             const category = data.title;
             files.forEach((file) => {
-              rootFiles.push({ file, category });
+              rootFiles.push({ file, category, id: module.id });
             });
           }
         }

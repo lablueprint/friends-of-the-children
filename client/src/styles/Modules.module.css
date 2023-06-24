@@ -133,6 +133,10 @@
     overflow: hidden;
 }
 
+.filesContainer{
+    margin-top: 50px;
+}
+
 .preview {
     /* display: inline-block; */
     width: 100% !important;
@@ -172,9 +176,14 @@
 }
 
 .fileName {
+    width: 300px !important;
     white-space: nowrap; /* Prevent text from wrapping to multiple lines */
     overflow: hidden; /* Hide any overflowing text */
     text-overflow: ellipsis; /* Display an ellipsis (...) when the text overflows */
+    text-align: left;
+    margin-left: 20px;
+    margin-right: 60px;
+    cursor: pointer;
 }
 
 .deleteFilesBar {
@@ -457,7 +466,7 @@
 }
 
 .fieldSpan :first-child{
-    margin-right: 380px;
+    margin-right: 350px;
 }
 
 .fieldSpan :nth-child(n+2){
@@ -492,25 +501,23 @@
     font-weight: 500;
 }
 
-.spanFile :first-child {
-    margin-right: 30px;
-  }
-
-.spanFile :nth-child(2) {
-    width: 300px;
-    text-align: left;
-    margin-right: 80px;
-    cursor: pointer;
-}
-
 .spanFile :nth-child(n+3){
     max-width: 200px;
-    margin-right: 30px;
+    text-align: left;
+    margin-right: 60px;
+    overflow: hidden;
+}
+
+.spanFile :nth-child(5){
+    width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .spanFile :nth-child(6){
     position: absolute;
-    right: 50px;
+    right: 40px;
 }
 
 .heart_button {

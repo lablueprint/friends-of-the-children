@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import {
   ref, getStorage, getDownloadURL, getMetadata,
 } from 'firebase/storage';
+import { Checkbox } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import FilePopup from '../components/FilePopup';
 import heartIcon from '../assets/icons/heart.svg';
 import filledHeart from '../assets/icons/filled_heart.svg';
@@ -18,13 +22,16 @@ import NewFilePopup from '../components/NewFilePopup';
 function Resources({ profile }) {
   const [files, setFiles] = useState([]);
   const [fileToDisplay, setFileToDisplay] = useState({});
+  const [checked, setChecked] = useState([]);
+  const [hoveredFile, setHoveredFile] = useState(null);
+  const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
   const [heartFilled, setHeartFilled] = useState(Array(files.length).fill(false));
   const [openFilePopups, setOpenFilePopups] = useState(Array(files.length).fill(false));
   const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
   const { role } = profile;
   const currRole = role.toLowerCase();
 
-  const updateImageURL = async (fileLinks) => {
+  const createFileObjects = async (fileLinks) => {
     setFiles([]);
     const fileContents = [];
     if (fileLinks.length > 0) {
@@ -44,7 +51,7 @@ function Resources({ profile }) {
 
         const { category } = fileLink;
         fileContents.push({
-          url, fileType, fileName, category, fileSize, fileDate,
+          url, fileType, fileName, category, fileSize, fileDate, id: fileLink.id,
         });
       }));
       // sorting files alphabetically
@@ -64,8 +71,7 @@ function Resources({ profile }) {
   // getting all modules relevant to current user
   const fetchData = async () => {
     const { data } = await api.getModules(currRole);
-    console.log(data.rootFiles);
-    updateImageURL(data.rootFiles);
+    createFileObjects(data.rootFiles);
   };
 
   // TODO: implement deleteModules to delete all modules, not just one at a time
@@ -100,6 +106,50 @@ function Resources({ profile }) {
   const handleClose = () => {
     setOpenNewFilePopup(false);
   };
+
+  const handleMouseEnter = (fileId) => {
+    setHoveredFile(fileId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredFile(null);
+  };
+
+  const handleCheckboxChange = (event, fileObject) => {
+    if (checked.includes(fileObject)) {
+      setChecked(checked.filter((file) => (file !== fileObject)));
+      return;
+    }
+
+    setChecked([...checked, fileObject]);
+  };
+
+  const clearCheckboxes = () => {
+    setChecked([]);
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const handleDeleteFilesClose = () => {
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const deleteFiles = async (filesToDelete) => {
+    const deletePromises = filesToDelete.map((file) => api.deleteFiles(file.id, [`files/${file.fileName}`]));
+
+    Promise.all(deletePromises)
+      .then(() => {
+        const tempFiles = [...files.filter((file) => !filesToDelete.includes(file))];
+        setFiles(tempFiles);
+        clearCheckboxes();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  // api.deleteFiles(id, filesToDelete).then(() => {
+
+  // });
 
   // empty dependency array means getModules is only being called on page load
   useEffect(() => {
@@ -136,18 +186,31 @@ function Resources({ profile }) {
           {files.map((file, index) => (
             <div key={file.url} className={styles.spanContainer}>
               <div className={styles.spanFile}>
-                {(file.fileType.includes('image'))
-                  && <img src={imgIcon} alt="img icon" />}
-                {(file.fileType.includes('video'))
-                  && <img src={vidIcon} alt="vid icon" />}
-                {(file.fileType.includes('pdf'))
-                  && <img src={pdfIcon} alt="pdf icon" />}
+                <div
+                  key={file.fileName}
+                  onMouseEnter={() => handleMouseEnter(file.fileName)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {(checked.length > 0) || (hoveredFile === file.fileName) || (checked.includes(file)) ? (
+                    <Checkbox
+                      checked={checked.includes(file)}
+                      onChange={(event) => handleCheckboxChange(event, file)}
+                      className={styles.checkbox}
+                    />
+                  ) : (
+                    <>
+                      {(file.fileType.includes('image')) && <img src={imgIcon} alt="img icon" />}
+                      {(file.fileType.includes('video')) && <img src={vidIcon} alt="vid icon" />}
+                      {((file.fileType.includes('pdf')) || file.fileType.includes('text')) && <img src={pdfIcon} alt="pdf icon" />}
+                    </>
+                  )}
+                </div>
                 <div onClick={() => (handleClickOpenFilePopup(file))} role="presentation" className={styles.fileName}>
                   {file.fileName}
                 </div>
                 <div><h5>{file.fileSize}</h5></div>
                 <div><h5>{file.fileDate}</h5></div>
-                <div><h5>{file.category}</h5></div>
+                <h5>{file.category}</h5>
                 <button
                   type="button"
                   className={styles.heart_button}
@@ -171,6 +234,64 @@ function Resources({ profile }) {
               )}
             </div>
           ))}
+        </div>
+
+        <div>
+          { openDeleteFilesPopup && checked.length > 0
+            ? (
+              <div>
+                <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
+                  <DialogTitle className={styles.dialogTitle}>
+                    You have chosen to delete
+                    {' '}
+                    {checked.length}
+                    {' '}
+                    {(checked.length) === 1 ? 'file ' : 'files '}
+                  </DialogTitle>
+                  <DialogContent>
+                    <div>
+                      <div className={styles.confirmMessage}>
+                        Are you sure you want to continue with this action?
+                      </div>
+                      <div className={styles.confirmButtons}>
+                        <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                          Cancel
+                        </button>
+                        <button type="button" className={styles.confirmDelete} onClick={() => { deleteFiles(checked); }}>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )
+            : <div />}
+        </div>
+        <div>
+          { (checked.length > 0)
+            ? (
+              <div className={styles.deleteFilesBar}>
+                <div className={styles.totalSelected}>
+                  <div className={styles.selectedNumber}>
+                    {checked.length}
+                  </div>
+                  <div className={styles.selectedText}>
+                    {' '}
+                    selected
+                  </div>
+                </div>
+                <div className={styles.cancelOrDelete}>
+                  <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                    Cancel
+                  </button>
+                  <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )
+            : <div />}
         </div>
       </div>
     </div>
