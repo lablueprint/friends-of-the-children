@@ -261,9 +261,10 @@ export const updateTextField = async (inputText, id, field) => {
 };
 
 // updates file links array in module with id
-export const updateFileLinksField = async (newFileLinks, id, field) => {
+export const updateFileLinksField = async (newFileLinks, id, field, action) => {
   try {
-    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}`, newFileLinks);
+    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}/${action}`, newFileLinks);
+    console.log(updatedFileLinks);
     return updatedFileLinks;
   } catch (error) {
     console.error(error.message);

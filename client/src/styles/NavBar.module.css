@@ -63,7 +63,7 @@
 
 .btn_selected{
     background-color: #DEF1FF;
-    color: #156DBF;
+    color: var(--dark-blue-for-nav-bar, #156DBF) !important;
 }
 
 .btn_info img{

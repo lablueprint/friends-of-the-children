@@ -4,7 +4,7 @@ import {
   collection, addDoc, getDoc, arrayUnion, updateDoc, doc, arrayRemove,
 } from 'firebase/firestore';
 import {
-  getStorage, ref, deleteObject,
+  ref, deleteObject,
   uploadBytes, getDownloadURL,
 } from 'firebase/storage';
 import crypto from 'crypto';
@@ -318,10 +318,7 @@ const addMenteeFile = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const { files } = req.body;
-    // console.log(files.name);
-    // console.log('REQBODY:', req.body);
     const storageRef = ref(storage, `/images/${files.name}`);
-
     uploadBytes(storageRef, files).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
         res.status(202).json(url);
@@ -362,20 +359,6 @@ const updateModuleChildren = async (req, res) => {
     await updateDoc(moduleRef, {
       children: arrayUnion(docRef.id),
     });
-
-    // add files to root doc of modules
-    // const rootRef = db.collection('modules').doc('root');
-    // const rootDoc = await rootRef.get();
-    // const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
-    // const newFileLinks = req.body.data.fileLinks || [];
-    // const updatedFiles = currentFiles.concat(newFileLinks);
-
-    // if (rootDoc.exists) {
-    //   await rootRef.update({ files: updatedFiles });
-    // } else {
-    //   await rootRef.set({ files: updatedFiles });
-    // }
-
     res.status(202).json(docRef.id);
   } catch (error) {
     res.status(400).json(error);
@@ -388,20 +371,6 @@ const addModule = async (req, res) => {
     const { data } = req.body;
     const dataRef = await db.collection('modules').add(data);
     const { id } = dataRef; // newly added module's id
-
-    // add files to root doc of modules
-    // const docRef = db.collection('modules').doc('root');
-    // const rootDoc = await docRef.get();
-    // const currentFiles = rootDoc.exists ? rootDoc.data().files || [] : [];
-    // const newFileLinks = req.body.data.fileLinks || [];
-    // const updatedFiles = currentFiles.concat(newFileLinks);
-
-    // if (rootDoc.exists) {
-    //   await docRef.update({ files: updatedFiles });
-    // } else {
-    //   await docRef.set({ files: updatedFiles });
-    // }
-
     res.status(202).json(id);
   } catch (error) {
     res.status(400).json(error);
@@ -565,22 +534,37 @@ const updateTextField = async (req, res) => {
 const updateFileLinksField = async (req, res) => {
   try {
     const {
-      id, field,
+      id, field, action,
     } = req.params;
     const newFileLinks = req.body;
 
-    const currRef = db.collection('modules').doc(id);
-    const currDoc = await currRef.get();
-    const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
-    const currLinks = newFileLinks || [];
-    const updatedLinks = currFiles.concat(currLinks);
-    if (field === 'fileLinks') {
-      await currRef
-        .update({ fileLinks: updatedLinks })
-        .catch((error) => {
-          console.log(error);
-        });
+    if (action === 'addFile') {
+      const currRef = db.collection('modules').doc(id);
+      const currDoc = await currRef.get();
+      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+      const currLinks = newFileLinks || [];
+      const updatedLinks = currFiles.concat(currLinks);
+      if (field === 'fileLinks') {
+        await currRef
+          .update({ fileLinks: updatedLinks })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    } else if (action === 'removeFile') {
+      const currRef = db.collection('modules').doc(id);
+      const currDoc = await currRef.get();
+      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+      const updatedLinks = currFiles.filter((file) => file.url !== newFileLinks.url);
+      if (field === 'fileLinks') {
+        await currRef
+          .update({ fileLinks: updatedLinks })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     }
+    res.status(202).json({});
   } catch (error) {
     res.status(400).json(error);
   }
@@ -609,15 +593,20 @@ const getModules = async (req, res) => {
     const { currRole } = req.params;
     const modules = [];
     const rootFiles = [];
+    const favoriteFiles = [];
     db.collection('modules').get().then((sc) => {
       sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
         const data = module.data();
-        if (module.id === 'root') {
+        if (module.id === 'root') { // fill up the root array (files in 'All Resources')
           const { fileLinks } = data;
           const category = 'All';
-
           fileLinks.forEach((file) => {
             rootFiles.push({ file, category, id: 'root' });
+          });
+        } else if (module.id === 'favorites') { // fill up the favorites array
+          const { fileLinks } = data;
+          fileLinks.forEach((file) => {
+            favoriteFiles.push(file);
           });
         }
         if (data && data.role) {
@@ -635,7 +624,7 @@ const getModules = async (req, res) => {
           }
         }
       });
-      res.status(202).json({ modules, rootFiles });
+      res.status(202).json({ modules, rootFiles, favoriteFiles });
     });
   } catch (error) {
     res.status(400).json(error);
@@ -908,10 +897,12 @@ const sendMailchimpEmails = async (req, res) => {
     // get all campaigns + check if any completed campaign segments can be deleted
     let allCampaigns = await mailchimp.campaigns.list();
     allCampaigns = allCampaigns.campaigns.filter((element) => element.status === 'sent' && element.recipients.segment_opts.saved_segment_id);
-    for (const element of allCampaigns) {
+    const deletePromises = allCampaigns.map((element) => {
       const delSegmentId = element.recipients.segment_opts.saved_segment_id;
-      const delResponse = await mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, element.recipients.segment_opts.saved_segment_id);
-    }
+      return mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, delSegmentId);
+    });
+
+    await Promise.all(deletePromises);
 
     // delete the segment (maybe clean up when a new segment is about to be created and store all the segment ids in a list)
     // const response = await mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, segment.id);

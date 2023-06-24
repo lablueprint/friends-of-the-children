@@ -25,7 +25,8 @@ function Resources({ profile }) {
   const [checked, setChecked] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
   const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
-  const [heartFilled, setHeartFilled] = useState(Array(files.length).fill(false));
+  const [favorites, setFavorites] = useState([]); // array of favorite file objects
+  const [favTab, setFavTab] = useState(false); // which tab you're on
   const [openFilePopups, setOpenFilePopups] = useState(Array(files.length).fill(false));
   const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
   const { role } = profile;
@@ -71,6 +72,7 @@ function Resources({ profile }) {
   // getting all modules relevant to current user
   const fetchData = async () => {
     const { data } = await api.getModules(currRole);
+    setFavorites(data.favoriteFiles);
     createFileObjects(data.rootFiles);
   };
 
@@ -147,17 +149,27 @@ function Resources({ profile }) {
       });
   };
 
-  // api.deleteFiles(id, filesToDelete).then(() => {
-
-  // });
+  const handleFillHeart = (index, file) => {
+    // if heart is filled
+    if (!favorites.some((element) => element.url === file.url)) {
+      // update favorites state array
+      const tempFavs = [...favorites];
+      tempFavs.push(file);
+      setFavorites(tempFavs);
+      // store this new state into the database
+      api.updateFileLinksField(file, 'favorites', 'fileLinks', 'addFile');
+    } else {
+      const tempFavs = favorites.filter((element) => element.url !== file.url);
+      setFavorites(tempFavs);
+      api.updateFileLinksField(file, 'favorites', 'fileLinks', 'removeFile');
+    }
+  };
 
   // empty dependency array means getModules is only being called on page load
   useEffect(() => {
     // saving all the user profiles from Firebase in an array (useProfiles) only on first load
     fetchData().catch(console.error);
   }, []);
-
-  console.log(files);
 
   return (
     <div>
@@ -174,7 +186,13 @@ function Resources({ profile }) {
           <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={[]} id="root" />
         </div>
       </div>
+
+      <div className={styles.tab_bar}>
+        <button className={`${!favTab ? styles.tab_selected : ''}`} type="button" onClick={() => { setFavTab(false); }}>All</button>
+        <button className={`${favTab ? styles.tab_selected : ''}`} type="button" onClick={() => { setFavTab(true); }}>Favorites</button>
+      </div>
       <div className={styles.line} />
+
       <div className={styles.resourcesContainer}>
         <div className={styles.fieldSpan}>
           <h5>File Name</h5>
@@ -183,7 +201,8 @@ function Resources({ profile }) {
           <h5>Category</h5>
         </div>
         <div className={styles.resourcesDisplay}>
-          {files.map((file, index) => (
+          {/* conditional rendering based on which tab (All/Favorites) ur on */}
+          {(favTab ? favorites : files).map((file, index) => (
             <div key={file.url} className={styles.spanContainer}>
               <div className={styles.spanFile}>
                 <div
@@ -214,28 +233,26 @@ function Resources({ profile }) {
                 <button
                   type="button"
                   className={styles.heart_button}
-                  onClick={() => {
-                    const updatedHearts = [...heartFilled];
-                    console.log(updatedHearts);
-                    updatedHearts[index] = !updatedHearts[index];
-                    console.log(updatedHearts);
-                    setHeartFilled(updatedHearts);
-                  }}
+                  onClick={() => { handleFillHeart(index, file); }}
                 >
-                  {heartFilled[index] ? <img src={filledHeart} alt="favorite file" /> : <img src={heartIcon} alt="not a favorite file" /> }
+                  {favorites.some((element) => element.url === file.url) ? (
+                    <img src={filledHeart} alt="favorite file" />
+                  ) : (
+                    <img src={heartIcon} alt="not a favorite file" />
+                  )}
                 </button>
               </div>
               {openFilePopups[index] && (
-              <FilePopup
-                file={fileToDisplay}
-                open={openFilePopups[index]}
-                handleClose={() => handleCloseFilePopup(file)}
-              />
+                <FilePopup
+                  file={fileToDisplay}
+                  open={openFilePopups[index]}
+                  handleClose={() => handleCloseFilePopup(file)}
+                />
               )}
             </div>
           ))}
         </div>
-
+        {/* this is the deleting files dialog popup */}
         <div>
           { openDeleteFilesPopup && checked.length > 0
             ? (
@@ -295,6 +312,7 @@ function Resources({ profile }) {
         </div>
       </div>
     </div>
+
   );
 }
 
