@@ -1,5 +1,6 @@
 import { React, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import styles from '../styles/Calendar.module.css';
 
 function UpcomingEvents({ profile, getCalendarRef }) {
   const { serviceArea } = profile;
@@ -36,35 +37,29 @@ function UpcomingEvents({ profile, getCalendarRef }) {
   useEffect(getUpcomingEvents, []);
 
   return (
-    <div>
-      <h2>Upcoming Events</h2>
-      <div>
-        {serviceArea}
+    <div className={styles['calendar-container']}>
+      <div className={styles['upcoming-events']}>
+        <h2>Upcoming Events</h2>
+        <div>{serviceArea}</div>
+        {upcomingEvents.map((event) => (
+          <div key={event.id} className={styles.event}>
+            <div className={styles['event-date']}>
+              <span>
+                {event.start.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
+              </span>
+              <span className={styles['event-bullet']}>&bull;</span>
+              <span>
+                {`${event.start.toLocaleTimeString(undefined, { hour: 'numeric', minute: 'numeric' }).replace(' ', '')} - ${event.end.toLocaleTimeString(undefined, { hour: 'numeric', minute: 'numeric' }).replace(' ', '')}`}
+              </span>
+
+            </div>
+            <h3 className={styles['event-title']}>{event.title}</h3>
+            <div className={styles['event-description']}>
+              <p>{event.extendedProps.description}</p>
+            </div>
+          </div>
+        ))}
       </div>
-      {upcomingEvents.map((event) => (
-        <div key={event.id}>
-          <h3>{event.title}</h3>
-          <p>
-            Date:
-            {' '}
-            {event.start.toLocaleDateString()}
-            {' '}
-            <br />
-            Time:
-            {' '}
-            {event.start.toLocaleTimeString()}
-            {' '}
-            -
-            {' '}
-            {event.end.toLocaleTimeString()}
-            {' '}
-            <br />
-            Description:
-            {' '}
-            {event.extendedProps.description}
-          </p>
-        </div>
-      ))}
     </div>
   );
 }
