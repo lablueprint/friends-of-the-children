@@ -7,6 +7,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import styles from '../styles/Mentees.module.css';
+import styles2 from '../styles/Modules.module.css';
 import VideoIcon from '../assets/icons/videos_icon.svg';
 import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
@@ -33,6 +34,7 @@ function ExpandedMentee({ profile }) {
   const [isLink, setIsLink] = useState(false);
   const [cleared, setCleared] = useState();
   const [currAge, setCurrAge] = useState(0);
+  const [favTab, setFavTab] = useState(false); // which tab you're on
   const role = (profile.role).toLowerCase();
 
   // called upon submitting the form that adds a new folder
@@ -189,21 +191,26 @@ function ExpandedMentee({ profile }) {
             </div>
 
             <div className={styles.buttons}>
-              <Button variant="contained" onClick={showCaregiver}>
+              <button type="button" onClick={showCaregiver} className={styles2.editModule}>
                 Caregiver Info
-              </Button>
+              </button>
 
               {role === 'mentor' && (
-              <Button variant="contained" onClick={addNewFile}>
+              <button type="button" onClick={addNewFile} className={styles2.addModule}>
                 + New Upload
-              </Button>
+              </button>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <h3>Folders</h3>
+      <div className={styles2.tab_bar}>
+        <button className={`${!favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(false); }}>All</button>
+        <button className={`${favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(true); }}>Favorites</button>
+      </div>
+      <div className={styles.line} />
+
       <div className={styles.folders_map}>
         {folderArray.map((folder) => (
           folder !== 'Root' && (
@@ -214,12 +221,14 @@ function ExpandedMentee({ profile }) {
                   id, folderName: folder, firstName, lastName, avatar,
                 }}
               >
-                {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
-                {folder === 'Images' && <img src={ImageIcon} alt="images icon" />}
-                {folder === 'Flyers' && <img src={FlyerIcon} alt="flyer icon" />}
-                {folder === 'Links' && <img src={LinkIcon} alt="links icon" />}
+                <div className={styles.folder_content}>
+                  {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
+                  {folder === 'Images' && <img src={ImageIcon} alt="images icon" />}
+                  {folder === 'Flyers' && <img src={FlyerIcon} alt="flyer icon" />}
+                  {folder === 'Links' && <img src={LinkIcon} className={styles.folder_container_linksImg} alt="links icon" />}
 
-                <p>{folder}</p>
+                  <p>{folder}</p>
+                </div>
               </Link>
             </div>
           )

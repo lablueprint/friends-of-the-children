@@ -133,17 +133,29 @@ a{
     background-repeat: no-repeat;
 }
 
+.folder_content {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust the gap value as needed */
+  }
+  
 .folder_container img{
-    display: inline-block;
     width: 70px;
-    margin-right: 1.5vw;
+    margin-right: 1vw;
+    margin-top: -10px;
+}
+
+.folder_container_linksImg{
+    width: 100px !important;
+    margin: 0 !important;
+    margin-top: -40px !important;
+    margin-right: -10px !important;
 }
 
 .folder_container p{
     color: black;
     font-size: 1.3rem;
     font-weight: 700;
-    display: inline-block;
 }
 
 .img_container{
@@ -324,5 +336,19 @@ input[type="radio"] {
   .buttons {
     display: flex;
     gap: 10px;
+  }
+
+  .buttons :first-child{
+    color: #156DBF;
+    font-size: 18px;
+    font-family: News Gothic;
+    font-weight: 700;
+  }
+
+  .buttons :nth-child(2){
+    color: #FFF;
+    font-size: 18px;
+    font-family: News Gothic;
+    font-weight: 700;
   }
   
