@@ -202,14 +202,23 @@ function Resources({ profile }) {
       </div>
     );
   }
+
   return (
-    <div className={styles.resourcesContainer}>
-      <div className={styles.resourcesDisplay}>
-        {modules.map((card) => (
-          <Module title={card.title} id={card.id} key={card.id} root={card.title} />
-        ))}
+    <>
+      <div className={styles.header}>
+        <div className={styles.pageTitle}>
+          {title}
+        </div>
       </div>
-    </div>
+      <div className={styles.resourcesContainer}>
+        <div className={styles.resourcesDisplay}>
+          {modules.map((card) => (
+            <Module title={card.title} id={card.id} key={card.id} root={card.title} />
+          ))}
+        </div>
+      </div>
+    </>
+
   );
 }
 

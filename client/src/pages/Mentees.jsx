@@ -18,6 +18,7 @@ import BirdIcon from '../assets/icons/bird_avatar.png';
 import DogIcon from '../assets/icons/dog_avatar.svg';
 import BearIcon from '../assets/icons/bear_avatar.svg';
 import MouseIcon from '../assets/icons/mouse_avatar.svg';
+import MenteeCard from '../assets/images/mentee_card.svg';
 import styles from '../styles/Mentees.module.css';
 import * as api from '../api';
 import { createTextField } from '../components/MuiComps';
@@ -51,46 +52,46 @@ function Mentees({ profile, updateAppProfile }) {
   const [open, setOpen] = useState(false);
   const role = (profile.role).toLowerCase();
 
+  // sort mentees by first name alphabetically
+  const sort = (array) => {
+    array.sort((a, b) => {
+      if (a.firstName < b.firstName) {
+        return -1;
+      }
+      if (a.firstName > b.firstName) {
+        return 1;
+      }
+      return 0;
+    });
+  };
+
   useEffect(() => {
     if (role === 'admin') {
       api.getAllMentees().then((tempMentees) => {
         if (tempMentees) {
+          sort(tempMentees.data);
           setMentees(tempMentees.data);
         }
       });
     } else {
       api.getMentees(profile.id).then((tempMentees) => {
         if (tempMentees) {
+          sort(tempMentees.data);
           setMentees(tempMentees.data);
         }
       });
     }
   }, []);
 
-  // calculates the age of a person given a birthdate of YYYY-MM-DD format
-  const calculateAge = (birthdate) => {
-    const today = new Date();
-    const birthdateObj = new Date(birthdate);
-    let age = today.getFullYear() - birthdateObj.getFullYear();
-    const monthDiff = today.getMonth() - birthdateObj.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
-      age -= 1;
-    }
-    return age;
-  };
-
   const addChild = async (e) => {
     e.preventDefault();
 
     // get the birthdate from datepicker calednar in YYYY-MM-DD format
     const formattedDate = birthday ? birthday.format('YYYY-MM-DD') : '';
-    // get age of youth
-    const age = calculateAge(formattedDate);
 
     const data = {
       firstName,
       lastName,
-      age,
       birthday: formattedDate,
       clearance,
       notes,
@@ -158,16 +159,35 @@ function Mentees({ profile, updateAppProfile }) {
 
       <div className={styles.mentees_container}>
         {mentees.map((mentee) => (
-          <div key={mentee.id} className={styles.card_container}>
+          <div key={mentee.id}>
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders, medicalClearance: mentee.medicalClearance, avatar: mentee.avatar,
+                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiverFirst: mentee.caregiverFirstName, caregiverLast: mentee.caregiverLastName, address: mentee.address, phone: mentee.phone, avatar: mentee.avatar,
               }}
             >
-              <div className={styles.card}>
-                <div className={styles.imageCard} />
-                <p>{`${mentee.firstName} ${mentee.lastName}`}</p>
+              <div className={styles.mentee_card}>
+                <img src={MenteeCard} alt="mentee card" className={styles.mentee_img} />
+                <div className={styles.card_content}>
+                  <div className={styles.card_content_flex}>
+                    <img src={mentee.avatar} alt="mentee's avatar" className={styles.avatar} />
+                    <div className={styles.mentee_desc}>
+                      <h3>{`${mentee.firstName} ${mentee.lastName}`}</h3>
+                      <p>
+                        Age:
+                        {' '}
+                        {mentee.age}
+                      </p>
+                      <p>
+                        Caregiver:
+                        {' '}
+                        {mentee.caregiverFirstName}
+                        {' '}
+                        {mentee.caregiverLastName}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Link>
           </div>
@@ -211,7 +231,7 @@ function Mentees({ profile, updateAppProfile }) {
                       <Select
                         id="med"
                         label="Media Clearance"
-                        name="mediaClearance"
+                        name="clearance"
                         defaultValue="False"
                         value={clearance}
                         onChange={(e) => setClearance(e.target.value)}

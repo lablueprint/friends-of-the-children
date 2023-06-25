@@ -12,21 +12,27 @@ import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
 import LinkIcon from '../assets/icons/link_icon.svg';
 import ClearedIcon from '../assets/icons/cleared.svg';
+import NotClearedIcon from '../assets/icons/not_cleared.svg';
+import HomeIcon from '../assets/icons/home.svg';
+import PhoneIcon from '../assets/icons/phone-call.svg';
+import CakeIcon from '../assets/icons/cake.svg';
 import { storage } from './firebase';
 import * as api from '../api';
 
 function ExpandedMentee({ profile }) {
   const location = useLocation();
   const {
-    id, firstName, lastName, age, caregiver, medicalClearance, avatar,
+    id, firstName, lastName, caregiverFirst, caregiverLast, address, phone, avatar,
   } = location.state;
   const [recents, setRecents] = useState([]);
   const [folderArray, setFolderArray] = useState([]);
   const [open, setOpen] = useState(false);
   const [fileUploadOpen, setfileUploadOpen] = useState(false);
+  const [caregiverOpen, setCaregiverOpen] = useState(false);
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
-  const [cleared, setCleared] = useState(medicalClearance);
+  const [cleared, setCleared] = useState();
+  const [currAge, setCurrAge] = useState(0);
   const role = (profile.role).toLowerCase();
 
   // called upon submitting the form that adds a new folder
@@ -43,8 +49,13 @@ function ExpandedMentee({ profile }) {
 
   // have all of the mentees' folders and root files display on page
   useEffect(() => {
-    api.getMenteeFolders(id).then((folders) => {
-      setFolderArray(folders.data);
+    api.getMenteeFolders(id).then((res) => {
+      if (res !== undefined) {
+        const { tempFolders, clear, age } = res.data;
+        setFolderArray(tempFolders);
+        setCleared(clear);
+        setCurrAge(age);
+      }
     });
     api.getMenteeFiles(id, 'Root').then((files) => {
       setRecents(files.data);
@@ -122,6 +133,16 @@ function ExpandedMentee({ profile }) {
     setfileUploadOpen(false);
   };
 
+  // when click on caregiver info button
+  const showCaregiver = () => {
+    setCaregiverOpen(true);
+  };
+
+  // when close caregiver info popup
+  const closeCaregiverInfo = () => {
+    setCaregiverOpen(false);
+  };
+
   // update the medical clearance
   const updateClearance = () => {
     api.updateClearance(id, cleared);
@@ -137,44 +158,48 @@ function ExpandedMentee({ profile }) {
             {`${firstName} ${lastName}`}
           </b>
         </p>
-
-        <p>
-          Caregiver:
-          {' '}
-          {caregiver}
-        </p>
       </div>
 
       <div className={styles.profile_container}>
         <div>
-          <div className={styles.pfp}>
-            <img className={styles.profile_pic} src={avatar} alt="" />
-          </div>
+          <div className={styles.container}>
+            <div>
+              <div className={styles.pfp}>
+                <img className={styles.profile_pic} src={avatar} alt="" />
+              </div>
 
-          <div className={styles.user_info}>
-            <h1>{`${firstName} ${lastName}`}</h1>
-            <p>
-              {age}
-              {' '}
-              years old
-            </p>
-          </div>
+              <div className={styles.user_info}>
+                <h1>{`${firstName} ${lastName}`}</h1>
+                <div style={{ display: 'inline-block' }}>
+                  <img src={CakeIcon} alt="birthday cake" style={{ marginBottom: '7px' }} />
+                  <p style={{ display: 'inline-block', margin: '0', marginLeft: '10px' }}>
+                    {currAge}
+                    {' '}
+                    years old
+                  </p>
+                </div>
+              </div>
 
-          <div className={styles.service_area}>
-            <button type="button" onClick={updateClearance}>
-              {cleared && <img alt="media clearance cleared" src={ClearedIcon} />}
-              {!cleared && <p>NOT CLEARED</p>}
-            </button>
-            <p>
-              {profile.serviceArea}
-            </p>
-          </div>
+              <div className={styles.clearance}>
+                <button type="button" onClick={updateClearance}>
+                  {cleared && <img alt="media clearance cleared" src={ClearedIcon} />}
+                  {!cleared && <img alt="media clearance not cleared" src={NotClearedIcon} />}
+                </button>
+              </div>
+            </div>
 
-          {role === 'mentor' && (
-          <Button variant="contained" onClick={addNewFile}>
-            + Upload File
-          </Button>
-          )}
+            <div className={styles.buttons}>
+              <Button variant="contained" onClick={showCaregiver}>
+                Caregiver Info
+              </Button>
+
+              {role === 'mentor' && (
+              <Button variant="contained" onClick={addNewFile}>
+                + New Upload
+              </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -186,7 +211,7 @@ function ExpandedMentee({ profile }) {
               <Link
                 to={`./folder_${folder}`}
                 state={{
-                  id, folderName: folder, firstName, lastName, age, caregiver, medicalClearance, avatar,
+                  id, folderName: folder, firstName, lastName, avatar,
                 }}
               >
                 {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}
@@ -310,6 +335,39 @@ function ExpandedMentee({ profile }) {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* show caregiver info */}
+      <Dialog
+        open={caregiverOpen}
+        onClose={closeCaregiverInfo}
+        sx={{
+          '& .MuiDialog-container': {
+            '& .MuiPaper-root': {
+              width: '100%',
+              maxWidth: '350px', // Set your width here
+            },
+          },
+        }}
+      >
+        <DialogContent>
+          <div className={styles.caregiverInfo}>
+            <h5>
+              {caregiverFirst}
+              {' '}
+              {caregiverLast}
+            </h5>
+            <div className={styles.caregiverLine} />
+            <div className={styles.caregiverFlex}>
+              <img src={HomeIcon} alt="home icon" />
+              <p>{address}</p>
+            </div>
+            <div className={styles.caregiverFlex}>
+              <img src={PhoneIcon} alt="phone icon" />
+              <p>{phone}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

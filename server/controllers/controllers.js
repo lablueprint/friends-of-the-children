@@ -91,13 +91,25 @@ const patchEvent = async (req, res) => {
   }
 };
 
+// calculates the age of a person given a birthdate of YYYY-MM-DD format
+const calculateAge = (birthdate) => {
+  const today = new Date();
+  const birthdateObj = new Date(birthdate);
+  let age = today.getFullYear() - birthdateObj.getFullYear();
+  const monthDiff = today.getMonth() - birthdateObj.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
+    age -= 1;
+  }
+  return age;
+};
+
 // update medical clearance
 const updateClearance = async (req, res) => {
   try {
     const { id, clearance } = req.body;
     await db.collection('mentees').doc(id)
       .update({
-        medicalClearance: !clearance,
+        clearance: !clearance,
       });
     res.status(202).json('success');
   } catch (error) {
@@ -117,9 +129,11 @@ const getMentees = async (req, res) => {
         const data = snap.data();
         const { id } = snap;
         if (allMentees && allMentees.includes(id)) {
+          const age = calculateAge(data.birthday);
           const data2 = {
             ...data,
             id,
+            age,
           };
           tempMentees.push(data2);
         }
@@ -217,6 +231,13 @@ const getMenteeFolders = async (req, res) => {
   try {
     const { id } = req.params;
     const tempFolders = [];
+    let clear;
+    let age;
+    db.collection('mentees').doc(id).get().then((sc) => {
+      const { birthday } = sc.data();
+      age = calculateAge(birthday);
+      clear = sc.data().clearance;
+    });
     db.collection('mentees').doc(id).collection('folders').get()
       .then((sc) => {
         if (sc.empty) {
@@ -228,7 +249,7 @@ const getMenteeFolders = async (req, res) => {
         });
       })
       .then(() => {
-        res.status(202).json(tempFolders);
+        res.status(202).json({ tempFolders, clear, age });
       });
   } catch (error) {
     res.status(400).json(error);

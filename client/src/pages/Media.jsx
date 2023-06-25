@@ -14,7 +14,7 @@ function Media({ profile }) {
   const location = useLocation();
   // media is the string of file links in this folder
   const {
-    id, folderName, firstName, lastName, age, caregiver, avatar,
+    id, folderName, firstName, lastName, avatar,
   } = location.state;
   // parse media string to an array
   const [open, setOpen] = useState(false);
@@ -99,32 +99,12 @@ function Media({ profile }) {
             {`${folderName}`}
           </b>
         </p>
-        <p>
-          Caregiver:
-          {' '}
-          {caregiver}
-        </p>
       </div>
 
       <div className={styles.profile_container}>
         <div>
           <div className={styles.pfp}>
             <img className={styles.profile_pic} src={avatar} alt="" />
-          </div>
-
-          <div className={styles.user_info}>
-            <h1>{`${firstName} ${lastName}`}</h1>
-            <p>
-              {age}
-              {' '}
-              years old
-            </p>
-          </div>
-
-          <div className={styles.service_area}>
-            <p>
-              {profile.serviceArea}
-            </p>
           </div>
 
           <h3>{`${folderName}`}</h3>
