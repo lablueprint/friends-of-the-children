@@ -14,7 +14,7 @@ function Media({ profile }) {
   const location = useLocation();
   // media is the string of file links in this folder
   const {
-    id, folderName, firstName, lastName, age, caregiver,
+    id, folderName, firstName, lastName, age, caregiver, avatar,
   } = location.state;
   // parse media string to an array
   const [open, setOpen] = useState(false);
@@ -109,7 +109,7 @@ function Media({ profile }) {
       <div className={styles.profile_container}>
         <div>
           <div className={styles.pfp}>
-            <img className={styles.profile_pic} src="https://i.pinimg.com/564x/a0/8e/a5/a08ea58c5ea6000579249c7ccbfa99b0.jpg" alt="" />
+            <img className={styles.profile_pic} src={avatar} alt="" />
           </div>
 
           <div className={styles.user_info}>

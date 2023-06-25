@@ -10,7 +10,6 @@ import styles from '../styles/Mentees.module.css';
 import VideoIcon from '../assets/icons/videos_icon.svg';
 import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
-import YouthIcon from '../assets/icons/youth_icon.svg';
 import LinkIcon from '../assets/icons/link_icon.svg';
 import ClearedIcon from '../assets/icons/cleared.svg';
 import { storage } from './firebase';
@@ -19,7 +18,7 @@ import * as api from '../api';
 function ExpandedMentee({ profile }) {
   const location = useLocation();
   const {
-    id, firstName, lastName, age, caregiver, medicalClearance,
+    id, firstName, lastName, age, caregiver, medicalClearance, avatar,
   } = location.state;
   const [recents, setRecents] = useState([]);
   const [folderArray, setFolderArray] = useState([]);
@@ -149,7 +148,7 @@ function ExpandedMentee({ profile }) {
       <div className={styles.profile_container}>
         <div>
           <div className={styles.pfp}>
-            <img className={styles.profile_pic} src={YouthIcon} alt="" />
+            <img className={styles.profile_pic} src={avatar} alt="" />
           </div>
 
           <div className={styles.user_info}>
@@ -163,7 +162,7 @@ function ExpandedMentee({ profile }) {
 
           <div className={styles.service_area}>
             <button type="button" onClick={updateClearance}>
-              {cleared && <img alt="medical clearance cleared" src={ClearedIcon} />}
+              {cleared && <img alt="media clearance cleared" src={ClearedIcon} />}
               {!cleared && <p>NOT CLEARED</p>}
             </button>
             <p>
@@ -187,7 +186,7 @@ function ExpandedMentee({ profile }) {
               <Link
                 to={`./folder_${folder}`}
                 state={{
-                  id, folderName: folder, firstName, lastName, age, caregiver, medicalClearance,
+                  id, folderName: folder, firstName, lastName, age, caregiver, medicalClearance, avatar,
                 }}
               >
                 {folder === 'Videos' && <img src={VideoIcon} alt="video icon" />}

@@ -8,6 +8,66 @@ a{
     padding: 50px 0px 25px 50px;
 }
 
+.dialogContainer {
+    padding: 20px;
+}
+
+.dialog_h3{
+    color: var(--text, #3F3F3F);
+    font-size: 23px;
+    font-family: News Gothic;
+    font-weight: 700;
+}
+
+.dialog_h3_2 {
+    margin-top: 30px;
+}
+
+.head_container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.head_container button {
+    display: flex;
+    padding: 13px 30px;
+    align-items: flex-start;
+    gap: 15px;
+    margin-right: 50px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 12px;
+    background: #156DBF;
+    color: #FFF;
+    font-size: 18px;
+    font-family: News Gothic;
+    font-weight: 700;
+}
+
+.head_container h1 {
+    color: #000;
+    font-family: News Gothic;
+    font-weight: 700;
+}
+
+.labels_container{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.labels_container p{
+    margin: 0;
+    margin-top: 15px !important;
+    margin-bottom: 5px;
+    width: 50%;
+    color: var(--text, #3F3F3F);
+    font-size: 16px;
+    font-family: News Gothic;
+    font-weight: 500;
+}
+
 .folders_page{
     background-image: url('../assets/images/banner.svg');
     background-repeat: no-repeat;
@@ -139,3 +199,27 @@ a{
 .mediaForm p{
     margin-bottom: 0 !important;
 }
+
+input[type="radio"] {
+    display: none;
+  }
+
+  /* Style the label to appear as clickable images */
+  .image_label {
+    z-index: 100;
+    display: inline-block;
+    cursor: pointer;
+    padding: 0px;
+  }
+
+  /* Add styles for the selected image */
+  .image_label.selected {
+    border: 5px solid #00AAEE !important;
+    border-radius: 50%;
+  }
+
+  .image_label img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+  }
