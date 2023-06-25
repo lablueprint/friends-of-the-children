@@ -164,7 +164,7 @@ function MessageWall({ profile }) {
   return (
     role.toLowerCase() === 'admin' ? (
       <div>
-        <h1 className={styles.announcement}>Message Wall</h1>
+        <h1 className={styles.announcement}>Announcements</h1>
         {messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
         {
           messages.filter((message) => (message.pinned)).map(
