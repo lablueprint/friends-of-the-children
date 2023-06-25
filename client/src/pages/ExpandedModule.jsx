@@ -38,7 +38,6 @@ function ExpandedModule({ profile }) {
   const [openNewUploadPopup, setOpenNewUploadPopup] = useState(false);
   const [openNewModulePopup, setOpenNewModulePopup] = useState(false);
   const [openNewFilePopup, setOpenNewFilePopup] = useState(false);
-  const [openFilePopup, setOpenFilePopup] = useState(false);
 
   const [currModuleFiles, setCurrModuleFiles] = useState([]);
 
@@ -51,6 +50,7 @@ function ExpandedModule({ profile }) {
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
+  const [openFilePopups, setOpenFilePopups] = useState(Array(files.length).fill(false));
 
   const getModulebyIdfunc = async (tempId, tempcurrRole) => {
     // data object structured as {data, children_array}
@@ -96,18 +96,24 @@ function ExpandedModule({ profile }) {
 
   // opening file popup
   const handleClickOpenFilePopup = (file) => {
-    setOpenFilePopup(true);
+    const fileIndex = files.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = true;
+    setOpenFilePopups(updatedOpenFilePopups);
     setFileToDisplay(file);
+  };
+
+  const handleCloseFilePopup = (file) => {
+    const fileIndex = files.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = false;
+    setOpenFilePopups(updatedOpenFilePopups);
   };
 
   const handleClose = () => {
     setOpenNewUploadPopup(false);
     setOpenNewModulePopup(false);
     setOpenNewFilePopup(false);
-  };
-
-  const handleCloseFilePopup = () => {
-    setOpenFilePopup(false);
   };
 
   const handleDeleteFilesClose = () => {
@@ -349,94 +355,96 @@ function ExpandedModule({ profile }) {
           )}
         </div>
 
-        {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
-        {files.map((file) => (
-          <div key={file.url} className={styles.fileContainer}>
-            {(file.fileType.includes('image')) && (
-            <div>
-              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                <img className={styles.displayImg} src={file.url} alt={file.fileName} />
-              </div>
-              <div className={styles.descriptionContainer}>
-                <div
-                  key={file.fileLink}
-                  onMouseEnter={() => handleMouseEnter(file.fileLink)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <img src={file.imageSrc} alt={file.name} />
-                  {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
-                    <Checkbox
-                      checked={checked.includes(file.fileLink)}
-                      onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                      className={styles.checkbox}
-                    />
-                  ) : (<img src={imgIcon} alt="img icon" />)}
+        <div className={styles.filesContainer}>
+          <h5>Files</h5>
+          {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
+          {files.map((file, index) => (
+            <div key={file.url} className={styles.fileContainer}>
+              {(file.fileType.includes('image')) && (
+              <div>
+                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <img className={styles.displayImg} src={file.url} alt={file.fileName} />
                 </div>
-                <div className={styles.fileName}>{file.fileName}</div>
-              </div>
-            </div>
-            )}
-            {(file.fileType.includes('video')) && (
-            <div>
-              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
-                  <track default kind="captions" />
-                </video>
-              </div>
-              <div className={styles.descriptionContainer}>
-                <div
-                  key={file.fileLink}
-                  onMouseEnter={() => handleMouseEnter(file.fileLink)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <img src={file.imageSrc} alt={file.name} />
-                  {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
-                    <Checkbox
-                      checked={checked.includes(file.fileLink)}
-                      onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                      className={styles.checkbox}
-                    />
-                  ) : (<img src={vidIcon} alt="video icon" />)}
+                <div className={styles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={styles.checkbox}
+                      />
+                    ) : (<img src={imgIcon} alt="img icon" />)}
+                  </div>
+                  <div className={styles.fileName}>{file.fileName}</div>
                 </div>
-                <div className={styles.fileName}>{file.fileName}</div>
               </div>
-            </div>
-            )}
-            {(file.fileType.includes('pdf')) && (
-            <div>
-              <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                <embed className={styles.preview} src={file.url} alt={file.fileName} />
-              </div>
-              <div className={styles.descriptionContainer}>
-                <div
-                  key={file.fileLink}
-                  onMouseEnter={() => handleMouseEnter(file.fileLink)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <img src={file.imageSrc} alt={file.name} />
-                  {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
-                    <Checkbox
-                      checked={checked.includes(file.fileLink)}
-                      onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                      className={styles.checkbox}
-                    />
-                  ) : (<img src={pdfIcon} alt="pdf icon" />)}
+              )}
+              {(file.fileType.includes('video')) && (
+              <div>
+                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
+                    <track default kind="captions" />
+                  </video>
                 </div>
-                <div className={styles.fileName}>{file.fileName}</div>
+                <div className={styles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={styles.checkbox}
+                      />
+                    ) : (<img src={vidIcon} alt="video icon" />)}
+                  </div>
+                  <div className={styles.fileName}>{file.fileName}</div>
+                </div>
               </div>
+              )}
+              {(file.fileType.includes('pdf')) && (
+              <div>
+                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <embed className={styles.displayImg} src={`${file.url}`} alt={file.fileName} />
+                </div>
+                <div className={styles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={styles.checkbox}
+                      />
+                    ) : (<img src={pdfIcon} alt="pdf icon" />)}
+                  </div>
+                  <div className={`${styles.fileName} ${styles.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
+                </div>
+              </div>
+              )}
+              {openFilePopups[index] && (
+              <FilePopup
+                file={fileToDisplay}
+                open={openFilePopups[index]}
+                handleClose={() => handleCloseFilePopup(file)}
+              />
+              )}
             </div>
-            )}
-            {openFilePopup && (
-            <FilePopup
-              file={fileToDisplay}
-              open={openFilePopup}
-              handleClose={handleCloseFilePopup}
-            />
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-
       <div>
         { openDeleteFilesPopup && (checked.length > 0 || checkedModules.length > 0)
           ? (

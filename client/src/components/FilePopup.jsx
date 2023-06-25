@@ -29,7 +29,7 @@ export default function FilePopup(props) {
           )}
           {(file.fileType.includes('pdf')) && (
             <div className={styles.fileDisplay}>
-              <embed className={styles.preview} src={file.url} alt={file.fileName} />
+              <embed className={styles.displayPdf} src={file.url} alt={file.fileName} />
             </div>
           )}
         </DialogContent>
