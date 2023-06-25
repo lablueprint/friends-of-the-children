@@ -22,6 +22,7 @@ import {
 } from './pages';
 import NavBar from './components/NavBar';
 import ModuleNav from './components/ModuleNav';
+import MenteeNav from './components/MenteeNav';
 
 function App() {
   const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
@@ -43,11 +44,14 @@ function App() {
         <div className="App">
           <div className={styles.wrapper}>
             {(currUser.role === 'Admin' || currUser.approved) && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
-            <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+            <div className={`${locationPath.includes('/resources') || locationPath.includes('/mentees/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
               {(locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/') && (
                 <ModuleNav profile={currUser} />
               )}
-              <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+              {locationPath.includes('/mentees/') && (
+                <MenteeNav profile={currUser} />
+              )}
+              <div className={`${locationPath.includes('/resources') || locationPath.includes('/mentees/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
                 <Routes>
                   {currUser.role === 'Admin' || currUser.approved ? <Route path="/" element={(<Resources profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
                   <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />

@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import {
+  ref, uploadBytes, getDownloadURL, getMetadata,
+} from 'firebase/storage';
+import { Checkbox } from '@mui/material';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import FilePopup from '../components/FilePopup';
 import styles from '../styles/Mentees.module.css';
 import styles2 from '../styles/Modules.module.css';
 import VideoIcon from '../assets/icons/videos_icon.svg';
 import ImageIcon from '../assets/icons/images_icon.svg';
 import FlyerIcon from '../assets/icons/flyers_icon.svg';
 import LinkIcon from '../assets/icons/link_icon.svg';
+import heartIcon from '../assets/icons/heart.svg';
+import filledHeart from '../assets/icons/filled_heart.svg';
+import imgIcon from '../assets/icons/file_img.svg';
+import vidIcon from '../assets/icons/file_vid.svg';
+import pdfIcon from '../assets/icons/file_pdf.svg';
 import ClearedIcon from '../assets/icons/cleared.svg';
 import NotClearedIcon from '../assets/icons/not_cleared.svg';
 import HomeIcon from '../assets/icons/home.svg';
@@ -22,14 +31,20 @@ import * as api from '../api';
 
 function ExpandedMentee({ profile }) {
   const location = useLocation();
+  const { menteeObj } = location.state;
   const {
     id, firstName, lastName, caregiverFirst, caregiverLast, address, phone, avatar,
-  } = location.state;
+  } = menteeObj;
   const [recents, setRecents] = useState([]);
-  const [folderArray, setFolderArray] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [customFolders, setCustomFolders] = useState([]);
+  const [defaultFolders, setDefaultFolders] = useState([]);
   const [fileUploadOpen, setfileUploadOpen] = useState(false);
   const [caregiverOpen, setCaregiverOpen] = useState(false);
+  const [checked, setChecked] = useState([]);
+  const [hoveredFile, setHoveredFile] = useState(null);
+  const [openFilePopups, setOpenFilePopups] = useState(Array(recents.length).fill(false));
+  const [fileToDisplay, setFileToDisplay] = useState({});
+  const [favorites, setFavorites] = useState([]); // array of favorite file objects
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
   const [cleared, setCleared] = useState();
@@ -37,52 +52,87 @@ function ExpandedMentee({ profile }) {
   const [favTab, setFavTab] = useState(false); // which tab you're on
   const role = (profile.role).toLowerCase();
 
-  // called upon submitting the form that adds a new folder
-  const addFolder = async (e) => {
-    e.preventDefault();
-    const name = e.target.folderName.value;
-    // call api function to add folder to database
-    api.addMenteeFolder(id, name).then(() => {
-      setFolderArray([...folderArray, name]);
-      setOpen(false);
-      e.target.reset();
-    });
+  console.log(recents);
+
+  const createFileObjects = async (fileLinks) => {
+    setRecents([]);
+    const fileContents = [];
+    if (fileLinks.length > 0) {
+      await Promise.all(fileLinks.map(async (fileLink) => {
+        const {
+          fileName, url, fileType, category,
+        } = fileLink;
+        const spaceRef = ref(storage, fileLink.url);
+        const file = await getMetadata(spaceRef);
+        const fileSize = `${(file.size / 1048576).toFixed(1)} MB`;
+
+        const timeString = file.timeCreated;
+        const date = new Date(timeString);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const fileDate = date.toLocaleString('en-US', options);
+
+        fileContents.push({
+          url, fileType, fileName, category, fileSize, fileDate,
+        });
+      }));
+      // sorting files alphabetically
+      fileContents.sort((a, b) => {
+        if (a.category < b.category) {
+          return -1;
+        }
+        if (a.category > b.category) {
+          return 1;
+        }
+        return 0;
+      });
+      setRecents(fileContents);
+    }
   };
 
   // have all of the mentees' folders and root files display on page
   useEffect(() => {
     api.getMenteeFolders(id).then((res) => {
       if (res !== undefined) {
-        const { tempFolders, clear, age } = res.data;
-        setFolderArray(tempFolders);
+        const {
+          tempFolders, customs, clear, age,
+        } = res.data;
+        setDefaultFolders(tempFolders);
+        setCustomFolders(customs);
         setCleared(clear);
         setCurrAge(age);
       }
     });
     api.getMenteeFiles(id, 'Root').then((files) => {
-      setRecents(files.data);
+      if (files) {
+        createFileObjects(files.data);
+      }
+    });
+    api.getMenteeFiles(id, 'favorites').then((files) => {
+      if (files) {
+        setFavorites(files.data);
+      }
     });
   }, []);
 
   // called upon submitting the form that uploads new files
   const addMedia = (e) => {
     e.preventDefault();
-    const title = e.target.title.value;
+    const fileName = e.target.title.value;
     const folderName = e.target.folders.value;
-    let fileName;
+    let fileUrl;
     let fileType;
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileName = files.name;
+      fileUrl = files.name;
       fileType = files.type;
-      const storageRef = ref(storage, `/images/${fileName}`);
+      const storageRef = ref(storage, `/images/${fileUrl}`);
       uploadBytes(storageRef, files).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
           const tempArr = recents;
           const data = {
-            title,
-            fileUrl: url,
+            fileName,
+            url,
             fileType,
           };
           tempArr.push(data);
@@ -97,12 +147,12 @@ function ExpandedMentee({ profile }) {
           });
       });
     } else if (isLink) { // reading text input for links, not file input
-      fileName = title;
+      fileUrl = fileName;
       fileType = 'link';
       const tempArr = recents;
       const data = {
-        title,
-        fileUrl: e.target.link.value,
+        fileName,
+        url: e.target.link.value,
         fileType,
       };
       tempArr.push(data);
@@ -111,16 +161,6 @@ function ExpandedMentee({ profile }) {
       setfileUploadOpen(false);
       e.target.reset();
     }
-  };
-
-  // when click on add new folder button
-  const addNewFolder = () => {
-    setOpen(true);
-  };
-
-  // when close add new folder popup
-  const handleClose = () => {
-    setOpen(false);
   };
 
   // when click on upload file button
@@ -149,6 +189,55 @@ function ExpandedMentee({ profile }) {
   const updateClearance = () => {
     api.updateClearance(id, cleared);
     setCleared(!cleared);
+  };
+
+  const handleMouseEnter = (fileId) => {
+    setHoveredFile(fileId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredFile(null);
+  };
+
+  const handleCheckboxChange = (event, fileObject) => {
+    if (checked.includes(fileObject)) {
+      setChecked(checked.filter((file) => (file !== fileObject)));
+      return;
+    }
+
+    setChecked([...checked, fileObject]);
+  };
+
+  // opening file popup
+  const handleClickOpenFilePopup = (file) => {
+    const fileIndex = recents.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = true;
+    setOpenFilePopups(updatedOpenFilePopups);
+    setFileToDisplay(file);
+  };
+
+  const handleCloseFilePopup = (file) => {
+    const fileIndex = recents.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = false;
+    setOpenFilePopups(updatedOpenFilePopups);
+  };
+
+  const handleFillHeart = (index, file) => {
+    // if heart is filled
+    if (!favorites.some((element) => element.url === file.url)) {
+      // update favorites state array
+      const tempFavs = [...favorites];
+      tempFavs.push(file);
+      setFavorites(tempFavs);
+      // store this new state into the database
+      api.updateFileLinksField(file, id, 'files', 'addFile', 'mentees');
+    } else {
+      const tempFavs = favorites.filter((element) => element.url !== file.url);
+      setFavorites(tempFavs);
+      api.updateFileLinksField(file, id, 'files', 'removeFile', 'mentees');
+    }
   };
 
   return (
@@ -212,13 +301,13 @@ function ExpandedMentee({ profile }) {
       <div className={styles.line} />
 
       <div className={styles.folders_map}>
-        {folderArray.map((folder) => (
+        {defaultFolders.map((folder) => (
           folder !== 'Root' && (
             <div className={styles.folder_container}>
               <Link
-                to={`./folder_${folder}`}
+                to={`./All_${folder}`}
                 state={{
-                  id, folderName: folder, firstName, lastName, avatar,
+                  menteeObj: { ...menteeObj, folderName: folder },
                 }}
               >
                 <div className={styles.folder_content}>
@@ -233,57 +322,65 @@ function ExpandedMentee({ profile }) {
             </div>
           )
         ))}
-        {role === 'mentor' && (
-        <Button variant="outlined" onClick={addNewFolder}>
-          + Add a New Folder
-        </Button>
-        )}
       </div>
 
-      <h3>Recent Uploads</h3>
-      {recents.map((file) => (
-        <div className={styles.img_container}>
-          {(file.fileType.includes('image')) && (
-          <div>
-            <img className={styles.media_image} src={file.fileUrl} alt={file.title} />
+      <div className={styles2.fieldSpan}>
+        <h5>File Name</h5>
+        <h5>File Size</h5>
+        <h5>Date Uploaded</h5>
+        <h5>Category</h5>
+      </div>
+      <div className={styles2.resourcesDisplay}>
+        {/* conditional rendering based on which tab (All/Favorites) ur on */}
+        {(favTab ? favorites : recents).map((file, index) => (
+          <div key={file.url} className={styles2.spanContainer}>
+            <div className={styles2.spanFile}>
+              <div
+                key={file.fileName}
+                onMouseEnter={() => handleMouseEnter(file.fileName)}
+                onMouseLeave={handleMouseLeave}
+              >
+                {(checked.length > 0) || (hoveredFile === file.fileName) || (checked.includes(file)) ? (
+                  <Checkbox
+                    checked={checked.includes(file)}
+                    onChange={(event) => handleCheckboxChange(event, file)}
+                    className={styles2.checkbox}
+                  />
+                ) : (
+                  <>
+                    {(file.fileType.includes('image')) && <img src={imgIcon} alt="img icon" />}
+                    {(file.fileType.includes('video')) && <img src={vidIcon} alt="vid icon" />}
+                    {((file.fileType.includes('pdf')) || file.fileType.includes('text')) && <img src={pdfIcon} alt="pdf icon" />}
+                  </>
+                )}
+              </div>
+              <div onClick={() => (handleClickOpenFilePopup(file))} role="presentation" className={styles2.fileName}>
+                {file.fileName}
+              </div>
+              <div><h5>{file.fileSize}</h5></div>
+              <div><h5>{file.fileDate}</h5></div>
+              <h5>{file.category}</h5>
+              <button
+                type="button"
+                className={styles2.heart_button}
+                onClick={() => { handleFillHeart(index, file); }}
+              >
+                {favorites.some((element) => element.url === file.url) ? (
+                  <img src={filledHeart} alt="favorite file" />
+                ) : (
+                  <img src={heartIcon} alt="not a favorite file" />
+                )}
+              </button>
+            </div>
+            {openFilePopups[index] && (
+            <FilePopup
+              file={fileToDisplay}
+              open={openFilePopups[index]}
+              handleClose={() => handleCloseFilePopup(file)}
+            />
+            )}
           </div>
-          )}
-          {(file.fileType.includes('video')) && (
-          <div>
-            <video className={styles.media_image} controls src={file.fileUrl} alt={file.title}>
-              <track default kind="captions" />
-            </video>
-          </div>
-          )}
-          {(file.fileType.includes('link')) && (
-          <div>
-            <li><a href={file.fileUrl} target="_blank" rel="noreferrer">{file.fileUrl}</a></li>
-          </div>
-          )}
-          {(file.fileType.includes('pdf')) && (
-          <div key={file.url} className="pdf">
-            <embed className={styles.media_image} src={file.fileUrl} alt={file.title} />
-          </div>
-          )}
-          <p>{file.title}</p>
-        </div>
-      ))}
-
-      {/* create a new folder */}
-      <div>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <h5>Create New Folder</h5>
-            Title
-            <form onSubmit={(e) => addFolder(e)}>
-              <input type="text" name="folderName" required />
-              <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button type="submit">Save</Button>
-              </DialogActions>
-            </form>
-          </DialogContent>
-        </Dialog>
+        ))}
       </div>
 
       {/* add file */}
@@ -327,10 +424,9 @@ function ExpandedMentee({ profile }) {
                 <p>Folder</p>
                 <select name="folders">
                   <option value="Root">Select Folder</option>
-                  {folderArray.map((folder) => (
+                  {customFolders.map((folder) => (
                     (
-                      folder !== 'Flyers' && folder !== 'Videos' && folder !== 'Images' && folder !== 'Links'
-                      && <option value={folder}>{folder}</option>
+                      <option value={folder}>{folder}</option>
                     )
                   ))}
                 </select>

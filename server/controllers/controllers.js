@@ -231,6 +231,7 @@ const getMenteeFolders = async (req, res) => {
   try {
     const { id } = req.params;
     const tempFolders = [];
+    const customs = [];
     let clear;
     let age;
     db.collection('mentees').doc(id).get().then((sc) => {
@@ -245,11 +246,19 @@ const getMenteeFolders = async (req, res) => {
         }
         sc.forEach((currDoc) => {
           const folderName = currDoc.id;
-          if (folderName !== 'Root') { tempFolders.push(folderName); }
+          if (folderName !== 'Root') {
+            if (folderName !== 'Videos' && folderName !== 'Images' && folderName !== 'Flyers' && folderName !== 'Links') {
+              customs.push(folderName);
+            } else {
+              tempFolders.push(folderName);
+            }
+          }
         });
       })
       .then(() => {
-        res.status(202).json({ tempFolders, clear, age });
+        res.status(202).json({
+          customs, tempFolders, clear, age,
+        });
       });
   } catch (error) {
     res.status(400).json(error);
@@ -458,7 +467,7 @@ const recursivelyDeleteModules = async (moduleID) => {
     // delete the current module
     await db.collection('modules').doc(moduleID).delete();
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -470,6 +479,18 @@ const deleteModule = async (req, res) => {
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete module');
+  }
+};
+
+// deletes a folder from a mentee
+const deleteFolder = async (req, res) => {
+  const { folderID } = req.params;
+  try {
+    const folderRef = db.collection('modules').doc(folderID);
+    await folderRef.delete();
+    res.status(202).json(`successfully deleted folder: ${folderID}`);
+  } catch (error) {
+    res.status(400).json(`could not delete folder: ${folderID}`);
   }
 };
 
@@ -555,39 +576,35 @@ const updateTextField = async (req, res) => {
 const updateFileLinksField = async (req, res) => {
   try {
     const {
-      id, field, action,
+      id, field, action, collectionName,
     } = req.params;
     const newFileLinks = req.body;
 
     if (action === 'addFile') {
-      const currRef = db.collection('modules').doc(id);
+      const currRef = collectionName === 'mentees' ? db.collection('mentees').doc(id).collection('folders').doc('favorites') : db.collection(collectionName).doc(id);
       const currDoc = await currRef.get();
-      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+      const currFiles = currDoc.exists ? currDoc.data()[field] || [] : [];
       const currLinks = newFileLinks || [];
       const updatedLinks = currFiles.concat(currLinks);
-      if (field === 'fileLinks') {
-        if (currDoc.exists) {
-          await currRef.update({ fileLinks: updatedLinks }).catch((error) => {
-            console.log(error);
-          });
-        } else {
-          await currRef.set({ fileLinks: updatedLinks }).catch((error) => {
-            console.log(error);
-          });
-        }
+      if (currDoc.exists) {
+        await currRef.update({ [field]: updatedLinks }).catch((error) => {
+          console.log(error);
+        });
+      } else {
+        await currRef.set({ [field]: updatedLinks }).catch((error) => {
+          console.log(error);
+        });
       }
     } else if (action === 'removeFile') {
-      const currRef = db.collection('modules').doc(id);
+      const currRef = collectionName === 'mentees' ? db.collection('mentees').doc(id).collection('folders').doc('favorites') : db.collection(collectionName).doc(id);
       const currDoc = await currRef.get();
-      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+      const currFiles = currDoc.exists ? currDoc.data()[field] || [] : [];
       const updatedLinks = currFiles.filter((file) => file.url !== newFileLinks.url);
-      if (field === 'fileLinks') {
-        await currRef
-          .update({ fileLinks: updatedLinks })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+      await currRef
+        .update({ [field]: updatedLinks })
+        .catch((error) => {
+          console.log(error);
+        });
     }
     res.status(202).json({});
   } catch (error) {
@@ -973,6 +990,7 @@ export {
   batchAddToList,
   batchDeleteFromList,
   deleteModule,
+  deleteFolder,
   deleteFiles,
   addModule,
 };

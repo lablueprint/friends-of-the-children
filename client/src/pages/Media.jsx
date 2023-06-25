@@ -4,26 +4,43 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import {
+  Checkbox,
+} from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import imgIcon from '../assets/icons/file_img.svg';
+import vidIcon from '../assets/icons/file_vid.svg';
+import pdfIcon from '../assets/icons/file_pdf.svg';
+import FilePopup from '../components/FilePopup';
 import styles from '../styles/Mentees.module.css';
+import styles2 from '../styles/Modules.module.css';
 import { storage } from './firebase';
 import * as api from '../api';
 
 function Media({ profile }) {
   const location = useLocation();
-  // media is the string of file links in this folder
+  // get the state of the location path (includes all the mentee's information)
   const {
-    id, folderName, firstName, lastName, avatar,
+    menteeObj,
   } = location.state;
+  const {
+    id, firstName, lastName, folderName,
+  } = menteeObj;
   // parse media string to an array
   const [open, setOpen] = useState(false);
   // this is the array of file links
   const [mediaArray, setMediaArray] = useState([]);
+  const role = (profile.role).toLowerCase();
   // media states for dialog opening/closing views
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
-  const role = (profile.role).toLowerCase();
+  // which tab you're on
+  const [favTab, setFavTab] = useState(false);
+  const [checked, setChecked] = useState([]);
+  const [hoveredFile, setHoveredFile] = useState(null);
+  const [fileToDisplay, setFileToDisplay] = useState({});
+  const [openFilePopups, setOpenFilePopups] = useState(Array(mediaArray.length).fill(false));
 
   // get the current folder contents on first load
   useEffect(() => {
@@ -32,25 +49,27 @@ function Media({ profile }) {
     });
   }, []);
 
+  console.log(mediaArray);
+
   // creates new object for the file, updates mediaArray, and calls updateMentee
   const addMedia = (e) => {
     e.preventDefault();
-    const title = e.target.title.value;
-    let fileName;
+    const fileName = e.target.title.value;
+    let fileUrl;
     let fileType;
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileName = files.name;
+      fileUrl = files.name;
       fileType = files.type;
 
-      const storageRef = ref(storage, `/images/${fileName}`);
+      const storageRef = ref(storage, `/images/${fileUrl}`);
       uploadBytes(storageRef, files).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
           const tempArr = mediaArray;
           const data = {
-            title,
-            fileUrl: url,
+            fileName,
+            url,
             fileType,
           };
           tempArr.push(data);
@@ -64,12 +83,12 @@ function Media({ profile }) {
           });
       });
     } else if (isLink) { // reading text input for links, not file input
-      fileName = title;
+      fileUrl = fileName;
       fileType = 'link';
       const tempArr = mediaArray;
       const data = {
-        title,
-        fileUrl: e.target.link.value,
+        fileName,
+        url: e.target.link.value,
         fileType,
       };
       tempArr.push(data);
@@ -86,8 +105,42 @@ function Media({ profile }) {
     setIsLink(false);
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
+  };
+
+  // opening file popup
+  const handleClickOpenFilePopup = (file) => {
+    const fileIndex = mediaArray.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = true;
+    setOpenFilePopups(updatedOpenFilePopups);
+    setFileToDisplay(file);
+  };
+
+  const handleCloseFilePopup = (file) => {
+    const fileIndex = mediaArray.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = false;
+    setOpenFilePopups(updatedOpenFilePopups);
+  };
+
+  const handleMouseEnter = (fileId) => {
+    setHoveredFile(fileId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredFile(null);
+  };
+
+  const handleCheckboxChange = (event, fileName) => {
+    if (checked.includes(fileName)) {
+      setChecked(checked.filter((file) => (file !== fileName)));
+      return;
+    }
+
+    setChecked([...checked, fileName]);
   };
 
   return (
@@ -103,48 +156,113 @@ function Media({ profile }) {
 
       <div className={styles.profile_container}>
         <div>
-          <div className={styles.pfp}>
-            <img className={styles.profile_pic} src={avatar} alt="" />
+          <div className={styles.media_heading_container}>
+            <h3>{`${folderName}`}</h3>
+            <div className={styles.buttons}>
+              <button type="button" className={styles2.editModule}>
+                Edit Module
+              </button>
+
+              {/* QUESTION: should users be able to directly add into the images/videos/flyers folders? */}
+              {role === 'mentor' && (
+              <button type="button" onClick={handleClickOpen} className={styles2.addModule}>
+                + New Upload
+              </button>
+              )}
+            </div>
           </div>
-
-          <h3>{`${folderName}`}</h3>
-
-          {/* users cannot directly add into the images/videos/flyers folders? */}
-          {role === 'mentor' && folderName !== 'Images' && folderName !== 'Videos' && folderName !== 'Flyers' && folderName !== 'Links' && (
-          <Button variant="contained" onClick={handleClickOpen}>
-            + Add Media
-          </Button>
-          )}
-
+          <div className={styles2.tab_bar}>
+            <button className={`${!favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(false); }}>All</button>
+            <button className={`${favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(true); }}>Favorites</button>
+          </div>
+          <div className={styles.line} />
         </div>
       </div>
 
       {/* mapping each file in the array to a little card element onscreen */}
-      {mediaArray.map((file) => (
-        <div className={styles.img_container}>
+      {/* EDIT: COPIED FROM EXPANDED MODULE */}
+      {mediaArray.map((file, index) => (
+        <div key={file.url} className={styles2.fileContainer}>
           {(file.fileType.includes('image')) && (
           <div>
-            <img className={styles.media_image} src={file.fileUrl} alt={file.title} />
+            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <img className={styles2.displayImg} src={file.url} alt={file.fileName} />
+            </div>
+            <div className={styles2.descriptionContainer}>
+              <div
+                key={file.url}
+                onMouseEnter={() => handleMouseEnter(file.url)}
+                onMouseLeave={handleMouseLeave}
+              >
+                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                  <Checkbox
+                    checked={checked.includes(file.url)}
+                    onChange={(event) => handleCheckboxChange(event, file.url)}
+                    className={styles2.checkbox}
+                  />
+                ) : (<img src={imgIcon} alt="img icon" />)}
+              </div>
+              <div className={styles2.fileName}>{file.fileName}</div>
+            </div>
           </div>
           )}
           {(file.fileType.includes('video')) && (
           <div>
-            <video className={styles.media_image} controls src={file.fileUrl} alt={file.title}>
-              <track default kind="captions" />
-            </video>
-          </div>
-          )}
-          {(file.fileType.includes('link')) && (
-          <div>
-            <li><a href={file.fileUrl} target="_blank" rel="noreferrer">{file.fileUrl}</a></li>
+            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <video className={styles2.displayImg} controls src={file.url} alt={file.fileName}>
+                <track default kind="captions" />
+              </video>
+            </div>
+            <div className={styles2.descriptionContainer}>
+              <div
+                key={file.url}
+                onMouseEnter={() => handleMouseEnter(file.url)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img src={file.imageSrc} alt={file.name} />
+                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                  <Checkbox
+                    checked={checked.includes(file.url)}
+                    onChange={(event) => handleCheckboxChange(event, file.url)}
+                    className={styles2.checkbox}
+                  />
+                ) : (<img src={vidIcon} alt="video icon" />)}
+              </div>
+              <div className={styles2.fileName}>{file.fileName}</div>
+            </div>
           </div>
           )}
           {(file.fileType.includes('pdf')) && (
-          <div key={file.url} className="pdf">
-            <embed className={styles.media_image} src={file.fileUrl} alt={file.title} />
+          <div>
+            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <embed className={styles2.displayImg} src={file.url} alt={file.fileName} />
+            </div>
+            <div className={styles2.descriptionContainer}>
+              <div
+                key={file.url}
+                onMouseEnter={() => handleMouseEnter(file.url)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img src={file.imageSrc} alt={file.name} />
+                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                  <Checkbox
+                    checked={checked.includes(file.url)}
+                    onChange={(event) => handleCheckboxChange(event, file.url)}
+                    className={styles2.checkbox}
+                  />
+                ) : (<img src={pdfIcon} alt="pdf icon" />)}
+              </div>
+              <div className={`${styles2.fileName} ${styles2.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
+            </div>
           </div>
           )}
-          <p>{file.title}</p>
+          {openFilePopups[index] && (
+          <FilePopup
+            file={fileToDisplay}
+            open={openFilePopups[index]}
+            handleClose={() => handleCloseFilePopup(file)}
+          />
+          )}
         </div>
       ))}
 

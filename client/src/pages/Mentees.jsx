@@ -163,7 +163,17 @@ function Mentees({ profile, updateAppProfile }) {
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiverFirst: mentee.caregiverFirstName, caregiverLast: mentee.caregiverLastName, address: mentee.address, phone: mentee.phone, avatar: mentee.avatar,
+                menteeObj: {
+                  id: mentee.id,
+                  firstName: mentee.firstName,
+                  lastName: mentee.lastName,
+                  age: mentee.age,
+                  caregiverFirst: mentee.caregiverFirstName,
+                  caregiverLast: mentee.caregiverLastName,
+                  address: mentee.address,
+                  phone: mentee.phone,
+                  avatar: mentee.avatar,
+                },
               }}
             >
               <div className={styles.mentee_card}>

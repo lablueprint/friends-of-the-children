@@ -71,15 +71,17 @@ a{
 .folders_page{
     background-repeat: no-repeat;
     background-size: 100%;
-    padding: 50px 0px 50px 80px;
+    padding: 50px 0px 50px 35px;
     text-align: left;
 }
 
 .folders_page h3{
-    font-weight: 500;
-    font-size: 1.3rem;
-    margin-top: 80px;
-    margin-bottom: 30px;
+  color: #000;
+  font-size: 25px;
+  font-family: News Gothic;
+  font-weight: 700;
+  margin-top: 10px;
+  margin-bottom: 30px;
 }
 
 .mentees_container{
@@ -335,7 +337,7 @@ input[type="radio"] {
   
   .buttons {
     display: flex;
-    gap: 10px;
+    gap: 20px;
   }
 
   .buttons :first-child{
@@ -352,3 +354,15 @@ input[type="radio"] {
     font-weight: 700;
   }
   
+  .line {
+    margin: 7px 10px 20px 10px;
+    height: 0px;
+    left: 230px;
+    border: 1.3px solid #CCC;
+  }
+
+  .media_heading_container {
+    display: flex;
+    justify-content: space-between;
+    height: 40px;
+  }

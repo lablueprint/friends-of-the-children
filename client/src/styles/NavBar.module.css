@@ -10,7 +10,7 @@
 .mainContent{
     width: 85%;
     justify-content: center;
-    margin-left: 15%;
+    margin-left: 13%;
     background-color: #F6FAFF;
     /* margin-top: 20px; */
 }
@@ -18,7 +18,7 @@
 .mainContent2{
     width: 90%;
     justify-content: center;
-    margin-left: 9%;
+    margin-left: 8%;
 }
 
 /* navbar container */
@@ -26,7 +26,7 @@
     height: 100%; /* 100% Full-height */
     position: fixed; /* Stay in place */
     z-index: 100;
-    width: 15%;
+    width: 13%;
     top: 0; /* Stay at the top */
     left: 0;
     background: #FFFFFF;
@@ -37,7 +37,7 @@
 .btn_info{
     display: inline-block;
     padding: .7rem;
-    padding-left: 30px;
+    padding-left: 25px;
     width: 100%;
     font-weight: 700;
     color: #000;
@@ -87,7 +87,7 @@
     height: 100%; /* 100% Full-height */
     position: fixed; /* Stay in place */
     z-index: 100;
-    width: 12%;
+    width: 11%;
     top: 0; /* Stay at the top */
     background: #1D2366;
     padding-top: 40px; /* Place content 40px from the top */
