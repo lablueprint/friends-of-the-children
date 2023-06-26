@@ -100,36 +100,6 @@ function Calendar({ profile }) {
   };
   const calendarInfo = getCalendarByRole();
 
-  // return (
-  //   <div>
-  //     <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
-  //     {currRole === 'admin' // enable add event form iff admin
-  //       ? <CalendarEventForm profile={profile} getCalendarRef={() => (calendarRef)} /> : null}
-  //     <div className={styles.calendar}>
-  //       <FullCalendar
-  //         ref={calendarRef}
-  //         plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
-  //         initialView="dayGridMonth"
-  //         selectable
-  //         editable={currRole === 'admin'}
-  //         eventDrop={currRole === 'admin' ? dropEvent : null}
-  //         selectMirror
-  //         dayMaxEvents
-  //         eventColor="rgba(0, 170, 238, 0.2)"
-  //         eventTextColor="black"
-  //         fixedWeekCount={false}
-  //         googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
-  //         eventSources={calendarInfo}
-  //         eventClick={handleEventClick}
-  //       />
-  //     </div>
-  //     <div className={styles.upcomingEvents}>
-  //       <div>
-  //         <UpcomingEvents profile={profile} getCalendarRef={() => (calendarRef)} />
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
   return (
     <div>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />

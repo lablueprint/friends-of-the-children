@@ -19,19 +19,6 @@ function UpcomingEvents({ profile, getCalendarRef }) {
     }, 500);
 
     return () => clearTimeout(timer);
-
-    //   events.forEach((event) => {
-    //     const eventStart = event.start;
-    //     const eventEnd = event.end;
-    //     const eventMonth = eventStart.toLocaleString('default', { month: 'long' });
-    //     const eventDay = eventStart.getDate();
-    //     const eventYear = eventStart.getFullYear();
-    //     const eventStartTime = eventStart.toLocaleString('en-US', { timeStyle: 'short' });
-    //     const eventEndTime = eventEnd ? eventEnd.toLocaleString('en-US', { timeStyle: 'short' }) : '';
-    //     const eventDescription = event.extendedProps.description || 'No description available'; // Extract description or provide a default value
-    //     console.log(`Event '${event.title}' is on ${eventMonth} ${eventDay}, ${eventYear} from ${eventStartTime} to ${eventEndTime}. Description: ${eventDescription}`);
-    //   });
-    // }
   };
 
   useEffect(getUpcomingEvents, []);
