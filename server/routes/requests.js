@@ -35,6 +35,7 @@ import {
   batchAddToList,
   batchDeleteFromList,
   deleteModule,
+  deleteFolder,
   deleteFiles,
   addModule,
 } from '../controllers/controllers.js';
@@ -107,6 +108,9 @@ router.post('/updateModuleChildren', updateModuleChildren);
 
 // deletes current module and all submodules underneath it
 router.delete('/deleteModule/:moduleID', deleteModule);
+
+// deletes current folder
+router.delete('/deleteFolder/:menteeID/:folderID', deleteFolder);
 
 // deletes file from module FileLink array field and Firebase storage
 router.delete('/deleteFiles', deleteFiles);

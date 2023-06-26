@@ -225,6 +225,16 @@ export const deleteModule = async (moduleID) => {
   }
 };
 
+// deletes the folder with folderID from the mentee with menteeID
+export const deleteFolder = async (menteeID, folderID) => {
+  try {
+    await axios.delete(`${url}/deleteFolder/${menteeID}/${folderID}`);
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete mentee folder');
+  }
+};
+
 // deletes all files within array filesToDelete belonging to module moduleID
 export const deleteFiles = async (moduleID, filesToDelete) => {
   try {

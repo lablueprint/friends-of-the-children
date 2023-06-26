@@ -28,8 +28,7 @@ function MenteeNav({ profile }) {
   const [open, setOpen] = useState(false);
   const [editModule, setEditModule] = useState(false);
   const [folderArray, setFolderArray] = useState([]);
-  const [openDeleteModulePopups, setOpenDeleteModulePopups] = useState(Array(folderArray.length).fill(false));
-  // const [title, setTitle] = useState('');
+  const [openDeleteFolderPopup, setOpenDeleteFolderPopup] = useState(Array(folderArray.length).fill(false));
 
   console.log(location.state);
   useEffect(() => {
@@ -51,24 +50,24 @@ function MenteeNav({ profile }) {
     setEditModule(true);
   };
 
-  const deleteModule = async (folder) => {
-    await api.deleteModule(folder);
-    setFolderArray(folderArray.filter((f) => f !== folder));
+  const deleteFolder = async (menteeID, folderID) => {
+    await api.deleteFolder(menteeID, folderID);
+    setFolderArray(folderArray.filter((f) => f !== folderID));
   };
 
-  const handleDeleteModulesOpen = (folder) => {
+  const handleDeleteFolderOpen = (folder) => {
     const fileIndex = folderArray.findIndex((f) => f === folder);
-    const updatedOpenDeleteModulePopups = [...openDeleteModulePopups];
-    updatedOpenDeleteModulePopups[fileIndex] = true;
-    setOpenDeleteModulePopups(updatedOpenDeleteModulePopups);
+    const updatedOpenDeleteFolderPopup = [...openDeleteFolderPopup];
+    updatedOpenDeleteFolderPopup[fileIndex] = true;
+    setOpenDeleteFolderPopup(updatedOpenDeleteFolderPopup);
   };
 
-  const handleDeleteModulesClose = (folder) => {
+  const handleDeleteFolderClose = (folder) => {
     const fileIndex = folderArray.findIndex((f) => f === folder);
     console.log(fileIndex);
-    const updatedOpenDeleteModulePopups = [...openDeleteModulePopups];
-    updatedOpenDeleteModulePopups[fileIndex] = false;
-    setOpenDeleteModulePopups(updatedOpenDeleteModulePopups);
+    const updatedOpenDeleteFolderPopup = [...openDeleteFolderPopup];
+    updatedOpenDeleteFolderPopup[fileIndex] = false;
+    setOpenDeleteFolderPopup(updatedOpenDeleteFolderPopup);
   };
 
   // when click on add new folder button
@@ -109,7 +108,7 @@ function MenteeNav({ profile }) {
           <div className={styles.nav2_btn_container} key={folder}>
             <div className={styles.deleteIconContainer}>
               {editModule && (
-                <button type="button" className={styles.delete_button} onClick={() => (handleDeleteModulesOpen(folder))}>
+                <button type="button" className={styles.delete_button} onClick={() => (handleDeleteFolderOpen(folder))}>
                   <img className={styles.deleteIcon} src={deleteIcon} alt="delete icon" />
                 </button>
               )}
@@ -132,7 +131,7 @@ function MenteeNav({ profile }) {
                 <div className={styles.nav2_btn_bottom_round} />
               </div>
             </div>
-            <Dialog open={openDeleteModulePopups[index]} onClose={handleDeleteModulesClose}>
+            <Dialog open={openDeleteFolderPopup[index]} onClose={handleDeleteFolderClose}>
               <div className={styles2.dialogContainer}>
                 <DialogTitle className={styles2.dialogTitle}>
                   You have chosen to delete
@@ -147,10 +146,10 @@ function MenteeNav({ profile }) {
                       Are you sure you want to continue with this action?
                     </div>
                     <div className={styles2.confirmButtons}>
-                      <button className={styles2.confirmCancel} type="button" onClick={() => (handleDeleteModulesClose(folder))}>
+                      <button className={styles2.confirmCancel} type="button" onClick={() => (handleDeleteFolderClose(folder))}>
                         Cancel
                       </button>
-                      <button type="button" className={styles2.confirmDelete} onClick={() => { deleteModule(folder); handleDeleteModulesClose(folder); }}>
+                      <button type="button" className={styles2.confirmDelete} onClick={() => { deleteFolder(id, folder); handleDeleteFolderClose(folder); }}>
                         Delete
                       </button>
                     </div>

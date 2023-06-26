@@ -484,9 +484,47 @@ const deleteModule = async (req, res) => {
 
 // deletes a folder from a mentee
 const deleteFolder = async (req, res) => {
-  const { folderID } = req.params;
+  const { menteeID, folderID } = req.params;
   try {
-    const folderRef = db.collection('modules').doc(folderID);
+    const folderRef = db.collection('mentees').doc(menteeID).collection('folders').doc(folderID);
+    const sc = await folderRef.get();
+    // iterate through the array of files in the doc
+    const { files } = sc.data();
+    files.forEach((file) => {
+      const { fileType } = file;
+      // remove file from Root folder
+      db.collection('mentees').doc(menteeID).collection('folders').doc('Root')
+        .update({
+          files: arrayRemove(file),
+        });
+      // if exists in favorites folder, remove file from there too
+      db.collection('mentees').doc(menteeID).collection('folders').doc('favorites')
+        .update({
+          files: arrayRemove(file),
+        });
+      // remove from the default folders
+      if (fileType.includes('image')) {
+        db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
+          .update({
+            files: arrayRemove(file),
+          });
+      } else if (fileType.includes('video')) {
+        db.collection('mentees').doc(menteeID).collection('folders').doc('Videos')
+          .update({
+            files: arrayRemove(file),
+          });
+      } else if (fileType === 'link') {
+        db.collection('mentees').doc(menteeID).collection('folders').doc('Links')
+          .update({
+            files: arrayRemove(file),
+          });
+      } else if (fileType.includes('pdf')) {
+        db.collection('mentees').doc(menteeID).collection('folders').doc('Flyers')
+          .update({
+            files: arrayRemove(file),
+          });
+      }
+    });
     await folderRef.delete();
     res.status(202).json(`successfully deleted folder: ${folderID}`);
   } catch (error) {
@@ -496,7 +534,6 @@ const deleteFolder = async (req, res) => {
 
 const deleteFiles = async (req, res) => {
   try {
-    // const currStorage = getStorage();
     // delete path from module files array field
     const { moduleID, filesToDelete } = req.body;
     console.log('TO DELETE: ', filesToDelete);
