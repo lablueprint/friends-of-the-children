@@ -44,11 +44,11 @@ export default function NewFilePopup(props) {
   const handleFileChange = (e) => {
     const urls = [];
     Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
-    setFileLinks((links) => [...links, ...urls]);
+    setFileLinks(urls);
   };
 
   const updateFileLinksFirebase = async () => {
-    await api.updateFileLinksField(fileLinks, id, 'fileLinks');
+    await api.updateFileLinksField(fileLinks, id, 'fileLinks', 'addFile');
     // console.log(fileLinks);
     // console.log(id);
     // // Only call firebase if edits were made
@@ -61,10 +61,10 @@ export default function NewFilePopup(props) {
     // }
   };
 
-  const submitForm = async (event) => { // adds a module to the root module page
+  const submitForm = async (event) => {
     event.preventDefault();
     updateFileLinksFirebase();
-    handleClose(); // closes add module popup
+    handleClose();
     window.location.reload(false);
   };
 
@@ -72,7 +72,7 @@ export default function NewFilePopup(props) {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={submitForm}>
-          <DialogTitle>New File</DialogTitle>
+          <DialogTitle>Add New File(s)</DialogTitle>
           <DialogContent>
             <FormLabel>Attachments:</FormLabel>
             <br />

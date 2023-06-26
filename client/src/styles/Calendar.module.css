@@ -6,6 +6,7 @@
 }
 
 .calendar{
+    flex: 1;
     background: #FFFFFF;
     box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.05);
     border-radius: 10px;
@@ -13,6 +14,8 @@
     max-width: 1100px;
     margin: 40px auto;
     font-family: 'Inter';
+    flex-basis: 70%; /* Adjust the width as needed */
+    padding: 1rem;
 }
 
 .calendar a{
@@ -38,3 +41,86 @@
 .fc .fc-toolbar-title {
     font-weight: 900 !important;
 }
+
+.calendar-container {
+    display: flex;
+    flex-wrap: row;
+  }
+
+  .upcoming-events {
+    flex: 1;
+    flex-basis: 30%; /* Adjust the width as needed */
+    padding: 1rem;
+    margin-left: 20px;
+    text-align: left;
+  }
+
+  .event {
+    width: 346px;
+    height: auto;
+    min-height: 130px;
+    background-color: #FFFFFF;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px;
+  }
+
+  .event-title {
+    font-weight: bold;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+    color: #3F3F3F;
+  }
+
+  .event-details {
+    margin-top: 0.5rem;
+  }
+
+  .contentContainer {
+    display: flex;
+    flex: 1;
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+  }
+  
+  .event-date {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+  }
+  
+  .event-date .event-date-time {
+    color: #989898; /* Change this to the desired color for the time */
+  }
+  
+  .event-date .event-date-date {
+    color: #555555; /* Change this to the desired color for the date */
+  }
+  
+
+  .event-description {
+    margin-top: 0.5rem;
+    align-self: flex-start;
+    color: #555555;
+  }
+
+  .event-time {
+    font-weight: bold;
+    margin-left: auto;
+  }
+
+  .event-date::before {
+    content: '\2022';
+    font-size: 24px; /* Adjust the font size as desired */
+    margin: 0 5px;
+    color: var(--event-color);
+  }
+
+  .event-details::after {
+    content: '\2022';
+    font-size: 8px;
+    margin-left: 5px;
+    margin-right: 5px;
+  }

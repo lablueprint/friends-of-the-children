@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import * as api from '../api';
 import NewModulePopup from './NewModulePopup';
 import styles from '../styles/NavBar.module.css';
+import styles2 from '../styles/Modules.module.css';
+import deleteIcon from '../assets/icons/delete_icon.svg';
 import editIcon from '../assets/icons/edit_pencil.svg';
 import addIcon from '../assets/icons/add_icon.svg';
 
@@ -16,25 +19,17 @@ function ModuleNav({ profile }) {
   // remove profile info from localStorage
   const location = useLocation();
   const locationPath = location.pathname.split('/');
-  // const { root } = location.state;
   const role = profile.role.toLowerCase();
   const [modules, setModules] = useState([{ title: 'All' }]);
   const [openNewUploadPopup, setOpenNewUploadPopup] = useState(false);
-  // const [checked, setChecked] = useState([]);
-  // const [editModule, setEditModule] = useState(false); // toggles edit button
-  // const [hoveredFile, setHoveredFile] = useState(null);
+  const [openDeleteModulePopups, setOpenDeleteModulePopups] = useState(Array(modules.length).fill(false));
+  const [editModule, setEditModule] = useState(false);
 
   useEffect(() => {
     api.getModules(role).then((temp) => {
-      setModules(modules.concat(temp.data));
+      setModules(modules.concat(temp.data.modules));
     });
   }, []);
-
-  // console.log(modules);
-
-  const updateModule = () => {
-    // setChildren([...children, data]);
-  };
 
   // opening add module popup
   const handleClickOpen = () => {
@@ -45,97 +40,122 @@ function ModuleNav({ profile }) {
     setOpenNewUploadPopup(false);
   };
 
-  // const deleteChild = (childId) => {
-  //   setChildren(children.filter((child) => child.id !== childId));
-  // };
-
-  // const handleMouseEnter = (fileId) => {
-  //   setHoveredFile(fileId);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   setHoveredFile(null);
-  // };
-
-  // const handleCheckboxChange = (event, fileName) => {
-  //   if (checked.includes(fileName)) {
-  //     setChecked(checked.filter((file) => (file !== fileName)));
-  //     return;
-  //   }
-
-  //   setChecked([...checked, fileName]);
-  // };
-
   const displayCheckBoxes = () => {
-    // setEditModule(true);
-    // toggleEdit(editModule);
+    setEditModule(true);
   };
 
-  // const deleteModule = async (moduleId) => { // calls api to delete modules, then removes that module from state children array in ExpandedModule
-  //   if (checked.length > 0) {
-  //     api.deleteModule(moduleId).then(() => {
-  //       // reloads the page
-  //       deleteChild(moduleId);
-  //     });
-  //   }
-  //   setEditModule(false);
-  // };
+  const deleteModule = async (moduleId) => {
+    await api.deleteModule(moduleId);
+    setModules(modules.filter((module) => module.id !== moduleId));
+  };
 
-  // const clearCheckboxes = () => {
-  //   setChecked([]);
-  //   setEditModule(false);
-  // };
+  const handleDeleteModulesOpen = (module) => {
+    const fileIndex = modules.findIndex((m) => m.title === module.title);
+    const updatedOpenDeleteModulePopups = [...openDeleteModulePopups];
+    updatedOpenDeleteModulePopups[fileIndex] = true;
+    setOpenDeleteModulePopups(updatedOpenDeleteModulePopups);
+  };
 
-  // const deleteFiles = async (filesToDelete) => {
-
-  // };
+  const handleDeleteModulesClose = (module) => {
+    const fileIndex = modules.findIndex((m) => m.title === module.title);
+    const updatedOpenDeleteModulePopups = [...openDeleteModulePopups];
+    updatedOpenDeleteModulePopups[fileIndex] = false;
+    setOpenDeleteModulePopups(updatedOpenDeleteModulePopups);
+  };
 
   return (
     <div>
       <div className={styles.second_container}>
-        {modules.map((module) => (
+        {modules.map((module, index) => (
           <div className={styles.nav2_btn_container} key={module.title}>
-            <div className={`${locationPath.includes(module.title) ? styles.nav2_btn_top : styles.nav2_btn_blue}`}>
-              <div className={styles.nav2_btn_top_round} />
+            <div className={styles.deleteIconContainer}>
+              {editModule && module.title !== 'All' && (
+                <button type="button" className={styles.delete_button} onClick={() => (handleDeleteModulesOpen(module))}>
+                  <img className={styles.deleteIcon} src={deleteIcon} alt="delete icon" />
+                </button>
+              )}
             </div>
-
-            <Link to={`/resources/${module.title}`} state={{ id: module.id, root: module.title }} className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${locationPath.includes(module.title) ? '' : styles.nav2_btn_selected}`}>
-              {module.title}
-            </Link>
-
-            <div className={`${locationPath.includes(module.title) ? styles.nav2_btn_bottom : styles.nav2_btn_blue}`}>
-              <div className={styles.nav2_btn_bottom_round} />
+            <div className={styles.nav2_btn_content}>
+              <div className={`${locationPath.includes(module.title) ? styles.nav2_btn_top : styles.nav2_btn_blue}`}>
+                <div className={styles.nav2_btn_top_round} />
+              </div>
+              <Link to={`/resources/${module.title}`} state={{ id: module.id, root: module.title }} className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${locationPath.includes(module.title) ? '' : styles.nav2_btn_selected}`}>
+                {module.title}
+              </Link>
+              <div className={`${locationPath.includes(module.title) ? styles.nav2_btn_bottom : styles.nav2_btn_blue}`}>
+                <div className={styles.nav2_btn_bottom_round} />
+              </div>
             </div>
+            <Dialog open={openDeleteModulePopups[index]} onClose={handleDeleteModulesClose}>
+              <div className={styles2.dialogContainer}>
+                <DialogTitle className={styles2.dialogTitle}>
+                  You have chosen to delete
+                  {' '}
+                  &quot;
+                  {module.title}
+                  &quot;.
+                </DialogTitle>
+                <DialogContent>
+                  <div>
+                    <div className={styles2.confirmMessage}>
+                      Are you sure you want to continue with this action?
+                    </div>
+                    <div className={styles2.confirmButtons}>
+                      <button className={styles2.confirmCancel} type="button" onClick={() => (handleDeleteModulesClose(module))}>
+                        Cancel
+                      </button>
+                      <button type="button" className={styles2.confirmDelete} onClick={() => { deleteModule(module.id); handleDeleteModulesClose(module); }}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </div>
+            </Dialog>
           </div>
         ))}
+
         {/* TODO: have requests link instead for admin */}
         {role === 'admin'
         && (
         <div>
           <div className={styles.line} />
           <div className={styles.navEditAdd}>
-            <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
-              <img src={editIcon} alt="edit icon" />
-              Edit
-            </button>
-            <button type="button" onClick={handleClickOpen} className={styles.editModule}>
-              <img src={addIcon} alt="add icon" />
-              Add
-            </button>
-            <Dialog
-              open={openNewUploadPopup}
-              onClose={handleClose}
-              aria-labelledby="parent-modal-title"
-              aria-describedby="parent-modal-description"
-            >
-              <DialogContent>
-                <NewModulePopup
-                  updateModule={updateModule}
+            {editModule ? (
+              <>
+                <button className={styles.cancelModuleChanges} type="button" onClick={() => setEditModule(false)}>
+                  Cancel
+                </button>
+                <button type="button" className={styles.saveModuleChanges} onClick={() => setEditModule(false)}>
+                  Save
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
+                  <img src={editIcon} alt="edit icon" />
+                  Edit
+                </button>
+                <button type="button" onClick={handleClickOpen} className={styles.editModule}>
+                  <img src={addIcon} alt="add icon" />
+                  Add
+                </button>
+                <Dialog
                   open={openNewUploadPopup}
-                  handleClose={handleClose}
-                />
-              </DialogContent>
-            </Dialog>
+                  onClose={handleClose}
+                  aria-labelledby="parent-modal-title"
+                  aria-describedby="parent-modal-description"
+                >
+                  <DialogContent>
+                    <NewModulePopup
+                      updateModule={() => {}}
+                      open={openNewUploadPopup}
+                      handleClose={handleClose}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
           </div>
         </div>
         ) }
