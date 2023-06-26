@@ -156,6 +156,7 @@ export const uploadFile = async (files) => {
   }
   return null;
 };
+
 // gets all user profiles
 //
 // to use this function to get all profiles, put the following in a useEffect:
@@ -214,6 +215,7 @@ export const getModulebyId = async (id, currRole) => {
   return null;
 };
 
+// deletes a module with moduleID
 export const deleteModule = async (moduleID) => {
   try {
     await axios.delete(`${url}/deleteModule/${moduleID}`);
@@ -223,12 +225,13 @@ export const deleteModule = async (moduleID) => {
   }
 };
 
-export const deleteFile = async (moduleID, fileToDelete) => {
+// deletes all files within array filesToDelete belonging to module moduleID
+export const deleteFiles = async (moduleID, filesToDelete) => {
   try {
-    await axios.delete(`${url}/deleteFile`, { data: { moduleID, fileToDelete } });
+    await axios.delete(`${url}/deleteFiles`, { data: { moduleID, filesToDelete } });
   } catch (error) {
     console.error(error.message);
-    console.error('could not delete file');
+    console.error('could not delete files');
   }
 };
 
@@ -245,13 +248,27 @@ export const getGoogleaccount = async (googleEmail) => {
   return null;
 };
 
+// updates title, body text in a module with id
 export const updateTextField = async (inputText, id, field) => {
   try {
-    const updatedText = await axios.get(`${url}/updateTextField/${inputText}/${id}/${field}`);
+    const updatedText = await axios.post(`${url}/updateTextField/${id}/${field}`, { inputText });
     return updatedText;
   } catch (error) {
     console.error(error.message);
     console.error('could not update text field');
+  }
+  return null;
+};
+
+// updates file links array in module with id
+export const updateFileLinksField = async (newFileLinks, id, field, action) => {
+  try {
+    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}/${action}`, newFileLinks);
+    console.log(updatedFileLinks);
+    return updatedFileLinks;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update file links field');
   }
   return null;
 };
@@ -267,6 +284,7 @@ export const getUsernames = async () => {
   return null;
 };
 
+// adds module to firebase
 export const addModule = async (data) => {
   try {
     const moduleRef = await axios.post(`${url}/addModule`, { data });

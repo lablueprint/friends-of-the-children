@@ -1,5 +1,5 @@
 import { React } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import { useDispatch, useSelector } from 'react-redux';
 import styles from './styles/NavBar.module.css';
@@ -21,10 +21,13 @@ import {
   UserNotApproved,
 } from './pages';
 import NavBar from './components/NavBar';
+import ModuleNav from './components/ModuleNav';
 
 function App() {
   const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
   const dispatch = useDispatch();
+  const location = useLocation();
+  const locationPath = location.pathname;
   // const { password: profilePassword, ...userProfile } = profile; // peform destruction to get profile w/o password
 
   // this functions props allow us to change the state in app.jsx from children components
@@ -40,23 +43,29 @@ function App() {
         <div className="App">
           <div className={styles.wrapper}>
             {(currUser.role === 'Admin' || currUser.approved) && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
-            <div className={styles.mainContent}>
-              <Routes>
-                {currUser.role === 'Admin' || currUser.approved ? <Route path="/" element={(<Resources profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
-                <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
-                <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
-                <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
-                <Route path="/mentees/:menteeSlug" element={(<ExpandedMentee profile={currUser} />)} />
-                <Route path="/mentees/:menteeSlug/:folderSlug" element={(<Media profile={currUser} />)} />
-                <Route path="/example" element={(<Example profile={currUser} />)} />
-                <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
-                <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
-                <Route path="/resources" element={(<Resources profile={currUser} />)} />
-                <Route path="/expanded-module" element={(<ExpandedModule profile={currUser} />)} />
-                <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
-                <Route path="/requests" element={(<Requests profile={currUser} />)} />
-                <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />
-              </Routes>
+            <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+              {(locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/') && (
+                <ModuleNav profile={currUser} />
+              )}
+              <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+                <Routes>
+                  {currUser.role === 'Admin' || currUser.approved ? <Route path="/" element={(<Resources profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
+                  <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
+                  <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
+                  <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
+                  <Route path="/mentees/:menteeSlug" element={(<ExpandedMentee profile={currUser} />)} />
+                  <Route path="/mentees/:menteeSlug/:folderSlug" element={(<Media profile={currUser} />)} />
+                  <Route path="/example" element={(<Example profile={currUser} />)} />
+                  <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
+                  <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
+                  <Route path="/resources" element={(<Resources profile={currUser} />)} />
+                  <Route path="/resources/All" element={(<Resources profile={currUser} />)} />
+                  <Route path="/resources/:resourceSlug" element={(<ExpandedModule profile={currUser} />)} />
+                  <Route path="/resources/:resourceSlug/:ls" element={(<ExpandedModule profile={currUser} />)} />
+                  <Route path="/calendar" element={(<Calendar profile={currUser} />)} />
+                  <Route path="/requests" element={(<Requests profile={currUser} />)} />
+                </Routes>
+              </div>
             </div>
           </div>
         </div>

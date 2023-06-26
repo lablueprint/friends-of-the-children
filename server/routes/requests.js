@@ -22,6 +22,7 @@ import {
   getModulebyId,
   getGoogleaccount,
   updateTextField,
+  updateFileLinksField,
   getUsernames,
   getMessages,
   addToMailchimpList,
@@ -34,7 +35,7 @@ import {
   batchAddToList,
   batchDeleteFromList,
   deleteModule,
-  deleteFile,
+  deleteFiles,
   addModule,
 } from '../controllers/controllers.js';
 
@@ -92,7 +93,10 @@ router.get('/getModulebyId/:id/:currRole', getModulebyId);
 router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 
 // updating module's text field
-router.get('/updateTextField/:inputText/:id/:field', updateTextField);
+router.post('/updateTextField/:id/:field', updateTextField);
+
+// updating module's file links field
+router.post('/updateFileLinksField/:id/:field/:action', updateFileLinksField);
 
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);
@@ -105,7 +109,7 @@ router.post('/updateModuleChildren', updateModuleChildren);
 router.delete('/deleteModule/:moduleID', deleteModule);
 
 // deletes file from module FileLink array field and Firebase storage
-router.delete('/deleteFile', deleteFile);
+router.delete('/deleteFiles', deleteFiles);
 
 // adds a module to Firebase, returns dataRef (containing module's id in firebase)
 router.post('/addModule', addModule);
