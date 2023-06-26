@@ -13,11 +13,7 @@ import deleteIcon from '../assets/icons/delete_icon.svg';
 import editIcon from '../assets/icons/edit_pencil.svg';
 import addIcon from '../assets/icons/add_icon.svg';
 
-// Navigation Bar component used to navigate to different pages
-
 function MenteeNav({ profile }) {
-  // uses React Redux to log user out and
-  // remove profile info from localStorage
   const location = useLocation();
   const locationPath = location.pathname;
   const { menteeObj } = location.state;
@@ -30,7 +26,6 @@ function MenteeNav({ profile }) {
   const [folderArray, setFolderArray] = useState([]);
   const [openDeleteFolderPopup, setOpenDeleteFolderPopup] = useState(Array(folderArray.length).fill(false));
 
-  console.log(location.state);
   useEffect(() => {
     // have all of the mentees' folders and root files display on page
     api.getMenteeFolders(id).then((res) => {
@@ -64,7 +59,6 @@ function MenteeNav({ profile }) {
 
   const handleDeleteFolderClose = (folder) => {
     const fileIndex = folderArray.findIndex((f) => f === folder);
-    console.log(fileIndex);
     const updatedOpenDeleteFolderPopup = [...openDeleteFolderPopup];
     updatedOpenDeleteFolderPopup[fileIndex] = false;
     setOpenDeleteFolderPopup(updatedOpenDeleteFolderPopup);

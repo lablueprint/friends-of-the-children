@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import FilePopup from '../components/FilePopup';
 import styles from '../styles/Mentees.module.css';
 import styles2 from '../styles/Modules.module.css';
@@ -43,6 +44,7 @@ function ExpandedMentee({ profile }) {
   const [checked, setChecked] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
   const [openFilePopups, setOpenFilePopups] = useState(Array(recents.length).fill(false));
+  const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [favorites, setFavorites] = useState([]); // array of favorite file objects
   const [isFile, setIsFile] = useState(false);
@@ -224,19 +226,48 @@ function ExpandedMentee({ profile }) {
     setOpenFilePopups(updatedOpenFilePopups);
   };
 
+  const clearCheckboxes = () => {
+    setChecked([]);
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const handleDeleteFilesClose = () => {
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const deleteFiles = async (filesToDelete) => {
+    const deletePromises = filesToDelete.map((file) => api.deleteFiles(file.id, [`files/${file.fileName}`]));
+
+    Promise.all(deletePromises)
+      .then(() => {
+        const tempFiles = [...recents.filter((file) => !filesToDelete.includes(file))];
+        setRecents(tempFiles);
+        clearCheckboxes();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handleFillHeart = (index, file) => {
+    // revert the file object when storing into database
+    const fileObj = {
+      fileName: file.fileName,
+      url: file.url,
+      fileType: file.fileType,
+    };
     // if heart is filled
     if (!favorites.some((element) => element.url === file.url)) {
       // update favorites state array
       const tempFavs = [...favorites];
-      tempFavs.push(file);
+      tempFavs.push(fileObj);
       setFavorites(tempFavs);
       // store this new state into the database
-      api.updateFileLinksField(file, id, 'files', 'addFile', 'mentees');
+      api.updateFileLinksField(fileObj, id, 'files', 'addFile', 'mentees');
     } else {
       const tempFavs = favorites.filter((element) => element.url !== file.url);
       setFavorites(tempFavs);
-      api.updateFileLinksField(file, id, 'files', 'removeFile', 'mentees');
+      api.updateFileLinksField(fileObj, id, 'files', 'removeFile', 'mentees');
     }
   };
 
@@ -473,6 +504,65 @@ function ExpandedMentee({ profile }) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* this is the deleting files dialog popup */}
+      <div>
+        { openDeleteFilesPopup && checked.length > 0
+          ? (
+            <div>
+              <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
+                <DialogTitle className={styles2.dialogTitle}>
+                  You have chosen to delete
+                  {' '}
+                  {checked.length}
+                  {' '}
+                  {(checked.length) === 1 ? 'file ' : 'files '}
+                </DialogTitle>
+                <DialogContent>
+                  <div>
+                    <div className={styles2.confirmMessage}>
+                      Are you sure you want to continue with this action?
+                    </div>
+                    <div className={styles2.confirmButtons}>
+                      <button className={styles2.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                        Cancel
+                      </button>
+                      <button type="button" className={styles2.confirmDelete} onClick={() => { deleteFiles(checked); }}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )
+          : <div />}
+      </div>
+      <div>
+        { (checked.length > 0)
+          ? (
+            <div className={styles2.deleteFilesBar}>
+              <div className={styles2.totalSelected}>
+                <div className={styles2.selectedNumber}>
+                  {checked.length}
+                </div>
+                <div className={styles2.selectedText}>
+                  {' '}
+                  selected
+                </div>
+              </div>
+              <div className={styles2.cancelOrDelete}>
+                <button className={styles2.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                  Cancel
+                </button>
+                <button type="button" className={styles2.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          )
+          : <div />}
+      </div>
     </div>
   );
 }
