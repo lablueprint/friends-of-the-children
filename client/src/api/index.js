@@ -1,7 +1,7 @@
 // send client-side (frontend) data to server
 import axios from 'axios';
 
-const url = '0.0.0.0:5000/fotc';
+const url = 'http://localhost:5000/fotc';
 
 // creates an event on gcal
 export const createEvent = async (eventData) => {
