@@ -1,6 +1,7 @@
 // send client-side (frontend) data to server
 import axios from 'axios';
 
+// replace with url for EC2 instance
 const url = 'http://localhost:5000/fotc';
 
 // creates an event on gcal
@@ -156,6 +157,7 @@ export const uploadFile = async (files) => {
   }
   return null;
 };
+
 // gets all user profiles
 //
 // to use this function to get all profiles, put the following in a useEffect:
@@ -250,7 +252,7 @@ export const getGoogleaccount = async (googleEmail) => {
 // updates title, body text in a module with id
 export const updateTextField = async (inputText, id, field) => {
   try {
-    const updatedText = await axios.post(`${url}/updateTextField/${id}/${field}`, inputText);
+    const updatedText = await axios.post(`${url}/updateTextField/${id}/${field}`, { inputText });
     return updatedText;
   } catch (error) {
     console.error(error.message);
@@ -260,9 +262,10 @@ export const updateTextField = async (inputText, id, field) => {
 };
 
 // updates file links array in module with id
-export const updateFileLinksField = async (newFileLinks, id, field) => {
+export const updateFileLinksField = async (newFileLinks, id, field, action) => {
   try {
-    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}`, newFileLinks);
+    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}/${action}`, newFileLinks);
+    console.log(updatedFileLinks);
     return updatedFileLinks;
   } catch (error) {
     console.error(error.message);

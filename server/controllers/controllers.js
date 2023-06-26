@@ -4,7 +4,7 @@ import {
   collection, addDoc, getDoc, arrayUnion, updateDoc, doc, arrayRemove,
 } from 'firebase/firestore';
 import {
-  getStorage, ref, deleteObject,
+  ref, deleteObject,
   uploadBytes, getDownloadURL,
 } from 'firebase/storage';
 import crypto from 'crypto';
@@ -318,10 +318,7 @@ const addMenteeFile = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const { files } = req.body;
-    // console.log(files.name);
-    // console.log('REQBODY:', req.body);
     const storageRef = ref(storage, `/images/${files.name}`);
-
     uploadBytes(storageRef, files).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
         res.status(202).json(url);
@@ -407,24 +404,38 @@ const getModulebyId = async (req, res) => {
 };
 
 // deletes a module and all of its children from firebase
-const recursivelyDeletemodules = async (moduleID) => {
+const recursivelyDeleteModules = async (moduleID) => {
   try {
     const moduleRef = await db.collection('modules').doc(moduleID).get();
     const currModule = moduleRef.data();
-    if (Array.isArray(currModule.children) && currModule.children.length > 0) {
+
+    if (currModule && currModule.children !== undefined && Array.isArray(currModule.children) && currModule.children.length > 0) {
       // if there are submodules, recursively delete them
-      currModule.children.forEach(async (child) => {
-        await recursivelyDeletemodules(child);
-      });
+      await Promise.all(currModule.children.map(async (child) => {
+        await recursivelyDeleteModules(child);
+      }));
     }
-    if (currModule.parent) { // if the parent exists, remove the current module from the parent's children array
+
+    if (currModule && currModule.parent !== undefined && currModule.parent) {
       const parentRef = db.collection('modules').doc(currModule.parent);
       const parentRefSnapshot = await parentRef.get();
       const currParent = parentRefSnapshot.data();
-      const updatedChildren = currParent.children.filter((id) => id !== moduleID);
-      await parentRef.update({ children: updatedChildren }).then();
+      if (currParent && currParent.children) {
+        const updatedChildren = currParent.children.filter((id) => id !== moduleID);
+        await parentRef.update({ children: updatedChildren });
+      }
     }
-    await db.collection('modules').doc(moduleID).delete(); // delete the current module
+
+    // delete all files in current module from firebase storage
+    if (currModule && currModule.fileLinks) {
+      await Promise.all(currModule.fileLinks.map(async (fileLink) => {
+        const fileRef = ref(storage, fileLink);
+        await deleteObject(fileRef);
+      }));
+    }
+
+    // delete the current module
+    await db.collection('modules').doc(moduleID).delete();
   } catch (error) {
     console.log(error);
   }
@@ -434,7 +445,7 @@ const recursivelyDeletemodules = async (moduleID) => {
 const deleteModule = async (req, res) => {
   try {
     const { moduleID } = req.params;
-    await recursivelyDeletemodules(moduleID); // helper function
+    await recursivelyDeleteModules(moduleID); // helper function
     res.status(202).json('successfully deleted module');
   } catch (error) {
     res.status(400).json('could not delete module');
@@ -443,16 +454,16 @@ const deleteModule = async (req, res) => {
 
 const deleteFiles = async (req, res) => {
   try {
-    const currStorage = getStorage();
+    // const currStorage = getStorage();
     // delete path from module files array field
     const { moduleID, filesToDelete } = req.body;
-    console.log(filesToDelete);
+    console.log('TO DELETE: ', filesToDelete);
     const moduleRef = await db.collection('modules').doc(moduleID);
-    const moduleRefSnapshot = await moduleRef.get();
-    const currModule = moduleRefSnapshot.data();
-    console.log('currModule is ', currModule);
+    // const moduleRefSnapshot = await moduleRef.get();
+    // const currModule = moduleRefSnapshot.data();
+    // console.log('currModule is ', currModule);
     filesToDelete.forEach(async (file) => {
-      const fileRef = ref(currStorage, file);
+      const fileRef = ref(storage, file);
       await deleteObject(fileRef);
     });
     moduleRef.update({
@@ -523,18 +534,41 @@ const updateTextField = async (req, res) => {
 const updateFileLinksField = async (req, res) => {
   try {
     const {
-      id, field,
+      id, field, action,
     } = req.params;
     const newFileLinks = req.body;
-    if (field === 'fileLinks') {
-      await db.collection('modules')
-        .doc(id)
-        .update({ fileLinks: newFileLinks })
-        .catch((error) => {
-        // setUpdateProfileMessage('We ran into an error updating your text field!');
-          console.log(error);
-        });
+
+    if (action === 'addFile') {
+      const currRef = db.collection('modules').doc(id);
+      const currDoc = await currRef.get();
+      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+      const currLinks = newFileLinks || [];
+      const updatedLinks = currFiles.concat(currLinks);
+      if (field === 'fileLinks') {
+        if (currDoc.exists) {
+          await currRef.update({ fileLinks: updatedLinks }).catch((error) => {
+            console.log(error);
+          });
+        } else {
+          await currRef.set({ fileLinks: updatedLinks }).catch((error) => {
+            console.log(error);
+          });
+        }
+      }
+    } else if (action === 'removeFile') {
+      const currRef = db.collection('modules').doc(id);
+      const currDoc = await currRef.get();
+      const currFiles = currDoc.exists ? currDoc.data().fileLinks || [] : [];
+      const updatedLinks = currFiles.filter((file) => file.url !== newFileLinks.url);
+      if (field === 'fileLinks') {
+        await currRef
+          .update({ fileLinks: updatedLinks })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     }
+    res.status(202).json({});
   } catch (error) {
     res.status(400).json(error);
   }
@@ -562,18 +596,39 @@ const getModules = async (req, res) => {
   try {
     const { currRole } = req.params;
     const modules = [];
+    const rootFiles = [];
+    const favoriteFiles = [];
     db.collection('modules').get().then((sc) => {
       sc.forEach((module) => { // display all modules that match the role of the profile (admin sees all modules)
         const data = module.data();
+        if (module.id === 'root') { // fill up the root array (files in 'All Resources')
+          const { fileLinks } = data;
+          const category = 'All';
+          fileLinks.forEach((file) => {
+            rootFiles.push({ file, category, id: 'root' });
+          });
+        } else if (module.id === 'favorites') { // fill up the favorites array
+          const { fileLinks } = data;
+          fileLinks.forEach((file) => {
+            favoriteFiles.push(file);
+          });
+        }
         if (data && data.role) {
           data.id = module.id;
           // fetching parent-level modules that we have permission to view
-          if (data.parent == null && (currRole === 'admin' || data.role.includes(currRole))) {
-            modules.push(data);
+          if (currRole === 'admin' || data.role.includes(currRole)) {
+            if (data.parent == null) {
+              modules.push(data);
+            }
+            const files = data.fileLinks;
+            const category = data.title;
+            files.forEach((file) => {
+              rootFiles.push({ file, category, id: module.id });
+            });
           }
         }
       });
-      res.status(202).json(modules);
+      res.status(202).json({ modules, rootFiles, favoriteFiles });
     });
   } catch (error) {
     res.status(400).json(error);
@@ -846,10 +901,12 @@ const sendMailchimpEmails = async (req, res) => {
     // get all campaigns + check if any completed campaign segments can be deleted
     let allCampaigns = await mailchimp.campaigns.list();
     allCampaigns = allCampaigns.campaigns.filter((element) => element.status === 'sent' && element.recipients.segment_opts.saved_segment_id);
-    for (const element of allCampaigns) {
+    const deletePromises = allCampaigns.map((element) => {
       const delSegmentId = element.recipients.segment_opts.saved_segment_id;
-      const delResponse = await mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, element.recipients.segment_opts.saved_segment_id);
-    }
+      return mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, delSegmentId);
+    });
+
+    await Promise.all(deletePromises);
 
     // delete the segment (maybe clean up when a new segment is about to be created and store all the segment ids in a list)
     // const response = await mailchimp.lists.deleteSegment(process.env.MAILCHIMP_AUDIENCE_ID, segment.id);
