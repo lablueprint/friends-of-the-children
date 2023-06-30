@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   ref, uploadBytes, getDownloadURL, getMetadata,
 } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from '@mui/material';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
@@ -22,6 +23,7 @@ import filledHeart from '../assets/icons/filled_heart.svg';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+// import linkIcon from '../assets/icons/file_link.svg';
 import ClearedIcon from '../assets/icons/cleared.svg';
 import NotClearedIcon from '../assets/icons/not_cleared.svg';
 import HomeIcon from '../assets/icons/home.svg';
@@ -60,7 +62,7 @@ function ExpandedMentee({ profile }) {
     if (fileLinks.length > 0) {
       await Promise.all(fileLinks.map(async (fileLink) => {
         const {
-          fileName, url, fileType, category,
+          fileName, url, fileType, category, fileID,
         } = fileLink;
         const spaceRef = ref(storage, fileLink.url);
         const file = await getMetadata(spaceRef);
@@ -72,7 +74,7 @@ function ExpandedMentee({ profile }) {
         const fileDate = date.toLocaleString('en-US', options);
 
         fileContents.push({
-          url, fileType, fileName, category, fileSize, fileDate,
+          url, fileType, fileName, category, fileSize, fileDate, fileID,
         });
       }));
       // sorting files alphabetically
@@ -124,13 +126,14 @@ function ExpandedMentee({ profile }) {
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileUrl = files.name;
+      fileUrl = uuidv4(files.name);
       fileType = files.type;
       const storageRef = ref(storage, `/images/${fileUrl}`);
       uploadBytes(storageRef, files).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
           const tempArr = recents;
           const data = {
+            fileID: fileUrl,
             fileName,
             url,
             fileType,
@@ -250,6 +253,7 @@ function ExpandedMentee({ profile }) {
       url: file.url,
       fileType: file.fileType,
       category: file.category,
+      fileID: file.fileID,
     };
     // if heart is filled
     if (!favorites.some((element) => element.url === file.url)) {

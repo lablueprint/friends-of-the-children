@@ -3,6 +3,7 @@ import { createRequire } from 'module';
 import {
   collection, addDoc, getDoc, arrayUnion, updateDoc, doc, arrayRemove,
 } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 import {
   ref, deleteObject,
   uploadBytes, getDownloadURL,
@@ -348,7 +349,8 @@ const addMenteeFile = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const { files } = req.body;
-    const storageRef = ref(storage, `/images/${files.name}`);
+    const name = uuidv4(files.name);
+    const storageRef = ref(storage, `/images/${name}`);
     uploadBytes(storageRef, files).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
         res.status(202).json(url);
@@ -487,14 +489,11 @@ const removeMenteeFile = async (menteeID, folderID, file, type = '') => {
   const { fileType } = file;
   const menteeRef = db.collection('mentees').doc(menteeID).collection('folders');
   // remove file from firebase storage
-  // const fileRef = ref(storage, file.url);
-  // await deleteObject(fileRef);
-
-  console.log('Folder: ', folderID);
-  console.log('file: ', file);
+  const fileRef = ref(storage, file.url);
+  await deleteObject(fileRef);
 
   // remove file from custom folder
-  if (type !== 'deleteFolder') {
+  if (type !== 'deleteFolder' && folderID !== 'All') {
     menteeRef.doc(folderID)
       .update({
         files: arrayRemove(file),
@@ -506,10 +505,13 @@ const removeMenteeFile = async (menteeID, folderID, file, type = '') => {
       files: arrayRemove({ ...file, category: folderID }),
     });
   // if exists in favorites folder, remove file from there too
-  menteeRef.doc('favorites')
-    .update({
-      files: arrayRemove({ ...file, category: folderID }),
-    });
+  const favRef = await menteeRef.doc('favorites').get();
+  if (favRef.exists) {
+    menteeRef.doc('favorites')
+      .update({
+        files: arrayRemove({ ...file, category: folderID }),
+      });
+  }
   // remove from the default folders
   if (fileType.includes('image')) {
     menteeRef.doc('Images')
@@ -546,13 +548,12 @@ const deleteMenteeFiles = async (req, res) => {
           fileName: file.fileName,
           url: file.url,
           fileType: file.fileType,
+          fileID: file.fileID,
         };
         await removeMenteeFile(menteeID, file.category, fileObj);
       }));
     } else {
-      console.log('LKSDJFKLSJKLJD');
       await Promise.all(filesToDelete.map(async (file) => {
-        console.log('HERE');
         await removeMenteeFile(menteeID, folderID, file);
       }));
     }

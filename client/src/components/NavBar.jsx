@@ -58,7 +58,7 @@ function NavBar({ profile, updateAppProfile }) {
               Resources
             </Link>
             {/* TODO: have requests link instead for admin */}
-            <Link to="/mentees" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath.includes('/mentees') ? styles.btn_selected : ''}`}>
+            <Link to="/youth" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath.includes('/youth') ? styles.btn_selected : ''}`}>
               <img src={YouthIcon} alt="mentees icon" />
               My Youth
             </Link>

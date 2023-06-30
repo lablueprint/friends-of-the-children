@@ -44,21 +44,21 @@ function App() {
         <div className="App">
           <div className={styles.wrapper}>
             {(currUser.role === 'Admin' || currUser.approved) && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
-            <div className={`${locationPath.includes('/resources') || locationPath.includes('/mentees/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+            <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
               {(locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/') && (
                 <ModuleNav profile={currUser} />
               )}
-              {locationPath.includes('/mentees/') && (
+              {locationPath.includes('/youth/') && (
                 <MenteeNav profile={currUser} />
               )}
-              <div className={`${locationPath.includes('/resources') || locationPath.includes('/mentees/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+              <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
                 <Routes>
                   {currUser.role === 'Admin' || currUser.approved ? <Route path="/" element={(<Resources profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
                   <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
                   <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
-                  <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
-                  <Route path="/mentees/:menteeSlug" element={(<ExpandedMentee profile={currUser} />)} />
-                  <Route path="/mentees/:menteeSlug/:folderSlug" element={(<Media profile={currUser} />)} />
+                  <Route path="/youth" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
+                  <Route path="/youth/:menteeSlug" element={(<ExpandedMentee profile={currUser} />)} />
+                  <Route path="/youth/:menteeSlug/:folderSlug" element={(<Media profile={currUser} />)} />
                   <Route path="/example" element={(<Example profile={currUser} />)} />
                   <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
                   <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />

@@ -1,5 +1,6 @@
 import { React, useState } from 'react';
 import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -20,7 +21,7 @@ export default function NewFilePopup(props) {
   const [fileLinks, setFileLinks] = useState(currModuleFiles);
 
   const handleUpload = (file) => {
-    const fileName = file.name;
+    const fileName = uuidv4(file.name);
     const storageRef = ref(storage, `/files/${fileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 

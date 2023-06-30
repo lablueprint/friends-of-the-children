@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import {
   ref, uploadBytes, getDownloadURL,
 } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -62,7 +63,7 @@ function Media({ profile }) {
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileUrl = files.name;
+      fileUrl = uuidv4(files.name);
       fileType = files.type;
 
       const storageRef = ref(storage, `/images/${fileUrl}`);
@@ -73,6 +74,7 @@ function Media({ profile }) {
             fileName,
             url,
             fileType,
+            fileID: fileUrl,
           };
           tempArr.push(data);
           setMediaArray(tempArr);

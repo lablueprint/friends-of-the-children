@@ -18,7 +18,7 @@ function MenteeNav({ profile }) {
   const locationPath = location.pathname;
   const { menteeObj } = location.state;
   const {
-    id, firstName, lastName,
+    id, firstName, lastName, avatar,
   } = menteeObj;
   const role = profile.role.toLowerCase();
   const [open, setOpen] = useState(false);
@@ -84,15 +84,23 @@ function MenteeNav({ profile }) {
   return (
     <div>
       <div className={styles.second_container}>
+        {
+          locationPath !== `/youth/${firstName}${lastName}` && (
+            <>
+              <img src={avatar} alt="youth avatar" />
+              <div className={styles.youth_label}>{`${firstName} ${lastName}`}</div>
+            </>
+          )
+        }
         <div className={styles.nav2_btn_container}>
           <div className={styles.nav2_btn_content}>
-            <div className={`${(locationPath === `/mentees/${firstName}${lastName}` || locationPath.includes('/All_')) ? styles.nav2_btn_top : styles.nav2_btn_blue}`}>
+            <div className={`${(locationPath === `/youth/${firstName}${lastName}` || locationPath.includes('/All_')) ? styles.nav2_btn_top : styles.nav2_btn_blue}`}>
               <div className={styles.nav2_btn_top_round} />
             </div>
-            <Link to={`/mentees/${firstName}${lastName}`} state={{ menteeObj }} className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${(locationPath === `/mentees/${firstName}${lastName}` || locationPath.includes('/All_')) ? '' : styles.nav2_btn_selected}`}>
+            <Link to={`/youth/${firstName}${lastName}`} state={{ menteeObj }} className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${(locationPath === `/youth/${firstName}${lastName}` || locationPath.includes('/All_')) ? '' : styles.nav2_btn_selected}`}>
               All
             </Link>
-            <div className={`${(locationPath === `/mentees/${firstName}${lastName}` || locationPath.includes('/All_')) ? styles.nav2_btn_bottom : styles.nav2_btn_blue}`}>
+            <div className={`${(locationPath === `/youth/${firstName}${lastName}` || locationPath.includes('/All_')) ? styles.nav2_btn_bottom : styles.nav2_btn_blue}`}>
               <div className={styles.nav2_btn_bottom_round} />
             </div>
           </div>
@@ -113,7 +121,7 @@ function MenteeNav({ profile }) {
               </div>
               <Link
                 key={`${location.pathname}_${folder}`} // Add key prop based on the location pathname
-                to={`/mentees/${firstName}${lastName}/folder_${folder}`}
+                to={`/youth/${firstName}${lastName}/folder_${folder}`}
                 state={{ id: folder, menteeObj: { ...menteeObj, folderName: folder } }}
                 className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${locationPath.includes(`/folder_${folder}`) ? '' : styles.nav2_btn_selected}`}
               >
@@ -162,7 +170,7 @@ function MenteeNav({ profile }) {
                 <button className={styles.cancelModuleChanges} type="button" onClick={() => setEditModule(false)}>
                   Cancel
                 </button>
-                <Link to={`/mentees/${firstName}${lastName}`} state={{ menteeObj }} className={styles.saveModuleChanges} onClick={() => setEditModule(false)}>
+                <Link to={`/youth/${firstName}${lastName}`} state={{ menteeObj }} className={styles.saveModuleChanges} onClick={() => setEditModule(false)}>
                   Save
                 </Link>
               </>
