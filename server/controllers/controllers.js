@@ -246,7 +246,7 @@ const getMenteeFolders = async (req, res) => {
         }
         sc.forEach((currDoc) => {
           const folderName = currDoc.id;
-          if (folderName !== 'Root') {
+          if (folderName !== 'Root' && folderName !== 'favorites') {
             if (folderName !== 'Videos' && folderName !== 'Images' && folderName !== 'Flyers' && folderName !== 'Links') {
               customs.push(folderName);
             } else {

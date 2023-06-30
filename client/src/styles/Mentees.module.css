@@ -89,6 +89,7 @@ a{
     display: flex;
     gap: 20px;
     text-align: left;
+    flex-wrap: wrap;
 }
 
 .card_container{
