@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import {
+  ref, uploadBytes, getDownloadURL,
+} from 'firebase/storage';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -9,6 +11,7 @@ import {
 } from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
@@ -41,15 +44,14 @@ function Media({ profile }) {
   const [hoveredFile, setHoveredFile] = useState(null);
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [openFilePopups, setOpenFilePopups] = useState(Array(mediaArray.length).fill(false));
+  const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
 
   // get the current folder contents on first load
   useEffect(() => {
     api.getMenteeFiles(id, folderName).then((files) => {
       setMediaArray(files.data);
     });
-  }, []);
-
-  console.log(mediaArray);
+  }, [menteeObj]);
 
   // creates new object for the file, updates mediaArray, and calls updateMentee
   const addMedia = (e) => {
@@ -134,13 +136,35 @@ function Media({ profile }) {
     setHoveredFile(null);
   };
 
-  const handleCheckboxChange = (event, fileName) => {
-    if (checked.includes(fileName)) {
-      setChecked(checked.filter((file) => (file !== fileName)));
+  const handleCheckboxChange = (event, fileObject) => {
+    if (checked.includes(fileObject)) {
+      setChecked(checked.filter((file) => (file !== fileObject)));
       return;
     }
 
-    setChecked([...checked, fileName]);
+    setChecked([...checked, fileObject]);
+  };
+
+  const clearCheckboxes = () => {
+    setChecked([]);
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const handleDeleteFilesClose = () => {
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const deleteFiles = async (filesToDelete) => {
+    api.deleteMenteeFiles({
+      menteeID: id, folderID: folderName, type: '', filesToDelete,
+    }).then(() => {
+      const tempFiles = [...mediaArray.filter((file) => !filesToDelete.includes(file))];
+      setMediaArray(tempFiles);
+      clearCheckboxes();
+    })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -196,8 +220,8 @@ function Media({ profile }) {
               >
                 {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
                   <Checkbox
-                    checked={checked.includes(file.url)}
-                    onChange={(event) => handleCheckboxChange(event, file.url)}
+                    checked={checked.includes(file)}
+                    onChange={(event) => handleCheckboxChange(event, file)}
                     className={styles2.checkbox}
                   />
                 ) : (<img src={imgIcon} alt="img icon" />)}
@@ -220,10 +244,10 @@ function Media({ profile }) {
                 onMouseLeave={handleMouseLeave}
               >
                 <img src={file.imageSrc} alt={file.name} />
-                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file)) ? (
                   <Checkbox
                     checked={checked.includes(file.url)}
-                    onChange={(event) => handleCheckboxChange(event, file.url)}
+                    onChange={(event) => handleCheckboxChange(event, file)}
                     className={styles2.checkbox}
                   />
                 ) : (<img src={vidIcon} alt="video icon" />)}
@@ -246,8 +270,8 @@ function Media({ profile }) {
                 <img src={file.imageSrc} alt={file.name} />
                 {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
                   <Checkbox
-                    checked={checked.includes(file.url)}
-                    onChange={(event) => handleCheckboxChange(event, file.url)}
+                    checked={checked.includes(file)}
+                    onChange={(event) => handleCheckboxChange(event, file)}
                     className={styles2.checkbox}
                   />
                 ) : (<img src={pdfIcon} alt="pdf icon" />)}
@@ -266,6 +290,7 @@ function Media({ profile }) {
         </div>
       ))}
 
+      {/* uploading media dialog popup */}
       <div>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
@@ -309,6 +334,65 @@ function Media({ profile }) {
 
           </DialogContent>
         </Dialog>
+      </div>
+
+      {/* this is the deleting files dialog popup */}
+      <div>
+        { openDeleteFilesPopup && checked.length > 0
+          ? (
+            <div>
+              <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
+                <DialogTitle className={styles2.dialogTitle}>
+                  You have chosen to delete
+                  {' '}
+                  {checked.length}
+                  {' '}
+                  {(checked.length) === 1 ? 'file ' : 'files '}
+                </DialogTitle>
+                <DialogContent>
+                  <div>
+                    <div className={styles2.confirmMessage}>
+                      Are you sure you want to continue with this action?
+                    </div>
+                    <div className={styles2.confirmButtons}>
+                      <button className={styles2.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                        Cancel
+                      </button>
+                      <button type="button" className={styles2.confirmDelete} onClick={() => { deleteFiles(checked); }}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )
+          : <div />}
+      </div>
+      <div>
+        { (checked.length > 0)
+          ? (
+            <div className={styles2.deleteFilesBar}>
+              <div className={styles2.totalSelected}>
+                <div className={styles2.selectedNumber}>
+                  {checked.length}
+                </div>
+                <div className={styles2.selectedText}>
+                  {' '}
+                  selected
+                </div>
+              </div>
+              <div className={styles2.cancelOrDelete}>
+                <button className={styles2.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                  Cancel
+                </button>
+                <button type="button" className={styles2.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          )
+          : <div />}
       </div>
     </div>
   );

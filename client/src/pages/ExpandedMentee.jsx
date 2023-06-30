@@ -54,8 +54,6 @@ function ExpandedMentee({ profile }) {
   const [favTab, setFavTab] = useState(false); // which tab you're on
   const role = (profile.role).toLowerCase();
 
-  console.log(recents);
-
   const createFileObjects = async (fileLinks) => {
     setRecents([]);
     const fileContents = [];
@@ -137,12 +135,11 @@ function ExpandedMentee({ profile }) {
             url,
             fileType,
           };
-          tempArr.push(data);
-          setRecents(tempArr);
+          tempArr.push({ ...data, category: folderName === 'Root' ? 'All' : folderName });
+          createFileObjects(tempArr);
           return data;
         })
           .then((data) => {
-            console.log(data);
             api.addMenteeFile(id, folderName, data, fileType);
             setfileUploadOpen(false);
             e.target.reset();
@@ -158,7 +155,7 @@ function ExpandedMentee({ profile }) {
         fileType,
       };
       tempArr.push(data);
-      setRecents(tempArr);
+      createFileObjects(data);
       api.addMenteeFile(id, folderName, data, fileType);
       setfileUploadOpen(false);
       e.target.reset();
@@ -187,7 +184,7 @@ function ExpandedMentee({ profile }) {
     setCaregiverOpen(false);
   };
 
-  // update the medical clearance
+  // update the media clearance
   const updateClearance = () => {
     api.updateClearance(id, cleared);
     setCleared(!cleared);
@@ -236,16 +233,13 @@ function ExpandedMentee({ profile }) {
   };
 
   const deleteFiles = async (filesToDelete) => {
-    const deletePromises = filesToDelete.map((file) => api.deleteFiles(file.id, [`files/${file.fileName}`]));
-
-    Promise.all(deletePromises)
-      .then(() => {
-        const tempFiles = [...recents.filter((file) => !filesToDelete.includes(file))];
-        setRecents(tempFiles);
-        clearCheckboxes();
-      })
+    api.deleteMenteeFiles({ menteeID: id, type: 'deleteFromRoot', filesToDelete }).then(() => {
+      const tempFiles = [...recents.filter((file) => !filesToDelete.includes(file))];
+      setRecents(tempFiles);
+      clearCheckboxes();
+    })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
 
@@ -255,14 +249,15 @@ function ExpandedMentee({ profile }) {
       fileName: file.fileName,
       url: file.url,
       fileType: file.fileType,
+      category: file.category,
     };
     // if heart is filled
     if (!favorites.some((element) => element.url === file.url)) {
-      // update favorites state array
+      // update favorites state array (want the full file object)
       const tempFavs = [...favorites];
-      tempFavs.push(fileObj);
+      tempFavs.push(file);
       setFavorites(tempFavs);
-      // store this new state into the database
+      // store this new state into the database (use reverted file object)
       api.updateFileLinksField(fileObj, id, 'files', 'addFile', 'mentees');
     } else {
       const tempFavs = favorites.filter((element) => element.url !== file.url);

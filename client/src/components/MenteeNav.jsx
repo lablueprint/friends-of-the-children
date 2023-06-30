@@ -116,8 +116,6 @@ function MenteeNav({ profile }) {
                 to={`/mentees/${firstName}${lastName}/folder_${folder}`}
                 state={{ id: folder, menteeObj: { ...menteeObj, folderName: folder } }}
                 className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${locationPath.includes(`/folder_${folder}`) ? '' : styles.nav2_btn_selected}`}
-                // unfortunately, media component doesn't reload so gotta force it
-                onClick={() => { setTimeout(() => { window.location.reload(); }, 520); }}
               >
                 {folder}
               </Link>
@@ -164,9 +162,9 @@ function MenteeNav({ profile }) {
                 <button className={styles.cancelModuleChanges} type="button" onClick={() => setEditModule(false)}>
                   Cancel
                 </button>
-                <button type="button" className={styles.saveModuleChanges} onClick={() => setEditModule(false)}>
+                <Link to={`/mentees/${firstName}${lastName}`} state={{ menteeObj }} className={styles.saveModuleChanges} onClick={() => setEditModule(false)}>
                   Save
-                </button>
+                </Link>
               </>
             ) : (
               <>

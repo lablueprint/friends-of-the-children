@@ -245,6 +245,20 @@ export const deleteFiles = async (moduleID, filesToDelete) => {
   }
 };
 
+// deletes files in a mentee folder
+export const deleteMenteeFiles = async ({
+  menteeID, folderID, type, filesToDelete,
+}) => {
+  try {
+    await axios.post(`${url}/deleteMenteeFiles`, {
+      menteeID, folderID, type, filesToDelete,
+    });
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete mentee files');
+  }
+};
+
 // gets google email
 export const getGoogleaccount = async (googleEmail) => {
   try {

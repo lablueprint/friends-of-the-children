@@ -314,7 +314,7 @@ const addMenteeFile = async (req, res) => {
     }
     await db.collection('mentees').doc(id).collection('folders').doc('Root')
       .update({
-        files: arrayUnion(data),
+        files: arrayUnion({ ...data, category: folderName === 'Root' ? 'All' : folderName }),
       });
 
     if (type.includes('image')) {
@@ -482,6 +482,86 @@ const deleteModule = async (req, res) => {
   }
 };
 
+// helper function, removes a mentee's file from various folders
+const removeMenteeFile = async (menteeID, folderID, file, type = '') => {
+  const { fileType } = file;
+  const menteeRef = db.collection('mentees').doc(menteeID).collection('folders');
+  // remove file from firebase storage
+  // const fileRef = ref(storage, file.url);
+  // await deleteObject(fileRef);
+
+  console.log('Folder: ', folderID);
+  console.log('file: ', file);
+
+  // remove file from custom folder
+  if (type !== 'deleteFolder') {
+    menteeRef.doc(folderID)
+      .update({
+        files: arrayRemove(file),
+      });
+  }
+  // remove file from Root folder
+  menteeRef.doc('Root')
+    .update({
+      files: arrayRemove({ ...file, category: folderID }),
+    });
+  // if exists in favorites folder, remove file from there too
+  menteeRef.doc('favorites')
+    .update({
+      files: arrayRemove({ ...file, category: folderID }),
+    });
+  // remove from the default folders
+  if (fileType.includes('image')) {
+    menteeRef.doc('Images')
+      .update({
+        files: arrayRemove(file),
+      });
+  } else if (fileType.includes('video')) {
+    menteeRef.doc('Videos')
+      .update({
+        files: arrayRemove(file),
+      });
+  } else if (fileType === 'link') {
+    menteeRef.doc('Links')
+      .update({
+        files: arrayRemove(file),
+      });
+  } else if (fileType.includes('pdf')) {
+    menteeRef.doc('Flyers')
+      .update({
+        files: arrayRemove(file),
+      });
+  }
+};
+
+const deleteMenteeFiles = async (req, res) => {
+  const {
+    menteeID, folderID, type, filesToDelete,
+  } = req.body;
+
+  try {
+    if (type === 'deleteFromRoot') {
+      await Promise.all(filesToDelete.map(async (file) => {
+        const fileObj = {
+          fileName: file.fileName,
+          url: file.url,
+          fileType: file.fileType,
+        };
+        await removeMenteeFile(menteeID, file.category, fileObj);
+      }));
+    } else {
+      console.log('LKSDJFKLSJKLJD');
+      await Promise.all(filesToDelete.map(async (file) => {
+        console.log('HERE');
+        await removeMenteeFile(menteeID, folderID, file);
+      }));
+    }
+    res.status(202).json('successfully deleted mentee files');
+  } catch (error) {
+    res.status(400).json('could not delete mentee files');
+  }
+};
+
 // deletes a folder from a mentee
 const deleteFolder = async (req, res) => {
   const { menteeID, folderID } = req.params;
@@ -490,41 +570,9 @@ const deleteFolder = async (req, res) => {
     const sc = await folderRef.get();
     // iterate through the array of files in the doc
     const { files } = sc.data();
-    files.forEach((file) => {
-      const { fileType } = file;
-      // remove file from Root folder
-      db.collection('mentees').doc(menteeID).collection('folders').doc('Root')
-        .update({
-          files: arrayRemove(file),
-        });
-      // if exists in favorites folder, remove file from there too
-      db.collection('mentees').doc(menteeID).collection('folders').doc('favorites')
-        .update({
-          files: arrayRemove(file),
-        });
-      // remove from the default folders
-      if (fileType.includes('image')) {
-        db.collection('mentees').doc(menteeID).collection('folders').doc('Images')
-          .update({
-            files: arrayRemove(file),
-          });
-      } else if (fileType.includes('video')) {
-        db.collection('mentees').doc(menteeID).collection('folders').doc('Videos')
-          .update({
-            files: arrayRemove(file),
-          });
-      } else if (fileType === 'link') {
-        db.collection('mentees').doc(menteeID).collection('folders').doc('Links')
-          .update({
-            files: arrayRemove(file),
-          });
-      } else if (fileType.includes('pdf')) {
-        db.collection('mentees').doc(menteeID).collection('folders').doc('Flyers')
-          .update({
-            files: arrayRemove(file),
-          });
-      }
-    });
+    await Promise.all(files.map(async (file) => {
+      await removeMenteeFile(menteeID, folderID, file, 'deleteFolder');
+    }));
     await folderRef.delete();
     res.status(202).json(`successfully deleted folder: ${folderID}`);
   } catch (error) {
@@ -1029,5 +1077,6 @@ export {
   deleteModule,
   deleteFolder,
   deleteFiles,
+  deleteMenteeFiles,
   addModule,
 };

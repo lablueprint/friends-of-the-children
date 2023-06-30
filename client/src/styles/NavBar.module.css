@@ -221,5 +221,6 @@
     color: var(--dark-blue-for-nav-bar, #156DBF);
     font-family: News Gothic;
     font-weight: 700;
-    margin-left: 20px;
+    width: 80%;
+    margin: auto;
   }

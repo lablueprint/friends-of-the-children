@@ -38,6 +38,7 @@ const theme = createTheme({
 function Mentees({ profile, updateAppProfile }) {
   const [selectedImage, setSelectedImage] = useState(TigerIcon);
   const avatars = [TigerIcon, BirdIcon, BearIcon, DogIcon, MouseIcon];
+  console.log(avatars);
   const [mentees, setMentees] = useState([]);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
