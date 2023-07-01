@@ -86,10 +86,10 @@ function MenteeNav({ profile }) {
       <div className={styles.second_container}>
         {
           locationPath !== `/youth/${firstName}${lastName}` && (
-            <>
+            <Link to={`/youth/${firstName}${lastName}`} state={{ menteeObj }}>
               <img src={avatar} alt="youth avatar" />
               <div className={styles.youth_label}>{`${firstName} ${lastName}`}</div>
-            </>
+            </Link>
           )
         }
         <div className={styles.nav2_btn_container}>

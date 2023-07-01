@@ -285,18 +285,21 @@ const getMenteeFiles = async (req, res) => {
   try {
     const { id, folderName } = req.params;
     if (folderName !== '') {
-      db.collection('mentees').doc(id).collection('folders').doc(folderName)
-        .get()
-        .then((sc) => {
-          const data = sc.data();
-          if (data) {
-            const { files } = data;
-            res.status(202).json(files);
-          }
-        });
+      const folderRef = db.collection('mentees').doc(id).collection('folders').doc(folderName);
+      const folderSnapshot = await folderRef.get();
+
+      if (folderSnapshot.exists) {
+        const data = folderSnapshot.data();
+        const { files } = data;
+        res.status(202).json(files);
+      } else {
+        res.status(404).json('Folder not found');
+      }
+    } else {
+      res.status(400).json('Invalid folder name');
     }
   } catch (error) {
-    res.status(400).json(error);
+    res.status(500).json('An error occurred');
   }
 };
 
@@ -485,16 +488,18 @@ const deleteModule = async (req, res) => {
 };
 
 // helper function, removes a mentee's file from various folders
-const removeMenteeFile = async (menteeID, folderID, file, type = '') => {
+const removeMenteeFile = async (menteeID, file) => {
+  console.log('FILE TO DELETE: ', file);
   const { fileType } = file;
   const menteeRef = db.collection('mentees').doc(menteeID).collection('folders');
   // remove file from firebase storage
-  const fileRef = ref(storage, file.url);
-  await deleteObject(fileRef);
-
+  if (fileType !== 'link') {
+    const fileRef = ref(storage, file.url);
+    await deleteObject(fileRef);
+  }
   // remove file from custom folder
-  if (type !== 'deleteFolder' && folderID !== 'All') {
-    menteeRef.doc(folderID)
+  if (file.category !== 'All') {
+    menteeRef.doc(file.category)
       .update({
         files: arrayRemove(file),
       });
@@ -502,14 +507,14 @@ const removeMenteeFile = async (menteeID, folderID, file, type = '') => {
   // remove file from Root folder
   menteeRef.doc('Root')
     .update({
-      files: arrayRemove({ ...file, category: folderID }),
+      files: arrayRemove(file),
     });
   // if exists in favorites folder, remove file from there too
   const favRef = await menteeRef.doc('favorites').get();
   if (favRef.exists) {
     menteeRef.doc('favorites')
       .update({
-        files: arrayRemove({ ...file, category: folderID }),
+        files: arrayRemove(file),
       });
   }
   // remove from the default folders
@@ -538,25 +543,21 @@ const removeMenteeFile = async (menteeID, folderID, file, type = '') => {
 
 const deleteMenteeFiles = async (req, res) => {
   const {
-    menteeID, folderID, type, filesToDelete,
+    menteeID, filesToDelete,
   } = req.body;
 
   try {
-    if (type === 'deleteFromRoot') {
-      await Promise.all(filesToDelete.map(async (file) => {
-        const fileObj = {
-          fileName: file.fileName,
-          url: file.url,
-          fileType: file.fileType,
-          fileID: file.fileID,
-        };
-        await removeMenteeFile(menteeID, file.category, fileObj);
-      }));
-    } else {
-      await Promise.all(filesToDelete.map(async (file) => {
-        await removeMenteeFile(menteeID, folderID, file);
-      }));
-    }
+    await Promise.all(filesToDelete.map(async (file) => {
+      // get rid of fileSize/fileDate fields if deleting from expandedmentee page
+      const fileObj = {
+        url: file.url,
+        fileType: file.fileType,
+        fileName: file.fileName,
+        category: file.category,
+        fileID: file.fileID,
+      };
+      await removeMenteeFile(menteeID, fileObj);
+    }));
     res.status(202).json('successfully deleted mentee files');
   } catch (error) {
     res.status(400).json('could not delete mentee files');
@@ -572,7 +573,7 @@ const deleteFolder = async (req, res) => {
     // iterate through the array of files in the doc
     const { files } = sc.data();
     await Promise.all(files.map(async (file) => {
-      await removeMenteeFile(menteeID, folderID, file, 'deleteFolder');
+      await removeMenteeFile(menteeID, file);
     }));
     await folderRef.delete();
     res.status(202).json(`successfully deleted folder: ${folderID}`);

@@ -220,7 +220,7 @@ a{
 }
 
 .clearance button img {
-    margin-bottom: 35px;
+    margin-left: 10px;
 }
 
 .mediaForm p{
@@ -366,4 +366,26 @@ input[type="radio"] {
     display: flex;
     justify-content: space-between;
     height: 40px;
+  }
+
+  .smaller_img {
+    width: 25px;
+  }
+
+  .my_youth_link{
+    color: black;
+    text-decoration: underline;
+  }
+
+  .heart_button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-left: 200px;
+    height: 0;
+    position: absolute;
+  }
+
+  .heart_button img {
+    margin-top: -50px;
   }

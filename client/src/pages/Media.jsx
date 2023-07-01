@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   ref, uploadBytes, getDownloadURL,
 } from 'firebase/storage';
@@ -16,6 +16,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+import linkIcon from '../assets/icons/file_link.svg';
+import heartIcon from '../assets/icons/heart.svg';
+import filledHeart from '../assets/icons/filled_heart.svg';
 import FilePopup from '../components/FilePopup';
 import styles from '../styles/Mentees.module.css';
 import styles2 from '../styles/Modules.module.css';
@@ -43,6 +46,7 @@ function Media({ profile }) {
   const [favTab, setFavTab] = useState(false);
   const [checked, setChecked] = useState([]);
   const [hoveredFile, setHoveredFile] = useState(null);
+  const [favorites, setFavorites] = useState([]); // array of favorite file objects
   const [fileToDisplay, setFileToDisplay] = useState({});
   const [openFilePopups, setOpenFilePopups] = useState(Array(mediaArray.length).fill(false));
   const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
@@ -52,49 +56,61 @@ function Media({ profile }) {
     api.getMenteeFiles(id, folderName).then((files) => {
       setMediaArray(files.data);
     });
+    api.getMenteeFiles(id, 'favorites').then((files) => {
+      if (files) {
+        const tempArr = [];
+        (files.data).forEach((file) => {
+          if (file.category === folderName) tempArr.push(file);
+        });
+        setFavorites(tempArr);
+      }
+    });
   }, [menteeObj]);
 
   // creates new object for the file, updates mediaArray, and calls updateMentee
   const addMedia = (e) => {
     e.preventDefault();
     const fileName = e.target.title.value;
-    let fileUrl;
+    const category = folderName;
+    let fileID;
     let fileType;
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileUrl = uuidv4(files.name);
+      fileID = uuidv4(files.name);
       fileType = files.type;
-
-      const storageRef = ref(storage, `/images/${fileUrl}`);
+      const storageRef = ref(storage, `/images/${fileID}`);
       uploadBytes(storageRef, files).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
           const tempArr = mediaArray;
           const data = {
+            fileID,
             fileName,
             url,
             fileType,
-            fileID: fileUrl,
+            category,
           };
           tempArr.push(data);
           setMediaArray(tempArr);
-          return data;
-        })
-          .then((data) => {
-            api.addMenteeFile(id, folderName, data, fileType);
-            setOpen(false);
-            e.target.reset();
-          });
+          api.addMenteeFile(id, folderName, data, fileType);
+          setOpen(false);
+          e.target.reset();
+        });
       });
     } else if (isLink) { // reading text input for links, not file input
-      fileUrl = fileName;
+      const url = e.target.link.value;
+      fileID = uuidv4(url);
       fileType = 'link';
+
       const tempArr = mediaArray;
       const data = {
         fileName,
-        url: e.target.link.value,
+        url,
         fileType,
+        fileID,
+        category,
       };
+
       tempArr.push(data);
       setMediaArray(tempArr);
       api.addMenteeFile(id, folderName, data, fileType);
@@ -157,11 +173,11 @@ function Media({ profile }) {
   };
 
   const deleteFiles = async (filesToDelete) => {
-    api.deleteMenteeFiles({
-      menteeID: id, folderID: folderName, type: '', filesToDelete,
-    }).then(() => {
+    api.deleteMenteeFiles({ menteeID: id, filesToDelete }).then(() => {
       const tempFiles = [...mediaArray.filter((file) => !filesToDelete.includes(file))];
       setMediaArray(tempFiles);
+      const tempFavFiles = [...favorites.filter((file) => !filesToDelete.includes(file))];
+      setFavorites(tempFavFiles);
       clearCheckboxes();
     })
       .catch((error) => {
@@ -169,11 +185,39 @@ function Media({ profile }) {
       });
   };
 
+  const handleFillHeart = (index, file) => {
+    // revert the file object when storing into database
+    const fileObj = {
+      fileName: file.fileName,
+      url: file.url,
+      fileType: file.fileType,
+      category: file.category,
+      fileID: file.fileID,
+    };
+    // if heart is filled
+    if (!favorites.some((element) => element.url === file.url)) {
+      // update favorites state array (want the full file object)
+      const tempFavs = [...favorites];
+      tempFavs.push(file);
+      setFavorites(tempFavs);
+      // store this new state into the database (use reverted file object)
+      api.updateFileLinksField(fileObj, id, 'files', 'addFile', 'mentees');
+    } else {
+      const tempFavs = favorites.filter((element) => element.url !== file.url);
+      setFavorites(tempFavs);
+      api.updateFileLinksField(fileObj, id, 'files', 'removeFile', 'mentees');
+    }
+  };
+
   return (
     <div className={styles.folders_page}>
       <div>
         <p>
-          {`My Youth > ${firstName} ${lastName} > `}
+          <Link to="/youth" className={styles.my_youth_link}>
+            My Youth
+          </Link>
+          {' > '}
+          {`${firstName} ${lastName} > `}
           <b>
             {`${folderName}`}
           </b>
@@ -207,8 +251,8 @@ function Media({ profile }) {
 
       {/* mapping each file in the array to a little card element onscreen */}
       {/* EDIT: COPIED FROM EXPANDED MODULE */}
-      {mediaArray.map((file, index) => (
-        <div key={file.url} className={styles2.fileContainer}>
+      {(favTab ? favorites : mediaArray).map((file, index) => (
+        <div key={file.fileID} className={styles2.fileContainer}>
           {(file.fileType.includes('image')) && (
           <div>
             <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
@@ -216,7 +260,7 @@ function Media({ profile }) {
             </div>
             <div className={styles2.descriptionContainer}>
               <div
-                key={file.url}
+                key={file.fileID}
                 onMouseEnter={() => handleMouseEnter(file.url)}
                 onMouseLeave={handleMouseLeave}
               >
@@ -241,7 +285,7 @@ function Media({ profile }) {
             </div>
             <div className={styles2.descriptionContainer}>
               <div
-                key={file.url}
+                key={file.fileID}
                 onMouseEnter={() => handleMouseEnter(file.url)}
                 onMouseLeave={handleMouseLeave}
               >
@@ -265,7 +309,7 @@ function Media({ profile }) {
             </div>
             <div className={styles2.descriptionContainer}>
               <div
-                key={file.url}
+                key={file.fileID}
                 onMouseEnter={() => handleMouseEnter(file.url)}
                 onMouseLeave={handleMouseLeave}
               >
@@ -282,12 +326,51 @@ function Media({ profile }) {
             </div>
           </div>
           )}
-          {openFilePopups[index] && (
-          <FilePopup
-            file={fileToDisplay}
-            open={openFilePopups[index]}
-            handleClose={() => handleCloseFilePopup(file)}
-          />
+          {(file.fileType === 'link') && (
+          <div>
+            <a href={file.url} target="_blank" rel="noreferrer">
+              <div className={styles2.preview}>
+                <embed className={styles2.displayImg} src={file.url} alt={file.fileName} />
+              </div>
+              <div className={styles2.descriptionContainer}>
+                <div
+                  key={file.fileID}
+                  onMouseEnter={() => handleMouseEnter(file.url)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <img src={file.imageSrc} alt={file.name} />
+                  {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                    <Checkbox
+                      checked={checked.includes(file)}
+                      onChange={(event) => handleCheckboxChange(event, file)}
+                      className={styles2.checkbox}
+                    />
+                  ) : (<img className={styles.smaller_img} src={linkIcon} alt="link icon" />)}
+                </div>
+                <div className={`${styles2.fileName} ${styles2.pdf_preview}`}>{file.fileName}</div>
+              </div>
+            </a>
+          </div>
+          )}
+
+          <button
+            type="button"
+            className={styles.heart_button}
+            onClick={() => { handleFillHeart(index, file); }}
+          >
+            {favorites.some((element) => element.url === file.url) ? (
+              <img src={filledHeart} alt="favorite file" />
+            ) : (
+              <img src={heartIcon} alt="not a favorite file" />
+            )}
+          </button>
+
+          {file.fileType !== 'link' && openFilePopups[index] && (
+            <FilePopup
+              file={fileToDisplay}
+              open={openFilePopups[index]}
+              handleClose={() => handleCloseFilePopup(file)}
+            />
           )}
         </div>
       ))}
