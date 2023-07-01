@@ -241,3 +241,36 @@
     font-weight: 700;
     line-height: normal;
 }
+  
+  .roleButton {
+    margin-right: 14px;
+    width: 135px;
+    padding: 10px 15px; 
+    border-radius: 8px;
+    border: 1.5px solid var(--green, #6AA);
+    background-color: transparent;
+    color: var(--text, #3F3F3F);
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  
+  .roleButton:hover {
+    background-color: var(--green, #6AA);
+    color: white;
+  }
+  
+  .roleButton.active {
+    border-radius: 8px;
+    border: 1.5px solid var(--green, #6AA);
+    background: #6AA;
+    color: var(--white, #FFF);
+    font-family: News Gothic;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .fotc_button {
+    border: none;
+    background-color: transparent;
+  }

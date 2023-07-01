@@ -29,7 +29,7 @@ function UserNotApproved({ updateAppProfile, profile }) {
   return (
     <div className={styles.approve_container}>
       <div>
-        <a href="/">
+        <button type="button" onClick={handleLogout} className={styles.fotc_button}>
           <img
             style={{
               position: 'absolute', width: '139px', height: '67px', left: '61px', top: '40px', zIndex: '1000',
@@ -37,7 +37,7 @@ function UserNotApproved({ updateAppProfile, profile }) {
             src={fotcLogo}
             alt="fotc logo"
           />
-        </a>
+        </button>
       </div>
       <div className={styles.approve_main}>
         <h1 className={styles.approve_title}>Thank you for signing up!</h1>

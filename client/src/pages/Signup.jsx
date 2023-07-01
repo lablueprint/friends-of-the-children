@@ -127,7 +127,7 @@ function Signup({ updateAppProfile }) {
               bio: '',
             };
             db.collection('profiles').doc().set(data);
-            navigate('/');
+            navigate('/unapproved');
           });
       } else {
         const data = {
@@ -192,7 +192,31 @@ function Signup({ updateAppProfile }) {
         <h1 className={styles.bigtitle}>Sign Up</h1>
         <p>Please identify your role</p>
         <form onSubmit={(event) => { onSubmit(); event.preventDefault(); }} id="signinform">
-          <FormControl sx={{ width: '60%' }}>
+          <div className={styles.roleContainer}>
+            <button
+              type="button"
+              className={`${styles.roleButton} ${role === 'Caregiver' ? styles.active : ''}`}
+              onClick={() => setRole('Caregiver')}
+            >
+              Caregiver
+            </button>
+            <button
+              type="button"
+              className={`${styles.roleButton} ${role === 'Mentor' ? styles.active : ''}`}
+              onClick={() => setRole('Mentor')}
+            >
+              Mentor
+            </button>
+            <button
+              type="button"
+              className={`${styles.roleButton} ${role === 'Admin' ? styles.active : ''}`}
+              onClick={() => setRole('Admin')}
+            >
+              Admin
+            </button>
+          </div>
+
+          {/* <FormControl sx={{ width: '60%' }}>
             <InputLabel>Role</InputLabel>
             <Select
               id="role"
@@ -206,7 +230,7 @@ function Signup({ updateAppProfile }) {
               <MenuItem value="Mentor">Mentor</MenuItem>
               <MenuItem value="Admin">Admin</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
           <p>Enter your information</p>
           <div>
             {createTextField('First Name', firstName, setFirstName)}
