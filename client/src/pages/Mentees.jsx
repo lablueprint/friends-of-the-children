@@ -39,7 +39,6 @@ function Mentees({ profile, updateAppProfile }) {
   const MouseIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fmouse_avatar.svg?alt=media&token=c51a55f4-81cb-4e0f-bfda-4bae1e6ae2ea';
   const [selectedImage, setSelectedImage] = useState(TigerIcon);
   const avatars = [TigerIcon, BirdIcon, BearIcon, DogIcon, MouseIcon];
-  console.log(avatars);
   const [mentees, setMentees] = useState([]);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');

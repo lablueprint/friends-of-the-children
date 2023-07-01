@@ -39,19 +39,19 @@ function App() {
   };
 
   return (
-    isLoggedIn
+    isLoggedIn && currUser.approved
       ? (
         <div className="App">
           <div className={styles.wrapper}>
             {(currUser.role === 'Admin' || currUser.approved) && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
-            <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
-              {(locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/') && (
+            <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || (locationPath === '/' && currUser.approved) ? styles.mainContent : styles.mainContent2}`}>
+              {(locationPath.includes('/resources') || locationPath === '/expanded-module' || (locationPath === '/' && currUser.approved)) && (
                 <ModuleNav profile={currUser} />
               )}
               {locationPath.includes('/youth/') && (
                 <MenteeNav profile={currUser} />
               )}
-              <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+              <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || (locationPath === '/' && currUser.approved) ? styles.mainContent : styles.mainContent2}`}>
                 <Routes>
                   {currUser.role === 'Admin' || currUser.approved ? <Route path="/" element={(<Resources profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
                   <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
@@ -78,7 +78,7 @@ function App() {
         <div className="App">
           <NavBar profile={currUser} updateAppProfile={updateProfile} />
           <Routes>
-            <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} />
+            {!currUser ? <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
             <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />

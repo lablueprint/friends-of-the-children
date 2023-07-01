@@ -46,9 +46,12 @@ a{
 }
 
 .head_container h1 {
-    color: #000;
-    font-family: News Gothic;
-    font-weight: 700;
+  color: #000;
+  font-size: 2.8rem;
+  font-family: News Gothic;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
 }
 
 .labels_container{
@@ -85,7 +88,7 @@ a{
 }
 
 .mentees_container{
-    margin-top: 50px;
+    margin-top: 40px;
     display: flex;
     gap: 20px;
     text-align: left;

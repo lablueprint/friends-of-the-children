@@ -229,9 +229,11 @@ function Media({ profile }) {
           <div className={styles.media_heading_container}>
             <h3>{`${folderName}`}</h3>
             <div className={styles.buttons}>
+              {role === 'mentor' && (
               <button type="button" className={styles2.editModule}>
                 Edit Module
               </button>
+              )}
 
               {/* QUESTION: should users be able to directly add into the images/videos/flyers folders? */}
               {role === 'mentor' && (

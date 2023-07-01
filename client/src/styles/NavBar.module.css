@@ -46,7 +46,6 @@
     vertical-align: middle;
     
     letter-spacing: 0.08rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     
     border-radius: 2rem;
     background-color: #F6FAFF;
@@ -135,7 +134,6 @@
     width: 1rem;
     height: .5rem;
     width: 100%;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out;
 }
 
 .nav2_btn_top_round, .nav2_btn_bottom_round {
@@ -161,7 +159,6 @@
 .nav2_btn_selected{
     background-color: #1D2366;
     color: white !important;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out;
 }
 
 .editModule{

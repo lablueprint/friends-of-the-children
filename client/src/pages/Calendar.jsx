@@ -100,9 +100,10 @@ function Calendar({ profile }) {
     ? <CalendarEventForm profile={profile} getCalendarRef={() => (calendarRef)} /> : null);
 
   return (
-    <div>
+    <div className={styles.calendar_container}>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       {createForm()}
+      <h1>Calendar</h1>
       <div className={styles.calendar}>
         <FullCalendar
           ref={calendarRef}

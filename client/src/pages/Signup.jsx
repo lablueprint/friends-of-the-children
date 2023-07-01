@@ -127,7 +127,7 @@ function Signup({ updateAppProfile }) {
               bio: '',
             };
             db.collection('profiles').doc().set(data);
-            navigate('/unapproved');
+            navigate('/');
           });
       } else {
         const data = {
