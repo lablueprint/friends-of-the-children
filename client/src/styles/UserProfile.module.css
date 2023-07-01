@@ -1,12 +1,12 @@
 .profile_page{
+    width: 107%;
     background-color: white;
     background-image: url('../assets/images/pfp_frame.svg');
     background-repeat: no-repeat;
-    border-radius: 20px;
-    margin: 50px 50px 100px 0px;
+    margin-left: -3%;
+    height: 150vh;
     padding: 100px;
     text-align: left;
-    margin-left: 50px;
 }
 
 .profile_flex{
