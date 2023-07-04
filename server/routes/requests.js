@@ -37,6 +37,7 @@ import {
   deleteModule,
   deleteFolder,
   deleteFiles,
+  deleteMenteeFiles,
   addModule,
 } from '../controllers/controllers.js';
 
@@ -114,6 +115,9 @@ router.delete('/deleteFolder/:menteeID/:folderID', deleteFolder);
 
 // deletes file from module FileLink array field and Firebase storage
 router.delete('/deleteFiles', deleteFiles);
+
+// deletes files from a mentee's folder or the Root folder
+router.post('/deleteMenteeFiles', deleteMenteeFiles);
 
 // adds a module to Firebase, returns dataRef (containing module's id in firebase)
 router.post('/addModule', addModule);

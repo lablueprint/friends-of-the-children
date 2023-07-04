@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   ref, uploadBytes, getDownloadURL, getMetadata,
 } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from '@mui/material';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
@@ -22,6 +23,7 @@ import filledHeart from '../assets/icons/filled_heart.svg';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+import linkIcon from '../assets/icons/file_link.svg';
 import ClearedIcon from '../assets/icons/cleared.svg';
 import NotClearedIcon from '../assets/icons/not_cleared.svg';
 import HomeIcon from '../assets/icons/home.svg';
@@ -54,30 +56,38 @@ function ExpandedMentee({ profile }) {
   const [favTab, setFavTab] = useState(false); // which tab you're on
   const role = (profile.role).toLowerCase();
 
-  console.log(recents);
-
   const createFileObjects = async (fileLinks) => {
     setRecents([]);
     const fileContents = [];
     if (fileLinks.length > 0) {
       await Promise.all(fileLinks.map(async (fileLink) => {
+        // extract existing fields
         const {
-          fileName, url, fileType, category,
+          fileName, url, fileType, category, fileID,
         } = fileLink;
-        const spaceRef = ref(storage, fileLink.url);
-        const file = await getMetadata(spaceRef);
-        const fileSize = `${(file.size / 1048576).toFixed(1)} MB`;
 
-        const timeString = file.timeCreated;
-        const date = new Date(timeString);
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const fileDate = date.toLocaleString('en-US', options);
+        // new fields to add to fileLink object
+        let fileSize = '0.0 MB';
+        let fileDate = 'July 1, 2023'; // PLACEHOLDER
+
+        // get file size and file upload date if not a link
+        if (fileType !== 'link') {
+          const spaceRef = ref(storage, fileLink.url);
+          const file = await getMetadata(spaceRef);
+          fileSize = `${(file.size / 1048576).toFixed(1)} MB`;
+
+          const timeString = file.timeCreated;
+          const date = new Date(timeString);
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          fileDate = date.toLocaleString('en-US', options);
+        }
 
         fileContents.push({
-          url, fileType, fileName, category, fileSize, fileDate,
+          url, fileType, fileName, category, fileSize, fileDate, fileID,
         });
       }));
-      // sorting files alphabetically
+
+      // sorting files by category alphabetically
       fileContents.sort((a, b) => {
         if (a.category < b.category) {
           return -1;
@@ -87,6 +97,7 @@ function ExpandedMentee({ profile }) {
         }
         return 0;
       });
+
       setRecents(fileContents);
     }
   };
@@ -121,44 +132,49 @@ function ExpandedMentee({ profile }) {
     e.preventDefault();
     const fileName = e.target.title.value;
     const folderName = e.target.folders.value;
-    let fileUrl;
+    const category = folderName === 'Root' ? 'All' : folderName;
+    let fileID;
     let fileType;
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileUrl = files.name;
+      fileID = uuidv4(files.name);
       fileType = files.type;
-      const storageRef = ref(storage, `/images/${fileUrl}`);
+      const storageRef = ref(storage, `/images/${fileID}`);
       uploadBytes(storageRef, files).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
           const tempArr = recents;
           const data = {
+            fileID,
             fileName,
             url,
             fileType,
+            category,
           };
+          // add new file to corresponding folders in firebase + update recents array
           tempArr.push(data);
-          setRecents(tempArr);
-          return data;
-        })
-          .then((data) => {
-            console.log(data);
-            api.addMenteeFile(id, folderName, data, fileType);
-            setfileUploadOpen(false);
-            e.target.reset();
-          });
+          createFileObjects(tempArr);
+          api.addMenteeFile(id, folderName, data, fileType);
+          setfileUploadOpen(false);
+          e.target.reset();
+        });
       });
     } else if (isLink) { // reading text input for links, not file input
-      fileUrl = fileName;
+      const url = e.target.link.value;
+      fileID = uuidv4(url);
       fileType = 'link';
+
       const tempArr = recents;
       const data = {
         fileName,
-        url: e.target.link.value,
+        url,
         fileType,
+        fileID,
+        category,
       };
+
       tempArr.push(data);
-      setRecents(tempArr);
+      createFileObjects(tempArr);
       api.addMenteeFile(id, folderName, data, fileType);
       setfileUploadOpen(false);
       e.target.reset();
@@ -187,7 +203,7 @@ function ExpandedMentee({ profile }) {
     setCaregiverOpen(false);
   };
 
-  // update the medical clearance
+  // update the media clearance
   const updateClearance = () => {
     api.updateClearance(id, cleared);
     setCleared(!cleared);
@@ -236,16 +252,15 @@ function ExpandedMentee({ profile }) {
   };
 
   const deleteFiles = async (filesToDelete) => {
-    const deletePromises = filesToDelete.map((file) => api.deleteFiles(file.id, [`files/${file.fileName}`]));
-
-    Promise.all(deletePromises)
-      .then(() => {
-        const tempFiles = [...recents.filter((file) => !filesToDelete.includes(file))];
-        setRecents(tempFiles);
-        clearCheckboxes();
-      })
+    api.deleteMenteeFiles({ menteeID: id, filesToDelete }).then(() => {
+      const tempFiles = [...recents.filter((file) => !filesToDelete.includes(file))];
+      setRecents(tempFiles);
+      const tempFavFiles = [...favorites.filter((file) => !filesToDelete.includes(file))];
+      setFavorites(tempFavFiles);
+      clearCheckboxes();
+    })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
 
@@ -255,14 +270,16 @@ function ExpandedMentee({ profile }) {
       fileName: file.fileName,
       url: file.url,
       fileType: file.fileType,
+      category: file.category,
+      fileID: file.fileID,
     };
     // if heart is filled
     if (!favorites.some((element) => element.url === file.url)) {
-      // update favorites state array
+      // update favorites state array (want the full file object)
       const tempFavs = [...favorites];
-      tempFavs.push(fileObj);
+      tempFavs.push(file);
       setFavorites(tempFavs);
-      // store this new state into the database
+      // store this new state into the database (use reverted file object)
       api.updateFileLinksField(fileObj, id, 'files', 'addFile', 'mentees');
     } else {
       const tempFavs = favorites.filter((element) => element.url !== file.url);
@@ -275,7 +292,10 @@ function ExpandedMentee({ profile }) {
     <div className={styles.folders_page}>
       <div>
         <p>
-          {'My Youth > '}
+          <Link to="/youth" className={styles.my_youth_link}>
+            My Youth
+          </Link>
+          {' > '}
           <b>
             {`${firstName} ${lastName}`}
           </b>
@@ -300,13 +320,12 @@ function ExpandedMentee({ profile }) {
                     years old
                   </p>
                 </div>
-              </div>
-
-              <div className={styles.clearance}>
-                <button type="button" onClick={updateClearance}>
-                  {cleared && <img alt="media clearance cleared" src={ClearedIcon} />}
-                  {!cleared && <img alt="media clearance not cleared" src={NotClearedIcon} />}
-                </button>
+                <div className={styles.clearance}>
+                  <button type="button" onClick={updateClearance}>
+                    {cleared && <img alt="media clearance cleared" src={ClearedIcon} />}
+                    {!cleared && <img alt="media clearance not cleared" src={NotClearedIcon} />}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -331,6 +350,7 @@ function ExpandedMentee({ profile }) {
       </div>
       <div className={styles.line} />
 
+      {/* displaying the default folders */}
       <div className={styles.folders_map}>
         {defaultFolders.map((folder) => (
           folder !== 'Root' && (
@@ -355,6 +375,7 @@ function ExpandedMentee({ profile }) {
         ))}
       </div>
 
+      {/* displaying the list of all files */}
       <div className={styles2.fieldSpan}>
         <h5>File Name</h5>
         <h5>File Size</h5>
@@ -363,11 +384,12 @@ function ExpandedMentee({ profile }) {
       </div>
       <div className={styles2.resourcesDisplay}>
         {/* conditional rendering based on which tab (All/Favorites) ur on */}
+        {/* maps favorites array if on favorites tab; maps recents array otherwise */}
         {(favTab ? favorites : recents).map((file, index) => (
-          <div key={file.url} className={styles2.spanContainer}>
+          <div key={file.fileID} className={styles2.spanContainer}>
             <div className={styles2.spanFile}>
               <div
-                key={file.fileName}
+                key={file.fileID}
                 onMouseEnter={() => handleMouseEnter(file.fileName)}
                 onMouseLeave={handleMouseLeave}
               >
@@ -382,12 +404,22 @@ function ExpandedMentee({ profile }) {
                     {(file.fileType.includes('image')) && <img src={imgIcon} alt="img icon" />}
                     {(file.fileType.includes('video')) && <img src={vidIcon} alt="vid icon" />}
                     {((file.fileType.includes('pdf')) || file.fileType.includes('text')) && <img src={pdfIcon} alt="pdf icon" />}
+                    {((file.fileType === 'link')) && <img className={styles.smaller_img} src={linkIcon} alt="link icon" />}
                   </>
                 )}
               </div>
-              <div onClick={() => (handleClickOpenFilePopup(file))} role="presentation" className={styles2.fileName}>
-                {file.fileName}
-              </div>
+              {file.fileType !== 'link' && (
+                <div onClick={() => (handleClickOpenFilePopup(file))} role="presentation" className={styles2.fileName}>
+                  {file.fileName}
+                </div>
+              )}
+              {file.fileType === 'link' && (
+              <a href={file.url} target="_blank" rel="noreferrer">
+                <div className={styles2.fileName}>
+                  {file.fileName}
+                </div>
+              </a>
+              )}
               <div><h5>{file.fileSize}</h5></div>
               <div><h5>{file.fileDate}</h5></div>
               <h5>{file.category}</h5>
@@ -403,7 +435,7 @@ function ExpandedMentee({ profile }) {
                 )}
               </button>
             </div>
-            {openFilePopups[index] && (
+            {file.fileType !== 'link' && openFilePopups[index] && (
             <FilePopup
               file={fileToDisplay}
               open={openFilePopups[index]}

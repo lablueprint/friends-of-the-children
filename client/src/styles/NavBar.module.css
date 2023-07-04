@@ -46,7 +46,6 @@
     vertical-align: middle;
     
     letter-spacing: 0.08rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     
     border-radius: 2rem;
     background-color: #F6FAFF;
@@ -94,6 +93,20 @@
     box-shadow: 7px 4px 30px 2px rgba(165, 217, 255, 0.2);
 }
 
+.youth_label {
+    width: 80%;
+    margin: auto;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background: #DEEBFF;
+    color: #1D2366;
+    font-size: 1.3rem;
+    font-family: News Gothic;
+    font-weight: 500;
+}
+
 .secondNav{
     background-color: #1D2366;
     height: 100vh;
@@ -121,7 +134,6 @@
     width: 1rem;
     height: .5rem;
     width: 100%;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out;
 }
 
 .nav2_btn_top_round, .nav2_btn_bottom_round {
@@ -147,7 +159,6 @@
 .nav2_btn_selected{
     background-color: #1D2366;
     color: white !important;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out;
 }
 
 .editModule{
@@ -221,5 +232,6 @@
     color: var(--dark-blue-for-nav-bar, #156DBF);
     font-family: News Gothic;
     font-weight: 700;
-    margin-left: 20px;
+    width: 80%;
+    margin: auto;
   }

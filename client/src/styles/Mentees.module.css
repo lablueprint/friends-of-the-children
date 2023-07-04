@@ -46,9 +46,12 @@ a{
 }
 
 .head_container h1 {
-    color: #000;
-    font-family: News Gothic;
-    font-weight: 700;
+  color: #000;
+  font-size: 2.8rem;
+  font-family: News Gothic;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
 }
 
 .labels_container{
@@ -85,10 +88,11 @@ a{
 }
 
 .mentees_container{
-    margin-top: 50px;
+    margin-top: 40px;
     display: flex;
     gap: 20px;
     text-align: left;
+    flex-wrap: wrap;
 }
 
 .card_container{
@@ -219,7 +223,7 @@ a{
 }
 
 .clearance button img {
-    margin-bottom: 35px;
+    margin-left: 10px;
 }
 
 .mediaForm p{
@@ -366,4 +370,26 @@ input[type="radio"] {
     display: flex;
     justify-content: space-between;
     height: 40px;
+  }
+
+  .smaller_img {
+    width: 25px;
+  }
+
+  .my_youth_link{
+    color: black;
+    text-decoration: underline;
+  }
+
+  .heart_button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-left: 200px;
+    height: 0;
+    position: absolute;
+  }
+
+  .heart_button img {
+    margin-top: -50px;
   }

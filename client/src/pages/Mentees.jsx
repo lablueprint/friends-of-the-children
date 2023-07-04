@@ -13,11 +13,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import SmileyIcon from '../assets/icons/smiley.svg';
-import TigerIcon from '../assets/icons/tiger_avatar.svg';
-import BirdIcon from '../assets/icons/bird_avatar.png';
-import DogIcon from '../assets/icons/dog_avatar.svg';
-import BearIcon from '../assets/icons/bear_avatar.svg';
-import MouseIcon from '../assets/icons/mouse_avatar.svg';
 import MenteeCard from '../assets/images/mentee_card.svg';
 import styles from '../styles/Mentees.module.css';
 import * as api from '../api';
@@ -36,6 +31,12 @@ const theme = createTheme({
 });
 
 function Mentees({ profile, updateAppProfile }) {
+  // have avatar images pre-stored in the firebase storage (under /avatars)
+  const TigerIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Ftiger_avatar.svg?alt=media&token=9636de6b-fb88-4f23-9c25-0cf71c96e9ee';
+  const BirdIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fbird_avatar.png?alt=media&token=f572e7ad-fc03-467c-acb2-4f6c2f6c0e98';
+  const BearIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fbear_avatar.svg?alt=media&token=8933836d-fc68-4249-9d67-5466c91b3d59';
+  const DogIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fdog_avatar.svg?alt=media&token=81b925cc-c121-4cbc-9914-79e884af2ccb';
+  const MouseIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fmouse_avatar.svg?alt=media&token=c51a55f4-81cb-4e0f-bfda-4bae1e6ae2ea';
   const [selectedImage, setSelectedImage] = useState(TigerIcon);
   const avatars = [TigerIcon, BirdIcon, BearIcon, DogIcon, MouseIcon];
   const [mentees, setMentees] = useState([]);

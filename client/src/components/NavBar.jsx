@@ -28,13 +28,13 @@ function NavBar({ profile, updateAppProfile }) {
 
   return (
     <div>
-      {!profile
+      {!profile || (profile && !profile.approved)
         ? (
           <div>
             <a href="/">
               <img
                 style={{
-                  position: 'absolute', width: '139px', height: '67px', left: '61px', top: '40px',
+                  position: 'absolute', width: '139px', height: '67px', left: '61px', top: '40px', zIndex: '1000',
                 }}
                 src={fotcLogo}
                 alt="fotc logo"
@@ -58,10 +58,13 @@ function NavBar({ profile, updateAppProfile }) {
               Resources
             </Link>
             {/* TODO: have requests link instead for admin */}
-            <Link to="/mentees" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath.includes('/mentees') ? styles.btn_selected : ''}`}>
+            {profile.role !== 'Admin'
+            && (
+            <Link to="/youth" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath.includes('/youth') ? styles.btn_selected : ''}`}>
               <img src={YouthIcon} alt="mentees icon" />
               My Youth
             </Link>
+            )}
             <Link to="/calendar" className={`${styles.btn_info} ${styles.main_btn_info} ${locationPath === '/calendar' ? styles.btn_selected : ''}`}>
               <img src={CalendarIcon} alt="calendar icon" />
               Calendar
@@ -101,6 +104,7 @@ NavBar.propTypes = {
     bio: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
     google: PropTypes.bool,
+    approved: PropTypes.bool,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   updateAppProfile: PropTypes.func.isRequired,
