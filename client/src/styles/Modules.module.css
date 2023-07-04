@@ -516,8 +516,8 @@
 }
 
 .spanFile :nth-child(6){
-    position: absolute;
-    right: 40px;
+    position: relative;
+    right: 20px;
 }
 
 .heart_button {
@@ -526,6 +526,10 @@
     padding: 0;
     margin-left: 10px;
   }
+
+.heart_button img {
+    width: 100%;
+}
 
 .line{
     margin: 7px 30px 20px 20px;

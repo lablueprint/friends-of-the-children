@@ -12,6 +12,7 @@ import DialogContent from '@mui/material/DialogContent';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+import EditIcon from '../assets/icons/editicon.svg';
 import FilePopup from '../components/FilePopup';
 import styles from '../styles/Mentees.module.css';
 import styles2 from '../styles/Modules.module.css';
@@ -160,6 +161,7 @@ function Media({ profile }) {
             <h3>{`${folderName}`}</h3>
             <div className={styles.buttons}>
               <button type="button" className={styles2.editModule}>
+                <img src={EditIcon} alt="edit icon" />
                 Edit Module
               </button>
 

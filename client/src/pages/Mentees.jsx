@@ -206,7 +206,7 @@ function Mentees({ profile, updateAppProfile }) {
 
       <div>
         <ThemeProvider theme={theme}>
-          <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+          <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
             <DialogContent>
               <div className={styles.dialogContainer}>
                 <h3 className={styles.dialog_h3}>Add a Youth</h3>

@@ -236,6 +236,7 @@ input[type="radio"] {
     display: inline-block;
     cursor: pointer;
     padding: 0px;
+    margin-right: 20px;
   }
 
   /* Add styles for the selected image */
