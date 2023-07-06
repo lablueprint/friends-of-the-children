@@ -90,7 +90,6 @@ export default function NewModulePopup(props) {
       children: [],
       parent: parentID,
       fileLinks, // set from handleChange, which triggers handleUpload of all the files
-
     };
 
     // if you are adding a child node to an expanded module, update parent's child array and child's parentID

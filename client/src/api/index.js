@@ -1,6 +1,7 @@
 // send client-side (frontend) data to server
 import axios from 'axios';
 
+// replace with url for EC2 instance
 const url = 'http://localhost:5000/fotc';
 
 // creates an event on gcal

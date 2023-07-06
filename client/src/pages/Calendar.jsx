@@ -1,4 +1,6 @@
-import { React, useRef } from 'react';
+import {
+  React, useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import FullCalendar from '@fullcalendar/react'; // must go before plugins
@@ -9,6 +11,7 @@ import styles from '../styles/Calendar.module.css';
 import ColorBlobs from '../assets/images/color_blobs.svg';
 import * as constants from '../constants';
 import CalendarEventForm from '../components/CalendarEventForm';
+import UpcomingEvents from '../components/UpcomingEvents';
 
 /*
 
@@ -33,6 +36,7 @@ function Calendar({ profile }) {
   } = process.env;
 
   const calendarRef = useRef();
+
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
   };
@@ -96,31 +100,38 @@ function Calendar({ profile }) {
   };
   const calendarInfo = getCalendarByRole();
 
-  const createForm = () => (currRole === 'admin' // enable add event form iff admin
-    ? <CalendarEventForm profile={profile} getCalendarRef={() => (calendarRef)} /> : null);
-
   return (
     <div className={styles.calendar_container}>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
-      {createForm()}
-      <h1>Calendar</h1>
-      <div className={styles.calendar}>
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          selectable
-          editable={currRole === 'admin'}
-          eventDrop={currRole === 'admin' ? dropEvent : null}
-          selectMirror
-          dayMaxEvents
-          eventColor="rgba(0, 170, 238, 0.2)"
-          eventTextColor="black"
-          fixedWeekCount={false}
-          googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
-          eventSources={calendarInfo}
-          eventClick={handleEventClick}
-        />
+      <div className={styles.container}>
+        {currRole === 'admin' && (
+          <div className={styles.formContainer}>
+            <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} />
+          </div>
+        )}
+        <div className={styles.contentContainer}>
+          <div className={styles.calendar}>
+            <FullCalendar
+              ref={calendarRef}
+              plugins={[dayGridPlugin, googleCalendarPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              selectable
+              editable={currRole === 'admin'}
+              eventDrop={currRole === 'admin' ? dropEvent : null}
+              selectMirror
+              dayMaxEvents
+              eventColor="rgba(0, 170, 238, 0.2)"
+              eventTextColor="black"
+              fixedWeekCount={false}
+              googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
+              eventSources={calendarInfo}
+              eventClick={handleEventClick}
+            />
+          </div>
+          <div className={styles.upcomingEvents}>
+            <UpcomingEvents profile={profile} getCalendarRef={() => calendarRef} />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -141,4 +152,5 @@ Calendar.propTypes = {
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
+
 export default Calendar;

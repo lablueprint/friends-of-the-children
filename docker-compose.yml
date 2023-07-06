@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  front-end:
+    build: 'client'
+    env_file:
+      - 'client/.env'
+    tty: true
+    stdin_open: true
+    ports:
+      - '3000:3000'
+    restart: always
+  server:
+    build: 'server'
+    env_file:
+      - 'server/.env'
+    tty: true
+    stdin_open: true
+    ports:
+      - '5000:5000'
+    restart: always
