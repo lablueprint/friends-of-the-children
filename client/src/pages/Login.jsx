@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   TextField,
 } from '@mui/material';
@@ -39,20 +39,20 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   const navigate = useNavigate();
 
-  const { isLoggedIn } = useSelector((state) => state.sliceAuth); // destructuring the state to obtain localStorage's user object and login status using redux
   const dispatch = useDispatch();
 
   // Checking if inputted password matches profile's password from Firebase
   // Called whenever inputted profile info gets updated or when user's existing profile is updated
   const checkPassword = () => {
     // Check the hash password only if profile is not empty
-    if (profile !== null) {
+    if (profile) {
       if (!profile.google) {
         bcrypt.compare(password, profile.password) // compare passwords
           .then((isValid) => {
             if (isValid) { // check whether it is a valid credential
               dispatch(login(profile)); // pass in profile to redux
               updateAppProfile(profile); // pass to the upper lever (parent components so that it can be used for other pages)
+              navigate('/');
               setError(false);
             } else {
               setError(true);
@@ -98,16 +98,6 @@ function Login({ updateAppProfile }) { // deconstruct the function props
     fetchData().catch(console.error);
   }, []);
 
-  // Defaults main page to be resources if user is already logged in
-  // TODO: might be unnecessary
-  if (isLoggedIn) {
-    if (!profile.approved) {
-      navigate('/unapproved');
-    } else {
-      navigate('/resources');
-    }
-  }
-
   // Sets profile state with inputted profile info
   // Called when user clicks "Login" button or presses Enter after inputting username + password
   const handleSubmit = async (event) => {
@@ -151,7 +141,7 @@ function Login({ updateAppProfile }) { // deconstruct the function props
             Login
           </h1>
           <p>Welcome back! Enter in details</p>
-          <form onSubmit={handleSubmit}>
+          <form className={styles.login_form} onSubmit={handleSubmit}>
             <TextField
               id="username"
               label="Username"

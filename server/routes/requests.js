@@ -35,7 +35,9 @@ import {
   batchAddToList,
   batchDeleteFromList,
   deleteModule,
+  deleteFolder,
   deleteFiles,
+  deleteMenteeFiles,
   addModule,
 } from '../controllers/controllers.js';
 
@@ -96,7 +98,7 @@ router.get('/getGoogleaccount/:googleAccount', getGoogleaccount);
 router.post('/updateTextField/:id/:field', updateTextField);
 
 // updating module's file links field
-router.post('/updateFileLinksField/:id/:field/:action', updateFileLinksField);
+router.post('/updateFileLinksField/:id/:field/:action/:collectionName', updateFileLinksField);
 
 // gets existing users' usernames (for sign up username conflicts)
 router.get('/getUsernames', getUsernames);
@@ -108,8 +110,14 @@ router.post('/updateModuleChildren', updateModuleChildren);
 // deletes current module and all submodules underneath it
 router.delete('/deleteModule/:moduleID', deleteModule);
 
+// deletes current folder
+router.delete('/deleteFolder/:menteeID/:folderID', deleteFolder);
+
 // deletes file from module FileLink array field and Firebase storage
 router.delete('/deleteFiles', deleteFiles);
+
+// deletes files from a mentee's folder or the Root folder
+router.post('/deleteMenteeFiles', deleteMenteeFiles);
 
 // adds a module to Firebase, returns dataRef (containing module's id in firebase)
 router.post('/addModule', addModule);

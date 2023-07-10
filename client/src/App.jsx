@@ -22,6 +22,7 @@ import {
 } from './pages';
 import NavBar from './components/NavBar';
 import ModuleNav from './components/ModuleNav';
+import MenteeNav from './components/MenteeNav';
 
 function App() {
   const { user: currUser, isLoggedIn } = useSelector((state) => state.sliceAuth);
@@ -38,23 +39,26 @@ function App() {
   };
 
   return (
-    isLoggedIn
+    isLoggedIn && currUser.approved
       ? (
         <div className="App">
           <div className={styles.wrapper}>
             {(currUser.role === 'Admin' || currUser.approved) && <NavBar profile={currUser} updateAppProfile={updateProfile} />}
-            <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
-              {(locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/') && (
+            <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || (locationPath === '/' && currUser.approved) ? styles.mainContent : styles.mainContent2}`}>
+              {(locationPath.includes('/resources') || locationPath === '/expanded-module' || (locationPath === '/' && currUser.approved)) && (
                 <ModuleNav profile={currUser} />
               )}
-              <div className={`${locationPath.includes('/resources') || locationPath === '/expanded-module' || locationPath === '/' ? styles.mainContent : styles.mainContent2}`}>
+              {locationPath.includes('/youth/') && (
+                <MenteeNav profile={currUser} />
+              )}
+              <div className={`${locationPath.includes('/resources') || locationPath.includes('/youth/') || locationPath === '/expanded-module' || (locationPath === '/' && currUser.approved) ? styles.mainContent : styles.mainContent2}`}>
                 <Routes>
                   {currUser.role === 'Admin' || currUser.approved ? <Route path="/" element={(<Resources profile={currUser} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
                   <Route path="/profile" element={(<UserProfile profile={currUser} updateAppProfile={updateProfile} />)} />
                   <Route path="/message-wall" element={(<MessageWall profile={currUser} />)} />
-                  <Route path="/mentees" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
-                  <Route path="/mentees/:menteeSlug" element={(<ExpandedMentee profile={currUser} />)} />
-                  <Route path="/mentees/:menteeSlug/:folderSlug" element={(<Media profile={currUser} />)} />
+                  <Route path="/youth" element={(<Mentees profile={currUser} updateAppProfile={updateProfile} />)} />
+                  <Route path="/youth/:menteeSlug" element={(<ExpandedMentee profile={currUser} />)} />
+                  <Route path="/youth/:menteeSlug/:folderSlug" element={(<Media profile={currUser} />)} />
                   <Route path="/example" element={(<Example profile={currUser} />)} />
                   <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
                   <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
@@ -74,7 +78,7 @@ function App() {
         <div className="App">
           <NavBar profile={currUser} updateAppProfile={updateProfile} />
           <Routes>
-            <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} />
+            {!currUser ? <Route path="/" element={(<Login updateAppProfile={updateProfile} />)} /> : <Route path="/" element={(<UserNotApproved updateAppProfile={updateProfile} profile={currUser} />)} />}
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
             <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />

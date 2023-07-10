@@ -101,7 +101,7 @@ function Calendar({ profile }) {
   const calendarInfo = getCalendarByRole();
 
   return (
-    <div>
+    <div className={styles.calendar_container}>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       <div className={styles.container}>
         {currRole === 'admin' && (
