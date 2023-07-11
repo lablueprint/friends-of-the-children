@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { app, db } from './firebase';
 import Message from '../components/Message';
 import * as api from '../api';
+import styles from '../styles/Messages.module.css';
 
 function MessageWall({ profile }) {
   const [title, setTitle] = useState('');
@@ -163,12 +164,15 @@ function MessageWall({ profile }) {
   return (
     role.toLowerCase() === 'admin' ? (
       <div>
-        <h3>Message Wall</h3>
+        <h1 className={styles.announcement}>Message Wall</h1>
+        {messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
         {
           messages.filter((message) => (message.pinned)).map(
             (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
           )
         }
+        <h4 className={styles.pinnedtitle}>Posts</h4>
+
         {
           messages.filter((message) => (!message.pinned)).map(
             (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
@@ -179,12 +183,14 @@ function MessageWall({ profile }) {
     ) : (
       <div>
         <h3>Message Wall</h3>
+        <h4 className={styles.pinnedtitle}>Pinned</h4>
         {messages.filter(
           (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role))),
         ).map(
           (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
         )}
+        <h4 className={styles.pinnedtitle}>Posts</h4>
         {messages.filter(
           (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role))),
@@ -206,6 +212,11 @@ MessageWall.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
 

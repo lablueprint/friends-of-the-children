@@ -5,7 +5,7 @@ a{
 
 .mentees_page{
     text-align: left;
-    padding: 50px 0px 50px 100px;
+    padding: 50px 0px 25px 50px;
 }
 
 .folders_page{
@@ -120,7 +120,7 @@ a{
 }
 
 .profile_pic{
-    background: bisque;
+    /* background: white; */
     border-radius: 50%;
     width: 150px;
 }

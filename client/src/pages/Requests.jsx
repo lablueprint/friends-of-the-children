@@ -8,6 +8,7 @@ import TabPanel from '../components/TabPanel';
 import AdminTable from '../components/AdminTable';
 import * as api from '../api';
 import styles from '../styles/Requests.module.css';
+import NotFound from './NotFound';
 
 function a11yProps(index) {
   return {
@@ -16,10 +17,12 @@ function a11yProps(index) {
   };
 }
 
-function Requests() {
+function Requests({ profile }) {
   // pull new users from firebase and show them in the correct order
   // console.log the entire object, look for a field called data to see if there's any kind of time stamp included in the metadata
   // allow admin to modify the user's approved status
+
+  const { role } = profile;
 
   const [pendingUsers, setPendingUsers] = useState([]);
 
@@ -81,7 +84,6 @@ function Requests() {
 
   useEffect(() => {
     async function fetchProfiles() {
-      // ask jerry how to get the data sorted
       const { data } = await api.getProfilesSortedByDate();
 
       // filter array of profile objects (also make sure they all have approved and date fields in firebase)
@@ -123,48 +125,52 @@ function Requests() {
   }, []);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.bigtitle}>
-        Requests
-      </h1>
-      <div>
-        <Tabs
-          value={value}
-          onChange={handleTabChange}
-          aria-label="basic tabs example"
-        >
-          <HomeTab label="New Users" {...a11yProps(1)} />
-          <HomeTab label="All Users" {...a11yProps(2)} />
-        </Tabs>
-        <div className={styles.line} />
-      </div>
-      <TabPanel value={value} index={0}>
-        {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} setSelectMode={setSelectMode} />}
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} setSelectMode={setSelectMode} />}
-      </TabPanel>
-      <div>
-        { selectMode
-          ? (
-            <div>
-              <p>
-                {numChecked}
-                {' '}
-                Selected
-              </p>
-              <div>
-                <button type="button" onClick={HandleCancelClick}>Cancel</button>
-                <button type="button" onClick={HandleApproveClick}>Approve</button>
-                <button type="button" onClick={HandleDeleteClick}>Delete</button>
-              </div>
-            </div>
-          )
-          : (<button type="button" onClick={HandleSelectClick}>Select</button>)}
-      </div>
-    </div>
+    role === 'Admin'
+      ? (
+        <div className={styles.container}>
+          <h1 className={styles.bigtitle}>
+            Requests
+          </h1>
+          <div>
+            <Tabs
+              value={value}
+              onChange={handleTabChange}
+              aria-label="basic tabs example"
+            >
+              <HomeTab label="New Users" {...a11yProps(1)} />
+              <HomeTab label="All Users" {...a11yProps(2)} />
+            </Tabs>
+            <div className={styles.line} />
+          </div>
+          <TabPanel value={value} index={0}>
+            {currentAccounts
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            {currentAccounts
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+          </TabPanel>
+          <div>
+            { selectMode
+              ? (
+                <div>
+                  <p>
+                    {numChecked}
+                    {' '}
+                    Selected
+                  </p>
+                  <div>
+                    <button type="button" onClick={HandleCancelClick}>Cancel</button>
+                    <button type="button" onClick={HandleApproveClick}>Approve</button>
+                    <button type="button" onClick={HandleDeleteClick}>Delete</button>
+                  </div>
+                </div>
+              )
+              : (<button type="button" onClick={HandleSelectClick}>Select</button>)}
+          </div>
+        </div>
+      )
+      : <NotFound />
   );
 }
 
@@ -176,6 +182,10 @@ Requests.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    bio: PropTypes.string.isRequired,
+    google: PropTypes.bool,
+    mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
 };
 

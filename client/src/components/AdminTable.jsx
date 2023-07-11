@@ -113,11 +113,8 @@ export default function AdminTable({
     DeleteButtonHandler();
   }, [deleteButton]);
 
-  // useEffect(() => console.log(table), [table]);
-
   function handleChange(e, username) {
     setTable((prevValue) => prevValue.map((user) => {
-      // console.log(prevValue.checked);
       if (user.username === username) {
         return {
           // return the user with the checked state updated
