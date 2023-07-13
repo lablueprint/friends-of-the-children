@@ -41,6 +41,7 @@ export default function AdminTable({
       return accum;
     }, 0);
     setRowsSelected(num);
+    console.log(selectMode);
   }, [table]);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export default function AdminTable({
         name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, id: user.id, serviceArea: user.serviceArea, checked: false,
       })));
       setCancelButton(false);
+      // setSelectMode(false);
     }
   }, [cancelButton]);
 
@@ -77,6 +79,7 @@ export default function AdminTable({
 
         setTimeout(() => { window.location.reload(); }, 800);
         setApproveButton(false);
+        // setSelectMode(false);
       }
     }
 
@@ -85,7 +88,6 @@ export default function AdminTable({
 
   useEffect(() => {
     async function DeleteButtonHandler() {
-      // const deletedPayloadToMailchimp = [];
       const selectedAccounts = [];
       if (deleteButton) {
         table.forEach((user) => {
@@ -98,15 +100,14 @@ export default function AdminTable({
               role: user.role,
               serviceArea: user.serviceArea,
             };
-            // deletedPayloadToMailchimp.push(payload);
           }
         });
 
         api.batchDeleteProfile(selectedAccounts);
-        // await api.batchDeleteFromList(deletedPayloadToMailchimp);
 
         setTimeout(() => { window.location.reload(); }, 800);
         setDeleteButton(false);
+        // setSelectMode(false);
       }
     }
 
