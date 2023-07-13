@@ -1,10 +1,7 @@
 // send client-side (frontend) data to server
 import axios from 'axios';
 
-const {
-  SERVER_URL,
-} = process.env;
-const url = `${SERVER_URL}:5000/fotc`;
+const url = `${process.env.REACT_APP_SERVER_URL}:5000/fotc`;
 
 // creates an event on gcal
 export const createEvent = async (eventData) => {
@@ -174,6 +171,7 @@ export const getAllProfiles = async () => {
     return allProfiles;
   } catch (error) {
     console.error(error.message);
+    console.error(`url: ${url}/getAllProfiles`);
     console.error('could not get all profiles');
   }
   return null;
