@@ -17,12 +17,14 @@
   }
 
 .left_column{
+    z-index: 1;
     display: flex;
     justify-content: center;
     flex-direction: column;
 }
 
 .signinForm{
+    z-index: 1;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -70,7 +72,6 @@
 
 .design_top{
     position: absolute;
-    z-index: -1000;
     right: 0;
     top: 0;
     max-width: 100%;
@@ -78,7 +79,6 @@
 
 .design_bottom{
     position: absolute;
-    z-index: -1000;
     left: 0;
     bottom: 0;
     max-width: 100%;
@@ -86,7 +86,6 @@
 
 .design_top2{
     position: absolute;
-    z-index: -1000;
     left: 0;
     top: 0;
     max-width: 100%;
@@ -95,7 +94,6 @@
 
 .design_bottom2{
     position: absolute;
-    z-index: -1000;
     right: 0;
     bottom: 0;
     max-width: 100%;
@@ -170,6 +168,109 @@
     background: #989898;
   }
 
-.login_text {
-    padding-top: 1em;
+.approve_family_img {
+    margin: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-right: 130px;
+    width: 400px;
 }
+
+  .request_pending_message {
+    /* Your request to become a mentor has been received and is awaiting approval.
+    We will send you an email once your account has been approved. */
+    width: 597px;
+    text-align: center;
+    color: #000;
+    font-size: 17px;
+    font-family: News Gothic;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.login_form{
+    z-index: 1000;
+}
+
+.approve_container{
+    justify-content: center;
+    height: 100vh;
+}
+
+.approve_main {
+    display: inline-block;
+    text-align: center;
+    margin: auto;
+}
+
+.approve_main :first-child {
+    color: #000;
+    margin-top: 40px;
+}
+
+.approve_main :nth-child(2) {
+    margin-top: 20px;
+}
+
+.approve_title{
+    color: #000;
+    font-size: 43px;
+    font-family: News Gothic;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.logout {
+    margin-top: 5px;
+    padding: 8px;
+    width: 350px;
+    position: relative;
+    z-index: 10000;
+    border-radius: 12px;
+    border: 2px solid #156DBF;
+    background: #FFF;
+}
+
+.logout a {
+    color: #156DBF !important;
+    font-size: 16px;
+    font-family: News Gothic;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+  
+  .roleButton {
+    margin-right: 14px;
+    width: 135px;
+    padding: 10px 15px; 
+    border-radius: 8px;
+    border: 1.5px solid var(--green, #6AA);
+    background-color: transparent;
+    color: var(--text, #3F3F3F);
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  
+  .roleButton:hover {
+    background-color: var(--green, #6AA);
+    color: white;
+  }
+  
+  .roleButton.active {
+    border-radius: 8px;
+    border: 1.5px solid var(--green, #6AA);
+    background: #6AA;
+    color: var(--white, #FFF);
+    font-family: News Gothic;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .fotc_button {
+    border: none;
+    background-color: transparent;
+  }

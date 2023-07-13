@@ -79,7 +79,11 @@ function ModuleNav({ profile }) {
               <div className={`${locationPath.includes(module.title) ? styles.nav2_btn_top : styles.nav2_btn_blue}`}>
                 <div className={styles.nav2_btn_top_round} />
               </div>
-              <Link to={`/resources/${module.title}`} state={{ id: module.id, root: module.title }} className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${locationPath.includes(module.title) ? '' : styles.nav2_btn_selected}`}>
+              <Link
+                to={`/resources/${module.title}`}
+                state={{ id: module.id, root: module.title }}
+                className={`${styles.btn_info} ${styles.nav2_btn} ${styles.nav2_btn1} ${locationPath.includes(module.title) ? '' : styles.nav2_btn_selected}`}
+              >
                 {module.title}
               </Link>
               <div className={`${locationPath.includes(module.title) ? styles.nav2_btn_bottom : styles.nav2_btn_blue}`}>

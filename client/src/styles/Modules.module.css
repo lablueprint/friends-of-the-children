@@ -186,6 +186,10 @@
     cursor: pointer;
 }
 
+.fileName a {
+    color: #156DBF !important;
+}
+
 .deleteFilesBar {
     position: fixed;
     bottom: 0;
@@ -341,10 +345,12 @@
 }
 
 .pageTitle {
+    color: #000;
+    font-size: 2.8rem;
+    font-family: News Gothic;
+    font-style: normal;
     font-weight: 700;
-    font-size: 48px;
-    line-height: 57px;
-    color: #000000;
+    line-height: normal;
     padding-top: 1em;
     padding-left: 1em;
 }
@@ -516,8 +522,8 @@
 }
 
 .spanFile :nth-child(6){
-    position: absolute;
-    right: 40px;
+    position: relative;
+    right: 20px;
 }
 
 .heart_button {
@@ -526,6 +532,10 @@
     padding: 0;
     margin-left: 10px;
   }
+
+.heart_button img {
+    width: 100%;
+}
 
 .line{
     margin: 7px 30px 20px 20px;

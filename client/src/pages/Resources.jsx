@@ -157,11 +157,11 @@ function Resources({ profile }) {
       tempFavs.push(file);
       setFavorites(tempFavs);
       // store this new state into the database
-      api.updateFileLinksField(file, 'favorites', 'fileLinks', 'addFile');
+      api.updateFileLinksField(file, 'favorites', 'fileLinks', 'addFile', 'modules');
     } else {
       const tempFavs = favorites.filter((element) => element.url !== file.url);
       setFavorites(tempFavs);
-      api.updateFileLinksField(file, 'favorites', 'fileLinks', 'removeFile');
+      api.updateFileLinksField(file, 'favorites', 'fileLinks', 'removeFile', 'modules');
     }
   };
 

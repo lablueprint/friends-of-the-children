@@ -182,8 +182,9 @@ function MessageWall({ profile }) {
       </div>
     ) : (
       <div>
-        <h3>Message Wall</h3>
-        <h4 className={styles.pinnedtitle}>Pinned</h4>
+        <h1 className={styles.announcement}>Announcements</h1>
+        {messages.some((message) => message.pinned && (message.serviceArea.includes(serviceArea)
+        && message.target.includes(role))) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
         {messages.filter(
           (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role))),

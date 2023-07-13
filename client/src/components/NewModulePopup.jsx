@@ -1,5 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -48,7 +49,7 @@ export default function NewModulePopup(props) {
   // TODO: Move to backend, figure out how to maintain setPercent once it is moved to the backedn and sent back as a promise chain
   // upload file to Firebase:
   const handleUpload = (file) => {
-    const fileName = file.name;
+    const fileName = uuidv4(file.name);
     const storageRef = ref(storage, `/files/${fileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 

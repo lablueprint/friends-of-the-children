@@ -1,8 +1,12 @@
 .App {
   text-align: center;
   font-family: 'News Gothic';
+  background-color: #F6FAFF;
 }
 
+body {
+  background-color: #F6FAFF;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
