@@ -4,7 +4,7 @@ import axios from 'axios';
 const {
   SERVER_URL,
 } = process.env;
-const url = SERVER_URL;
+const url = `${SERVER_URL}:5000/fotc`;
 
 // creates an event on gcal
 export const createEvent = async (eventData) => {
