@@ -309,10 +309,10 @@ function Signup({ updateAppProfile }) {
       <div className={styles.container}>
         <div className={styles.left_column}>
           <img src={LoginFamily} alt="fotc family" className={styles.family_img} />
-          <p>
+          <p className={styles.login_text}>
             Already have an account?
             {' '}
-            <a href="/login" style={{ color: '#3F3F3F' }}><b>Log In</b></a>
+            <a href="/login" style={{ color: '#3F3F3F' }}><b>Click Here to Login</b></a>
           </p>
         </div>
         {SigninForm}
