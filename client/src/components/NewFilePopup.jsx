@@ -1,5 +1,6 @@
 import { React, useState } from 'react';
 import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -20,7 +21,7 @@ export default function NewFilePopup(props) {
   const [fileLinks, setFileLinks] = useState(currModuleFiles);
 
   const handleUpload = (file) => {
-    const fileName = file.name;
+    const fileName = uuidv4(file.name);
     const storageRef = ref(storage, `/files/${fileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -48,7 +49,7 @@ export default function NewFilePopup(props) {
   };
 
   const updateFileLinksFirebase = async () => {
-    await api.updateFileLinksField(fileLinks, id, 'fileLinks', 'addFile');
+    await api.updateFileLinksField(fileLinks, id, 'fileLinks', 'addFile', 'modules');
     // console.log(fileLinks);
     // console.log(id);
     // // Only call firebase if edits were made
@@ -64,7 +65,7 @@ export default function NewFilePopup(props) {
   const submitForm = async (event) => {
     event.preventDefault();
     updateFileLinksFirebase();
-    handleClose();
+    handleClose(); // closes add module popup
     window.location.reload(false);
   };
 

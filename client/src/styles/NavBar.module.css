@@ -10,7 +10,7 @@
 .mainContent{
     width: 85%;
     justify-content: center;
-    margin-left: 15%;
+    margin-left: 13%;
     background-color: #F6FAFF;
     /* margin-top: 20px; */
 }
@@ -18,7 +18,7 @@
 .mainContent2{
     width: 90%;
     justify-content: center;
-    margin-left: 9%;
+    margin-left: 8%;
 }
 
 /* navbar container */
@@ -26,7 +26,7 @@
     height: 100%; /* 100% Full-height */
     position: fixed; /* Stay in place */
     z-index: 100;
-    width: 15%;
+    width: 13%;
     top: 0; /* Stay at the top */
     left: 0;
     background: #FFFFFF;
@@ -37,7 +37,7 @@
 .btn_info{
     display: inline-block;
     padding: .7rem;
-    padding-left: 30px;
+    padding-left: 25px;
     width: 100%;
     font-weight: 700;
     color: #000;
@@ -46,7 +46,6 @@
     vertical-align: middle;
     
     letter-spacing: 0.08rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     
     border-radius: 2rem;
     background-color: #F6FAFF;
@@ -87,11 +86,25 @@
     height: 100%; /* 100% Full-height */
     position: fixed; /* Stay in place */
     z-index: 100;
-    width: 12%;
+    width: 11%;
     top: 0; /* Stay at the top */
     background: #1D2366;
     padding-top: 40px; /* Place content 40px from the top */
     box-shadow: 7px 4px 30px 2px rgba(165, 217, 255, 0.2);
+}
+
+.youth_label {
+    width: 80%;
+    margin: auto;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background: #DEEBFF;
+    color: #1D2366;
+    font-size: 1.3rem;
+    font-family: News Gothic;
+    font-weight: 500;
 }
 
 .secondNav{
@@ -121,7 +134,6 @@
     width: 1rem;
     height: .5rem;
     width: 100%;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out;
 }
 
 .nav2_btn_top_round, .nav2_btn_bottom_round {
@@ -147,7 +159,6 @@
 .nav2_btn_selected{
     background-color: #1D2366;
     color: white !important;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out;
 }
 
 .editModule{
@@ -221,5 +232,6 @@
     color: var(--dark-blue-for-nav-bar, #156DBF);
     font-family: News Gothic;
     font-weight: 700;
-    margin-left: 20px;
+    width: 80%;
+    margin: auto;
   }

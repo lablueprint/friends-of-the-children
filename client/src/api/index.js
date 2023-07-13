@@ -226,6 +226,16 @@ export const deleteModule = async (moduleID) => {
   }
 };
 
+// deletes the folder with folderID from the mentee with menteeID
+export const deleteFolder = async (menteeID, folderID) => {
+  try {
+    await axios.delete(`${url}/deleteFolder/${menteeID}/${folderID}`);
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete mentee folder');
+  }
+};
+
 // deletes all files within array filesToDelete belonging to module moduleID
 export const deleteFiles = async (moduleID, filesToDelete) => {
   try {
@@ -233,6 +243,20 @@ export const deleteFiles = async (moduleID, filesToDelete) => {
   } catch (error) {
     console.error(error.message);
     console.error('could not delete files');
+  }
+};
+
+// deletes files in a mentee folder
+export const deleteMenteeFiles = async ({
+  menteeID, folderID, type, filesToDelete,
+}) => {
+  try {
+    await axios.post(`${url}/deleteMenteeFiles`, {
+      menteeID, folderID, type, filesToDelete,
+    });
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete mentee files');
   }
 };
 
@@ -262,9 +286,9 @@ export const updateTextField = async (inputText, id, field) => {
 };
 
 // updates file links array in module with id
-export const updateFileLinksField = async (newFileLinks, id, field, action) => {
+export const updateFileLinksField = async (newFileLinks, id, field, action, collectionName) => {
   try {
-    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}/${action}`, newFileLinks);
+    const updatedFileLinks = await axios.post(`${url}/updateFileLinksField/${id}/${field}/${action}/${collectionName}`, newFileLinks);
     console.log(updatedFileLinks);
     return updatedFileLinks;
   } catch (error) {

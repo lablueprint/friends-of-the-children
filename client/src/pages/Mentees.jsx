@@ -4,29 +4,80 @@ import PropTypes from 'prop-types';
 import {
   MenuItem, FormControl, InputLabel, Select,
 } from '@mui/material';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import SmileyIcon from '../assets/icons/smiley.svg';
+import MenteeCard from '../assets/images/mentee_card.svg';
 import styles from '../styles/Mentees.module.css';
 import * as api from '../api';
+import { createTextField } from '../components/MuiComps';
 // import MenteeImage from '../assets/images/empty_mentees.svg';
 
+const theme = createTheme({
+  overrides: {
+    MuiDialog: {
+      paper: {
+        backgroundColor: 'blue',
+        padding: '30px',
+      },
+    },
+  },
+});
+
 function Mentees({ profile, updateAppProfile }) {
+  // have avatar images pre-stored in the firebase storage (under /avatars)
+  const TigerIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Ftiger_avatar.svg?alt=media&token=9636de6b-fb88-4f23-9c25-0cf71c96e9ee';
+  const BirdIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fbird_avatar.png?alt=media&token=f572e7ad-fc03-467c-acb2-4f6c2f6c0e98';
+  const BearIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fbear_avatar.svg?alt=media&token=8933836d-fc68-4249-9d67-5466c91b3d59';
+  const DogIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fdog_avatar.svg?alt=media&token=81b925cc-c121-4cbc-9914-79e884af2ccb';
+  const MouseIcon = 'https://firebasestorage.googleapis.com/v0/b/friends-of-the-children-5.appspot.com/o/avatars%2Fmouse_avatar.svg?alt=media&token=c51a55f4-81cb-4e0f-bfda-4bae1e6ae2ea';
+  const [selectedImage, setSelectedImage] = useState(TigerIcon);
+  const avatars = [TigerIcon, BirdIcon, BearIcon, DogIcon, MouseIcon];
   const [mentees, setMentees] = useState([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [clearance, setClearance] = useState(false);
+  const [notes, setNotes] = useState('');
+  const [caregiverFirstName, setCaregiverFirstName] = useState('');
+  const [caregiverLastName, setCaregiverLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [open, setOpen] = useState(false);
   const role = (profile.role).toLowerCase();
+
+  // sort mentees by first name alphabetically
+  const sort = (array) => {
+    array.sort((a, b) => {
+      if (a.firstName < b.firstName) {
+        return -1;
+      }
+      if (a.firstName > b.firstName) {
+        return 1;
+      }
+      return 0;
+    });
+  };
 
   useEffect(() => {
     if (role === 'admin') {
       api.getAllMentees().then((tempMentees) => {
         if (tempMentees) {
+          sort(tempMentees.data);
           setMentees(tempMentees.data);
         }
       });
     } else {
       api.getMentees(profile.id).then((tempMentees) => {
         if (tempMentees) {
+          sort(tempMentees.data);
           setMentees(tempMentees.data);
         }
       });
@@ -35,30 +86,22 @@ function Mentees({ profile, updateAppProfile }) {
 
   const addChild = async (e) => {
     e.preventDefault();
-    const firstName = e.target.firstName.value;
-    const lastName = e.target.lastName.value;
-    const age = e.target.age.value;
-    const notes = e.target.notes.value;
-    const caregiverFirstName = e.target.caregiverFirstName.value;
-    const caregiverLastName = e.target.caregiverLastName.value;
-    const caregiverEmail = e.target.caregiverEmail.value;
-    let medicalClearance = e.target.medicalClearance.value;
 
-    if (medicalClearance === 'false') {
-      medicalClearance = false;
-    } else {
-      medicalClearance = true;
-    }
+    // get the birthdate from datepicker calednar in YYYY-MM-DD format
+    const formattedDate = birthday ? birthday.format('YYYY-MM-DD') : '';
 
     const data = {
       firstName,
       lastName,
-      age,
+      birthday: formattedDate,
+      clearance,
       notes,
       caregiverFirstName,
       caregiverLastName,
-      caregiverEmail,
-      medicalClearance,
+      email,
+      address,
+      phone,
+      avatar: selectedImage,
     };
 
     // add new mentee object to mentees collection on firebase
@@ -72,7 +115,7 @@ function Mentees({ profile, updateAppProfile }) {
       const tempMentees = [...mentees, data2];
       setMentees(tempMentees);
 
-      api.addMentee(profile.id, menteeID, caregiverEmail);
+      api.addMentee(profile.id, menteeID, email);
 
       const newProfile = {
         ...profile,
@@ -94,29 +137,68 @@ function Mentees({ profile, updateAppProfile }) {
     setOpen(false);
   };
 
+  const handleImageChange = (avatar) => {
+    const selectedImageUrl = avatar;
+    console.log(selectedImageUrl);
+    setSelectedImage(selectedImageUrl);
+  };
+
   return (
     <div className={styles.mentees_page}>
-      <h1>My Youth</h1>
-      {role === 'mentor' && (
-      <Button variant="contained" onClick={handleClickOpen}>
-        Add Youth
-      </Button>
-      )}
+      <div className={styles.head_container}>
+        <h1>My Youth</h1>
+        {role === 'mentor' && (
+        <button type="button" onClick={handleClickOpen}>
+          <img src={SmileyIcon} alt="smiley icon" />
+          Add Youth
+        </button>
+        )}
+      </div>
 
+      {/* has this weird glitch that shows the image for a split second if you reload the page... */}
       {/* {(mentees.length === 0) && (<img src={MenteeImage} alt="mentees" />)} */}
 
       <div className={styles.mentees_container}>
         {mentees.map((mentee) => (
-          <div key={mentee.id} className={styles.card_container}>
+          <div key={mentee.id}>
             <Link
               to={`./${mentee.firstName}${mentee.lastName}`}
               state={{
-                id: mentee.id, firstName: mentee.firstName, lastName: mentee.lastName, age: mentee.age, caregiver: mentee.caregiverFirstName, folders: mentee.folders, medicalClearance: mentee.medicalClearance,
+                menteeObj: {
+                  id: mentee.id,
+                  firstName: mentee.firstName,
+                  lastName: mentee.lastName,
+                  age: mentee.age,
+                  caregiverFirst: mentee.caregiverFirstName,
+                  caregiverLast: mentee.caregiverLastName,
+                  address: mentee.address,
+                  phone: mentee.phone,
+                  avatar: mentee.avatar,
+                },
               }}
             >
-              <div className={styles.card}>
-                <div className={styles.imageCard} />
-                <p>{`${mentee.firstName} ${mentee.lastName}`}</p>
+              <div className={styles.mentee_card}>
+                <img src={MenteeCard} alt="mentee card" className={styles.mentee_img} />
+                <div className={styles.card_content}>
+                  <div className={styles.card_content_flex}>
+                    <img src={mentee.avatar} alt="mentee's avatar" className={styles.avatar} />
+                    <div className={styles.mentee_desc}>
+                      <h3>{`${mentee.firstName} ${mentee.lastName}`}</h3>
+                      <p>
+                        Age:
+                        {' '}
+                        {mentee.age}
+                      </p>
+                      <p>
+                        Caregiver:
+                        {' '}
+                        {mentee.caregiverFirstName}
+                        {' '}
+                        {mentee.caregiverLastName}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Link>
           </div>
@@ -124,54 +206,116 @@ function Mentees({ profile, updateAppProfile }) {
       </div>
 
       <div>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <h3>Add a Mentee</h3>
-            <form onSubmit={(e) => addChild(e)}>
-              First Name:
-              <input type="text" name="firstName" required />
-              <br />
-              Last Name:
-              <input type="text" name="lastName" required />
-              <br />
-              Age:
-              <input type="text" name="age" required />
-              <br />
-              Notes:
-              <input type="text" name="notes" required />
-              <h3>Caregiver Information</h3>
-              First Name:
-              <input type="text" name="caregiverFirstName" required />
-              <br />
-              Last Name:
-              <input type="text" name="caregiverLastName" required />
-              <br />
-              Email:
-              <input type="text" name="caregiverEmail" required />
-              <br />
-              <br />
-              <FormControl sx={{ width: '100%' }}>
-                <InputLabel>Medical Clearance</InputLabel>
-                <Select
-                  id="med"
-                  label="Medical Clearance"
-                  name="medicalClearance"
-                  defaultValue="False"
-                  required
-                >
-                  <MenuItem value="false">Not Cleared</MenuItem>
-                  <MenuItem value="true">Cleared</MenuItem>
-                </Select>
-              </FormControl>
-              <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button type="submit">Add Child</Button>
-              </DialogActions>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+        <ThemeProvider theme={theme}>
+          <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+            <DialogContent>
+              <div className={styles.dialogContainer}>
+                <h3 className={styles.dialog_h3}>Add a Youth</h3>
+                <form onSubmit={(e) => addChild(e)}>
+                  <div className={styles.labels_container}>
+                    <p>First Name</p>
+                    <p>Last Name</p>
+                  </div>
+                  <div className={styles.labels_container}>
+                    {createTextField('First Name', firstName, setFirstName, '48%')}
+                    {createTextField('Last Name', lastName, setLastName, '48%')}
+                  </div>
+                  <div className={styles.labels_container}>
+                    <p />
+                  </div>
+                  <div className={styles.labels_container}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Birthday"
+                        value={birthday}
+                        onChange={(date) => setBirthday(date)}
+                        slotProps={{
+                          textField: {
+                            error: false,
+                          },
+                        }}
+                        sx={{ width: '48%', marginRight: '10px' }}
+                      />
+                    </LocalizationProvider>
+                    <FormControl sx={{ width: '48%' }}>
+                      <InputLabel>Media Clearance </InputLabel>
+                      <Select
+                        id="med"
+                        label="Media Clearance"
+                        name="clearance"
+                        defaultValue="False"
+                        value={clearance}
+                        onChange={(e) => setClearance(e.target.value)}
+                        required
+                      >
+                        <MenuItem value="false">Not Cleared</MenuItem>
+                        <MenuItem value="true">Cleared</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+                  <div className={styles.labels_container}>
+                    <p>Notes</p>
+                  </div>
+                  <div className={styles.labels_container}>
+                    {createTextField('Notes', notes, setNotes, '100%')}
+                  </div>
 
+                  <h3 className={`${styles.dialog_h3} ${styles.dialog_h3_2}`}>Caregiver Information</h3>
+                  <div className={styles.labels_container}>
+                    <p>First Name</p>
+                    <p>Last Name</p>
+                  </div>
+                  <div className={styles.labels_container}>
+                    {createTextField('First Name', caregiverFirstName, setCaregiverFirstName, '48%')}
+                    {createTextField('Last Name', caregiverLastName, setCaregiverLastName, '48%')}
+                  </div>
+                  <div className={styles.labels_container}>
+                    <p>Email</p>
+                    <p>Phone Number</p>
+                  </div>
+                  <div className={styles.labels_container}>
+                    {createTextField('Email', email, setEmail, '48%')}
+                    {createTextField('Phone Number', phone, setPhone, '48%')}
+                  </div>
+                  <div className={styles.labels_container}>
+                    <p>Address</p>
+                  </div>
+                  <div className={styles.labels_container}>
+                    {createTextField('Address', address, setAddress, '100%')}
+                  </div>
+
+                  <h3 className={`${styles.dialog_h3} ${styles.dialog_h3_2}`}>Choose an Avatar</h3>
+                  {avatars.map((avatar) => (
+                    <React.Fragment key={avatar}>
+                      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                      <label
+                        htmlFor={avatar}
+                        className={`${styles.image_label} ${
+                          selectedImage === avatar ? styles.selected : ''
+                        }`}
+                      >
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
+                        <img src={avatar} alt="s" onClick={() => handleImageChange(avatar)} />
+                      </label>
+                      <input
+                        type="radio"
+                        id={avatar}
+                        name={avatar}
+                        value={avatar}
+                      />
+                    </React.Fragment>
+                  ))}
+
+                  <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button type="submit">Save</Button>
+                  </DialogActions>
+                </form>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </ThemeProvider>
+      </div>
     </div>
   );
 }

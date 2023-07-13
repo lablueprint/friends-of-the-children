@@ -1,77 +1,117 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  ref, uploadBytes, getDownloadURL,
+} from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import {
+  Checkbox,
+} from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import imgIcon from '../assets/icons/file_img.svg';
+import vidIcon from '../assets/icons/file_vid.svg';
+import pdfIcon from '../assets/icons/file_pdf.svg';
+import linkIcon from '../assets/icons/file_link.svg';
+import heartIcon from '../assets/icons/heart.svg';
+import filledHeart from '../assets/icons/filled_heart.svg';
+import EditIcon from '../assets/icons/editicon.svg';
+import FilePopup from '../components/FilePopup';
 import styles from '../styles/Mentees.module.css';
+import styles2 from '../styles/Modules.module.css';
 import { storage } from './firebase';
 import * as api from '../api';
 
 function Media({ profile }) {
   const location = useLocation();
-  // media is the string of file links in this folder
+  // get the state of the location path (includes all the mentee's information)
   const {
-    id, folderName, firstName, lastName, age, caregiver,
+    menteeObj,
   } = location.state;
+  const {
+    id, firstName, lastName, folderName,
+  } = menteeObj;
   // parse media string to an array
   const [open, setOpen] = useState(false);
   // this is the array of file links
   const [mediaArray, setMediaArray] = useState([]);
+  const role = (profile.role).toLowerCase();
   // media states for dialog opening/closing views
   const [isFile, setIsFile] = useState(false);
   const [isLink, setIsLink] = useState(false);
-  const role = (profile.role).toLowerCase();
+  // which tab you're on
+  const [favTab, setFavTab] = useState(false);
+  const [checked, setChecked] = useState([]);
+  const [hoveredFile, setHoveredFile] = useState(null);
+  const [favorites, setFavorites] = useState([]); // array of favorite file objects
+  const [fileToDisplay, setFileToDisplay] = useState({});
+  const [openFilePopups, setOpenFilePopups] = useState(Array(mediaArray.length).fill(false));
+  const [openDeleteFilesPopup, setOpenDeleteFilesPopup] = useState(false);
 
   // get the current folder contents on first load
   useEffect(() => {
     api.getMenteeFiles(id, folderName).then((files) => {
       setMediaArray(files.data);
     });
-  }, []);
+    api.getMenteeFiles(id, 'favorites').then((files) => {
+      if (files) {
+        const tempArr = [];
+        (files.data).forEach((file) => {
+          if (file.category === folderName) tempArr.push(file);
+        });
+        setFavorites(tempArr);
+      }
+    });
+  }, [menteeObj]);
 
   // creates new object for the file, updates mediaArray, and calls updateMentee
   const addMedia = (e) => {
     e.preventDefault();
-    const title = e.target.title.value;
-    let fileName;
+    const fileName = e.target.title.value;
+    const category = folderName;
+    let fileID;
     let fileType;
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileName = files.name;
+      fileID = uuidv4(files.name);
       fileType = files.type;
-
-      const storageRef = ref(storage, `/images/${fileName}`);
+      const storageRef = ref(storage, `/images/${fileID}`);
       uploadBytes(storageRef, files).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => { // get url of file through firebase
           const tempArr = mediaArray;
           const data = {
-            title,
-            fileUrl: url,
+            fileID,
+            fileName,
+            url,
             fileType,
+            category,
           };
           tempArr.push(data);
           setMediaArray(tempArr);
-          return data;
-        })
-          .then((data) => {
-            api.addMenteeFile(id, folderName, data, fileType);
-            setOpen(false);
-            e.target.reset();
-          });
+          api.addMenteeFile(id, folderName, data, fileType);
+          setOpen(false);
+          e.target.reset();
+        });
       });
     } else if (isLink) { // reading text input for links, not file input
-      fileName = title;
+      const url = e.target.link.value;
+      fileID = uuidv4(url);
       fileType = 'link';
+
       const tempArr = mediaArray;
       const data = {
-        title,
-        fileUrl: e.target.link.value,
+        fileName,
+        url,
         fileType,
+        fileID,
+        category,
       };
+
       tempArr.push(data);
       setMediaArray(tempArr);
       api.addMenteeFile(id, folderName, data, fileType);
@@ -86,88 +126,260 @@ function Media({ profile }) {
     setIsLink(false);
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
+  };
+
+  // opening file popup
+  const handleClickOpenFilePopup = (file) => {
+    const fileIndex = mediaArray.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = true;
+    setOpenFilePopups(updatedOpenFilePopups);
+    setFileToDisplay(file);
+  };
+
+  const handleCloseFilePopup = (file) => {
+    const fileIndex = mediaArray.findIndex((f) => f.url === file.url);
+    const updatedOpenFilePopups = [...openFilePopups];
+    updatedOpenFilePopups[fileIndex] = false;
+    setOpenFilePopups(updatedOpenFilePopups);
+  };
+
+  const handleMouseEnter = (fileId) => {
+    setHoveredFile(fileId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredFile(null);
+  };
+
+  const handleCheckboxChange = (event, fileObject) => {
+    if (checked.includes(fileObject)) {
+      setChecked(checked.filter((file) => (file !== fileObject)));
+      return;
+    }
+
+    setChecked([...checked, fileObject]);
+  };
+
+  const clearCheckboxes = () => {
+    setChecked([]);
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const handleDeleteFilesClose = () => {
+    setOpenDeleteFilesPopup(false);
+  };
+
+  const deleteFiles = async (filesToDelete) => {
+    api.deleteMenteeFiles({ menteeID: id, filesToDelete }).then(() => {
+      const tempFiles = [...mediaArray.filter((file) => !filesToDelete.includes(file))];
+      setMediaArray(tempFiles);
+      const tempFavFiles = [...favorites.filter((file) => !filesToDelete.includes(file))];
+      setFavorites(tempFavFiles);
+      clearCheckboxes();
+    })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleFillHeart = (index, file) => {
+    // revert the file object when storing into database
+    const fileObj = {
+      fileName: file.fileName,
+      url: file.url,
+      fileType: file.fileType,
+      category: file.category,
+      fileID: file.fileID,
+    };
+    // if heart is filled
+    if (!favorites.some((element) => element.url === file.url)) {
+      // update favorites state array (want the full file object)
+      const tempFavs = [...favorites];
+      tempFavs.push(file);
+      setFavorites(tempFavs);
+      // store this new state into the database (use reverted file object)
+      api.updateFileLinksField(fileObj, id, 'files', 'addFile', 'mentees');
+    } else {
+      const tempFavs = favorites.filter((element) => element.url !== file.url);
+      setFavorites(tempFavs);
+      api.updateFileLinksField(fileObj, id, 'files', 'removeFile', 'mentees');
+    }
   };
 
   return (
     <div className={styles.folders_page}>
       <div>
         <p>
-          {`My Youth > ${firstName} ${lastName} > `}
+          <Link to="/youth" className={styles.my_youth_link}>
+            My Youth
+          </Link>
+          {' > '}
+          {`${firstName} ${lastName} > `}
           <b>
             {`${folderName}`}
           </b>
-        </p>
-        <p>
-          Caregiver:
-          {' '}
-          {caregiver}
         </p>
       </div>
 
       <div className={styles.profile_container}>
         <div>
-          <div className={styles.pfp}>
-            <img className={styles.profile_pic} src="https://i.pinimg.com/564x/a0/8e/a5/a08ea58c5ea6000579249c7ccbfa99b0.jpg" alt="" />
+          <div className={styles.media_heading_container}>
+            <h3>{`${folderName}`}</h3>
+            <div className={styles.buttons}>
+              {role === 'mentor' && (
+              <button type="button" className={styles2.editModule}>
+                <img src={EditIcon} alt="edit icon" />
+                Edit Module
+              </button>
+              )}
+
+              {/* QUESTION: should users be able to directly add into the images/videos/flyers folders? */}
+              {role === 'mentor' && (
+              <button type="button" onClick={handleClickOpen} className={styles2.addModule}>
+                + New Upload
+              </button>
+              )}
+            </div>
           </div>
-
-          <div className={styles.user_info}>
-            <h1>{`${firstName} ${lastName}`}</h1>
-            <p>
-              {age}
-              {' '}
-              years old
-            </p>
+          <div className={styles2.tab_bar}>
+            <button className={`${!favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(false); }}>All</button>
+            <button className={`${favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(true); }}>Favorites</button>
           </div>
-
-          <div className={styles.service_area}>
-            <p>
-              {profile.serviceArea}
-            </p>
-          </div>
-
-          <h3>{`${folderName}`}</h3>
-
-          {/* users cannot directly add into the images/videos/flyers folders? */}
-          {role === 'mentor' && folderName !== 'Images' && folderName !== 'Videos' && folderName !== 'Flyers' && folderName !== 'Links' && (
-          <Button variant="contained" onClick={handleClickOpen}>
-            + Add Media
-          </Button>
-          )}
-
+          <div className={styles.line} />
         </div>
       </div>
 
       {/* mapping each file in the array to a little card element onscreen */}
-      {mediaArray.map((file) => (
-        <div className={styles.img_container}>
+      {/* EDIT: COPIED FROM EXPANDED MODULE */}
+      {(favTab ? favorites : mediaArray).map((file, index) => (
+        <div key={file.fileID} className={styles2.fileContainer}>
           {(file.fileType.includes('image')) && (
           <div>
-            <img className={styles.media_image} src={file.fileUrl} alt={file.title} />
+            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <img className={styles2.displayImg} src={file.url} alt={file.fileName} />
+            </div>
+            <div className={styles2.descriptionContainer}>
+              <div
+                key={file.fileID}
+                onMouseEnter={() => handleMouseEnter(file.url)}
+                onMouseLeave={handleMouseLeave}
+              >
+                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                  <Checkbox
+                    checked={checked.includes(file)}
+                    onChange={(event) => handleCheckboxChange(event, file)}
+                    className={styles2.checkbox}
+                  />
+                ) : (<img src={imgIcon} alt="img icon" />)}
+              </div>
+              <div className={styles2.fileName}>{file.fileName}</div>
+            </div>
           </div>
           )}
           {(file.fileType.includes('video')) && (
           <div>
-            <video className={styles.media_image} controls src={file.fileUrl} alt={file.title}>
-              <track default kind="captions" />
-            </video>
-          </div>
-          )}
-          {(file.fileType.includes('link')) && (
-          <div>
-            <li><a href={file.fileUrl} target="_blank" rel="noreferrer">{file.fileUrl}</a></li>
+            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <video className={styles2.displayImg} controls src={file.url} alt={file.fileName}>
+                <track default kind="captions" />
+              </video>
+            </div>
+            <div className={styles2.descriptionContainer}>
+              <div
+                key={file.fileID}
+                onMouseEnter={() => handleMouseEnter(file.url)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img src={file.imageSrc} alt={file.name} />
+                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file)) ? (
+                  <Checkbox
+                    checked={checked.includes(file.url)}
+                    onChange={(event) => handleCheckboxChange(event, file)}
+                    className={styles2.checkbox}
+                  />
+                ) : (<img src={vidIcon} alt="video icon" />)}
+              </div>
+              <div className={styles2.fileName}>{file.fileName}</div>
+            </div>
           </div>
           )}
           {(file.fileType.includes('pdf')) && (
-          <div key={file.url} className="pdf">
-            <embed className={styles.media_image} src={file.fileUrl} alt={file.title} />
+          <div>
+            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <embed className={styles2.displayImg} src={file.url} alt={file.fileName} />
+            </div>
+            <div className={styles2.descriptionContainer}>
+              <div
+                key={file.fileID}
+                onMouseEnter={() => handleMouseEnter(file.url)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img src={file.imageSrc} alt={file.name} />
+                {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                  <Checkbox
+                    checked={checked.includes(file)}
+                    onChange={(event) => handleCheckboxChange(event, file)}
+                    className={styles2.checkbox}
+                  />
+                ) : (<img src={pdfIcon} alt="pdf icon" />)}
+              </div>
+              <div className={`${styles2.fileName} ${styles2.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
+            </div>
           </div>
           )}
-          <p>{file.title}</p>
+          {(file.fileType === 'link') && (
+          <div>
+            <a href={file.url} target="_blank" rel="noreferrer">
+              <div className={styles2.preview}>
+                <embed className={styles2.displayImg} src={file.url} alt={file.fileName} />
+              </div>
+              <div className={styles2.descriptionContainer}>
+                <div
+                  key={file.fileID}
+                  onMouseEnter={() => handleMouseEnter(file.url)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <img src={file.imageSrc} alt={file.name} />
+                  {(checked.length > 0) || (hoveredFile === file.url) || (checked.includes(file.url)) ? (
+                    <Checkbox
+                      checked={checked.includes(file)}
+                      onChange={(event) => handleCheckboxChange(event, file)}
+                      className={styles2.checkbox}
+                    />
+                  ) : (<img className={styles.smaller_img} src={linkIcon} alt="link icon" />)}
+                </div>
+                <div className={`${styles2.fileName} ${styles2.pdf_preview}`}>{file.fileName}</div>
+              </div>
+            </a>
+          </div>
+          )}
+
+          <button
+            type="button"
+            className={styles.heart_button}
+            onClick={() => { handleFillHeart(index, file); }}
+          >
+            {favorites.some((element) => element.url === file.url) ? (
+              <img src={filledHeart} alt="favorite file" />
+            ) : (
+              <img src={heartIcon} alt="not a favorite file" />
+            )}
+          </button>
+
+          {file.fileType !== 'link' && openFilePopups[index] && (
+            <FilePopup
+              file={fileToDisplay}
+              open={openFilePopups[index]}
+              handleClose={() => handleCloseFilePopup(file)}
+            />
+          )}
         </div>
       ))}
 
+      {/* uploading media dialog popup */}
       <div>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
@@ -211,6 +423,65 @@ function Media({ profile }) {
 
           </DialogContent>
         </Dialog>
+      </div>
+
+      {/* this is the deleting files dialog popup */}
+      <div>
+        { openDeleteFilesPopup && checked.length > 0
+          ? (
+            <div>
+              <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
+                <DialogTitle className={styles2.dialogTitle}>
+                  You have chosen to delete
+                  {' '}
+                  {checked.length}
+                  {' '}
+                  {(checked.length) === 1 ? 'file ' : 'files '}
+                </DialogTitle>
+                <DialogContent>
+                  <div>
+                    <div className={styles2.confirmMessage}>
+                      Are you sure you want to continue with this action?
+                    </div>
+                    <div className={styles2.confirmButtons}>
+                      <button className={styles2.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                        Cancel
+                      </button>
+                      <button type="button" className={styles2.confirmDelete} onClick={() => { deleteFiles(checked); }}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )
+          : <div />}
+      </div>
+      <div>
+        { (checked.length > 0)
+          ? (
+            <div className={styles2.deleteFilesBar}>
+              <div className={styles2.totalSelected}>
+                <div className={styles2.selectedNumber}>
+                  {checked.length}
+                </div>
+                <div className={styles2.selectedText}>
+                  {' '}
+                  selected
+                </div>
+              </div>
+              <div className={styles2.cancelOrDelete}>
+                <button className={styles2.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+                  Cancel
+                </button>
+                <button type="button" className={styles2.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          )
+          : <div />}
       </div>
     </div>
   );
