@@ -168,6 +168,10 @@
     background: #989898;
   }
 
+.login_text {
+    padding-top: 1em;
+}
+
 .approve_family_img {
     margin: auto;
     margin-top: 30px;
