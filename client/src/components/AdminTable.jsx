@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import * as api from '../api';
 
 export default function AdminTable({
-  users, setRowsSelected, cancelButton, setCancelButton, approveButton, setApproveButton, deleteButton, setDeleteButton,
+  users, setRowsSelected, cancelButton, setCancelButton, approveButton, setApproveButton, deleteButton, setDeleteButton, selectMode,
 }) {
   const [table, setTable] = useState([]);
 
@@ -85,7 +85,6 @@ export default function AdminTable({
 
   useEffect(() => {
     async function DeleteButtonHandler() {
-      // const deletedPayloadToMailchimp = [];
       const selectedAccounts = [];
       if (deleteButton) {
         table.forEach((user) => {
@@ -98,12 +97,10 @@ export default function AdminTable({
               role: user.role,
               serviceArea: user.serviceArea,
             };
-            // deletedPayloadToMailchimp.push(payload);
           }
         });
 
         api.batchDeleteProfile(selectedAccounts);
-        // await api.batchDeleteFromList(deletedPayloadToMailchimp);
 
         setTimeout(() => { window.location.reload(); }, 800);
         setDeleteButton(false);
@@ -139,22 +136,38 @@ export default function AdminTable({
             <TableCell align="left">Status</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {table.map((row) => (
-            <TableRow
-              key={row.username}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <Checkbox align="center" checked={row.checked} onChange={(event) => { handleChange(event, row.username); }} />
-              <TableCell align="left">{row.name}</TableCell>
-              <TableCell align="left">{row.username}</TableCell>
-              <TableCell align="left">{row.email}</TableCell>
-              <TableCell align="left">{row.role}</TableCell>
-              <TableCell align="left">{row.dateJoined}</TableCell>
-              <TableCell align="left">{row.approved}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+        { selectMode ? (
+          <TableBody>
+            {table.map((row) => (
+              <TableRow key={row.username} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <Checkbox align="center" checked={row.checked} onChange={(event) => { handleChange(event, row.username); }} />
+                <TableCell align="left">{row.name}</TableCell>
+                <TableCell align="left">{row.username}</TableCell>
+                <TableCell align="left">{row.email}</TableCell>
+                <TableCell align="left">{row.role}</TableCell>
+                <TableCell align="left">{row.dateJoined}</TableCell>
+                <TableCell align="left">{row.approved}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        ) : (
+          <TableBody>
+            {table.map((row) => (
+              <TableRow
+                key={row.username}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <Checkbox disabled align="center" checked={row.checked} onChange={(event) => { handleChange(event, row.username); }} />
+                <TableCell align="left">{row.name}</TableCell>
+                <TableCell align="left">{row.username}</TableCell>
+                <TableCell align="left">{row.email}</TableCell>
+                <TableCell align="left">{row.role}</TableCell>
+                <TableCell align="left">{row.dateJoined}</TableCell>
+                <TableCell align="left">{row.approved}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        )}
       </Table>
     </TableContainer>
   );
@@ -177,4 +190,5 @@ AdminTable.propTypes = {
   setApproveButton: PropTypes.func.isRequired,
   deleteButton: PropTypes.bool.isRequired,
   setDeleteButton: PropTypes.func.isRequired,
+  selectMode: PropTypes.bool.isRequired,
 };

@@ -83,7 +83,7 @@ function App() {
             <Route path="/login" element={(<Login updateAppProfile={updateProfile} />)} />
             <Route path="/signup" element={(<Signup updateAppProfile={updateProfile} />)} />
             <Route path="/unapproved" element={(<UserNotApproved updateAppProfile={updateProfile} />)} />
-            <Route path="*" element={(<NotFound />)} />
+            <Route path="*" element={(<NotFound isLoggedIn={isLoggedIn} />)} />
           </Routes>
         </div>
       )

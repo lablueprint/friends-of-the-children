@@ -5,13 +5,30 @@
 // route that wasn't defined by any previous routes such as login, signup, etc.
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from '../styles/NotFound.module.css';
 
-export default function NotFound() {
+export default function NotFound({ isLoggedIn }) {
   return (
     <div className={styles.not_found_page}>
-      <h1 className={styles.title}>Page Not Found</h1>
-      <p className={styles.body}>Sorry, this page doesn&apos;t exist! Check if there is a typo in your URL.</p>
+      {isLoggedIn
+        ? (
+          <div>
+            <h1 className={styles.title}>Page Not Found</h1>
+            <p className={styles.body}>Please contact the system administrator if you believe you are seeing this page in error.</p>
+          </div>
+        )
+        : (
+          <div>
+            <h1 className={styles.title}>Page not accesible.</h1>
+            <p className={styles.body}>Please login first!</p>
+          </div>
+        )}
+
     </div>
   );
 }
+
+NotFound.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
+};

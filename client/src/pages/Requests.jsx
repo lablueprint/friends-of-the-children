@@ -18,10 +18,6 @@ function a11yProps(index) {
 }
 
 function Requests({ profile }) {
-  // pull new users from firebase and show them in the correct order
-  // console.log the entire object, look for a field called data to see if there's any kind of time stamp included in the metadata
-  // allow admin to modify the user's approved status
-
   const { role } = profile;
 
   const [pendingUsers, setPendingUsers] = useState([]);
@@ -144,11 +140,11 @@ function Requests({ profile }) {
           </div>
           <TabPanel value={value} index={0}>
             {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} />}
           </TabPanel>
           <TabPanel value={value} index={1}>
             {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} />}
           </TabPanel>
           <div>
             { selectMode
