@@ -6,13 +6,25 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import styles from '../styles/NotFound.module.css';
 
 export default function NotFound({ isLoggedIn }) {
   return (
-    <div>
+    <div className={styles.not_found_page}>
       {isLoggedIn
-        ? <h1>404 Page Not Found. Please contact the system administrator if you believe you are seeing this page in error.</h1>
-        : <h1>Page not accesible. Please login first!</h1>}
+        ? (
+          <div>
+            <h1 className={styles.title}>Page Not Found</h1>
+            <p className={styles.body}>Please contact the system administrator if you believe you are seeing this page in error.</p>
+          </div>
+        )
+        : (
+          <div>
+            <h1 className={styles.title}>Page not accesible.</h1>
+            <p className={styles.body}>Please login first!</p>
+          </div>
+        )}
+
     </div>
   );
 }

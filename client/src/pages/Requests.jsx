@@ -8,7 +8,7 @@ import TabPanel from '../components/TabPanel';
 import AdminTable from '../components/AdminTable';
 import * as api from '../api';
 import styles from '../styles/Requests.module.css';
-import NotFound from './NotFound';
+import PermissionDenied from './PermissionDenied';
 
 function a11yProps(index) {
   return {
@@ -166,7 +166,7 @@ function Requests({ profile }) {
           </div>
         </div>
       )
-      : <NotFound />
+      : <PermissionDenied />
   );
 }
 
