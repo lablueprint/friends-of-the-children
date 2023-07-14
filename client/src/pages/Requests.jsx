@@ -48,7 +48,6 @@ function Requests({ profile }) {
   }));
 
   function HandleSelectClick() {
-    console.log('requests: ', selectMode);
     setNumChecked(0);
     setSelectMode(true);
   }
@@ -141,11 +140,11 @@ function Requests({ profile }) {
           </div>
           <TabPanel value={value} index={0}>
             {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} />}
           </TabPanel>
           <TabPanel value={value} index={1}>
             {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} />}
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} />}
           </TabPanel>
           <div>
             { selectMode

@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import * as api from '../api';
 
 export default function AdminTable({
-  users, setRowsSelected, cancelButton, setCancelButton, approveButton, setApproveButton, deleteButton, setDeleteButton, selectMode, setSelectMode,
+  users, setRowsSelected, cancelButton, setCancelButton, approveButton, setApproveButton, deleteButton, setDeleteButton, selectMode,
 }) {
   const [table, setTable] = useState([]);
 
@@ -41,7 +41,6 @@ export default function AdminTable({
       return accum;
     }, 0);
     setRowsSelected(num);
-    console.log(selectMode);
   }, [table]);
 
   useEffect(() => {
@@ -50,7 +49,6 @@ export default function AdminTable({
         name: user.name, username: user.username, email: user.email, role: user.role, dateJoined: user.dateJoined, approved: user.approved, id: user.id, serviceArea: user.serviceArea, checked: false,
       })));
       setCancelButton(false);
-      // setSelectMode(false);
     }
   }, [cancelButton]);
 
@@ -79,7 +77,6 @@ export default function AdminTable({
 
         setTimeout(() => { window.location.reload(); }, 800);
         setApproveButton(false);
-        // setSelectMode(false);
       }
     }
 
@@ -107,7 +104,6 @@ export default function AdminTable({
 
         setTimeout(() => { window.location.reload(); }, 800);
         setDeleteButton(false);
-        // setSelectMode(false);
       }
     }
 
@@ -194,6 +190,5 @@ AdminTable.propTypes = {
   setApproveButton: PropTypes.func.isRequired,
   deleteButton: PropTypes.bool.isRequired,
   setDeleteButton: PropTypes.func.isRequired,
-  selectMode: PropTypes.func.isRequired,
-  setSelectMode: PropTypes.func.isRequired,
+  selectMode: PropTypes.bool.isRequired,
 };
