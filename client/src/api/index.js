@@ -1,7 +1,7 @@
 // send client-side (frontend) data to server
 import axios from 'axios';
 
-const url = `${process.env.REACT_APP_SERVER_URL}:5000/fotc`;
+const url = process.env.REACT_APP_SERVER_URL;
 
 // creates an event on gcal
 export const createEvent = async (eventData) => {
