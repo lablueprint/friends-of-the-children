@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {
   TextField, InputAdornment, IconButton,
 } from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -29,7 +29,8 @@ function UserProfile({ profile, updateAppProfile }) {
   });
 
   const handleUpload = async (image) => {
-    const imageName = uuidv4(image.name);
+    // const imageName = uuidv4(image.name);
+    const imageName = image.name;
     const storageRef = ref(storage, `/images/${imageName}`);
 
     uploadBytes(storageRef, image).then((snapshot) => {

@@ -8,7 +8,7 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import {
   ref, uploadBytesResumable,
 } from 'firebase/storage';
@@ -45,7 +45,8 @@ function CalendarEventForm({
   const [eventServiceArea, setEventServiceArea] = useState(serviceArea.toUpperCase());
 
   const handleUpload = (file) => {
-    const fileName = uuidv4(file.name);
+    // const fileName = uuidv4(file.name);
+    const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
