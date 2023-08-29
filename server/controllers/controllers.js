@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 import {
   collection, addDoc, getDoc, arrayUnion, updateDoc, doc, arrayRemove,
 } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import {
   ref, deleteObject,
   uploadBytes, getDownloadURL,
@@ -352,7 +352,8 @@ const addMenteeFile = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const { files } = req.body;
-    const name = uuidv4(files.name);
+    // const name = uuidv4(files.name);
+    const { name } = files;
     const storageRef = ref(storage, `/images/${name}`);
     uploadBytes(storageRef, files).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
@@ -666,6 +667,7 @@ const updateFileLinksField = async (req, res) => {
       id, field, action, collectionName,
     } = req.params;
     const newFileLinks = req.body;
+    console.log(newFileLinks);
 
     if (action === 'addFile') {
       const currRef = collectionName === 'mentees' ? db.collection('mentees').doc(id).collection('folders').doc('favorites') : db.collection(collectionName).doc(id);

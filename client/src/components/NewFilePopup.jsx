@@ -1,6 +1,6 @@
 import { React, useState } from 'react';
 import PropTypes from 'prop-types';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -21,7 +21,7 @@ export default function NewFilePopup(props) {
   const [fileLinks, setFileLinks] = useState(currModuleFiles);
 
   const handleUpload = (file) => {
-    const fileName = uuidv4(file.name);
+    const fileName = file.name;
     const storageRef = ref(storage, `/files/${fileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -38,6 +38,7 @@ export default function NewFilePopup(props) {
       },
       (err) => console.error(err),
     );
+    console.log(fileName);
     console.log(storageRef.fullPath);
     return storageRef.fullPath;
   };
@@ -50,8 +51,6 @@ export default function NewFilePopup(props) {
 
   const updateFileLinksFirebase = async () => {
     await api.updateFileLinksField(fileLinks, id, 'fileLinks', 'addFile', 'modules');
-    // console.log(fileLinks);
-    // console.log(id);
     // // Only call firebase if edits were made
     // if (titleText !== title && bodyText !== body) {
     //   await Promise.all([api.updateTextField(titleText, id, 'title'), api.updateTextField(bodyText, id, 'body')]);
@@ -67,6 +66,8 @@ export default function NewFilePopup(props) {
     updateFileLinksFirebase();
     handleClose(); // closes add module popup
     window.location.reload(false);
+    console.log(fileLinks);
+    console.log(id);
   };
 
   return (

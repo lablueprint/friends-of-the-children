@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -18,6 +18,7 @@ function ModuleNav({ profile }) {
   // uses React Redux to log user out and
   // remove profile info from localStorage
   const location = useLocation();
+  const navigate = useNavigate();
   const locationPath = location.pathname.split('/');
   const role = profile.role.toLowerCase();
   const [modules, setModules] = useState([{ title: 'All' }]);
@@ -38,6 +39,7 @@ function ModuleNav({ profile }) {
 
   const handleClose = () => {
     setOpenNewUploadPopup(false);
+    window.location.reload(false);
   };
 
   const displayCheckBoxes = () => {
@@ -61,6 +63,7 @@ function ModuleNav({ profile }) {
     const updatedOpenDeleteModulePopups = [...openDeleteModulePopups];
     updatedOpenDeleteModulePopups[fileIndex] = false;
     setOpenDeleteModulePopups(updatedOpenDeleteModulePopups);
+    navigate('/resources');
   };
 
   return (

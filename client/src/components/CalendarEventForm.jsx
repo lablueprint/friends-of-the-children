@@ -1,35 +1,90 @@
+/* eslint-disable no-unused-vars */
 import { React, useState } from 'react';
 import PropTypes from 'prop-types';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
-  Select, MenuItem, FormControl, InputLabel,
+  Button, Dialog, DialogActions, DialogContent, MenuItem, Select,
 } from '@mui/material';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+// import { v4 as uuidv4 } from 'uuid';
+import {
+  ref, uploadBytesResumable,
+} from 'firebase/storage';
 import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
 import * as constants from '../constants';
+import { createTextField } from './MuiComps';
+import { serviceAreas } from '../constants';
+import { storage } from '../pages/firebase';
 
-function CalendarEventForm({ profile, getCalendarRef }) {
+function CalendarEventForm({
+  profile, getCalendarRef, open, handleClose,
+}) {
+  const theme = createTheme({
+    overrides: {
+      MuiDialog: {
+        paper: {
+          backgroundColor: 'blue',
+          padding: '30px',
+        },
+      },
+    },
+  });
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
+  const [fileLinks, setFileLinks] = useState('');
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
+
   const { serviceArea } = profile;
   // Get default event service area based off user's service area
   const [eventServiceArea, setEventServiceArea] = useState(serviceArea.toUpperCase());
 
+  const handleUpload = (file) => {
+    // const fileName = uuidv4(file.name);
+    const fileName = file.name;
+    const storageRef = ref(storage, `/files/${fileName}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const p = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+        );
+
+        // update progress
+        // setPercent(p);
+        console.log(p);
+      },
+      (err) => console.error(err),
+    );
+    console.log(storageRef.fullPath);
+    return storageRef.fullPath;
+  };
+
+  const handleFileChange = (e) => {
+    const urls = [];
+    Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
+    setFileLinks(urls);
+  };
+
   const addEvent = (e) => {
     e.preventDefault();
 
-    const title = e.target.title.value;
-    const description = e.target.description.value;
-    const location = e.target.location.value;
     const attachments = [];
-    const fileUrl = e.target.attachments.value;
-    const start = e.target.start.value;
-    const end = e.target.end.value;
 
     let calendarId; // Admin users will specify event service area
     if (eventServiceArea === 'AV') { calendarId = constants.calIdAV; } else if (eventServiceArea === 'MS') { calendarId = constants.calIdMS; } else { calendarId = constants.calIdFOTC; }
 
     // check if user inputs an attachment
-    if (e.target.attachments.value) {
-      attachments.push({ fileUrl, title: 'an attachment!' });
-    }
+    // if (e.target.attachments.value) {
+    //   attachments.push({ fileUrl, title: 'an attachment!' });
+    // }
     // create json event object
     const event = {
       title,
@@ -56,38 +111,90 @@ function CalendarEventForm({ profile, getCalendarRef }) {
 
   return (
     <div>
-      <form onSubmit={(e) => addEvent(e)}>
-        <h1>FOTC test Calendar</h1>
-        Title:
-        <input type="text" name="title" required />
-        Description:
-        <input type="text" name="description" />
-        Location:
-        <input type="text" name="location" />
-        Attachments (Google link):
-        <input type="text" name="attachments" />
-        Start Time:
-        <input type="datetime-local" name="start" required />
-        End Time:
-        <input type="datetime-local" name="end" required />
-        <FormControl>
-          <InputLabel>Service Area</InputLabel>
-          <Select
-            id="serviceArea"
-            label="Service Area"
-            defaultValue="FOTC"
-            value={eventServiceArea}
-            onChange={(e) => setEventServiceArea(e.target.value)}
-            className={styles.textfield}
-          >
-            {/* TODO: update to NPO's real service areas */ }
-            <MenuItem value="FOTC">FOTC</MenuItem>
-            <MenuItem value="AV">AV</MenuItem>
-            <MenuItem value="MS">MS</MenuItem>
-          </Select>
-        </FormControl>
-        <button type="submit">Add Event</button>
-      </form>
+      <ThemeProvider theme={theme}>
+        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+          <DialogContent>
+            <div className={styles.dialogContainer}>
+              <form onSubmit={(e) => addEvent(e)}>
+                <div className={styles.labels_container}>
+                  {createTextField('Event Name', title, setTitle, '100%')}
+                </div>
+                <div className={styles.labels_container}>
+                  <p>Start</p>
+                  <p>End</p>
+                </div>
+                <div className={styles.labels_container}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateTimePicker
+                      label="Start"
+                      value={start}
+                      onChange={(date) => setStart(date)}
+                      slotProps={{
+                        textField: {
+                          error: false,
+                        },
+                      }}
+                      sx={{ width: '48%', marginRight: '10px' }}
+                    />
+                  </LocalizationProvider>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateTimePicker
+                      label="End"
+                      value={end}
+                      onChange={(date) => setEnd(date)}
+                      slotProps={{
+                        textField: {
+                          error: false,
+                        },
+                      }}
+                      sx={{ width: '48%', marginRight: '10px' }}
+                    />
+                  </LocalizationProvider>
+                </div>
+                <div className={styles.labels_container}>
+                  <p>Audience</p>
+                  <p>Location</p>
+                </div>
+                <div className={styles.labels_container}>
+                  <Select
+                    id="serviceArea"
+                    label="Audience"
+                    name="serviceArea"
+                    defaultValue="ALL"
+                    onChange={(e) => setEventServiceArea(e.target.value)}
+                    required
+                    sx={{ width: '48%', marginRight: '10px' }}
+                  >
+                    <MenuItem value="ALL">ALL</MenuItem>
+                    {serviceAreas.map((sa) => <MenuItem value={sa} key={sa}>{sa}</MenuItem>)}
+                  </Select>
+                  {createTextField('Location', location, setLocation, '48%')}
+                </div>
+                <div className={styles.labels_container}>
+                  <Button
+                    variant="contained"
+                    component="label"
+                  >
+                    Upload Files
+                    <input
+                      type="file"
+                      hidden
+                      multiple
+                      onChange={handleFileChange}
+                    />
+                  </Button>
+                </div>
+                <br />
+                {createTextField('Write some meeting details here...', description, setDescription, '100%', 'text', false, '', '', true)}
+                <DialogActions>
+                  <Button onClick={handleClose}>Cancel</Button>
+                  <Button type="submit">+ Add Event</Button>
+                </DialogActions>
+              </form>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </ThemeProvider>
     </div>
   );
 }
@@ -107,5 +214,7 @@ CalendarEventForm.propTypes = {
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   getCalendarRef: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
 };
 export default CalendarEventForm;
