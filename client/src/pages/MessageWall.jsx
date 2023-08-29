@@ -69,7 +69,10 @@ function MessageWall({ profile }) {
     }, { merge: true });
   };
 
-  const submitData = async () => {
+  const submitData = async (e) => {
+    e.preventDefault();
+    setOpen(false);
+
     if (audience === 'Friends') {
       target.push('Mentor');
     } else if (audience === 'Caregivers') {
