@@ -12,6 +12,7 @@ import NotFound from './NotFound';
 import UserProfile from './UserProfile';
 import Requests from './Requests';
 import UserNotApproved from './UserNotApproved';
+import PermissionDenied from './PermissionDenied';
 
 export {
   Example,
@@ -27,4 +28,5 @@ export {
   UserProfile,
   Requests,
   UserNotApproved,
+  PermissionDenied,
 };

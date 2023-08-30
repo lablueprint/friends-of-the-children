@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   ref, uploadBytes, getDownloadURL,
 } from 'firebase/storage';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -78,7 +78,8 @@ function Media({ profile }) {
 
     if (isFile) {
       const files = e.target.files.files[0];
-      fileID = uuidv4(files.name);
+      // fileID = uuidv4(files.name);
+      fileID = files.name;
       fileType = files.type;
       const storageRef = ref(storage, `/images/${fileID}`);
       uploadBytes(storageRef, files).then((snapshot) => {
@@ -100,7 +101,8 @@ function Media({ profile }) {
       });
     } else if (isLink) { // reading text input for links, not file input
       const url = e.target.link.value;
-      fileID = uuidv4(url);
+      // fileID = uuidv4(url);
+      fileID = url;
       fileType = 'link';
 
       const tempArr = mediaArray;
@@ -495,7 +497,9 @@ Media.propTypes = {
     email: PropTypes.string.isRequired,
     role: PropTypes.string.isRequired,
     serviceArea: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
+    id: PropTypes.string.isRequired,
   }).isRequired,
 };
 

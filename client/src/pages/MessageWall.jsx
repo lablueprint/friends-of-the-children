@@ -3,24 +3,39 @@
 // the page. If the user is admin, all messages will be displayed, otherwise, it is specified to service area & target.
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {
+  Button, Dialog, DialogActions, DialogContent, MenuItem, FormControl, InputLabel, Select,
+} from '@mui/material';
 import { app, db } from './firebase';
 import Message from '../components/Message';
 import * as api from '../api';
 import styles from '../styles/Messages.module.css';
+import { createTextField } from '../components/MuiComps';
+import { serviceAreas } from '../constants';
 
 function MessageWall({ profile }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [msgserviceArea, setmsgServiceArea] = useState('');
-  const [mentor, setMentor] = useState(false);
-  const [caregiver, setCaregiver] = useState(false);
+  const [audience, setAudience] = useState('');
   const [messages, setMessages] = useState([]);
-  const [allServiceAreas, setAllServiceAreas] = useState(false);
   const [statusMessage, seStatusMessage] = useState('');
+  const [open, setOpen] = useState(false);
   const target = [];
-  let serviceAreas = [];
 
   const { role, serviceArea } = profile;
+
+  const theme = createTheme({
+    overrides: {
+      MuiDialog: {
+        paper: {
+          backgroundColor: 'blue',
+          padding: '30px',
+        },
+      },
+    },
+  });
 
   // async function: an async function is a type of JS function that returns a promise (represents success or failure
   // of our operation) and allows for other code to continue running while a time-consuming operation runs.
@@ -54,32 +69,23 @@ function MessageWall({ profile }) {
     }, { merge: true });
   };
 
-  const submitData = async () => {
-    if (mentor) {
-      target.push('Mentor');
-    }
-    if (caregiver) {
-      target.push('Caregiver');
-    }
+  const submitData = async (e) => {
+    e.preventDefault();
+    setOpen(false);
 
-    if (allServiceAreas) {
-      serviceAreas = await api.getAllProfiles();
-      serviceAreas = serviceAreas.data.map((element) => ({ role: element.role, serviceArea: element.serviceArea }));
-      if (!(mentor && caregiver)) {
-        if (mentor) {
-          serviceAreas = serviceAreas.filter((element) => element.role === 'Mentor');
-        } else {
-          serviceAreas = serviceAreas.filter((element) => element.role === 'Caregiver');
-        }
-      }
-      serviceAreas = serviceAreas.map((element) => element.serviceArea);
-      serviceAreas = serviceAreas.filter((value, index, self) => self.indexOf(value) === index);
+    if (audience === 'Friends') {
+      target.push('Mentor');
+    } else if (audience === 'Caregivers') {
+      target.push('Caregiver');
+    } else if (audience === 'ALL') {
+      target.push('Mentor');
+      target.push('Caregiver');
     }
 
     const data = {
       title,
       body,
-      serviceArea: allServiceAreas ? serviceAreas : msgserviceArea.split(',').map((element) => element.trim()),
+      serviceArea: msgserviceArea === 'ALL' ? serviceAreas : [msgserviceArea],
       target,
       pinned: false,
       date: app.firebase.firestore.Timestamp.fromDate(new Date()),
@@ -90,7 +96,7 @@ function MessageWall({ profile }) {
       adminName: profile.firstName,
       replyBackEmail: profile.email,
       role: target,
-      serviceArea: allServiceAreas ? serviceAreas : msgserviceArea.split(',').map((element) => element.trim()),
+      serviceArea: msgserviceArea === 'ALL' ? serviceAreas : [msgserviceArea],
     };
 
     const message = await api.sendEmails(emailData, target);
@@ -103,55 +109,21 @@ function MessageWall({ profile }) {
         setTitle('');
         setBody('');
         setmsgServiceArea('');
-        setAllServiceAreas(false);
-        setMentor(false);
-        setCaregiver(false);
+        setAudience('');
       });
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   // this function creates a form with different text fields such as title, body, and serviceArea, and also allows
   // you to set whether the messages are "mentors" or "caregivers". this function also handles the submit button,
   // when you click submit, it will call submitData function which will store everything in the databse.
-  const messageForm = (
-    <form>
-      <div>
-        <label htmlFor="title">
-          Title:
-          <input type="text" id="title" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        </label>
-      </div>
-      <div>
-        <label htmlFor="body">
-          Body:
-          <input type="text" id="body" name="body" value={body} onChange={(e) => setBody(e.target.value)} />
-        </label>
-      </div>
-      <div>
-        <label htmlFor="msgserviceArea">
-          Service Area (separated by commas):
-          <input type="text" id="msgserviceArea" name="msgserviceArea" disabled={allServiceAreas} value={msgserviceArea} onChange={(e) => setmsgServiceArea(e.target.value)} />
-        </label>
-        <label htmlFor="mentor">
-          All?
-          <input type="checkbox" id="allServiceAreas" name="allServiceAreas" checked={allServiceAreas} onChange={(e) => setAllServiceAreas(e.target.checked)} />
-        </label>
-      </div>
-      <div>
-        <label htmlFor="mentor">
-          Mentor
-          <input type="checkbox" id="mentor" name="mentor" checked={mentor} onChange={(e) => setMentor(e.target.checked)} />
-        </label>
-      </div>
-      <div>
-        <label htmlFor="caregiver">
-          Caregiver
-          <input type="checkbox" id="caregiver" name="caregiver" checked={caregiver} onChange={(e) => setCaregiver(e.target.checked)} />
-        </label>
-      </div>
-      <button type="button" disabled={!(mentor || caregiver)} onClick={submitData}>Submit</button>
-      <p>{statusMessage}</p>
-    </form>
-  );
 
   // this useEffect hook calls the getMessagesfunc the first time the page is loaded
   useEffect(() => {
@@ -165,6 +137,12 @@ function MessageWall({ profile }) {
     role.toLowerCase() === 'admin' ? (
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
+        <div className={styles.buttonBox}>
+          <button className={styles.createPostButton} type="button" onClick={handleClickOpen}>
+            + Create Post
+          </button>
+        </div>
+
         {messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
         {
           messages.filter((message) => (message.pinned)).map(
@@ -178,7 +156,69 @@ function MessageWall({ profile }) {
             (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
           )
         }
-        {messageForm}
+
+        <ThemeProvider theme={theme}>
+          <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+            <DialogContent>
+              <div className={styles.dialogContainer}>
+                <h3 className={styles.dialog_h3}>Create a Message</h3>
+                <form onSubmit={(e) => submitData(e)}>
+                  <div className={styles.labels_container}>
+                    {createTextField('Announcement Title', title, setTitle, '100%')}
+                  </div>
+                  <div className={styles.labels_container}>
+                    <p>Service Area</p>
+                    <p>Audience</p>
+                  </div>
+                  <div className={styles.labels_container}>
+                    <FormControl sx={{ width: '48%' }}>
+                      <InputLabel>Service Area</InputLabel>
+                      <Select
+                        className={styles.half_width}
+                        id="servicearea"
+                        label="Service Area"
+                        name="servicearea"
+                        defaultValue="ALL"
+                        value={msgserviceArea}
+                        onChange={(e) => setmsgServiceArea(e.target.value)}
+                        required
+                      >
+                        <MenuItem value="ALL">ALL</MenuItem>
+                        {serviceAreas.map((sa) => <MenuItem value={sa}>{sa}</MenuItem>)}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ width: '48%' }}>
+                      <InputLabel>Audience</InputLabel>
+                      <Select
+                        className={styles.half_width}
+                        id="audience"
+                        label="Audience"
+                        name="audience"
+                        defaultValue="ALL"
+                        value={audience}
+                        onChange={(e) => setAudience(e.target.value)}
+                        required
+                      >
+                        <MenuItem value="Friends">Friends</MenuItem>
+                        <MenuItem value="Caregivers">Caregivers</MenuItem>
+                        <MenuItem value="ALL">ALL</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+                  <div className={styles.space}> </div>
+                  <div className={styles.labels_container}>
+                    {createTextField('Write your message here', body, setBody, '100%', 'text', false, '', '', true)}
+                  </div>
+                  <p>{statusMessage}</p>
+                  <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button type="submit">Post</Button>
+                  </DialogActions>
+                </form>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </ThemeProvider>
       </div>
     ) : (
       <div>

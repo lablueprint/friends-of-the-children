@@ -1,0 +1,10 @@
+.title {
+    text-align: left;
+    padding: 1.5em;
+    font-weight: bold;
+    color: #1d2366;
+}
+
+.body {
+    font-size: 2em;
+}

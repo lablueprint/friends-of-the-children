@@ -1,5 +1,5 @@
 import {
-  React, useRef,
+  React, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
@@ -34,6 +34,16 @@ function Calendar({ profile }) {
   const {
     REACT_APP_FIREBASE_CALENDAR_ID,
   } = process.env;
+
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const calendarRef = useRef();
 
@@ -102,12 +112,15 @@ function Calendar({ profile }) {
 
   return (
     <div className={styles.calendar_container}>
+      <h1 className={styles.title}>Calendar</h1>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       <div className={styles.container}>
         {currRole === 'admin' && (
-          <div className={styles.formContainer}>
-            <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} />
-          </div>
+        <div className={styles.buttonBox}>
+          <button className={styles.addEventButton} type="button" onClick={handleClickOpen}>
+            + Add Event
+          </button>
+        </div>
         )}
         <div className={styles.contentContainer}>
           <div className={styles.calendar}>
@@ -133,6 +146,7 @@ function Calendar({ profile }) {
           </div>
         </div>
       </div>
+      <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} open={open} handleClose={handleClose} />
     </div>
   );
 }

@@ -58,4 +58,64 @@
     font-size: 1.3em;
 }
 
+.buttonBox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
 
+.createPostButton {
+    background: #156DBF;
+    border-radius: 12px;
+    border: none;
+    padding: 16px 40px;
+    gap: 10px;
+
+    font-family: 'News Gothic';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 21px;
+
+    color: #FFFFFF;
+}
+
+.labels_container{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.labels_container p{
+    margin: 0;
+    margin-top: 15px !important;
+    margin-bottom: 5px;
+    width: 50%;
+    color: var(--text, #3F3F3F);
+    font-size: 16px;
+    font-family: News Gothic;
+    font-weight: 500;
+}
+
+.dialogContainer {
+    padding: 20px;
+}
+
+.dialog_h3{
+    color: var(--text, #3F3F3F);
+    font-size: 23px;
+    font-family: News Gothic;
+    font-weight: 700;
+}
+
+.dialog_h3_2 {
+    margin-top: 30px;
+}
+
+.space {
+    height: 30px;
+}
+
+.half_width{
+    margin: 0 10px 15px 0 !important;
+}
