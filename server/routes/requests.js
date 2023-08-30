@@ -24,7 +24,7 @@ import {
   updateTextField,
   updateFileLinksField,
   getUsernames,
-  getMessages,
+  messagesController,
   addToMailchimpList,
   updateMailchimpList,
   sendMailchimpEmails,
@@ -40,6 +40,7 @@ import {
   deleteMenteeFiles,
   addModule,
 } from '../controllers/controllers.js';
+const [getMessages, pinMessage, deleteMessage] = messagesController;
 
 const router = express.Router();
 
@@ -124,7 +125,6 @@ router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
 
-//
 router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
 
 router.post('/batchUpdateProfile', batchUpdateProfile);

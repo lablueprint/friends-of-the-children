@@ -47,10 +47,6 @@ function MessageWall({ profile }) {
     setMessages(data);
   };
 
-  useEffect(() => {
-    getMessagesfunc();
-  }, []);
-
   // this function's purpose is to update the pinned update. it first stores all the messages in a temp variable
   // so those messages aren't affected, then it goes and finds the with a correspinding id and updates that pinned
   // status. Lastly, it sets the messages state to that message.
@@ -150,7 +146,6 @@ function MessageWall({ profile }) {
           )
         }
         <h4 className={styles.pinnedtitle}>Posts</h4>
-
         {
           messages.filter((message) => (!message.pinned)).map(
             (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
@@ -229,14 +224,14 @@ function MessageWall({ profile }) {
           (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role))),
         ).map(
-          (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} id={message.id} message={message} updatePinned={updatePinned} />,
         )}
         <h4 className={styles.pinnedtitle}>Posts</h4>
         {messages.filter(
           (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role))),
         ).map(
-          (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} id={message.id} message={message} updatePinned={updatePinned} />,
         )}
       </div>
     )
