@@ -11,10 +11,10 @@ const getMessages = async (req, res) => {
         });
         // sort in reverse chronological order (i.e. newest at first)
         message.sort((a, b) => {
-          if (a.date < b.date) {
+          if (a.date > b.date) {
             return -1;
           }
-          if (a.date > b.date) {
+          if (a.date < b.date) {
             return 1;
           }
           return 0;
@@ -49,10 +49,10 @@ const getMessages = async (req, res) => {
       });
   
       message.sort((a, b) => {
-        if (a.date < b.date) {
+        if (a.date > b.date) {
           return -1;
         }
-        if (a.date > b.date) {
+        if (a.date < b.date) {
           return 1;
         }
         return 0;

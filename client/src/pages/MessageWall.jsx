@@ -19,7 +19,7 @@ function MessageWall({ profile }) {
   const [body, setBody] = useState('');
   const [msgserviceArea, setmsgServiceArea] = useState('');
   const [audience, setAudience] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(null);
   const [statusMessage, seStatusMessage] = useState('');
   const [open, setOpen] = useState(false);
   const target = [];
@@ -42,9 +42,15 @@ function MessageWall({ profile }) {
 
   // in this specific getMessagesfunc, we extract the data by making a call to api.getMessages using the await
   // keyword which pauses execution until it's done. Then we update the messages state with the data.
-  const getMessagesfunc = async () => {
-    const { data } = await api.getFilteredMessages(serviceArea, role);
-    setMessages(data);
+
+  const getMessages = async () => {
+    if (role.toLowerCase() === 'admin') {
+      const { data } = await api.getMessages();
+      setMessages(data);
+    } else {
+      const { data } = await api.getFilteredMessages(serviceArea, role);
+      setMessages(data);
+    }
   };
 
   // this function's purpose is to update the pinned update. it first stores all the messages in a temp variable
@@ -98,15 +104,17 @@ function MessageWall({ profile }) {
     const message = await api.sendEmails(emailData, target);
     seStatusMessage(message);
 
-    // this code updates the database with new messages and resets the state variables back to empty strings after
-    // a message is succesfully submitted
-    db.collection('messages').doc().set(data).then(getMessagesfunc)
+    // update db with new messages + reset the state variables back to empty strings after a message is succesfully submitted
+    db.collection('messages').doc().set(data).then(getMessages)
       .then(() => {
         setTitle('');
         setBody('');
         setmsgServiceArea('');
         setAudience('');
       });
+
+    // show the new message
+    getMessages();
   };
 
   // convert firebase timestamp to a date string, passed as a prop into Message component
@@ -130,9 +138,9 @@ function MessageWall({ profile }) {
   // you to set whether the messages are "mentors" or "caregivers". this function also handles the submit button,
   // when you click submit, it will call submitData function which will store everything in the databse.
 
-  // this useEffect hook calls the getMessagesfunc the first time the page is loaded
+  // call getMessages the first time the page is loaded
   useEffect(() => {
-    getMessagesfunc();
+    getMessages();
   }, []);
 
   // this a conditional and will render different things on the page based on the role. if role is admin, it will
@@ -142,25 +150,27 @@ function MessageWall({ profile }) {
     role.toLowerCase() === 'admin' ? (
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
+        {/* create post button */}
         <div className={styles.buttonBox}>
           <button className={styles.createPostButton} type="button" onClick={handleClickOpen}>
             + Create Post
           </button>
         </div>
-
-        {messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
-        {
-          messages.filter((message) => (message.pinned)).map(
-            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
-          )
-        }
+        <div>{serviceArea}</div>
+        {/* message posts */}
+        {messages && messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
+        {messages && messages.filter(
+          (message) => (message.pinned),
+        ).map(
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
+        )}
         <h4 className={styles.pinnedtitle}>Posts</h4>
-        {
-          messages.filter((message) => (!message.pinned)).map(
-            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
-          )
-        }
-
+        {messages && messages.filter(
+          (message) => (!message.pinned),
+        ).map(
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
+        )}
+        {/* popup when creating post */}
         <ThemeProvider theme={theme}>
           <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
             <DialogContent>
@@ -225,20 +235,18 @@ function MessageWall({ profile }) {
         </ThemeProvider>
       </div>
     ) : (
+      // for non-admin roles (no create button)
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
-        {messages.some((message) => message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role))) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
-        {messages.filter(
-          (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role))),
+        {messages && messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
+        {messages && messages.filter(
+          (message) => (message.pinned),
         ).map(
-          (message) => <Message key={message.id} id={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
         )}
         <h4 className={styles.pinnedtitle}>Posts</h4>
-        {messages.filter(
-          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role))),
+        {messages && messages.filter(
+          (message) => (!message.pinned),
         ).map(
           (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
         )}
