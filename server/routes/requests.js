@@ -40,7 +40,7 @@ import {
   deleteMenteeFiles,
   addModule,
 } from '../controllers/controllers.js';
-const [getMessages, pinMessage, deleteMessage] = messagesController;
+const [getMessages, getFilteredMessages, pinMessage, deleteMessage] = messagesController;
 
 const router = express.Router();
 
@@ -124,6 +124,10 @@ router.post('/deleteMenteeFiles', deleteMenteeFiles);
 router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
+
+router.get('/getFilteredMessages', getFilteredMessages);
+
+router.post('/deleteMessage', deleteMessage);
 
 router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
 

@@ -412,6 +412,28 @@ export const getMessages = async () => {
   return null;
 };
 
+export const getFilteredMessages = async (serviceArea, role) => {
+  try {
+    const messages = await axios.get(`${url}/getFilteredMessages`, { params: { serviceArea, role } });
+    return messages;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get filtered messages');
+  }
+  return null;
+};
+
+export const deleteMessage = async (id) => {
+  try {
+    const deletedMessage = await axios.post(`${url}/deleteMessage`, { params: { id } });
+    return deletedMessage;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete message');
+  }
+  return null;
+};
+
 export const getProfilesSortedByDate = async () => {
   try {
     const sortedProfiles = await axios.get(`${url}/getProfilesSortedByDate`);

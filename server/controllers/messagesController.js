@@ -26,6 +26,44 @@ const getMessages = async (req, res) => {
     }
   };
 
+  const getFilteredMessages = async (req, res) => {
+    const { role, serviceArea } = req.query; // use req.query instead of req.params for query parameters
+  
+    try {
+      const message = [];
+      
+      const serviceAreaQuery = db.collection("messages").where("serviceArea", "array-contains", serviceArea).get();
+      const targetQuery = db.collection("messages").where("target", "array-contains", role).get();
+  
+      const [saSnapshot, targetSnapshot] = await Promise.all([serviceAreaQuery, targetQuery]);
+  
+      const saDocs = saSnapshot.docs;
+      const tDocs = targetSnapshot.docs;
+  
+      const docs = saDocs.filter((sa) => 
+        tDocs.some((td) => td.id === sa.id)
+      );
+  
+      docs.forEach((doc) => {
+        message.push(doc.data());
+      });
+  
+      message.sort((a, b) => {
+        if (a.date < b.date) {
+          return -1;
+        }
+        if (a.date > b.date) {
+          return 1;
+        }
+        return 0;
+      });
+  
+      res.status(202).json(message);
+    } catch (error) {
+      res.status(400).json(error);
+    }
+  };
+
 const pinMessage = async (req, res) => {
   const { id } = req.params;
     try {
@@ -38,7 +76,7 @@ const pinMessage = async (req, res) => {
 };
 
 const deleteMessage = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.query;
   try {
     await db.collection('messages').doc(id).delete();
     res.status(202).json(`successfully deleted message: ${id}`);
@@ -47,4 +85,4 @@ const deleteMessage = async (req, res) => {
   }
 }
 
-export default [getMessages, pinMessage, deleteMessage]
+export default [getMessages, getFilteredMessages, pinMessage, deleteMessage]

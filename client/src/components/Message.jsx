@@ -8,14 +8,12 @@ import styles from '../styles/Messages.module.css';
 
 function Message(props) {
   const {
-    id, message, updatePinned,
+    message, date, updatePinned,
   } = props;
 
   const {
-    title, body, pinned, date,
+    id, title, body, pinned,
   } = message;
-
-  console.log(message);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const pinActions = ['Pin', 'Delete'];
@@ -39,8 +37,12 @@ function Message(props) {
       <div className={styles.titlediv}>
         <h1 className={styles.title_css}>
           {title}
-          {date}
         </h1>
+        <h5>
+          Posted at
+          {' '}
+          {date}
+        </h5>
         <div>
           <IconButton
             aria-label="more"
@@ -79,13 +81,13 @@ function Message(props) {
 }
 
 Message.propTypes = {
-  id: PropTypes.string.isRequired,
   message: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     body: PropTypes.string.isRequired,
     pinned: PropTypes.bool.isRequired,
-    date: PropTypes.string.isRequired,
   }).isRequired,
+  date: PropTypes.string.isRequired,
   updatePinned: PropTypes.func.isRequired,
 };
 export default Message;

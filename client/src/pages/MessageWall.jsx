@@ -43,7 +43,7 @@ function MessageWall({ profile }) {
   // in this specific getMessagesfunc, we extract the data by making a call to api.getMessages using the await
   // keyword which pauses execution until it's done. Then we update the messages state with the data.
   const getMessagesfunc = async () => {
-    const { data } = await api.getMessages();
+    const { data } = await api.getFilteredMessages(serviceArea, role);
     setMessages(data);
   };
 
@@ -107,6 +107,15 @@ function MessageWall({ profile }) {
         setmsgServiceArea('');
         setAudience('');
       });
+  };
+
+  // convert firebase timestamp to a date string, passed as a prop into Message component
+  const convertToDate = (timestampObject) => {
+    const timestamp = new Date(timestampObject.seconds * 1000 + timestampObject.nanoseconds / 1000000);
+    const month = String(timestamp.getMonth() + 1).padStart(2, '0');
+    const day = String(timestamp.getDate()).padStart(2, '0');
+    const year = String(timestamp.getFullYear()).slice(-2);
+    return `${month}/${day}/${year}`;
   };
 
   const handleClickOpen = () => {
@@ -224,14 +233,14 @@ function MessageWall({ profile }) {
           (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role))),
         ).map(
-          (message) => <Message key={message.id} id={message.id} message={message} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} id={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
         )}
         <h4 className={styles.pinnedtitle}>Posts</h4>
         {messages.filter(
           (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
         && message.target.includes(role))),
         ).map(
-          (message) => <Message key={message.id} id={message.id} message={message} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
         )}
       </div>
     )
