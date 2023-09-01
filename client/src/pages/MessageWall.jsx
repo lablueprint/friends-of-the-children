@@ -21,6 +21,8 @@ function MessageWall({ profile }) {
   const [audience, setAudience] = useState('');
   const [messages, setMessages] = useState(null);
   const [statusMessage, seStatusMessage] = useState('');
+  const [serviceAreaFilter, setServiceAreaFilter] = useState('All');
+  const [timeFilter, setTimeFilter] = useState('Most Recent');
   const [open, setOpen] = useState(false);
   const target = [];
   const { role, serviceArea } = profile;
@@ -126,6 +128,27 @@ function MessageWall({ profile }) {
     return `${month}/${day}/${year}`;
   };
 
+  const filterByServiceArea = (sa) => {
+    setServiceAreaFilter(sa);
+    api.getMessages().then((res) => {
+      let { data } = res;
+      if (timeFilter === 'Least Recent') {
+        data = data.reverse();
+      }
+      if (sa !== 'All') {
+        const msgs = data.filter((d) => (d.serviceArea.includes(sa)));
+        setMessages(msgs);
+      } else {
+        setMessages(data);
+      }
+    });
+  };
+
+  const filterByTime = (time) => {
+    setTimeFilter(time);
+    setMessages(messages.reverse());
+  };
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -151,8 +174,53 @@ function MessageWall({ profile }) {
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
 
-        {/* create post button */}
-        <div className={styles.buttonBox}>
+        {/* actions panel */}
+        <div className={styles.actionsContainer}>
+          <h5>Filter By: </h5>
+
+          {/* time filter */}
+          <FormControl sx={{ m: 1, minWidth: 150 }}>
+            <InputLabel id="demo-simple-select-label">Time</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={timeFilter}
+              label="Time"
+              onChange={(e) => filterByTime(e.target.value)}
+            >
+              <MenuItem value={'Most Recent'}>Most Recent</MenuItem>
+              <MenuItem value={'Least Recent'}>Least Recent</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* service area filter */}
+          <FormControl sx={{ m: 1, minWidth: 150 }}>
+            <InputLabel id="demo-simple-select-label">Service Area</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={serviceAreaFilter}
+              onChange={(e) => filterByServiceArea(e.target.value)}
+              label="Service Area"
+            >
+              <MenuItem value="All">
+                <div className={styles.serviceContainer2}>
+                  <div className={styles.serviceAreaCircle} />
+                  {'All'}
+                </div>
+              </MenuItem>
+              {serviceAreas.map((sa) => (
+                <MenuItem value={sa}>
+                  <div className={styles.serviceContainer2}>
+                    <div className={`${styles[`serviceAreaCircle_${sa}`]} ${styles.serviceAreaCircle}`} />
+                    {sa}
+                  </div>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* create post button */}
           <button className={styles.createPostButton} type="button" onClick={handleClickOpen}>
             + Create Post
           </button>
@@ -267,7 +335,7 @@ function MessageWall({ profile }) {
             {'All'}
           </div>
           <div className={styles.serviceContainer}>
-            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_CS}`} />
+            <div className={`${styles[`serviceAreaCircle_${serviceArea}`]} ${styles.serviceAreaCircle}`} />
             {serviceArea}
           </div>
         </div>
