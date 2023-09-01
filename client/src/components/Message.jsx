@@ -39,7 +39,7 @@ function Message(props) {
           {title}
         </h1>
         <h5>
-          Posted at
+          Posted on
           {' '}
           {date}
         </h5>

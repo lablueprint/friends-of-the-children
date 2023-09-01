@@ -7,7 +7,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   Button, Dialog, DialogActions, DialogContent, MenuItem, FormControl, InputLabel, Select,
 } from '@mui/material';
-import { app, db } from './firebase';
+import { app } from './firebase';
 import Message from '../components/Message';
 import * as api from '../api';
 import styles from '../styles/Messages.module.css';
@@ -23,7 +23,6 @@ function MessageWall({ profile }) {
   const [statusMessage, seStatusMessage] = useState('');
   const [open, setOpen] = useState(false);
   const target = [];
-
   const { role, serviceArea } = profile;
 
   const theme = createTheme({
@@ -59,16 +58,11 @@ function MessageWall({ profile }) {
   const updatePinned = (id, pinned) => {
     // deep copy for useState to work properly
     // see https://www.coletiv.com/blog/dangers-of-using-objects-in-useState-and-useEffect-ReactJS-hooks/ for more context
-    const tempMessages = [...messages];
-
-    // change local variable, then push to firebase
-    /* eslint no-param-reassign: ["error", { "props": false }] */
-    tempMessages.find((message) => (message.id === id)).pinned = pinned;
-    setMessages(tempMessages);
-
-    db.collection('messages').doc(id).set({
-      pinned,
-    }, { merge: true });
+    api.pinMessage(id, pinned).then(() => {
+      const tempMessages = [...messages];
+      tempMessages.find((message) => (message.id === id)).pinned = pinned;
+      setMessages(tempMessages);
+    });
   };
 
   const submitData = async (e) => {
@@ -105,13 +99,13 @@ function MessageWall({ profile }) {
     seStatusMessage(message);
 
     // update db with new messages + reset the state variables back to empty strings after a message is succesfully submitted
-    db.collection('messages').doc().set(data).then(getMessages)
-      .then(() => {
-        setTitle('');
-        setBody('');
-        setmsgServiceArea('');
-        setAudience('');
-      });
+    api.createMessage(data).then(() => {
+      getMessages();
+      setTitle('');
+      setBody('');
+      setmsgServiceArea('');
+      setAudience('');
+    });
 
     // show the new message
     getMessages();
