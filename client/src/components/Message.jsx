@@ -8,12 +8,14 @@ import styles from '../styles/Messages.module.css';
 
 function Message(props) {
   const {
-    message, date, updatePinned,
+    message, date, updatePinned, deleteMessage, pinPrivilege = false,
   } = props;
 
   const {
-    id, title, body, pinned,
+    id, title, body, pinned, serviceArea,
   } = message;
+
+  const serviceAreaCSS = serviceArea.length === 1 ? `serviceAreaCircle_${serviceArea[0]}` : '';
 
   const [anchorEl, setAnchorEl] = useState(null);
   const pinActions = ['Pin', 'Delete'];
@@ -28,21 +30,19 @@ function Message(props) {
     setAnchorEl(null);
   };
 
-  const update = () => {
-    updatePinned(id, !pinned);
-  };
-
   return (
     <div className={pinned ? styles.pinnedmessage : styles.message}>
       <div className={styles.titlediv}>
+        <div className={`${styles[serviceAreaCSS]} ${styles.serviceAreaCircle}`} />
         <h1 className={styles.title_css}>
           {title}
         </h1>
-        <h5>
+        <h5 className={styles.date}>
           Posted on
           {' '}
           {date}
         </h5>
+        {pinPrivilege && (
         <div>
           <IconButton
             aria-label="more"
@@ -64,12 +64,24 @@ function Message(props) {
             onClose={handleClose}
           >
             {(pinned ? unpinActions : pinActions).map((option) => (
-              <MenuItem key={option} selected={option === 'Pin'} onClick={update}>
-                {option}
-              </MenuItem>
+              <div key={option}>
+                <MenuItem
+                  selected={option === 'Pin' || option === 'Unpin'}
+                  onClick={() => {
+                    if (option === 'Pin' || option === 'Unpin') {
+                      updatePinned(id, !pinned);
+                    } else if (option === 'Delete') {
+                      deleteMessage(id);
+                    }
+                  }}
+                >
+                  {option}
+                </MenuItem>
+              </div>
             ))}
           </Menu>
         </div>
+        ) }
         {/* <button type="button" className={pinned ? styles.pinnedbutton : styles.button} onClick={update}>{pinned ? '❗️📌 UNPIN' : '📌 PIN' }</button> */}
       </div>
 
@@ -86,8 +98,11 @@ Message.propTypes = {
     title: PropTypes.string.isRequired,
     body: PropTypes.string.isRequired,
     pinned: PropTypes.bool.isRequired,
+    serviceArea: PropTypes.arrayOf.isRequired,
   }).isRequired,
   date: PropTypes.string.isRequired,
   updatePinned: PropTypes.func.isRequired,
+  deleteMessage: PropTypes.func.isRequired,
+  pinPrivilege: PropTypes.bool.isRequired,
 };
 export default Message;

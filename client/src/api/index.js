@@ -447,7 +447,7 @@ export const pinMessage = async (id, pinned) => {
 
 export const deleteMessage = async (id) => {
   try {
-    const deletedMessage = await axios.post(`${url}/deleteMessage`, { params: { id } });
+    const deletedMessage = await axios.post(`${url}/deleteMessage`, { id });
     return deletedMessage;
   } catch (error) {
     console.error(error.message);

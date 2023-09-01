@@ -65,6 +65,12 @@ function MessageWall({ profile }) {
     });
   };
 
+  const deleteMessage = (id) => {
+    api.deleteMessage(id).then(() => {
+      getMessages();
+    });
+  };
+
   const submitData = async (e) => {
     e.preventDefault();
     setOpen(false);
@@ -144,26 +150,48 @@ function MessageWall({ profile }) {
     role.toLowerCase() === 'admin' ? (
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
+
         {/* create post button */}
         <div className={styles.buttonBox}>
           <button className={styles.createPostButton} type="button" onClick={handleClickOpen}>
             + Create Post
           </button>
         </div>
-        <div>{serviceArea}</div>
-        {/* message posts */}
-        {messages && messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
+
+        {/* pinned message posts */}
+        <div className={styles.postTitleContainer}>
+          <h4 className={styles.pinnedtitle}>{messages && messages.some((message) => message.pinned) ? 'Pinned' : 'Posts'}</h4>
+          <div className={styles.serviceContainer}>
+            <div className={styles.serviceAreaCircle} />
+            {'All'}
+          </div>
+          <div className={styles.serviceContainer}>
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_CS}`} />
+            {'CS'}
+          </div>
+          <div className={styles.serviceContainer}>
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_AV}`} />
+            {'AV'}
+          </div>
+          <div className={styles.serviceContainer}>
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_SV}`} />
+            {'SV'}
+          </div>
+        </div>
         {messages && messages.filter(
           (message) => (message.pinned),
         ).map(
-          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} deleteMessage={deleteMessage} pinPrivilege />,
         )}
-        <h4 className={styles.pinnedtitle}>Posts</h4>
+
+        {/* regular posts */}
+        {messages && messages.some((message) => message.pinned) && <div className={styles.postTitleContainer}><h4 className={styles.pinnedtitle}>Posts</h4></div>}
         {messages && messages.filter(
           (message) => (!message.pinned),
         ).map(
-          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} deleteMessage={deleteMessage} pinPrivilege />,
         )}
+
         {/* popup when creating post */}
         <ThemeProvider theme={theme}>
           <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -207,9 +235,9 @@ function MessageWall({ profile }) {
                         onChange={(e) => setAudience(e.target.value)}
                         required
                       >
+                        <MenuItem value="ALL">ALL</MenuItem>
                         <MenuItem value="Friends">Friends</MenuItem>
                         <MenuItem value="Caregivers">Caregivers</MenuItem>
-                        <MenuItem value="ALL">ALL</MenuItem>
                       </Select>
                     </FormControl>
                   </div>
@@ -232,17 +260,27 @@ function MessageWall({ profile }) {
       // for non-admin roles (no create button)
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
-        {messages && messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
+        <div className={styles.postTitleContainer}>
+          <h4 className={styles.pinnedtitle}>{messages && messages.some((message) => message.pinned) ? 'Pinned' : 'Posts'}</h4>
+          <div className={styles.serviceContainer}>
+            <div className={styles.serviceAreaCircle} />
+            {'All'}
+          </div>
+          <div className={styles.serviceContainer}>
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_CS}`} />
+            {serviceArea}
+          </div>
+        </div>
         {messages && messages.filter(
           (message) => (message.pinned),
         ).map(
-          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} deleteMessage={deleteMessage} updatePinned={updatePinned} />,
         )}
-        <h4 className={styles.pinnedtitle}>Posts</h4>
+        {messages && messages.some((message) => message.pinned) && <div className={styles.postTitleContainer}><h4 className={styles.pinnedtitle}>Posts</h4></div>}
         {messages && messages.filter(
           (message) => (!message.pinned),
         ).map(
-          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} deleteMessage={deleteMessage} updatePinned={updatePinned} />,
         )}
       </div>
     )

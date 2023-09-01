@@ -21,10 +21,10 @@ const getMessages = async (req, res) => {
       });
       // sort in reverse chronological order (i.e. newest at first)
       message.sort((a, b) => {
-        if (a.date > b.date) {
+        if (a.date.seconds > b.date.seconds) {
           return -1;
         }
-        if (a.date < b.date) {
+        if (a.date.seconds < b.date.seconds) {
           return 1;
         }
         return 0;
@@ -52,10 +52,10 @@ const getFilteredMessages = async (req, res) => {
       message.push(doc.data());
     });
     message.sort((a, b) => {
-      if (a.date > b.date) {
+      if (a.date.seconds > b.date.seconds) {
         return -1;
       }
-      if (a.date < b.date) {
+      if (a.date.seconds < b.date.seconds) {
         return 1;
       }
       return 0;
@@ -79,7 +79,7 @@ const pinMessage = async (req, res) => {
 };
 
 const deleteMessage = async (req, res) => {
-  const { id } = req.query;
+  const { id } = req.body;
   try {
     await db.collection('messages').doc(id).delete();
     res.status(202).json(`successfully deleted message: ${id}`);

@@ -1,6 +1,5 @@
 .message{
-    width: 90%;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     margin-left: 3em;
     padding: 35px;
     background: #FFFFFF;
@@ -11,8 +10,7 @@
 }
 
 .pinnedmessage{
-    width: 90%;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     margin-left: 3em;
     padding: 35px;
     background: #FFFFFF;
@@ -23,8 +21,9 @@
 
 .titlediv {
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 .announcement {
@@ -35,6 +34,8 @@
 }
 
 .pinnedtitle {
+    margin: 0;
+    margin-right: auto;
     text-align: left;
     font-size: 1.8em;
     padding-left: 2em;
@@ -50,7 +51,48 @@
     margin: 5px;
 }
 
+.postTitleContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.serviceContainer {
+    display: inherit;
+    margin-left: 25px;
+}
+
+.serviceAreaCircle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 5px;
+    background: linear-gradient(var(--green, #6AA), #FF9292, var(--ochre, #EB1));
+}
+
+.serviceAreaCircle_AV {
+    background: var(--green, #6AA) !important;
+}
+
+.serviceAreaCircle_CS {
+    background: #FF9292 !important;
+}
+
+.serviceAreaCircle_SV {
+    background: var(--ochre, #EB1) !important;
+}
+
+.date {
+    margin-bottom: 0;
+    font-size: 1.1em;
+    margin-right: 10px;
+}
+
 .title_css {
+    margin-right: auto;
+    margin-left: 15px;
+    margin-bottom: 0;
     text-align: left;
     font-weight: 500;
     font-size: 1.5em;
