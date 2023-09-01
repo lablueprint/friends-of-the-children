@@ -328,6 +328,24 @@ function MessageWall({ profile }) {
       // for non-admin roles (no create button)
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
+        {/* actions panel */}
+        <div className={styles.actionsContainer}>
+          <h5>Filter By: </h5>
+          {/* time filter */}
+          <FormControl sx={{ m: 1, minWidth: 150 }}>
+            <InputLabel id="demo-simple-select-label">Time</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={timeFilter}
+              label="Time"
+              onChange={(e) => filterByTime(e.target.value)}
+            >
+              <MenuItem value={'Most Recent'}>Most Recent</MenuItem>
+              <MenuItem value={'Least Recent'}>Least Recent</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
         <div className={styles.postTitleContainer}>
           <h4 className={styles.pinnedtitle}>{messages && messages.some((message) => message.pinned) ? 'Pinned' : 'Posts'}</h4>
           <div className={styles.serviceContainer}>
