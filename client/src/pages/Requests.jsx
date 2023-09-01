@@ -83,7 +83,7 @@ function Requests({ profile }) {
       const { data } = await api.getProfilesSortedByDate();
 
       // filter array of profile objects (also make sure they all have approved and date fields in firebase)
-      const users = data.filter((user) => (('approved' in user) && ('date' in user)) && (user.role.toLowerCase() !== 'admin'));
+      const users = data.filter((user) => (('approved' in user) && ('date' in user)));
       const reducedAllUsers = users.map((user) => {
         const myDate = new Date(user.date.seconds * 1000);
         return ({

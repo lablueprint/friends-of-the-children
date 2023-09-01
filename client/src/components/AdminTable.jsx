@@ -8,8 +8,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-
 import PropTypes from 'prop-types';
+import styles from '../styles/Requests.module.css';
+import ApproveIcon from '../assets/icons/approved.svg';
+import UnapproveIcon from '../assets/icons/unapproved.svg';
+
 import * as api from '../api';
 
 export default function AdminTable({
@@ -144,9 +147,15 @@ export default function AdminTable({
                 <TableCell align="left">{row.name}</TableCell>
                 <TableCell align="left">{row.username}</TableCell>
                 <TableCell align="left">{row.email}</TableCell>
-                <TableCell align="left">{row.role}</TableCell>
+                <TableCell align="left">
+                  <div className={`${styles.roleWrapper} ${styles[row.role]}`}>
+                    {row.role}
+                  </div>
+                </TableCell>
                 <TableCell align="left">{row.dateJoined}</TableCell>
-                <TableCell align="left">{row.approved}</TableCell>
+                <TableCell align="left">
+                  {row.approved === 'Approved' ? <img className={styles.approveIcon} src={ApproveIcon} alt="approved" /> : <img className={styles.approveIcon} src={UnapproveIcon} alt="not approved" /> }
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -161,9 +170,15 @@ export default function AdminTable({
                 <TableCell align="left">{row.name}</TableCell>
                 <TableCell align="left">{row.username}</TableCell>
                 <TableCell align="left">{row.email}</TableCell>
-                <TableCell align="left">{row.role}</TableCell>
+                <TableCell align="left">
+                  <div className={`${styles.roleWrapper} ${styles[row.role]}`}>
+                    {row.role}
+                  </div>
+                </TableCell>
                 <TableCell align="left">{row.dateJoined}</TableCell>
-                <TableCell align="left">{row.approved}</TableCell>
+                <TableCell align="left">
+                  {row.approved === 'Approved' ? <img className={styles.approveIcon} src={ApproveIcon} alt="approved" /> : <img className={styles.approveIcon} src={UnapproveIcon} alt="not approved" /> }
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

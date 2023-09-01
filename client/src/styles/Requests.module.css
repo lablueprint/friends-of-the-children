@@ -31,3 +31,29 @@
 .tabs {
     padding-left: 10rem;
 }
+
+.roleWrapper {
+    border-radius: 20px;
+    padding: 5px;
+    max-width: 100px;
+    text-align: center;
+}
+
+.Caregiver {
+    color: #871B99;
+    background: rgba(167, 116, 185, 0.15);
+}
+
+.Mentor {
+    color: #005DE8;
+    background: rgba(0, 170, 238, 0.15);
+}
+
+.Admin {
+    color: #e88b00;
+    background: rgba(238, 194, 0, 0.15);
+}
+
+.approveIcon {
+    width: 140px;
+}
