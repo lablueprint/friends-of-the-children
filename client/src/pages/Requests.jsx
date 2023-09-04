@@ -4,6 +4,10 @@ import {
   Tab, Tabs,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Dialog from '@mui/material/Dialog';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
 import TabPanel from '../components/TabPanel';
 import AdminTable from '../components/AdminTable';
 import * as api from '../api';
@@ -38,6 +42,10 @@ function Requests({ profile }) {
 
   const [allUsers, setAllUsers] = useState([]);
 
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+  const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
+
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -47,28 +55,40 @@ function Requests({ profile }) {
 
   }));
 
-  function HandleSelectClick() {
-    setNumChecked(0);
-    setSelectMode(true);
-  }
-
   function HandleCancelClick() {
     setNumChecked(0);
     setCancelButton(true);
-    setSelectMode(false);
   }
 
   function HandleApproveClick() {
     setNumChecked(0);
-    setApproveButton(true);
-    setSelectMode(false);
+    setOpenApprovalDialog(true);
   }
 
   function HandleDeleteClick() {
     setNumChecked(0);
-    setDeleteButton(true);
-    setSelectMode(false);
+    setOpenDeleteDialog(true);
   }
+
+  const closeDeleteDialog = () => {
+    setNumChecked(0);
+    setOpenDeleteDialog(false);
+    setCancelButton(true);
+  };
+
+  const handleDelete = () => {
+    setDeleteButton(true);
+  };
+
+  const closeApprovalDialog = () => {
+    setNumChecked(0);
+    setOpenApprovalDialog(false);
+    setCancelButton(true);
+  };
+
+  const handleApproval = () => {
+    setApproveButton(true);
+  };
 
   useEffect(() => {
     if (value === 0) {
@@ -77,6 +97,12 @@ function Requests({ profile }) {
       setCurrentAccounts(allUsers);
     }
   }, [value]);
+
+  useEffect(() => {
+    if (numChecked === 0) {
+      setSelectMode(false);
+    }
+  }, [numChecked]);
 
   useEffect(() => {
     async function fetchProfiles() {
@@ -140,30 +166,58 @@ function Requests({ profile }) {
           </div>
           <TabPanel value={value} index={0}>
             {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} />}
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} setSelectMode={setSelectMode} />}
           </TabPanel>
           <TabPanel value={value} index={1}>
             {currentAccounts
-            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} selectMode={selectMode} />}
+            && <AdminTable users={currentAccounts} setRowsSelected={setNumChecked} cancelButton={cancelButton} setCancelButton={setCancelButton} approveButton={approveButton} setApproveButton={setApproveButton} deleteButton={deleteButton} setDeleteButton={setDeleteButton} setSelectMode={setSelectMode} />}
           </TabPanel>
-          <div>
-            { selectMode
-              ? (
-                <div>
-                  <p>
-                    {numChecked}
-                    {' '}
-                    Selected
-                  </p>
-                  <div>
-                    <button type="button" onClick={HandleCancelClick}>Cancel</button>
-                    <button type="button" onClick={HandleApproveClick}>Approve</button>
-                    <button type="button" onClick={HandleDeleteClick}>Delete</button>
-                  </div>
-                </div>
-              )
-              : (<button type="button" onClick={HandleSelectClick}>Select</button>)}
+          { selectMode
+          && (
+          <div className={styles.deleteFilesBar}>
+            <div className={styles.totalSelected}>
+              <div className={styles.selectedNumber}>
+                {numChecked}
+                {' '}
+              </div>
+              {' '}
+              <p className={styles.selectedText}>
+                Selected
+              </p>
+            </div>
+            <div>
+              <button type="button" className={styles.cancelButton} onClick={HandleCancelClick}>Cancel</button>
+              {value === 0 && <button type="button" className={styles.approveButton} onClick={HandleApproveClick}>Approve</button> }
+              <button type="button" className={styles.deleteButton} onClick={HandleDeleteClick}>Delete</button>
+            </div>
           </div>
+          )}
+
+          {/* confirmation to delete selected users */}
+          <Dialog fullWidth maxWidth={'xs'} open={openDeleteDialog} onClose={closeDeleteDialog}>
+            <DialogTitle>Delete selected user(s)?</DialogTitle>
+            <DialogActions>
+              <Button autoFocus onClick={closeDeleteDialog}>
+                Cancel
+              </Button>
+              <Button onClick={handleDelete} autoFocus>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* confirmation to approve selected users */}
+          <Dialog fullWidth maxWidth={'xs'} open={openApprovalDialog} onClose={closeApprovalDialog}>
+            <DialogTitle>Approve selected user(s)?</DialogTitle>
+            <DialogActions>
+              <Button autoFocus onClick={closeApprovalDialog}>
+                Cancel
+              </Button>
+              <Button onClick={handleApproval} autoFocus>
+                Approve
+              </Button>
+            </DialogActions>
+          </Dialog>
         </div>
       )
       : <PermissionDenied />
