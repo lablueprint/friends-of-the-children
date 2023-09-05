@@ -701,18 +701,24 @@ const updateFileLinksField = async (req, res) => {
   }
 };
 
-// checking if the username already exists in database (new user signing up)
+// checking if the username/email already exists in database (new user signing up)
 const getUsernames = async (req, res) => {
   try {
     const usernames = [];
+    const emails = [];
     db.collection('profiles').get().then((sc) => {
       sc.forEach((user) => {
         const data = user.data();
-        if (data && data.username) {
-          usernames.push(data.username);
+        if (data) {
+          if (data.username){
+            usernames.push(data.username);
+          }
+          if (data.email) {
+            emails.push(data.email);
+          }
         }
       });
-      res.status(202).json(usernames);
+      res.status(202).json({usernames, emails});
     });
   } catch (error) {
     res.status(400).json(error);

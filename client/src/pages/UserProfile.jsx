@@ -9,7 +9,6 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import bcrypt from 'bcryptjs';
-import { useDispatch } from 'react-redux';
 import styles from '../styles/UserProfile.module.css';
 import { db, storage } from './firebase';
 import * as api from '../api';
@@ -30,7 +29,6 @@ function UserProfile({ profile, updateAppProfile }) {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [newPasswordAllowed, setNewPasswordAllowed] = useState(false);
-
   const handleUpload = async (image) => {
     // const imageName = uuidv4(image.name);
     const imageName = image.name;
@@ -48,6 +46,11 @@ function UserProfile({ profile, updateAppProfile }) {
           image: url,
         };
         updateAppProfile(newProfile);
+        await api.updateProfile(profile.id, newProfile);
+        setUpdatedProfile({
+          ...profile,
+          image: url,
+        });
       });
     });
   };
