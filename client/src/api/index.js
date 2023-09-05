@@ -423,6 +423,28 @@ export const getProfilesSortedByDate = async () => {
   return null;
 };
 
+export const getProfile = async (id) => {
+  try {
+    const profile = await axios.get(`${url}/getProfile`, { params: { id } });
+    return profile;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get user profile');
+  }
+  return null;
+};
+
+export const updateProfile = async (id, updatedProfile) => {
+  try {
+    const profile = await axios.post(`${url}/updateProfile`, { id, updatedProfile });
+    return profile;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update user profile');
+  }
+  return null;
+};
+
 // profile object should have the following fields:
 // [{id: number, fields:{fieldName: fieldValue}}]
 export const batchUpdateProfile = async (data) => {

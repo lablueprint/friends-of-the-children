@@ -30,6 +30,8 @@ import {
   sendMailchimpEmails,
   updateModuleChildren,
   getProfilesSortedByDate,
+  getProfile,
+  updateProfile,
   batchUpdateProfile,
   batchDeleteProfile,
   batchAddToList,
@@ -124,8 +126,13 @@ router.post('/addModule', addModule);
 
 router.get('/getMessages', getMessages);
 
-//
 router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
+
+// get a single user profile
+router.get('/getProfile', getProfile);
+
+//update a single user profile
+router.post('/updateProfile', updateProfile);
 
 router.post('/batchUpdateProfile', batchUpdateProfile);
 

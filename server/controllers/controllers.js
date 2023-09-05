@@ -816,6 +816,32 @@ const getProfilesSortedByDate = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res) => {
+  const { id } = req.query;
+  try {
+    const profileDoc = await db.collection('profiles').doc(id).get();
+    if (!profileDoc.exists) {
+      res.status(404).json({ error: 'Profile not found' });
+      return;
+    }
+    const profileData = profileDoc.data();
+    res.status(200).json(profileData);
+  } catch (error) {
+    console.error('Error getting profile:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+const updateProfile = async (req, res) => {
+  const {id, updatedProfile} = req.body;
+  try {
+    const profile = await db.collection('profiles').doc(id).update(updatedProfile);
+    res.status(202).json(profile);
+  } catch (error) {
+    res.status(400).json(error)
+  }
+}
+
 const batchUpdateProfile = async (req, res) => {
   try {
     const batch = db.batch();
@@ -1074,6 +1100,8 @@ export {
   sendMailchimpEmails,
   updateModuleChildren,
   getProfilesSortedByDate,
+  getProfile,
+  updateProfile,
   batchUpdateProfile,
   batchDeleteProfile,
   batchAddToList,
