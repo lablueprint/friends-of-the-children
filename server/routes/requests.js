@@ -5,8 +5,6 @@ import express from 'express';
 import mailchimp from '../mailchimp.js';
 
 import {
-  createEvent,
-  patchEvent,
   getMentees,
   updateClearance,
   createMentee,
@@ -42,12 +40,15 @@ import {
   deleteMenteeFiles,
   addModule,
 } from '../controllers/controllers.js';
+import { createEvent, patchEvent, getEvents } from '../controllers/calendarController.js';
 
 const router = express.Router();
 
 router.get('/', (req, res) => {
   res.send('We are live!');
 });
+
+router.get('/getEvents', getEvents);
 
 // creates an event on google calendar
 router.post('/createEvent', createEvent);

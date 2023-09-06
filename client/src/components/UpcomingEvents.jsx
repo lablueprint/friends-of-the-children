@@ -1,27 +1,31 @@
 import { React, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from '../styles/Calendar.module.css';
+import * as api from '../api';
 
-function UpcomingEvents({ profile, getCalendarRef }) {
+function UpcomingEvents({ profile, calendarId }) {
   const { serviceArea } = profile;
   // Get default event service area based off user's service area
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
-  const getUpcomingEvents = () => {
-    // really jank but only loads events after half a second so that the ref is valid
-    const timer = setTimeout(() => {
-      if (getCalendarRef()) {
-        const events = getCalendarRef().current.getApi().getEvents();
-        setUpcomingEvents(events);
-        console.log(events);
-        console.log(getCalendarRef());
-      }
-    }, 500);
+  // format the datetime string returned by event object
+  function formatDateTime(inputDateTimeString) {
+    const inputDate = new Date(inputDateTimeString);
+    const month = String(inputDate.getMonth() + 1).padStart(2, '0');
+    const day = String(inputDate.getDate()).padStart(2, '0');
+    const year = inputDate.getFullYear();
+    const hour = String(inputDate.getHours() % 12 || 12).padStart(2, '0');
+    const minute = String(inputDate.getMinutes()).padStart(2, '0');
+    const ampm = inputDate.getHours() < 12 ? 'AM' : 'PM';
+    const formattedDateTime = `${month}/${day}/${year} ${hour}:${minute} ${ampm}`;
+    return formattedDateTime;
+  }
 
-    return () => clearTimeout(timer);
-  };
-
-  useEffect(getUpcomingEvents, []);
+  useEffect(() => {
+    api.getEvents(calendarId).then((events) => {
+      setUpcomingEvents(events.data);
+    });
+  }, []);
 
   return (
     <div className={styles['calendar-container']}>
@@ -32,17 +36,17 @@ function UpcomingEvents({ profile, getCalendarRef }) {
           <div key={event.id} className={styles.event}>
             <div className={styles['event-date']}>
               <span>
-                {event.start.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
+                {formatDateTime(event.start.dateTime)}
               </span>
               <span className={styles['event-bullet']}>&bull;</span>
               <span>
-                {`${event.start.toLocaleTimeString(undefined, { hour: 'numeric', minute: 'numeric' }).replace(' ', '')} - ${event.end.toLocaleTimeString(undefined, { hour: 'numeric', minute: 'numeric' }).replace(' ', '')}`}
+                {formatDateTime(event.end.dateTime)}
               </span>
 
             </div>
-            <h3 className={styles['event-title']}>{event.title}</h3>
+            <h3 className={styles['event-title']}>{event.summary}</h3>
             <div className={styles['event-description']}>
-              <p>{event.extendedProps.description}</p>
+              <p>{event.description}</p>
             </div>
           </div>
         ))}
@@ -65,7 +69,7 @@ UpcomingEvents.propTypes = {
     google: PropTypes.bool,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  getCalendarRef: PropTypes.func.isRequired,
+  calendarId: PropTypes.string.isRequired, // TODO: MAKE THIS AN ARRAY
 };
 
 export default UpcomingEvents;

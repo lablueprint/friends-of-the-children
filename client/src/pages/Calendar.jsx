@@ -32,8 +32,9 @@ function Calendar({ profile }) {
   const { role, serviceArea } = profile;
   const currRole = role.toLowerCase();
   const {
-    REACT_APP_FIREBASE_CALENDAR_ID,
+    REACT_APP_GOOGLE_CALENDAR_API_KEY,
   } = process.env;
+  const calendarRef = useRef();
 
   const [open, setOpen] = useState(false);
 
@@ -44,8 +45,6 @@ function Calendar({ profile }) {
   const handleClose = () => {
     setOpen(false);
   };
-
-  const calendarRef = useRef();
 
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
@@ -108,6 +107,7 @@ function Calendar({ profile }) {
       color: 'rgba(0, 170, 238, 0.2)',
     }];
   };
+
   const calendarInfo = getCalendarByRole();
 
   return (
@@ -136,13 +136,14 @@ function Calendar({ profile }) {
               eventColor="rgba(0, 170, 238, 0.2)"
               eventTextColor="black"
               fixedWeekCount={false}
-              googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
+              googleCalendarApiKey={REACT_APP_GOOGLE_CALENDAR_API_KEY}
               eventSources={calendarInfo}
               eventClick={handleEventClick}
             />
           </div>
           <div className={styles.upcomingEvents}>
-            <UpcomingEvents profile={profile} getCalendarRef={() => calendarRef} />
+            {/* FIX CALENDAR ID  */}
+            <UpcomingEvents profile={profile} calendarId={constants.calIdFOTC} />
           </div>
         </div>
       </div>

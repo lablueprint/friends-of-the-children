@@ -3,6 +3,18 @@ import axios from 'axios';
 
 const url = process.env.REACT_APP_SERVER_URL;
 
+// get all events
+export const getEvents = async (calendarId) => {
+  try {
+    const events = await axios.get(`${url}/getEvents`, { params: { calendarId } });
+    return events;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get events');
+  }
+  return null;
+};
+
 // creates an event on gcal
 export const createEvent = async (eventData) => {
   try {

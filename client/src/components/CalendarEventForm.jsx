@@ -78,8 +78,8 @@ function CalendarEventForm({
 
     const attachments = [];
 
-    let calendarId; // Admin users will specify event service area
-    if (eventServiceArea === 'AV') { calendarId = constants.calIdAV; } else if (eventServiceArea === 'MS') { calendarId = constants.calIdMS; } else { calendarId = constants.calIdFOTC; }
+    const calendarId = constants.calIdFOTC; // Admin users will specify event service area
+    // if (eventServiceArea === 'AV') { calendarId = constants.calIdAV; } else if (eventServiceArea === 'MS') { calendarId = constants.calIdMS; } else { calendarId = constants.calIdFOTC; }
 
     // check if user inputs an attachment
     // if (e.target.attachments.value) {
@@ -105,7 +105,7 @@ function CalendarEventForm({
       calApi.addEvent(event);
     });
     // TODO: remove this manual reload and fix color of calendar bug
-    window.location.reload();
+    // window.location.reload();
     e.target.reset();
   };
 
