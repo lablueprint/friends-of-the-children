@@ -4,9 +4,9 @@ import axios from 'axios';
 const url = process.env.REACT_APP_SERVER_URL;
 
 // get all events
-export const getEvents = async (calendarId) => {
+export const getEvents = async (start, end, calendarId) => {
   try {
-    const events = await axios.get(`${url}/getEvents`, { params: { calendarId } });
+    const events = await axios.get(`${url}/getEvents`, { params: { start, end, calendarId } });
     return events;
   } catch (error) {
     console.error(error.message);

@@ -122,16 +122,16 @@ function Calendar({ profile }) {
 
   return (
     <div className={styles.calendar_container}>
-      <h1 className={styles.title}>Calendar</h1>
       <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       <div className={styles.container}>
-        {currRole === 'admin' && (
         <div className={styles.buttonBox}>
+          <h1 className={styles.title}>Calendar</h1>
+          {currRole === 'admin' && (
           <button className={styles.addEventButton} type="button" onClick={handleClickOpen}>
             + Add Event
           </button>
+          )}
         </div>
-        )}
         <div className={styles.contentContainer}>
           <div className={styles.calendar}>
             <FullCalendar
@@ -161,19 +161,6 @@ function Calendar({ profile }) {
 
       {popupEvent && (
         <EventPopup openEvent={openEvent} closeEvent={closeEvent} popupEvent={popupEvent} />
-      // <Dialog open={openEvent} onClose={closeEvent}>
-      //   <DialogTitle>{popupEvent.title}</DialogTitle>
-      //   <DialogContent>
-      //     <h5>Location: </h5>
-      //     {popupEvent.extendedProps.location}
-      //     <h5>Start Time: </h5>
-      //     {JSON.stringify(popupEvent.start)}
-      //     <h5>End Time: </h5>
-      //     {JSON.stringify(popupEvent.end)}
-      //     <h5>Note: </h5>
-      //     {popupEvent.extendedProps.description}
-      //   </DialogContent>
-      // </Dialog>
       )}
     </div>
   );

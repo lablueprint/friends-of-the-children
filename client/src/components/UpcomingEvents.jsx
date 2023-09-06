@@ -5,24 +5,32 @@ import * as api from '../api';
 
 function UpcomingEvents({ profile, calendarId }) {
   const { serviceArea } = profile;
+  console.log(serviceArea);
   // Get default event service area based off user's service area
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   // format the datetime string returned by event object
   function formatDateTime(inputDateTimeString) {
     const inputDate = new Date(inputDateTimeString);
-    const month = String(inputDate.getMonth() + 1).padStart(2, '0');
-    const day = String(inputDate.getDate()).padStart(2, '0');
-    const year = inputDate.getFullYear();
-    const hour = String(inputDate.getHours() % 12 || 12).padStart(2, '0');
+    const month = String(inputDate.getMonth() + 1);
+    const day = String(inputDate.getDate());
+    // const year = inputDate.getFullYear();
+    const hour = String(inputDate.getHours() % 12 || 12);
     const minute = String(inputDate.getMinutes()).padStart(2, '0');
-    const ampm = inputDate.getHours() < 12 ? 'AM' : 'PM';
-    const formattedDateTime = `${month}/${day}/${year} ${hour}:${minute} ${ampm}`;
+    const ampm = inputDate.getHours() < 12 ? 'am' : 'pm';
+    const formattedDateTime = `${month}/${day} ${hour}:${minute}${ampm}`;
     return formattedDateTime;
   }
 
   useEffect(() => {
-    api.getEvents(calendarId).then((events) => {
+    // date range = 3 weeks
+    const currDate = new Date();
+    const futureDate = new Date(currDate);
+    futureDate.setDate(currDate.getDate() + 21);
+    // format the dates in RFC3339 timestamp format
+    const currDateString = currDate.toISOString();
+    const futureDateString = futureDate.toISOString();
+    api.getEvents(currDateString, futureDateString, calendarId).then((events) => {
       setUpcomingEvents(events.data);
     });
   }, []);
@@ -30,24 +38,22 @@ function UpcomingEvents({ profile, calendarId }) {
   return (
     <div className={styles['calendar-container']}>
       <div className={styles['upcoming-events']}>
-        <h2>Upcoming Events</h2>
-        <div>{serviceArea}</div>
+        <h2 className={styles['upcoming-events-title']}>Upcoming Events</h2>
         {upcomingEvents.map((event) => (
           <div key={event.id} className={styles.event}>
             <div className={styles['event-date']}>
               <span>
                 {formatDateTime(event.start.dateTime)}
-              </span>
-              <span className={styles['event-bullet']}>&bull;</span>
-              <span>
+                {' '}
+                -
+                {' '}
                 {formatDateTime(event.end.dateTime)}
               </span>
-
             </div>
             <h3 className={styles['event-title']}>{event.summary}</h3>
-            <div className={styles['event-description']}>
-              <p>{event.description}</p>
-            </div>
+            <p className={styles['event-description']}>
+              {event.description}
+            </p>
           </div>
         ))}
       </div>

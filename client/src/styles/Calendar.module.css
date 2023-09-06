@@ -6,15 +6,16 @@
 }
 
 .calendar_container h1{
-    color: black;
-    font-size: 2.8rem;
-    font-family: News Gothic;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    text-align: left;
-    padding-left: 40px;
-    padding-top: 30px;
+  color: black;
+  font-size: 2.8rem;
+  font-family: News Gothic;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  text-align: left;
+  height: 22px;
+  padding: 0;
+  margin-right: auto;
 }
 
 .calendar{
@@ -27,7 +28,7 @@
     margin: 40px auto;
     font-family: 'Inter';
     flex-basis: 70%; /* Adjust the width as needed */
-    padding: 1rem;
+    padding: 2.5rem;
 }
 
 .calendar a{
@@ -50,10 +51,6 @@
     margin: 5px;
 }
 
-.fc .fc-toolbar-title {
-    font-weight: 900 !important;
-}
-
 .calendar-container {
     display: flex;
     flex-wrap: row;
@@ -67,20 +64,31 @@
     text-align: left;
   }
 
+  .upcoming-events-title {
+    color: var(--text, #3F3F3F);
+    font-family: News Gothic;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin-bottom: 20px;
+  }
+
   .event {
-    width: 346px;
+    width: 300px;
     height: auto;
-    min-height: 130px;
-    background-color: #FFFFFF;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    border-radius: 15px;
+    padding: 20px;
+    margin-right: 30px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 0.5px solid var(--reverse-light-gray, #CCC);
+    background: #FFF;
+    box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 0.05);
   }
 
   .event-title {
     font-weight: bold;
+    font-size: 1.5rem;
     margin-top: 0.5rem;
     align-self: flex-start;
     color: #3F3F3F;
@@ -98,43 +106,26 @@
   }
   
   .event-date {
-    display: flex;
-    align-items: center;
-    font-weight: bold;
+    color: #818181;
+    font-family: News Gothic;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
   }
-  
-  .event-date .event-date-time {
-    color: #989898; /* Change this to the desired color for the time */
-  }
-  
-  .event-date .event-date-date {
-    color: #555555; /* Change this to the desired color for the date */
-  }
-  
 
   .event-description {
-    margin-top: 0.5rem;
-    align-self: flex-start;
-    color: #555555;
+    color: #818181;
+    font-family: News Gothic;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
   }
 
   .event-time {
     font-weight: bold;
     margin-left: auto;
-  }
-
-  .event-date::before {
-    content: '\2022';
-    font-size: 24px; /* Adjust the font size as desired */
-    margin: 0 5px;
-    color: var(--event-color);
-  }
-
-  .event-details::after {
-    content: '\2022';
-    font-size: 8px;
-    margin-left: 5px;
-    margin-right: 5px;
   }
 
 .title {
@@ -148,20 +139,22 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: baseline;
+  padding: 35px;
+  padding-right: 0px;
 }
 
 .addEventButton {
   background: #156DBF;
   border-radius: 12px;
   border: none;
-  padding: 16px 40px;
-  gap: 10px;
+  padding: 16px 32px;
 
   font-family: 'News Gothic';
   font-style: normal;
   font-weight: 700;
   font-size: 18px;
-  line-height: 21px;
+  height: fit-content;
 
   color: #FFFFFF;
 }
