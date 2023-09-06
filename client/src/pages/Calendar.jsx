@@ -12,6 +12,7 @@ import ColorBlobs from '../assets/images/color_blobs.svg';
 import * as constants from '../constants';
 import CalendarEventForm from '../components/CalendarEventForm';
 import UpcomingEvents from '../components/UpcomingEvents';
+import EventPopup from '../components/EventPopup';
 
 /*
 
@@ -35,6 +36,8 @@ function Calendar({ profile }) {
     REACT_APP_GOOGLE_CALENDAR_API_KEY,
   } = process.env;
   const calendarRef = useRef();
+  const [popupEvent, setPopupEvent] = useState(null);
+  const [openEvent, setOpenEvent] = useState(false);
 
   const [open, setOpen] = useState(false);
 
@@ -46,8 +49,15 @@ function Calendar({ profile }) {
     setOpen(false);
   };
 
+  const closeEvent = () => {
+    setOpenEvent(false);
+  };
+
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
+    setOpenEvent(true);
+    console.log(eventInfo.event.title);
+    setPopupEvent(eventInfo.event);
   };
 
   const dropEvent = (info) => {
@@ -148,6 +158,23 @@ function Calendar({ profile }) {
         </div>
       </div>
       <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} open={open} handleClose={handleClose} />
+
+      {popupEvent && (
+        <EventPopup openEvent={openEvent} closeEvent={closeEvent} popupEvent={popupEvent} />
+      // <Dialog open={openEvent} onClose={closeEvent}>
+      //   <DialogTitle>{popupEvent.title}</DialogTitle>
+      //   <DialogContent>
+      //     <h5>Location: </h5>
+      //     {popupEvent.extendedProps.location}
+      //     <h5>Start Time: </h5>
+      //     {JSON.stringify(popupEvent.start)}
+      //     <h5>End Time: </h5>
+      //     {JSON.stringify(popupEvent.end)}
+      //     <h5>Note: </h5>
+      //     {popupEvent.extendedProps.description}
+      //   </DialogContent>
+      // </Dialog>
+      )}
     </div>
   );
 }
