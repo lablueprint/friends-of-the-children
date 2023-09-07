@@ -1,5 +1,5 @@
 import {
-  React, useRef, useState,
+  React, useRef, useState, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
@@ -38,7 +38,7 @@ function Calendar({ profile }) {
   const calendarRef = useRef();
   const [popupEvent, setPopupEvent] = useState(null);
   const [openEvent, setOpenEvent] = useState(false);
-
+  const [calendarInfo, setCalendarInfo] = useState(null);
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -56,7 +56,6 @@ function Calendar({ profile }) {
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
     setOpenEvent(true);
-    console.log(eventInfo.event.title);
     setPopupEvent(eventInfo.event);
   };
 
@@ -118,7 +117,9 @@ function Calendar({ profile }) {
     }];
   };
 
-  const calendarInfo = getCalendarByRole();
+  useEffect(() => {
+    setCalendarInfo(getCalendarByRole());
+  }, []);
 
   return (
     <div className={styles.calendar_container}>
