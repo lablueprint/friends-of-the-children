@@ -154,7 +154,7 @@ function Calendar({ profile }) {
           </div>
           <div className={styles.upcomingEvents}>
             {/* FIX CALENDAR ID  */}
-            <UpcomingEvents profile={profile} calendarId={constants.calIdFOTC} />
+            {calendarInfo && <UpcomingEvents profile={profile} calendars={calendarInfo} />}
           </div>
         </div>
       </div>

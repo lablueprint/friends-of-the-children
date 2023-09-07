@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import styles from '../styles/Calendar.module.css';
 import * as api from '../api';
 
-function UpcomingEvents({ profile, calendarId }) {
-  const { serviceArea } = profile;
-  console.log(serviceArea);
+function UpcomingEvents({ profile, calendars }) {
+  console.log(profile);
   // Get default event service area based off user's service area
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
@@ -30,7 +29,7 @@ function UpcomingEvents({ profile, calendarId }) {
     // format the dates in RFC3339 timestamp format
     const currDateString = currDate.toISOString();
     const futureDateString = futureDate.toISOString();
-    api.getEvents(currDateString, futureDateString, calendarId).then((events) => {
+    api.getEvents(currDateString, futureDateString, calendars).then((events) => {
       setUpcomingEvents(events.data);
     });
   }, []);
@@ -43,11 +42,11 @@ function UpcomingEvents({ profile, calendarId }) {
           <div key={event.id} className={styles.event}>
             <div className={styles['event-date']}>
               <span>
-                {formatDateTime(event.start.dateTime)}
+                {event.start.dateTime ? formatDateTime(event.start.dateTime) : formatDateTime(event.start.date)}
                 {' '}
                 -
                 {' '}
-                {formatDateTime(event.end.dateTime)}
+                {event.end.dateTime ? formatDateTime(event.end.dateTime) : formatDateTime(event.end.date)}
               </span>
             </div>
             <h3 className={styles['event-title']}>{event.summary}</h3>
@@ -75,7 +74,7 @@ UpcomingEvents.propTypes = {
     google: PropTypes.bool,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  calendarId: PropTypes.string.isRequired, // TODO: MAKE THIS AN ARRAY
+  calendars: PropTypes.arrayOf.isRequired,
 };
 
 export default UpcomingEvents;

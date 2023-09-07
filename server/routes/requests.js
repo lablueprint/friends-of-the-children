@@ -48,7 +48,7 @@ router.get('/', (req, res) => {
   res.send('We are live!');
 });
 
-router.get('/getEvents', getEvents);
+router.post('/getEvents', getEvents);
 
 // creates an event on google calendar
 router.post('/createEvent', createEvent);
