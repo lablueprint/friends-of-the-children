@@ -40,6 +40,7 @@ function UpcomingEvents({ profile, calendars }) {
         <h2 className={styles['upcoming-events-title']}>Upcoming Events</h2>
         {upcomingEvents.map((event) => (
           <div key={event.id} className={styles.event}>
+            {console.log(event.color)}
             <div className={styles['event-date']}>
               <span>
                 {event.start.dateTime ? formatDateTime(event.start.dateTime) : formatDateTime(event.start.date)}

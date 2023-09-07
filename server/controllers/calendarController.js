@@ -31,6 +31,7 @@ const getEvents = async (req, res) => {
           timeMin: start,
           timeMax: end,
         });
+        response.data.items['color'] = cal.color;
         events.push(...response.data.items);
       } catch (error) {
         console.error(error);

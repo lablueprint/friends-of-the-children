@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 export default function EventPopup({ openEvent, closeEvent, popupEvent }) {
   return (
     <div>
-      <Dialog open={openEvent} onClose={closeEvent}>
+      <Dialog fullWidth maxWidth="sm" open={openEvent} onClose={closeEvent}>
         <DialogTitle>{popupEvent.title}</DialogTitle>
         <DialogContent>
           <h5>Location: </h5>
