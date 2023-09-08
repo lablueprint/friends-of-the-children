@@ -73,7 +73,8 @@ function Login({ updateAppProfile }) { // deconstruct the function props
 
   // Checking inputted username with all the usernames in database (stored in userProfiles array)
   const checkUsers = (usernameSearch) => {
-    const tempUserMatch = allProfiles.filter((p) => p.username === usernameSearch); // array of objects with matching usernames
+    console.log(allProfiles);
+    const tempUserMatch = allProfiles ? allProfiles.filter((p) => p.username === usernameSearch) : []; // array of objects with matching usernames
     if (tempUserMatch.length === 0) { // no matching username
       setError(true);
     } else {

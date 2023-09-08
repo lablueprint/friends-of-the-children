@@ -1,28 +1,29 @@
 .message{
-    width: 70%;
-    margin: auto;
-    margin-bottom: 20px;
-    padding: 20px;
+    margin-bottom: 30px;
+    margin-left: 3em;
+    padding: 35px;
     background: #FFFFFF;
-    box-shadow: 0px 4px 20px #0000000d;
-    border: solid;
     border-radius: 10px;
+    background: #FFF;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.05);
+    color: var(--text, #3F3F3F);
 }
 
 .pinnedmessage{
-    width: 70%;
-    margin: auto;
-    margin-bottom: 20px;
-    padding: 20px;
-    box-shadow: 0px 4px 20px #0000000d;
-    border: solid;
+    margin-bottom: 30px;
+    margin-left: 3em;
+    padding: 35px;
+    background: #FFFFFF;
     border-radius: 10px;
+    background: #FFF;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.05);
 }
 
 .titlediv {
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 .announcement {
@@ -33,6 +34,8 @@
 }
 
 .pinnedtitle {
+    margin: 0;
+    margin-right: auto;
     text-align: left;
     font-size: 1.8em;
     padding-left: 2em;
@@ -48,20 +51,69 @@
     margin: 5px;
 }
 
+.postTitleContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.serviceContainer {
+    display: inherit;
+    margin-left: 25px;
+}
+
+.serviceContainer2 {
+    display: flex;
+}
+
+.serviceAreaCircle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 8px;
+    background: linear-gradient(var(--green, #6AA), #FF9292, var(--ochre, #EB1));
+}
+
+.serviceAreaCircle_AV {
+    background: var(--green, #6AA) !important;
+}
+
+/* .serviceAreaCircle_CS {
+    background: #FF9292 !important;
+} */
+
+.serviceAreaCircle_MS {
+    background: var(--ochre, #EB1) !important;
+}
+
+.date {
+    margin-bottom: 0;
+    font-size: 1.1em;
+    margin-right: 10px;
+}
+
 .title_css {
+    margin-right: auto;
+    margin-left: 15px;
+    margin-bottom: 0;
     text-align: left;
-    font-size: 2em;
+    font-weight: 500;
+    font-size: 1.5em;
 }
 
 .body_css {
     text-align: left;
-    font-size: 1.3em;
+    font-size: 1.1em;
 }
 
-.buttonBox {
+.actionsContainer {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 50px;
+    margin-left: 3.5em;
 }
 
 .createPostButton {
@@ -70,13 +122,13 @@
     border: none;
     padding: 16px 40px;
     gap: 10px;
-
+    height: 58px;
     font-family: 'News Gothic';
     font-style: normal;
     font-weight: 700;
     font-size: 18px;
     line-height: 21px;
-
+    margin-left: auto;
     color: #FFFFFF;
 }
 

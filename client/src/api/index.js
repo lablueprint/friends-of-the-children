@@ -413,6 +413,17 @@ export const sendEmails = async (data) => {
   }
 };
 
+export const createMessage = async (messageData) => {
+  try {
+    const res = await axios.post(`${url}/createMessage`, { messageData });
+    return res;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not create message');
+  }
+  return null;
+};
+
 export const getMessages = async () => {
   try {
     const messages = await axios.get(`${url}/getMessages`);
@@ -420,6 +431,39 @@ export const getMessages = async () => {
   } catch (error) {
     console.error(error.message);
     console.error('could not get messages');
+  }
+  return null;
+};
+
+export const getFilteredMessages = async (serviceArea, role) => {
+  try {
+    const messages = await axios.get(`${url}/getFilteredMessages`, { params: { serviceArea, role } });
+    return messages;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get filtered messages');
+  }
+  return null;
+};
+
+export const pinMessage = async (id, pinned) => {
+  try {
+    const res = await axios.post(`${url}/pinMessage`, { id, pinned });
+    return res;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not pin/unpin message');
+  }
+  return null;
+};
+
+export const deleteMessage = async (id) => {
+  try {
+    const deletedMessage = await axios.post(`${url}/deleteMessage`, { id });
+    return deletedMessage;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not delete message');
   }
   return null;
 };

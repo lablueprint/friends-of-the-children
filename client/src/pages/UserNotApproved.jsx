@@ -46,7 +46,7 @@ function UserNotApproved({ updateAppProfile, profile }) {
           {' '}
           <b>request</b>
           {' '}
-          to become a caregiver has been received and is
+          to create an account has been received and is
           {' '}
           <b>awaiting approval</b>
           . We will send you an email once your account has been approved.

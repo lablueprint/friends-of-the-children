@@ -417,19 +417,6 @@
     padding: 0.25em 1em 0.25em 1em;
 }
 
-.addModule:hover {
-    background: #156DBF;
-    color: white;
-    display: flex;
-    border-radius: 12px;
-    flex-wrap: nowrap;
-    box-shadow: none;
-    border: none;
-    white-space: nowrap;
-    display: inline-block;
-    padding: 0.25em 1em 0.25em 1em;
-}
-
 .cancelOrSave {
     display: flex;
     gap: 30%;
