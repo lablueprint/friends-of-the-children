@@ -13,84 +13,7 @@ import { uuid } from 'uuidv4';
 import { db, storage } from '../firebase.js';
 // eslint-disable-next-line import/extensions
 import mailchimp from '../mailchimp.js';
-// import google api
-const require = createRequire(import.meta.url);
-const { google } = require('googleapis');
 import messagesController from './messagesController.js';
-
-// fotc google auth information
-const {
-  GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, REFRESH_TOKEN,
-} = process.env;
-
-const oauth2Client = new google.auth.OAuth2(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URL,
-);
-
-// inserts an event to google calendar
-const createEvent = async (req, res) => {
-  try {
-    // obtain data from client side
-    const {
-      title, description, location, attachments, start, end, calendarId,
-    } = req.body;
-    // set required auth credentials to use gcal api
-    oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-    const calendar = google.calendar('v3');
-    // call gcal api's "insert" method w valid json object
-    const response = await calendar.events.insert({
-      auth: oauth2Client,
-      calendarId,
-      supportsAttachments: true,
-      requestBody: {
-        summary: title,
-        description,
-        location,
-        attachments,
-        start: {
-          dateTime: new Date(start),
-        },
-        end: {
-          dateTime: new Date(end),
-        },
-      },
-    });
-    // promise chain to send response back to client
-    res.status(202).json(response.data);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-// updates gcal event without modifying any unspecified event properties (requires eventID)
-const patchEvent = async (req, res) => {
-  try {
-    const { id, start, end } = req.body;
-    oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-    const calendar = google.calendar('v3');
-    // call gcal api's "patch" method
-    const response = await calendar.events.patch({
-      auth: oauth2Client,
-      calendarId: 'primary',
-      eventId: id,
-      requestBody: {
-        start: {
-          dateTime: start,
-          date: null,
-        },
-        end: {
-          dateTime: end,
-          date: null,
-        },
-      },
-    });
-    res.status(202).json(response.data);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
 
 // calculates the age of a person given a birthdate of YYYY-MM-DD format
 const calculateAge = (birthdate) => {
@@ -1056,8 +979,6 @@ const sendMailchimpEmails = async (req, res) => {
 
 export {
   messagesController,
-  createEvent,
-  patchEvent,
   getMentees,
   updateClearance,
   createMentee,
