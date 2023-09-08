@@ -79,11 +79,11 @@
     background: var(--green, #6AA) !important;
 }
 
-.serviceAreaCircle_CS {
+/* .serviceAreaCircle_CS {
     background: #FF9292 !important;
-}
+} */
 
-.serviceAreaCircle_SV {
+.serviceAreaCircle_MS {
     background: var(--ochre, #EB1) !important;
 }
 

@@ -233,17 +233,17 @@ function MessageWall({ profile }) {
             <div className={styles.serviceAreaCircle} />
             {'All'}
           </div>
-          <div className={styles.serviceContainer}>
+          {/* <div className={styles.serviceContainer}>
             <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_CS}`} />
             {'CS'}
-          </div>
+          </div> */}
           <div className={styles.serviceContainer}>
             <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_AV}`} />
             {'AV'}
           </div>
           <div className={styles.serviceContainer}>
-            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_SV}`} />
-            {'SV'}
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_MS}`} />
+            {'MS'}
           </div>
         </div>
         {messages && messages.filter(
