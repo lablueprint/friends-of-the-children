@@ -17,6 +17,7 @@ import mailchimp from '../mailchimp.js';
 // import google api
 const require = createRequire(import.meta.url);
 const { google } = require('googleapis');
+import messagesController from './messagesController.js';
 
 // fotc google auth information
 const {
@@ -762,32 +763,6 @@ const getModules = async (req, res) => {
   }
 };
 
-const getMessages = async (req, res) => {
-  try {
-    const message = [];
-    await db.collection('messages').get().then((sc) => {
-      sc.forEach((dc) => {
-        const dat = dc.data();
-        dat.id = dc.id;
-        message.push(dat);
-      });
-      // sort in reverse chronological order (i.e. newest at first)
-      message.sort((a, b) => {
-        if (a.date < b.date) {
-          return -1;
-        }
-        if (a.date > b.date) {
-          return 1;
-        }
-        return 0;
-      });
-      res.status(202).json(message);
-    });
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
 const getProfilesSortedByDate = async (req, res) => {
   try {
     // await user profile data from firebase
@@ -1049,6 +1024,7 @@ const sendMailchimpEmails = async (req, res) => {
 };
 
 export {
+  messagesController,
   createEvent,
   patchEvent,
   getMentees,
@@ -1068,7 +1044,6 @@ export {
   updateTextField,
   updateFileLinksField,
   getUsernames,
-  getMessages,
   addToMailchimpList,
   updateMailchimpList,
   sendMailchimpEmails,

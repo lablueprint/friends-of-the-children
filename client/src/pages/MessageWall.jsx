@@ -7,7 +7,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   Button, Dialog, DialogActions, DialogContent, MenuItem, FormControl, InputLabel, Select,
 } from '@mui/material';
-import { app, db } from './firebase';
+import { app } from './firebase';
 import Message from '../components/Message';
 import * as api from '../api';
 import styles from '../styles/Messages.module.css';
@@ -19,11 +19,12 @@ function MessageWall({ profile }) {
   const [body, setBody] = useState('');
   const [msgserviceArea, setmsgServiceArea] = useState('');
   const [audience, setAudience] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(null);
   const [statusMessage, seStatusMessage] = useState('');
+  const [serviceAreaFilter, setServiceAreaFilter] = useState('All');
+  const [timeFilter, setTimeFilter] = useState('Most Recent');
   const [open, setOpen] = useState(false);
   const target = [];
-
   const { role, serviceArea } = profile;
 
   const theme = createTheme({
@@ -42,14 +43,16 @@ function MessageWall({ profile }) {
 
   // in this specific getMessagesfunc, we extract the data by making a call to api.getMessages using the await
   // keyword which pauses execution until it's done. Then we update the messages state with the data.
-  const getMessagesfunc = async () => {
-    const { data } = await api.getMessages();
-    setMessages(data);
-  };
 
-  useEffect(() => {
-    getMessagesfunc();
-  }, []);
+  const getMessages = async () => {
+    if (role.toLowerCase() === 'admin') {
+      const { data } = await api.getMessages();
+      setMessages(data);
+    } else {
+      const { data } = await api.getFilteredMessages(serviceArea, role);
+      setMessages(data);
+    }
+  };
 
   // this function's purpose is to update the pinned update. it first stores all the messages in a temp variable
   // so those messages aren't affected, then it goes and finds the with a correspinding id and updates that pinned
@@ -57,16 +60,17 @@ function MessageWall({ profile }) {
   const updatePinned = (id, pinned) => {
     // deep copy for useState to work properly
     // see https://www.coletiv.com/blog/dangers-of-using-objects-in-useState-and-useEffect-ReactJS-hooks/ for more context
-    const tempMessages = [...messages];
+    api.pinMessage(id, pinned).then(() => {
+      const tempMessages = [...messages];
+      tempMessages.find((message) => (message.id === id)).pinned = pinned;
+      setMessages(tempMessages);
+    });
+  };
 
-    // change local variable, then push to firebase
-    /* eslint no-param-reassign: ["error", { "props": false }] */
-    tempMessages.find((message) => (message.id === id)).pinned = pinned;
-    setMessages(tempMessages);
-
-    db.collection('messages').doc(id).set({
-      pinned,
-    }, { merge: true });
+  const deleteMessage = (id) => {
+    api.deleteMessage(id).then(() => {
+      getMessages();
+    });
   };
 
   const submitData = async (e) => {
@@ -102,15 +106,47 @@ function MessageWall({ profile }) {
     const message = await api.sendEmails(emailData, target);
     seStatusMessage(message);
 
-    // this code updates the database with new messages and resets the state variables back to empty strings after
-    // a message is succesfully submitted
-    db.collection('messages').doc().set(data).then(getMessagesfunc)
-      .then(() => {
-        setTitle('');
-        setBody('');
-        setmsgServiceArea('');
-        setAudience('');
-      });
+    // update db with new messages + reset the state variables back to empty strings after a message is succesfully submitted
+    api.createMessage(data).then(() => {
+      getMessages();
+      setTitle('');
+      setBody('');
+      setmsgServiceArea('');
+      setAudience('');
+    });
+
+    // show the new message
+    getMessages();
+  };
+
+  // convert firebase timestamp to a date string, passed as a prop into Message component
+  const convertToDate = (timestampObject) => {
+    const timestamp = new Date(timestampObject.seconds * 1000 + timestampObject.nanoseconds / 1000000);
+    const month = String(timestamp.getMonth() + 1).padStart(2, '0');
+    const day = String(timestamp.getDate()).padStart(2, '0');
+    const year = String(timestamp.getFullYear()).slice(-2);
+    return `${month}/${day}/${year}`;
+  };
+
+  const filterByServiceArea = (sa) => {
+    setServiceAreaFilter(sa);
+    api.getMessages().then((res) => {
+      let { data } = res;
+      if (timeFilter === 'Least Recent') {
+        data = data.reverse();
+      }
+      if (sa !== 'All') {
+        const msgs = data.filter((d) => (d.serviceArea.includes(sa)));
+        setMessages(msgs);
+      } else {
+        setMessages(data);
+      }
+    });
+  };
+
+  const filterByTime = (time) => {
+    setTimeFilter(time);
+    setMessages(messages.reverse());
   };
 
   const handleClickOpen = () => {
@@ -125,9 +161,9 @@ function MessageWall({ profile }) {
   // you to set whether the messages are "mentors" or "caregivers". this function also handles the submit button,
   // when you click submit, it will call submitData function which will store everything in the databse.
 
-  // this useEffect hook calls the getMessagesfunc the first time the page is loaded
+  // call getMessages the first time the page is loaded
   useEffect(() => {
-    getMessagesfunc();
+    getMessages();
   }, []);
 
   // this a conditional and will render different things on the page based on the role. if role is admin, it will
@@ -137,26 +173,94 @@ function MessageWall({ profile }) {
     role.toLowerCase() === 'admin' ? (
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
-        <div className={styles.buttonBox}>
+
+        {/* actions panel */}
+        <div className={styles.actionsContainer}>
+          <h5>Filter By: </h5>
+
+          {/* time filter */}
+          <FormControl sx={{ m: 1, minWidth: 150 }}>
+            <InputLabel id="demo-simple-select-label">Time</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={timeFilter}
+              label="Time"
+              onChange={(e) => filterByTime(e.target.value)}
+            >
+              <MenuItem value={'Most Recent'}>Most Recent</MenuItem>
+              <MenuItem value={'Least Recent'}>Least Recent</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* service area filter */}
+          <FormControl sx={{ m: 1, minWidth: 150 }}>
+            <InputLabel id="demo-simple-select-label">Service Area</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={serviceAreaFilter}
+              onChange={(e) => filterByServiceArea(e.target.value)}
+              label="Service Area"
+            >
+              <MenuItem value="All">
+                <div className={styles.serviceContainer2}>
+                  <div className={styles.serviceAreaCircle} />
+                  {'All'}
+                </div>
+              </MenuItem>
+              {serviceAreas.map((sa) => (
+                <MenuItem value={sa}>
+                  <div className={styles.serviceContainer2}>
+                    <div className={`${styles[`serviceAreaCircle_${sa}`]} ${styles.serviceAreaCircle}`} />
+                    {sa}
+                  </div>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* create post button */}
           <button className={styles.createPostButton} type="button" onClick={handleClickOpen}>
             + Create Post
           </button>
         </div>
 
-        {messages.some((message) => message.pinned) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
-        {
-          messages.filter((message) => (message.pinned)).map(
-            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
-          )
-        }
-        <h4 className={styles.pinnedtitle}>Posts</h4>
+        {/* pinned message posts */}
+        <div className={styles.postTitleContainer}>
+          <h4 className={styles.pinnedtitle}>{messages && messages.some((message) => message.pinned) ? 'Pinned' : 'Posts'}</h4>
+          <div className={styles.serviceContainer}>
+            <div className={styles.serviceAreaCircle} />
+            {'All'}
+          </div>
+          {/* <div className={styles.serviceContainer}>
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_CS}`} />
+            {'CS'}
+          </div> */}
+          <div className={styles.serviceContainer}>
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_AV}`} />
+            {'AV'}
+          </div>
+          <div className={styles.serviceContainer}>
+            <div className={`${styles.serviceAreaCircle} ${styles.serviceAreaCircle_MS}`} />
+            {'MS'}
+          </div>
+        </div>
+        {messages && messages.filter(
+          (message) => (message.pinned),
+        ).map(
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} deleteMessage={deleteMessage} pinPrivilege />,
+        )}
 
-        {
-          messages.filter((message) => (!message.pinned)).map(
-            (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
-          )
-        }
+        {/* regular posts */}
+        {messages && messages.some((message) => message.pinned) && <div className={styles.postTitleContainer}><h4 className={styles.pinnedtitle}>Posts</h4></div>}
+        {messages && messages.filter(
+          (message) => (!message.pinned),
+        ).map(
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} updatePinned={updatePinned} deleteMessage={deleteMessage} pinPrivilege />,
+        )}
 
+        {/* popup when creating post */}
         <ThemeProvider theme={theme}>
           <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
             <DialogContent>
@@ -199,9 +303,9 @@ function MessageWall({ profile }) {
                         onChange={(e) => setAudience(e.target.value)}
                         required
                       >
+                        <MenuItem value="ALL">ALL</MenuItem>
                         <MenuItem value="Friends">Friends</MenuItem>
                         <MenuItem value="Caregivers">Caregivers</MenuItem>
-                        <MenuItem value="ALL">ALL</MenuItem>
                       </Select>
                     </FormControl>
                   </div>
@@ -221,22 +325,48 @@ function MessageWall({ profile }) {
         </ThemeProvider>
       </div>
     ) : (
+      // for non-admin roles (no create button)
       <div>
         <h1 className={styles.announcement}>Announcements</h1>
-        {messages.some((message) => message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role))) && <h4 className={styles.pinnedtitle}>Pinned</h4>}
-        {messages.filter(
-          (message) => (message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role))),
+        {/* actions panel */}
+        <div className={styles.actionsContainer}>
+          <h5>Filter By: </h5>
+          {/* time filter */}
+          <FormControl sx={{ m: 1, minWidth: 150 }}>
+            <InputLabel id="demo-simple-select-label">Time</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={timeFilter}
+              label="Time"
+              onChange={(e) => filterByTime(e.target.value)}
+            >
+              <MenuItem value={'Most Recent'}>Most Recent</MenuItem>
+              <MenuItem value={'Least Recent'}>Least Recent</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <div className={styles.postTitleContainer}>
+          <h4 className={styles.pinnedtitle}>{messages && messages.some((message) => message.pinned) ? 'Pinned' : 'Posts'}</h4>
+          <div className={styles.serviceContainer}>
+            <div className={styles.serviceAreaCircle} />
+            {'All'}
+          </div>
+          <div className={styles.serviceContainer}>
+            <div className={`${styles[`serviceAreaCircle_${serviceArea}`]} ${styles.serviceAreaCircle}`} />
+            {serviceArea}
+          </div>
+        </div>
+        {messages && messages.filter(
+          (message) => (message.pinned),
         ).map(
-          (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} deleteMessage={deleteMessage} updatePinned={updatePinned} />,
         )}
-        <h4 className={styles.pinnedtitle}>Posts</h4>
-        {messages.filter(
-          (message) => (!message.pinned && (message.serviceArea.includes(serviceArea)
-        && message.target.includes(role))),
+        {messages && messages.some((message) => message.pinned) && <div className={styles.postTitleContainer}><h4 className={styles.pinnedtitle}>Posts</h4></div>}
+        {messages && messages.filter(
+          (message) => (!message.pinned),
         ).map(
-          (message) => <Message key={message.id} id={message.id} title={message.title} body={message.body} pinned={message.pinned} updatePinned={updatePinned} />,
+          (message) => <Message key={message.id} message={message} date={convertToDate(message.date)} deleteMessage={deleteMessage} updatePinned={updatePinned} />,
         )}
       </div>
     )

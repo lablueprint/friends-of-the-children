@@ -24,7 +24,7 @@ import {
   updateTextField,
   updateFileLinksField,
   getUsernames,
-  getMessages,
+  messagesController,
   addToMailchimpList,
   updateMailchimpList,
   sendMailchimpEmails,
@@ -40,6 +40,7 @@ import {
   deleteMenteeFiles,
   addModule,
 } from '../controllers/controllers.js';
+const [createMessage, getMessages, getFilteredMessages, pinMessage, deleteMessage] = messagesController;
 
 const router = express.Router();
 
@@ -122,9 +123,16 @@ router.post('/deleteMenteeFiles', deleteMenteeFiles);
 // adds a module to Firebase, returns dataRef (containing module's id in firebase)
 router.post('/addModule', addModule);
 
+router.post('/createMessage', createMessage);
+
 router.get('/getMessages', getMessages);
 
-//
+router.get('/getFilteredMessages', getFilteredMessages);
+
+router.post('/deleteMessage', deleteMessage);
+
+router.post('/pinMessage', pinMessage);
+
 router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
 
 router.post('/batchUpdateProfile', batchUpdateProfile);

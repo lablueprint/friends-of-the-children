@@ -18,7 +18,7 @@ import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
 import editIcon from '../assets/icons/editicon.svg';
-import styles from '../styles/Modules.module.css';
+import moduleStyles from '../styles/Modules.module.css';
 import NewModulePopup from '../components/NewModulePopup';
 import NewFilePopup from '../components/NewFilePopup';
 import Module from '../components/Module';
@@ -244,22 +244,22 @@ function ExpandedModule({ profile }) {
 
   return (
     <div>
-      <div className={styles.header}>
-        <div className={styles.backAndTitle}>
-          <div className={styles.backContainer}>
+      <div className={moduleStyles.header}>
+        <div className={moduleStyles.backAndTitle}>
+          <div className={moduleStyles.backContainer}>
             <IconButton>
               {parent != null ? (
-                <Link to={`/resources/${root}/${ParentTitle}`} state={{ id: parent, parentTitle: ParentTitle, root }} className={styles.backButton}>
+                <Link to={`/resources/${root}/${ParentTitle}`} state={{ id: parent, parentTitle: ParentTitle, root }} className={moduleStyles.backButton}>
                   <ArrowBackIcon />
                 </Link>
               ) : (
-                <Link to="/resources/All" className={styles.backButton}>
+                <Link to="/resources/All" className={moduleStyles.backButton}>
                   <ArrowBackIcon />
                 </Link>
               )}
             </IconButton>
           </div>
-          <div className={styles.title}>
+          <div className={moduleStyles.title}>
             {editModule ? (
               <TextField
                 value={titleText}
@@ -273,13 +273,13 @@ function ExpandedModule({ profile }) {
           </div>
         </div>
         {editModule ? (
-          <div className={styles.cancelOrSave}>
-            <button className={styles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
+          <div className={moduleStyles.cancelOrSave}>
+            <button className={moduleStyles.cancelModuleChanges} type="button" onClick={() => (clearCheckboxes())}>
               Cancel
             </button>
             <button
               type="button"
-              className={styles.saveModuleChanges}
+              className={moduleStyles.saveModuleChanges}
               onClick={() => {
                 deleteModule(checked);
                 updateBodyAndTitleFirebase();
@@ -289,14 +289,14 @@ function ExpandedModule({ profile }) {
             </button>
           </div>
         ) : (
-          <div className={styles.editOrAddModule}>
-            <div className={styles.editModuleContainer}>
-              <button type="button" onClick={displayCheckBoxes} className={styles.editModule}>
+          <div className={moduleStyles.editOrAddModule}>
+            <div className={moduleStyles.editModuleContainer}>
+              <button type="button" onClick={displayCheckBoxes} className={moduleStyles.editModule}>
                 <img src={editIcon} alt="edit icon" />
                 Edit Module
               </button>
             </div>
-            <button type="button" onClick={handleClickOpen} className={styles.addModule}>
+            <button type="button" onClick={handleClickOpen} className={moduleStyles.addModule}>
               + New Upload
             </button>
             <Dialog
@@ -306,11 +306,11 @@ function ExpandedModule({ profile }) {
               aria-describedby="parent-modal-description"
             >
               <DialogContent>
-                <button type="button" onClick={handleClickOpenNewFile} className={styles.addModule}>
+                <button type="button" onClick={handleClickOpenNewFile} className={moduleStyles.addModule}>
                   New File
                 </button>
                 <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={currModuleFiles} id={id} />
-                <button type="button" onClick={handleClickOpenNewModule} className={styles.addModule}>
+                <button type="button" onClick={handleClickOpenNewModule} className={moduleStyles.addModule}>
                   New Folder
                 </button>
                 <NewModulePopup
@@ -325,24 +325,24 @@ function ExpandedModule({ profile }) {
         )}
       </div>
 
-      <div className={styles.content_container}>
-        <div className={styles.cards_container}>
+      <div className={moduleStyles.content_container}>
+        <div className={moduleStyles.cards_container}>
           {
             children.map((kid) => (
-              <div className={styles.filecards}>
+              <div className={moduleStyles.filecards}>
                 <Module id={kid.id} title={kid.title} role={currRole} deleteModule={deleteModule} editable={editModule} checked={checkedModules} handleCheckboxChange={handleModuleCheckboxChange} root={root} />
               </div>
             ))
           }
         </div>
-        <div className={styles.bodyContainer}>
+        <div className={moduleStyles.bodyContainer}>
           {editModule ? (
             <TextField
               value={bodyText}
               onChange={(e) => setBodyText(e.target.value)}
               variant="outlined"
               multiline={false}
-              className={styles.body}
+              className={moduleStyles.body}
             />
           ) : (
             <TextField
@@ -350,22 +350,22 @@ function ExpandedModule({ profile }) {
               InputProps={{ readOnly: true }}
               variant="outlined"
               multiline={false}
-              className={styles.body}
+              className={moduleStyles.body}
             />
           )}
         </div>
 
-        <div className={styles.filesContainer}>
+        <div className={moduleStyles.filesContainer}>
           <h5>Files</h5>
           {/* checks if file is img (png, jpg, jpeg), vid (np4, mpeg, mov), or pdf */}
           {files.map((file, index) => (
-            <div key={file.url} className={styles.fileContainer}>
+            <div key={file.url} className={moduleStyles.fileContainer}>
               {(file.fileType.includes('image')) && (
               <div>
-                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                  <img className={styles.displayImg} src={file.url} alt={file.fileName} />
+                <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <img className={moduleStyles.displayImg} src={file.url} alt={file.fileName} />
                 </div>
-                <div className={styles.descriptionContainer}>
+                <div className={moduleStyles.descriptionContainer}>
                   <div
                     key={file.fileLink}
                     onMouseEnter={() => handleMouseEnter(file.fileLink)}
@@ -376,22 +376,22 @@ function ExpandedModule({ profile }) {
                       <Checkbox
                         checked={checked.includes(file.fileLink)}
                         onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                        className={styles.checkbox}
+                        className={moduleStyles.checkbox}
                       />
                     ) : (<img src={imgIcon} alt="img icon" />)}
                   </div>
-                  <div className={styles.fileName}>{file.fileName}</div>
+                  <div className={moduleStyles.fileName}>{file.fileName}</div>
                 </div>
               </div>
               )}
               {(file.fileType.includes('video')) && (
               <div>
-                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                  <video className={styles.displayImg} controls src={file.url} alt={file.fileName}>
+                <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <video className={moduleStyles.displayImg} controls src={file.url} alt={file.fileName}>
                     <track default kind="captions" />
                   </video>
                 </div>
-                <div className={styles.descriptionContainer}>
+                <div className={moduleStyles.descriptionContainer}>
                   <div
                     key={file.fileLink}
                     onMouseEnter={() => handleMouseEnter(file.fileLink)}
@@ -402,20 +402,20 @@ function ExpandedModule({ profile }) {
                       <Checkbox
                         checked={checked.includes(file.fileLink)}
                         onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                        className={styles.checkbox}
+                        className={moduleStyles.checkbox}
                       />
                     ) : (<img src={vidIcon} alt="video icon" />)}
                   </div>
-                  <div className={styles.fileName}>{file.fileName}</div>
+                  <div className={moduleStyles.fileName}>{file.fileName}</div>
                 </div>
               </div>
               )}
               {(file.fileType.includes('pdf')) && (
               <div>
-                <div className={styles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                  <embed className={styles.displayImg} src={`${file.url}`} alt={file.fileName} />
+                <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  <embed className={moduleStyles.displayImg} src={`${file.url}`} alt={file.fileName} />
                 </div>
-                <div className={styles.descriptionContainer}>
+                <div className={moduleStyles.descriptionContainer}>
                   <div
                     key={file.fileLink}
                     onMouseEnter={() => handleMouseEnter(file.fileLink)}
@@ -426,11 +426,11 @@ function ExpandedModule({ profile }) {
                       <Checkbox
                         checked={checked.includes(file.fileLink)}
                         onChange={(event) => handleCheckboxChange(event, file.fileLink)}
-                        className={styles.checkbox}
+                        className={moduleStyles.checkbox}
                       />
                     ) : (<img src={pdfIcon} alt="pdf icon" />)}
                   </div>
-                  <div className={`${styles.fileName} ${styles.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
+                  <div className={`${moduleStyles.fileName} ${moduleStyles.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
                 </div>
               </div>
               )}
@@ -450,7 +450,7 @@ function ExpandedModule({ profile }) {
           ? (
             <div>
               <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
-                <DialogTitle className={styles.dialogTitle}>
+                <DialogTitle className={moduleStyles.dialogTitle}>
                   You have chosen to delete
                   {' '}
                   {checked.length}
@@ -467,14 +467,14 @@ function ExpandedModule({ profile }) {
                 </DialogTitle>
                 <DialogContent>
                   <div>
-                    <div className={styles.confirmMessage}>
+                    <div className={moduleStyles.confirmMessage}>
                       Are you sure you want to continue with this action?
                     </div>
-                    <div className={styles.confirmButtons}>
-                      <button className={styles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                    <div className={moduleStyles.confirmButtons}>
+                      <button className={moduleStyles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
                         Cancel
                       </button>
-                      <button type="button" className={styles.confirmDelete} onClick={() => { deleteFiles(checked); deleteModules(checkedModules); }}>
+                      <button type="button" className={moduleStyles.confirmDelete} onClick={() => { deleteFiles(checked); deleteModules(checkedModules); }}>
                         Delete
                       </button>
                     </div>
@@ -488,21 +488,21 @@ function ExpandedModule({ profile }) {
       <div>
         { (checked.length > 0 || checkedModules.length > 0)
           ? (
-            <div className={styles.deleteFilesBar}>
-              <div className={styles.totalSelected}>
-                <div className={styles.selectedNumber}>
+            <div className={moduleStyles.deleteFilesBar}>
+              <div className={moduleStyles.totalSelected}>
+                <div className={moduleStyles.selectedNumber}>
                   {checked.length + checkedModules.length}
                 </div>
-                <div className={styles.selectedText}>
+                <div className={moduleStyles.selectedText}>
                   {' '}
                   selected
                 </div>
               </div>
-              <div className={styles.cancelOrDelete}>
-                <button className={styles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+              <div className={moduleStyles.cancelOrDelete}>
+                <button className={moduleStyles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
                   Cancel
                 </button>
-                <button type="button" className={styles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                <button type="button" className={moduleStyles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
                   Delete
                 </button>
               </div>
