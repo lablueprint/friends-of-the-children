@@ -8,12 +8,15 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-
 import PropTypes from 'prop-types';
+import styles from '../styles/Requests.module.css';
+import ApproveIcon from '../assets/icons/approved.svg';
+import UnapproveIcon from '../assets/icons/unapproved.svg';
+
 import * as api from '../api';
 
 export default function AdminTable({
-  users, setRowsSelected, cancelButton, setCancelButton, approveButton, setApproveButton, deleteButton, setDeleteButton, selectMode,
+  users, setRowsSelected, cancelButton, setCancelButton, approveButton, setApproveButton, deleteButton, setDeleteButton, setSelectMode,
 }) {
   const [table, setTable] = useState([]);
 
@@ -111,6 +114,7 @@ export default function AdminTable({
   }, [deleteButton]);
 
   function handleChange(e, username) {
+    setSelectMode(true);
     setTable((prevValue) => prevValue.map((user) => {
       if (user.username === username) {
         return {
@@ -136,38 +140,28 @@ export default function AdminTable({
             <TableCell align="left">Status</TableCell>
           </TableRow>
         </TableHead>
-        { selectMode ? (
-          <TableBody>
-            {table.map((row) => (
-              <TableRow key={row.username} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <Checkbox align="center" checked={row.checked} onChange={(event) => { handleChange(event, row.username); }} />
-                <TableCell align="left">{row.name}</TableCell>
-                <TableCell align="left">{row.username}</TableCell>
-                <TableCell align="left">{row.email}</TableCell>
-                <TableCell align="left">{row.role}</TableCell>
-                <TableCell align="left">{row.dateJoined}</TableCell>
-                <TableCell align="left">{row.approved}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        ) : (
-          <TableBody>
-            {table.map((row) => (
-              <TableRow
-                key={row.username}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <Checkbox disabled align="center" checked={row.checked} onChange={(event) => { handleChange(event, row.username); }} />
-                <TableCell align="left">{row.name}</TableCell>
-                <TableCell align="left">{row.username}</TableCell>
-                <TableCell align="left">{row.email}</TableCell>
-                <TableCell align="left">{row.role}</TableCell>
-                <TableCell align="left">{row.dateJoined}</TableCell>
-                <TableCell align="left">{row.approved}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        )}
+        <TableBody>
+          {table.map((row) => (
+            <TableRow
+              key={row.username}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <Checkbox sx={{ padding: '16px' }} align="center" checked={row.checked} onChange={(event) => { handleChange(event, row.username); }} />
+              <TableCell align="left">{row.name}</TableCell>
+              <TableCell align="left">{row.username}</TableCell>
+              <TableCell align="left">{row.email}</TableCell>
+              <TableCell align="left">
+                <div className={`${styles.roleWrapper} ${styles[row.role]}`}>
+                  {row.role}
+                </div>
+              </TableCell>
+              <TableCell align="left">{row.dateJoined}</TableCell>
+              <TableCell align="left">
+                {row.approved !== 'Approved' ? <img className={styles.approveIcon} src={ApproveIcon} alt="approved" /> : <img className={styles.approveIcon} src={UnapproveIcon} alt="not approved" /> }
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
       </Table>
     </TableContainer>
   );
@@ -190,5 +184,5 @@ AdminTable.propTypes = {
   setApproveButton: PropTypes.func.isRequired,
   deleteButton: PropTypes.bool.isRequired,
   setDeleteButton: PropTypes.func.isRequired,
-  selectMode: PropTypes.bool.isRequired,
+  setSelectMode: PropTypes.func.isRequired,
 };
