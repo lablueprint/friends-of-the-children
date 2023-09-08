@@ -22,7 +22,7 @@ import filledHeart from '../assets/icons/filled_heart.svg';
 import EditIcon from '../assets/icons/editicon.svg';
 import FilePopup from '../components/FilePopup';
 import styles from '../styles/Mentees.module.css';
-import styles2 from '../styles/Modules.module.css';
+import moduleStyles from '../styles/Modules.module.css';
 import { storage } from './firebase';
 import * as api from '../api';
 
@@ -233,7 +233,7 @@ function Media({ profile }) {
             <h3>{`${folderName}`}</h3>
             <div className={styles.buttons}>
               {role === 'mentor' && (
-              <button type="button" className={styles2.editModule}>
+              <button type="button" className={moduleStyles.editModule}>
                 <img src={EditIcon} alt="edit icon" />
                 Edit Module
               </button>
@@ -241,15 +241,15 @@ function Media({ profile }) {
 
               {/* QUESTION: should users be able to directly add into the images/videos/flyers folders? */}
               {role === 'mentor' && (
-              <button type="button" onClick={handleClickOpen} className={styles2.addModule}>
+              <button type="button" onClick={handleClickOpen} className={moduleStyles.addModule}>
                 + New Upload
               </button>
               )}
             </div>
           </div>
-          <div className={styles2.tab_bar}>
-            <button className={`${!favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(false); }}>All</button>
-            <button className={`${favTab ? styles2.tab_selected : ''}`} type="button" onClick={() => { setFavTab(true); }}>Favorites</button>
+          <div className={moduleStyles.tab_bar}>
+            <button className={`${!favTab ? moduleStyles.tab_selected : ''}`} type="button" onClick={() => { setFavTab(false); }}>All</button>
+            <button className={`${favTab ? moduleStyles.tab_selected : ''}`} type="button" onClick={() => { setFavTab(true); }}>Favorites</button>
           </div>
           <div className={styles.line} />
         </div>
@@ -258,13 +258,13 @@ function Media({ profile }) {
       {/* mapping each file in the array to a little card element onscreen */}
       {/* EDIT: COPIED FROM EXPANDED MODULE */}
       {(favTab ? favorites : mediaArray).map((file, index) => (
-        <div key={file.fileID} className={styles2.fileContainer}>
+        <div key={file.fileID} className={moduleStyles.fileContainer}>
           {(file.fileType.includes('image')) && (
           <div>
-            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-              <img className={styles2.displayImg} src={file.url} alt={file.fileName} />
+            <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <img className={moduleStyles.displayImg} src={file.url} alt={file.fileName} />
             </div>
-            <div className={styles2.descriptionContainer}>
+            <div className={moduleStyles.descriptionContainer}>
               <div
                 key={file.fileID}
                 onMouseEnter={() => handleMouseEnter(file.url)}
@@ -274,22 +274,22 @@ function Media({ profile }) {
                   <Checkbox
                     checked={checked.includes(file)}
                     onChange={(event) => handleCheckboxChange(event, file)}
-                    className={styles2.checkbox}
+                    className={moduleStyles.checkbox}
                   />
                 ) : (<img src={imgIcon} alt="img icon" />)}
               </div>
-              <div className={styles2.fileName}>{file.fileName}</div>
+              <div className={moduleStyles.fileName}>{file.fileName}</div>
             </div>
           </div>
           )}
           {(file.fileType.includes('video')) && (
           <div>
-            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-              <video className={styles2.displayImg} controls src={file.url} alt={file.fileName}>
+            <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <video className={moduleStyles.displayImg} controls src={file.url} alt={file.fileName}>
                 <track default kind="captions" />
               </video>
             </div>
-            <div className={styles2.descriptionContainer}>
+            <div className={moduleStyles.descriptionContainer}>
               <div
                 key={file.fileID}
                 onMouseEnter={() => handleMouseEnter(file.url)}
@@ -300,20 +300,20 @@ function Media({ profile }) {
                   <Checkbox
                     checked={checked.includes(file.url)}
                     onChange={(event) => handleCheckboxChange(event, file)}
-                    className={styles2.checkbox}
+                    className={moduleStyles.checkbox}
                   />
                 ) : (<img src={vidIcon} alt="video icon" />)}
               </div>
-              <div className={styles2.fileName}>{file.fileName}</div>
+              <div className={moduleStyles.fileName}>{file.fileName}</div>
             </div>
           </div>
           )}
           {(file.fileType.includes('pdf')) && (
           <div>
-            <div className={styles2.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-              <embed className={styles2.displayImg} src={file.url} alt={file.fileName} />
+            <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+              <embed className={moduleStyles.displayImg} src={file.url} alt={file.fileName} />
             </div>
-            <div className={styles2.descriptionContainer}>
+            <div className={moduleStyles.descriptionContainer}>
               <div
                 key={file.fileID}
                 onMouseEnter={() => handleMouseEnter(file.url)}
@@ -324,21 +324,21 @@ function Media({ profile }) {
                   <Checkbox
                     checked={checked.includes(file)}
                     onChange={(event) => handleCheckboxChange(event, file)}
-                    className={styles2.checkbox}
+                    className={moduleStyles.checkbox}
                   />
                 ) : (<img src={pdfIcon} alt="pdf icon" />)}
               </div>
-              <div className={`${styles2.fileName} ${styles2.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
+              <div className={`${moduleStyles.fileName} ${moduleStyles.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
             </div>
           </div>
           )}
           {(file.fileType === 'link') && (
           <div>
             <a href={file.url} target="_blank" rel="noreferrer">
-              <div className={styles2.preview}>
-                <embed className={styles2.displayImg} src={file.url} alt={file.fileName} />
+              <div className={moduleStyles.preview}>
+                <embed className={moduleStyles.displayImg} src={file.url} alt={file.fileName} />
               </div>
-              <div className={styles2.descriptionContainer}>
+              <div className={moduleStyles.descriptionContainer}>
                 <div
                   key={file.fileID}
                   onMouseEnter={() => handleMouseEnter(file.url)}
@@ -349,11 +349,11 @@ function Media({ profile }) {
                     <Checkbox
                       checked={checked.includes(file)}
                       onChange={(event) => handleCheckboxChange(event, file)}
-                      className={styles2.checkbox}
+                      className={moduleStyles.checkbox}
                     />
                   ) : (<img className={styles.smaller_img} src={linkIcon} alt="link icon" />)}
                 </div>
-                <div className={`${styles2.fileName} ${styles2.pdf_preview}`}>{file.fileName}</div>
+                <div className={`${moduleStyles.fileName} ${moduleStyles.pdf_preview}`}>{file.fileName}</div>
               </div>
             </a>
           </div>
@@ -433,7 +433,7 @@ function Media({ profile }) {
           ? (
             <div>
               <Dialog open={openDeleteFilesPopup} onClose={handleDeleteFilesClose}>
-                <DialogTitle className={styles2.dialogTitle}>
+                <DialogTitle className={moduleStyles.dialogTitle}>
                   You have chosen to delete
                   {' '}
                   {checked.length}
@@ -442,14 +442,14 @@ function Media({ profile }) {
                 </DialogTitle>
                 <DialogContent>
                   <div>
-                    <div className={styles2.confirmMessage}>
+                    <div className={moduleStyles.confirmMessage}>
                       Are you sure you want to continue with this action?
                     </div>
-                    <div className={styles2.confirmButtons}>
-                      <button className={styles2.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
+                    <div className={moduleStyles.confirmButtons}>
+                      <button className={moduleStyles.confirmCancel} type="button" onClick={() => (clearCheckboxes())}>
                         Cancel
                       </button>
-                      <button type="button" className={styles2.confirmDelete} onClick={() => { deleteFiles(checked); }}>
+                      <button type="button" className={moduleStyles.confirmDelete} onClick={() => { deleteFiles(checked); }}>
                         Delete
                       </button>
                     </div>
@@ -463,21 +463,21 @@ function Media({ profile }) {
       <div>
         { (checked.length > 0)
           ? (
-            <div className={styles2.deleteFilesBar}>
-              <div className={styles2.totalSelected}>
-                <div className={styles2.selectedNumber}>
+            <div className={moduleStyles.deleteFilesBar}>
+              <div className={moduleStyles.totalSelected}>
+                <div className={moduleStyles.selectedNumber}>
                   {checked.length}
                 </div>
-                <div className={styles2.selectedText}>
+                <div className={moduleStyles.selectedText}>
                   {' '}
                   selected
                 </div>
               </div>
-              <div className={styles2.cancelOrDelete}>
-                <button className={styles2.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
+              <div className={moduleStyles.cancelOrDelete}>
+                <button className={moduleStyles.cancelButton} type="button" onClick={() => (clearCheckboxes())}>
                   Cancel
                 </button>
-                <button type="button" className={styles2.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
+                <button type="button" className={moduleStyles.deleteButton} onClick={() => (setOpenDeleteFilesPopup(true))}>
                   Delete
                 </button>
               </div>
