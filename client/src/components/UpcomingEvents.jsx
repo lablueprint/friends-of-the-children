@@ -4,7 +4,7 @@ import styles from '../styles/Calendar.module.css';
 import * as api from '../api';
 
 function UpcomingEvents({ profile, calendars }) {
-  console.log(profile);
+  console.log(profile.role);
   // Get default event service area based off user's service area
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
@@ -22,10 +22,10 @@ function UpcomingEvents({ profile, calendars }) {
   }
 
   useEffect(() => {
-    // date range = 3 weeks
+    // date range = 1 week
     const currDate = new Date();
     const futureDate = new Date(currDate);
-    futureDate.setDate(currDate.getDate() + 21);
+    futureDate.setDate(currDate.getDate() + 7);
     // format the dates in RFC3339 timestamp format
     const currDateString = currDate.toISOString();
     const futureDateString = futureDate.toISOString();
@@ -35,28 +35,24 @@ function UpcomingEvents({ profile, calendars }) {
   }, []);
 
   return (
-    <div className={styles['calendar-container']}>
-      <div className={styles['upcoming-events']}>
-        <h2 className={styles['upcoming-events-title']}>Upcoming Events</h2>
-        {upcomingEvents.map((event) => (
-          <div key={event.id} className={styles.event}>
-            {console.log(event.color)}
-            <div className={styles['event-date']}>
-              <span>
-                {event.start.dateTime ? formatDateTime(event.start.dateTime) : formatDateTime(event.start.date)}
-                {' '}
-                -
-                {' '}
-                {event.end.dateTime ? formatDateTime(event.end.dateTime) : formatDateTime(event.end.date)}
-              </span>
-            </div>
-            <h3 className={styles['event-title']}>{event.summary}</h3>
-            <p className={styles['event-description']}>
-              {event.description}
-            </p>
+    <div className={styles['upcoming-events']}>
+      <h2 className={styles['upcoming-events-title']}>Upcoming Events</h2>
+      {upcomingEvents.map((event) => (
+        <div key={event.id} className={styles.event}>
+          <div className={styles['event-date']}>
+            <div className={styles[event.class]} />
+            {event.start.dateTime ? formatDateTime(event.start.dateTime) : formatDateTime(event.start.date)}
+            {' '}
+            -
+            {' '}
+            {event.end.dateTime ? formatDateTime(event.end.dateTime) : formatDateTime(event.end.date)}
           </div>
-        ))}
-      </div>
+          <h3 className={styles['event-title']}>{event.summary}</h3>
+          <p className={styles['event-description']}>
+            {event.description}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }

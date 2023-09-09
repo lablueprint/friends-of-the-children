@@ -1,20 +1,20 @@
 // import google api
-import { createRequire } from "module";
+import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-const { google } = require("googleapis");
+const { google } = require('googleapis');
 
 // fotc google auth information
 const CREDENTIALS = JSON.parse(process.env.REACT_APP_GOOGLE_AUTH_CREDENTIALS);
 // const calendarId = process.env.CALENDAR_ID;
-const SCOPES = "https://www.googleapis.com/auth/calendar";
-const calendar = google.calendar({ version: "v3" });
+const SCOPES = 'https://www.googleapis.com/auth/calendar';
+const calendar = google.calendar({ version: 'v3' });
 
 const auth = new google.auth.JWT(
   CREDENTIALS.client_email,
   null,
   CREDENTIALS.private_key,
-  SCOPES
+  SCOPES,
 );
 
 const getEvents = async (req, res) => {
@@ -27,12 +27,12 @@ const getEvents = async (req, res) => {
         const calendarId = cal.googleCalendarId;
         const response = await calendar.events.list({
           auth,
-          calendarId: calendarId,
+          calendarId,
           timeMin: start,
           timeMax: end,
         });
-        response.data.items['color'] = cal.color;
-        events.push(...response.data.items);
+        const currCalEvents = response.data.items.map((item) => ({ ...item, class: cal.className }));
+        events.push(...currCalEvents);
       } catch (error) {
         console.error(error);
       }
@@ -40,10 +40,10 @@ const getEvents = async (req, res) => {
     await Promise.all(calendarPromises);
     // sort events from closest to furthest based on start time
     events.sort((a, b) => {
-       // event objects either have "date" or "dateTime" fields
+      // event objects either have "date" or "dateTime" fields
       if ((a.start.dateTime || a.start.date) > (b.start.dateTime || b.start.date)) return 1;
-      else if ((a.start.dateTime || a.start.date) < (b.start.dateTime || b.start.date)) return -1;
-      else return 0;
+      if ((a.start.dateTime || a.start.date) < (b.start.dateTime || b.start.date)) return -1;
+      return 0;
     });
     res.status(202).json(events);
   } catch (error) {
@@ -91,11 +91,13 @@ const createEvent = async (req, res) => {
 // updates gcal event without modifying any unspecified event properties (requires eventID)
 const patchEvent = async (req, res) => {
   try {
-    const { id, start, end, calendarId } = req.body;
+    const {
+      id, start, end, calendarId,
+    } = req.body;
     // call gcal api's "patch" method
     const response = await calendar.events.patch({
       auth,
-      calendarId: "primary",
+      calendarId: 'primary',
       eventId: id,
       requestBody: {
         start: {

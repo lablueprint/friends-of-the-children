@@ -20,7 +20,7 @@ import { serviceAreas } from '../constants';
 import { storage } from '../pages/firebase';
 
 function CalendarEventForm({
-  profile, getCalendarRef, open, handleClose,
+  profile, getCalendarRef, open, handleClose, setCalendarInfo, getCalendarByRole,
 }) {
   const theme = createTheme({
     overrides: {
@@ -79,8 +79,11 @@ function CalendarEventForm({
     const attachments = [];
 
     let calendarId = constants.calIdFOTC; // Admin users will specify event service area
-    // if (eventServiceArea === 'AV') { calendarId = constants.calIdAV; } else if (eventServiceArea === 'MS') { calendarId = constants.calIdMS; } else { calendarId = constants.calIdFOTC; }
-    if (eventServiceArea === 'MS') { calendarId = constants.calIdMS; }
+    if (eventServiceArea === 'AV') {
+      calendarId = constants.calIdAV;
+    } else if (eventServiceArea === 'MS') {
+      calendarId = constants.calIdMS;
+    }
     // check if user inputs an attachment
     // if (e.target.attachments.value) {
     //   attachments.push({ fileUrl, title: 'an attachment!' });
@@ -106,6 +109,7 @@ function CalendarEventForm({
     });
     // TODO: remove this manual reload and fix color of calendar bug
     // window.location.reload();
+    setCalendarInfo(getCalendarByRole());
     handleClose();
     e.target.reset();
   };
@@ -217,5 +221,7 @@ CalendarEventForm.propTypes = {
   getCalendarRef: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
+  setCalendarInfo: PropTypes.func.isRequired,
+  getCalendarByRole: PropTypes.func.isRequired,
 };
 export default CalendarEventForm;

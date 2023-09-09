@@ -29,6 +29,7 @@
     font-family: 'Inter';
     flex-basis: 70%; /* Adjust the width as needed */
     padding: 2.5rem;
+    height: fit-content;
 }
 
 .calendar a{
@@ -111,6 +112,9 @@
     font-style: normal;
     font-weight: 500;
     line-height: normal;
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
 
   .event-description {
@@ -188,4 +192,35 @@
 
 .dialog_h3_2 {
   margin-top: 30px;
+}
+
+.fotc-events {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: var(--blue, #0AE);
+}
+
+.av-events {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: var(--ochre, #EB1);
+}
+
+.ms-events {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: var(--coral, #F52);
+}
+
+.flex_container{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flex_container h3 {
+  margin: 0;
 }

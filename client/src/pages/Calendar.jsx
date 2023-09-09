@@ -8,7 +8,6 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
-import ColorBlobs from '../assets/images/color_blobs.svg';
 import * as constants from '../constants';
 import CalendarEventForm from '../components/CalendarEventForm';
 import UpcomingEvents from '../components/UpcomingEvents';
@@ -56,7 +55,11 @@ function Calendar({ profile }) {
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
     setOpenEvent(true);
-    setPopupEvent(eventInfo.event);
+    const { event } = eventInfo;
+    const calId = event.source.internalEventSource.meta.googleCalendarId;
+    event.calId = calId;
+    console.log(calId);
+    setPopupEvent(event);
   };
 
   const dropEvent = (info) => {
@@ -83,17 +86,17 @@ function Calendar({ profile }) {
         {
           googleCalendarId: constants.calIdFOTC,
           className: 'fotc-events',
-          color: 'rgba(0, 170, 238, 0.2)',
+          color: constants.calFOTCColor,
         },
         {
           googleCalendarId: constants.calIdAV,
           className: 'av-events',
-          color: 'rgba(238, 187, 17, 0.2)',
+          color: constants.calAVColor,
         },
         {
           googleCalendarId: constants.calIdMS,
           className: 'ms-events',
-          color: 'rgba(255, 85, 34, 0.2)',
+          color: constants.calMSColor,
         },
       ];
     }
@@ -101,19 +104,19 @@ function Calendar({ profile }) {
       return [{
         googleCalendarId: constants.calIdAV,
         className: 'av-events',
-        color: 'rgba(238, 187, 17, 0.2)',
+        color: constants.calAVColor,
       }];
     } if (serviceArea.toLowerCase() === 'ms') {
       return [{
         googleCalendarId: constants.calIdMS,
         className: 'ms-events',
-        color: 'rgba(255, 85, 34, 0.2)',
+        color: constants.calMSColor,
       }];
     }
     return [{
       googleCalendarId: constants.calIdFOTC,
       className: 'fotc-events',
-      color: 'rgba(0, 170, 238, 0.2)',
+      color: constants.calFOTCColor,
     }];
   };
 
@@ -123,7 +126,6 @@ function Calendar({ profile }) {
 
   return (
     <div className={styles.calendar_container}>
-      <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       <div className={styles.container}>
         <div className={styles.buttonBox}>
           <h1 className={styles.title}>Calendar</h1>
@@ -144,7 +146,7 @@ function Calendar({ profile }) {
               eventDrop={currRole === 'admin' ? dropEvent : null}
               selectMirror
               dayMaxEvents
-              eventColor="rgba(0, 170, 238, 0.2)"
+              eventColor={constants.calFOTCColor}
               eventTextColor="black"
               fixedWeekCount={false}
               googleCalendarApiKey={REACT_APP_GOOGLE_CALENDAR_API_KEY}
@@ -152,13 +154,11 @@ function Calendar({ profile }) {
               eventClick={handleEventClick}
             />
           </div>
-          <div className={styles.upcomingEvents}>
-            {/* FIX CALENDAR ID  */}
-            {calendarInfo && <UpcomingEvents profile={profile} calendars={calendarInfo} />}
-          </div>
+          {/* FIX CALENDAR ID  */}
+          {calendarInfo && <UpcomingEvents profile={profile} calendars={calendarInfo} />}
         </div>
       </div>
-      <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} open={open} handleClose={handleClose} />
+      <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} open={open} handleClose={handleClose} setCalendarInfo={setCalendarInfo} getCalendarByRole={getCalendarByRole} />
 
       {popupEvent && (
         <EventPopup openEvent={openEvent} closeEvent={closeEvent} popupEvent={popupEvent} />
