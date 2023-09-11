@@ -92,7 +92,7 @@ const createEvent = async (req, res) => {
 const patchEvent = async (req, res) => {
   try {
     const {
-      id, start, end, calendarId,
+      id, start, end,
     } = req.body;
     // call gcal api's "patch" method
     const response = await calendar.events.patch({

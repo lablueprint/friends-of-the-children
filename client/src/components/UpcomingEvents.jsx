@@ -6,18 +6,19 @@ import * as api from '../api';
 function UpcomingEvents({ profile, calendars }) {
   console.log(profile.role);
   // Get default event service area based off user's service area
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState(null);
 
   // format the datetime string returned by event object
   function formatDateTime(inputDateTimeString) {
     const inputDate = new Date(inputDateTimeString);
     const month = String(inputDate.getMonth() + 1);
     const day = String(inputDate.getDate());
-    // const year = inputDate.getFullYear();
+    const daysOfWeek = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'];
+    const dayOfWeek = daysOfWeek[inputDate.getDay()];
     const hour = String(inputDate.getHours() % 12 || 12);
     const minute = String(inputDate.getMinutes()).padStart(2, '0');
     const ampm = inputDate.getHours() < 12 ? 'am' : 'pm';
-    const formattedDateTime = `${month}/${day} ${hour}:${minute}${ampm}`;
+    const formattedDateTime = `${dayOfWeek}, ${month}/${day} @${hour}:${minute}${ampm}`;
     return formattedDateTime;
   }
 
@@ -37,15 +38,12 @@ function UpcomingEvents({ profile, calendars }) {
   return (
     <div className={styles['upcoming-events']}>
       <h2 className={styles['upcoming-events-title']}>Upcoming Events</h2>
-      {upcomingEvents.map((event) => (
+      {!upcomingEvents && <p>Loading...</p>}
+      {upcomingEvents && upcomingEvents.map((event) => (
         <div key={event.id} className={styles.event}>
           <div className={styles['event-date']}>
             <div className={styles[event.class]} />
             {event.start.dateTime ? formatDateTime(event.start.dateTime) : formatDateTime(event.start.date)}
-            {' '}
-            -
-            {' '}
-            {event.end.dateTime ? formatDateTime(event.end.dateTime) : formatDateTime(event.end.date)}
           </div>
           <h3 className={styles['event-title']}>{event.summary}</h3>
           <p className={styles['event-description']}>

@@ -18,9 +18,10 @@ import * as constants from '../constants';
 import { createTextField } from './MuiComps';
 import { serviceAreas } from '../constants';
 import { storage } from '../pages/firebase';
+import FileIcon from '../assets/icons/file-minus.svg';
 
 function CalendarEventForm({
-  profile, getCalendarRef, open, handleClose, setCalendarInfo, getCalendarByRole,
+  profile, getCalendarRef, open, handleClose,
 }) {
   const theme = createTheme({
     overrides: {
@@ -36,7 +37,7 @@ function CalendarEventForm({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [fileLinks, setFileLinks] = useState('');
+  const [fileLinks, setFileLinks] = useState([]);
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
 
@@ -69,15 +70,23 @@ function CalendarEventForm({
 
   const handleFileChange = (e) => {
     const urls = [];
-    Array.from(e.target.files).forEach((file) => urls.push(handleUpload(file))); // allows you to upload multiple files
-    setFileLinks(urls);
+    Array.from(e.target.files).forEach((file) => {
+      const currFile = handleUpload(file);
+      if (!fileLinks.includes(currFile)) { urls.push(handleUpload(file)); }
+    }); // allows you to upload multiple files, disallows duplicates
+    setFileLinks((prevUrls) => [...prevUrls, ...urls]);
+  };
+
+  const truncateFileName = (filePath) => {
+    const fileName = filePath.split('/').pop(); // Get the file name
+    const fileExtension = fileName.split('.').pop(); // Get the file extension
+    const truncatedFileName = `${fileName.substring(0, 20)}...${fileExtension}`;
+    return truncatedFileName;
   };
 
   const addEvent = (e) => {
     e.preventDefault();
-
     const attachments = [];
-
     let calendarId = constants.calIdFOTC; // Admin users will specify event service area
     if (eventServiceArea === 'AV') {
       calendarId = constants.calIdAV;
@@ -98,7 +107,6 @@ function CalendarEventForm({
       attachments,
       calendarId,
     };
-
     // add event to actual google calendar
     api.createEvent(event).then((eventID) => {
       // append google calendar's event ID into the fullcalendar event object (so we can update the event through the frontend with google's api, which requires eventID)
@@ -109,7 +117,6 @@ function CalendarEventForm({
     });
     // TODO: remove this manual reload and fix color of calendar bug
     // window.location.reload();
-    setCalendarInfo(getCalendarByRole());
     handleClose();
     e.target.reset();
   };
@@ -175,12 +182,20 @@ function CalendarEventForm({
                   </Select>
                   {createTextField('Location', location, setLocation, '48%')}
                 </div>
+                <br />
+                {fileLinks.map((file) => (
+                  <div className={styles.files_container}>
+                    <img src={FileIcon} alt="file icon" />
+                    {truncateFileName(file)}
+                    <button type="button" onClick={() => { setFileLinks(fileLinks.filter((element) => element !== file)); }}><p>X</p></button>
+                  </div>
+                ))}
                 <div className={styles.labels_container}>
                   <Button
                     variant="contained"
                     component="label"
                   >
-                    Upload Files
+                    {fileLinks.length === 0 ? 'Upload Files' : 'Add Files'}
                     <input
                       type="file"
                       hidden
@@ -221,7 +236,5 @@ CalendarEventForm.propTypes = {
   getCalendarRef: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
-  setCalendarInfo: PropTypes.func.isRequired,
-  getCalendarByRole: PropTypes.func.isRequired,
 };
 export default CalendarEventForm;

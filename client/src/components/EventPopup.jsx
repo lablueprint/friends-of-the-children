@@ -13,12 +13,32 @@ export default function EventPopup({ openEvent, closeEvent, popupEvent }) {
   const { location, description } = extendedProps;
 
   let className;
+  let serviceArea;
   if (calId === constants.calIdAV) {
     className = constants.classAV;
+    serviceArea = 'AV';
   } else if (calId === constants.calIdMS) {
     className = constants.classMS;
+    serviceArea = 'MS';
   } else {
     className = constants.classFOTC;
+    serviceArea = 'All';
+  }
+
+  console.log(popupEvent);
+
+  // format the datetime string returned by event object
+  function formatDateTime(inputDateTimeString) {
+    const inputDate = new Date(inputDateTimeString);
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = daysOfWeek[inputDate.getDay()];
+    const month = String(inputDate.getMonth() + 1);
+    const day = String(inputDate.getDate());
+    const hour = String(inputDate.getHours() % 12 || 12);
+    const minute = String(inputDate.getMinutes()).padStart(2, '0');
+    const ampm = inputDate.getHours() < 12 ? 'am' : 'pm';
+    const formattedDateTime = `${dayOfWeek}, ${month}/${day} ${hour}:${minute}${ampm}`;
+    return formattedDateTime;
   }
 
   return (
@@ -28,18 +48,20 @@ export default function EventPopup({ openEvent, closeEvent, popupEvent }) {
           <div className={styles.flex_container}>
             <div className={styles[className]} />
             <h3>{title}</h3>
+            {serviceArea}
           </div>
         </DialogTitle>
         <DialogContent>
+          {start && formatDateTime(start)}
+          {' '}
+          -
+          {' '}
+          {end && formatDateTime(end)}
           <h5>
             Location:
             {' '}
             {location}
           </h5>
-          <h5>Start Time: </h5>
-          {JSON.stringify(start)}
-          <h5>End Time: </h5>
-          {JSON.stringify(end)}
           <h5>Note: </h5>
           {description}
         </DialogContent>

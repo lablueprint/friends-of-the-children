@@ -52,13 +52,13 @@ function Calendar({ profile }) {
     setOpenEvent(false);
   };
 
+  console.log(calendarRef);
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
     setOpenEvent(true);
     const { event } = eventInfo;
     const calId = event.source.internalEventSource.meta.googleCalendarId;
     event.calId = calId;
-    console.log(calId);
     setPopupEvent(event);
   };
 
@@ -158,7 +158,7 @@ function Calendar({ profile }) {
           {calendarInfo && <UpcomingEvents profile={profile} calendars={calendarInfo} />}
         </div>
       </div>
-      <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} open={open} handleClose={handleClose} setCalendarInfo={setCalendarInfo} getCalendarByRole={getCalendarByRole} />
+      <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} open={open} handleClose={handleClose} />
 
       {popupEvent && (
         <EventPopup openEvent={openEvent} closeEvent={closeEvent} popupEvent={popupEvent} />

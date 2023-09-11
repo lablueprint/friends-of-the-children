@@ -224,3 +224,32 @@
 .flex_container h3 {
   margin: 0;
 }
+
+.files_container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px dashed #787878;
+  margin-bottom: 15px;
+  height: 40px;
+  width: 48%;
+}
+
+.files_container img {
+  width: 25px;
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+.files_container button {
+  margin-left: auto;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  background: white;
+  vertical-align: middle;
+  font-size: 10px;
+  font-weight: 700;
+  margin-right: 10px;
+}
