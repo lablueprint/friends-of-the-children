@@ -633,7 +633,7 @@ const getUsernames = async (req, res) => {
       sc.forEach((user) => {
         const data = user.data();
         if (data) {
-          if (data.username){
+          if (data.username) {
             usernames.push(data.username);
           }
           if (data.email) {
@@ -641,7 +641,7 @@ const getUsernames = async (req, res) => {
           }
         }
       });
-      res.status(202).json({usernames, emails});
+      res.status(202).json({ usernames, emails });
     });
   } catch (error) {
     res.status(400).json(error);
@@ -733,17 +733,17 @@ const getProfile = async (req, res) => {
     console.error('Error getting profile:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+};
 
 const updateProfile = async (req, res) => {
-  const {id, updatedProfile} = req.body;
+  const { id, updatedProfile } = req.body;
   try {
     const profile = await db.collection('profiles').doc(id).update(updatedProfile);
     res.status(202).json(profile);
   } catch (error) {
-    res.status(400).json(error)
+    res.status(400).json(error);
   }
-}
+};
 
 const batchUpdateProfile = async (req, res) => {
   try {

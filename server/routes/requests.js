@@ -41,6 +41,7 @@ import {
   addModule,
 } from '../controllers/controllers.js';
 import { createEvent, patchEvent, getEvents } from '../controllers/calendarController.js';
+
 const [createMessage, getMessages, getFilteredMessages, pinMessage, deleteMessage] = messagesController;
 
 const router = express.Router();
@@ -141,7 +142,7 @@ router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
 // get a single user profile
 router.get('/getProfile', getProfile);
 
-//update a single user profile
+// update a single user profile
 router.post('/updateProfile', updateProfile);
 
 router.post('/batchUpdateProfile', batchUpdateProfile);
