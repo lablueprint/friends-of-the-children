@@ -17,6 +17,8 @@ import FilePopup from '../components/FilePopup';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+import wordIcon from '../assets/icons/file_microsoft_word.svg';
+import excelIcon from '../assets/icons/file_microsoft_excel.svg';
 import editIcon from '../assets/icons/editicon.svg';
 import moduleStyles from '../styles/Modules.module.css';
 import NewModulePopup from '../components/NewModulePopup';
@@ -310,6 +312,7 @@ function ExpandedModule({ profile }) {
                   New File
                 </button>
                 <NewFilePopup open={openNewFilePopup} handleClose={handleClose} currModuleFiles={currModuleFiles} id={id} />
+                <br />
                 <button type="button" onClick={handleClickOpenNewModule} className={moduleStyles.addModule}>
                   New Folder
                 </button>
@@ -431,6 +434,54 @@ function ExpandedModule({ profile }) {
                     ) : (<img src={pdfIcon} alt="pdf icon" />)}
                   </div>
                   <div className={`${moduleStyles.fileName} ${moduleStyles.pdf_preview}`} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">{file.fileName}</div>
+                </div>
+              </div>
+              )}
+              {(file.fileType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) && (
+              <div>
+                <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  {/* <embed className={moduleStyles.displayImg} src={`${file.url}`} alt={file.fileName} /> */}
+                </div>
+                <div className={moduleStyles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={moduleStyles.checkbox}
+                      />
+                    ) : (<img src={wordIcon} width="24" alt="word icon" />)}
+                  </div>
+                  <div className={moduleStyles.fileName}>{file.fileName}</div>
+                </div>
+              </div>
+              )}
+              {(file.fileType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) && (
+              <div>
+                <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
+                  {/* <embed className={moduleStyles.displayImg} src={`${file.url}`} alt={file.fileName} /> */}
+                </div>
+                <div className={moduleStyles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={moduleStyles.checkbox}
+                      />
+                    ) : (<img src={excelIcon} width="24" alt="excel icon" />)}
+                  </div>
+                  <div className={moduleStyles.fileName}>{file.fileName}</div>
                 </div>
               </div>
               )}

@@ -13,6 +13,8 @@ import filledHeart from '../assets/icons/filled_heart.svg';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+import wordIcon from '../assets/icons/file_microsoft_word.svg';
+import excelIcon from '../assets/icons/file_microsoft_excel.svg';
 import * as api from '../api';
 import styles from '../styles/Modules.module.css';
 import NewFilePopup from '../components/NewFilePopup';
@@ -221,6 +223,8 @@ function Resources({ profile }) {
                       {(file.fileType.includes('image')) && <img src={imgIcon} alt="img icon" />}
                       {(file.fileType.includes('video')) && <img src={vidIcon} alt="vid icon" />}
                       {((file.fileType.includes('pdf')) || file.fileType.includes('text')) && <img src={pdfIcon} alt="pdf icon" />}
+                      {(file.fileType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) && <img src={wordIcon} width="24" alt="word icon" />}
+                      {(file.fileType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) && <img src={excelIcon} width="24" alt="excel icon" />}
                     </>
                   )}
                 </div>

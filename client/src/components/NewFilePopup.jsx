@@ -19,6 +19,7 @@ export default function NewFilePopup(props) {
   } = props;
 
   const [fileLinks, setFileLinks] = useState(currModuleFiles);
+  const [percent, setPercent] = useState(0);
 
   const handleUpload = (file) => {
     const fileName = file.name;
@@ -33,7 +34,7 @@ export default function NewFilePopup(props) {
         );
 
         // update progress
-        // setPercent(p);
+        setPercent(p);
         console.log(p);
       },
       (err) => console.error(err),
@@ -79,17 +80,20 @@ export default function NewFilePopup(props) {
             <FormLabel>Attachments:</FormLabel>
             <br />
             <input type="file" onChange={handleFileChange} multiple />
-            {/* <p>
-              XXX UPLOADING XXX
-              {' '}
+            {percent !== 0
+            && (
+            <p>
+              {percent}
               % done
-            </p> */}
+            </p>
+            )}
           </DialogContent>
           <DialogActions>
             <Button
               type="submit"
               color="primary"
               variant="contained"
+              disabled={percent !== 100}
             >
               Submit
             </Button>

@@ -23,6 +23,8 @@ import filledHeart from '../assets/icons/filled_heart.svg';
 import imgIcon from '../assets/icons/file_img.svg';
 import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
+import wordIcon from '../assets/icons/file_microsoft_word.svg';
+import excelIcon from '../assets/icons/file_microsoft_excel.svg';
 import linkIcon from '../assets/icons/file_link.svg';
 import ClearedIcon from '../assets/icons/cleared.svg';
 import NotClearedIcon from '../assets/icons/not_cleared.svg';
@@ -407,6 +409,8 @@ function ExpandedMentee({ profile }) {
                     {(file.fileType.includes('video')) && <img src={vidIcon} alt="vid icon" />}
                     {((file.fileType.includes('pdf')) || file.fileType.includes('text')) && <img src={pdfIcon} alt="pdf icon" />}
                     {((file.fileType === 'link')) && <img className={styles.smaller_img} src={linkIcon} alt="link icon" />}
+                    {(file.fileType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) && <img src={wordIcon} width="24" alt="word icon" />}
+                    {(file.fileType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) && <img src={excelIcon} width="24" alt="excel icon" />}
                   </>
                 )}
               </div>

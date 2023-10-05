@@ -116,7 +116,7 @@ function CalendarEventForm({
       calApi.addEvent(event);
     });
     // TODO: remove this manual reload and fix color of calendar bug
-    // window.location.reload();
+    window.location.reload();
     handleClose();
     e.target.reset();
   };
