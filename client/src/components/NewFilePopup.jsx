@@ -93,6 +93,7 @@ export default function NewFilePopup(props) {
               type="submit"
               color="primary"
               variant="contained"
+              disabled={percent !== 100}
             >
               Submit
             </Button>
