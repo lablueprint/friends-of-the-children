@@ -3,6 +3,18 @@ import axios from 'axios';
 
 const url = process.env.REACT_APP_SERVER_URL;
 
+// get all events
+export const getEvents = async (start, end, calendars) => {
+  try {
+    const events = await axios.post(`${url}/getEvents`, { start, end, calendars });
+    return events;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get events');
+  }
+  return null;
+};
+
 // creates an event on gcal
 export const createEvent = async (eventData) => {
   try {
@@ -463,6 +475,28 @@ export const getProfilesSortedByDate = async () => {
   } catch (error) {
     console.error(error.message);
     console.error('could not get profiles sorted by date');
+  }
+  return null;
+};
+
+export const getProfile = async (id) => {
+  try {
+    const profile = await axios.get(`${url}/getProfile`, { params: { id } });
+    return profile;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not get user profile');
+  }
+  return null;
+};
+
+export const updateProfile = async (id, updatedProfile) => {
+  try {
+    const profile = await axios.post(`${url}/updateProfile`, { id, updatedProfile });
+    return profile;
+  } catch (error) {
+    console.error(error.message);
+    console.error('could not update user profile');
   }
   return null;
 };

@@ -5,8 +5,6 @@ import express from 'express';
 import mailchimp from '../mailchimp.js';
 
 import {
-  createEvent,
-  patchEvent,
   getMentees,
   updateClearance,
   createMentee,
@@ -30,6 +28,8 @@ import {
   sendMailchimpEmails,
   updateModuleChildren,
   getProfilesSortedByDate,
+  getProfile,
+  updateProfile,
   batchUpdateProfile,
   batchDeleteProfile,
   batchAddToList,
@@ -40,6 +40,7 @@ import {
   deleteMenteeFiles,
   addModule,
 } from '../controllers/controllers.js';
+import { createEvent, patchEvent, getEvents } from '../controllers/calendarController.js';
 const [createMessage, getMessages, getFilteredMessages, pinMessage, deleteMessage] = messagesController;
 
 const router = express.Router();
@@ -47,6 +48,8 @@ const router = express.Router();
 router.get('/', (req, res) => {
   res.send('We are live!');
 });
+
+router.post('/getEvents', getEvents);
 
 // creates an event on google calendar
 router.post('/createEvent', createEvent);
@@ -134,6 +137,12 @@ router.post('/deleteMessage', deleteMessage);
 router.post('/pinMessage', pinMessage);
 
 router.get('/getProfilesSortedByDate', getProfilesSortedByDate);
+
+// get a single user profile
+router.get('/getProfile', getProfile);
+
+//update a single user profile
+router.post('/updateProfile', updateProfile);
 
 router.post('/batchUpdateProfile', batchUpdateProfile);
 

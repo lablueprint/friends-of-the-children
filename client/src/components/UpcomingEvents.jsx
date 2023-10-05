@@ -1,52 +1,56 @@
 import { React, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from '../styles/Calendar.module.css';
+import * as api from '../api';
 
-function UpcomingEvents({ profile, getCalendarRef }) {
-  const { serviceArea } = profile;
+function UpcomingEvents({ profile, calendars }) {
+  console.log(profile.role);
   // Get default event service area based off user's service area
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState(null);
 
-  const getUpcomingEvents = () => {
-    // really jank but only loads events after half a second so that the ref is valid
-    const timer = setTimeout(() => {
-      if (getCalendarRef()) {
-        const events = getCalendarRef().current.getApi().getEvents();
-        setUpcomingEvents(events);
-        console.log(events);
-        console.log(getCalendarRef());
-      }
-    }, 500);
+  // format the datetime string returned by event object
+  function formatDateTime(inputDateTimeString) {
+    const inputDate = new Date(inputDateTimeString);
+    const month = String(inputDate.getMonth() + 1);
+    const day = String(inputDate.getDate());
+    const daysOfWeek = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'];
+    const dayOfWeek = daysOfWeek[inputDate.getDay()];
+    const hour = String(inputDate.getHours() % 12 || 12);
+    const minute = String(inputDate.getMinutes()).padStart(2, '0');
+    const ampm = inputDate.getHours() < 12 ? 'am' : 'pm';
+    const formattedDateTime = `${dayOfWeek}, ${month}/${day} @${hour}:${minute}${ampm}`;
+    return formattedDateTime;
+  }
 
-    return () => clearTimeout(timer);
-  };
-
-  useEffect(getUpcomingEvents, []);
+  useEffect(() => {
+    // date range = 1 week
+    const currDate = new Date();
+    const futureDate = new Date(currDate);
+    futureDate.setDate(currDate.getDate() + 7);
+    // format the dates in RFC3339 timestamp format
+    const currDateString = currDate.toISOString();
+    const futureDateString = futureDate.toISOString();
+    api.getEvents(currDateString, futureDateString, calendars).then((events) => {
+      setUpcomingEvents(events.data);
+    });
+  }, []);
 
   return (
-    <div className={styles['calendar-container']}>
-      <div className={styles['upcoming-events']}>
-        <h2>Upcoming Events</h2>
-        <div>{serviceArea}</div>
-        {upcomingEvents.map((event) => (
-          <div key={event.id} className={styles.event}>
-            <div className={styles['event-date']}>
-              <span>
-                {event.start.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
-              </span>
-              <span className={styles['event-bullet']}>&bull;</span>
-              <span>
-                {`${event.start.toLocaleTimeString(undefined, { hour: 'numeric', minute: 'numeric' }).replace(' ', '')} - ${event.end.toLocaleTimeString(undefined, { hour: 'numeric', minute: 'numeric' }).replace(' ', '')}`}
-              </span>
-
-            </div>
-            <h3 className={styles['event-title']}>{event.title}</h3>
-            <div className={styles['event-description']}>
-              <p>{event.extendedProps.description}</p>
-            </div>
+    <div className={styles['upcoming-events']}>
+      <h2 className={styles['upcoming-events-title']}>Upcoming Events</h2>
+      {!upcomingEvents && <p>Loading...</p>}
+      {upcomingEvents && upcomingEvents.map((event) => (
+        <div key={event.id} className={styles.event}>
+          <div className={styles['event-date']}>
+            <div className={styles[event.class]} />
+            {event.start.dateTime ? formatDateTime(event.start.dateTime) : formatDateTime(event.start.date)}
           </div>
-        ))}
-      </div>
+          <h3 className={styles['event-title']}>{event.summary}</h3>
+          <p className={styles['event-description']}>
+            {event.description}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -65,7 +69,7 @@ UpcomingEvents.propTypes = {
     google: PropTypes.bool,
     mentees: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  getCalendarRef: PropTypes.func.isRequired,
+  calendars: PropTypes.arrayOf.isRequired,
 };
 
 export default UpcomingEvents;

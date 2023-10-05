@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import {
-  TextField,
+  TextField, Snackbar,
 } from '@mui/material';
 import * as api from '../api';
 import styles from '../styles/Login.module.css';
@@ -162,7 +162,13 @@ function Login({ updateAppProfile }) { // deconstruct the function props
               required
               className={`${styles.textfield} ${styles.full_width}`}
             />
-            {error ? <div>Your username or password is incorrect.</div> : <div />}
+            <Snackbar
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              open={error}
+              autoHideDuration={1500}
+              onClose={() => setError(false)}
+              message={'Your username or password is incorrect.'}
+            />
             <div className={styles.full_width}>
               <label className={styles.button_width} htmlFor="Submit">
                 <br />

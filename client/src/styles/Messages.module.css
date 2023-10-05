@@ -171,3 +171,7 @@
 .half_width{
     margin: 0 10px 15px 0 !important;
 }
+
+.wallWrapper {
+    padding-bottom: 50px;
+}

@@ -39,13 +39,16 @@ function Signup({ updateAppProfile }) {
   const [serviceArea, setServiceArea] = useState(serviceAreas[0]);
   const [role, setRole] = useState('Caregiver');
   const [username, setUsername] = useState('');
+  const [emails, setEmails] = useState();
   const [usernames, setUsernames] = useState(); // specifically for reducing firebase calls, saving all usernames
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userErrorMessage, setUserErrorMessage] = useState('');
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
   const [passErrorMessage, setPassErrorMessage] = useState('');
   const [confirmError, setConfirmError] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const [googleLoggedIn, setGoogleLoggedIn] = useState(false);
   const [googleError, setGoogleError] = useState(false);
   const [googErrorCode, setGoogleErrorCode] = useState(false);
@@ -58,7 +61,8 @@ function Signup({ updateAppProfile }) {
   // API call to reduce Firebase calls, saving all usernames to userUsernames state (array)
   const fetchData = async () => {
     const data = await api.getUsernames();
-    setUsernames(data.data);
+    setUsernames(data.data.usernames);
+    setEmails(data.data.emails);
   };
 
   useEffect(() => {
@@ -96,10 +100,17 @@ function Signup({ updateAppProfile }) {
     setConfirmError(false);
     setUsernameError(false);
     setUserErrorMessage('');
+    setEmailError(false);
+    setEmailErrorMessage('');
     setPassErrorMessage('');
     if (usernames.includes(username)) {
       setUsernameError(true);
       setUserErrorMessage('Username already exists!');
+      isValid = false;
+    }
+    if (emails.includes(email)) {
+      setEmailError(true);
+      setEmailErrorMessage('Email already exists!');
       isValid = false;
     }
     if (password !== confirmPassword) {
@@ -138,6 +149,7 @@ function Signup({ updateAppProfile }) {
           role,
           username,
           google: true,
+          image: 'https://i.pinimg.com/550x/18/b9/ff/18b9ffb2a8a791d50213a9d595c4dd52.jpg',
           approved: false,
           date: app.firebase.firestore.Timestamp.fromDate(new Date()),
           mentees: [],
@@ -216,21 +228,6 @@ function Signup({ updateAppProfile }) {
             </button>
           </div>
 
-          {/* <FormControl sx={{ width: '60%' }}>
-            <InputLabel>Role</InputLabel>
-            <Select
-              id="role"
-              label="Role"
-              defaultValue="Role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className={styles.textfield}
-            >
-              <MenuItem value="Caregiver">Caregiver</MenuItem>
-              <MenuItem value="Mentor">Mentor</MenuItem>
-              <MenuItem value="Admin">Admin</MenuItem>
-            </Select>
-          </FormControl> */}
           <p>Enter your information</p>
           <div>
             {createTextField('First Name', firstName, setFirstName)}
@@ -240,7 +237,7 @@ function Signup({ updateAppProfile }) {
             <div className={styles.username}>
               {googleLoggedIn
                 ? <p />
-                : createTextField('Email', email, setEmail, 'email')}
+                : createTextField('Email', email, setEmail, 'email', emailError, emailErrorMessage)}
             </div>
             <div className={styles.username2}>
               {createTextField('Username', username, setUsername, 'text', usernameError, userErrorMessage)}
@@ -300,7 +297,7 @@ function Signup({ updateAppProfile }) {
   return (
     <div>
       {(() => {
-        if (usernameError) return <Popup errorTitle="Signup" errorCode={userErrorMessage} />;
+        // if (usernameError) return <Popup errorTitle="Signup" errorCode={userErrorMessage} />;
         if (confirmError) return <Popup errorTitle="Signup" errorCode={passErrorMessage} />;
         if (googleError) return <Popup errorTitle="Signup" errorCode={googErrorCode.concat(' ', googErrorMessage)} />;
         return null;

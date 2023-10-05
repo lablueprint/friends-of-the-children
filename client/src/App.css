@@ -61,6 +61,10 @@ body {
 }
 
 .fc .fc-toolbar-title {
+  color: var(--text, #3F3F3F) !important;
+  font-family: News Gothic;
+  font-style: normal;
+  line-height: normal;
   font-size: 2rem !important;
   font-weight: 700 !important;
 }

@@ -1,5 +1,5 @@
 import {
-  React, useRef, useState,
+  React, useRef, useState, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
@@ -8,10 +8,10 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import * as api from '../api';
 import styles from '../styles/Calendar.module.css';
-import ColorBlobs from '../assets/images/color_blobs.svg';
 import * as constants from '../constants';
 import CalendarEventForm from '../components/CalendarEventForm';
 import UpcomingEvents from '../components/UpcomingEvents';
+import EventPopup from '../components/EventPopup';
 
 /*
 
@@ -32,9 +32,12 @@ function Calendar({ profile }) {
   const { role, serviceArea } = profile;
   const currRole = role.toLowerCase();
   const {
-    REACT_APP_FIREBASE_CALENDAR_ID,
+    REACT_APP_GOOGLE_CALENDAR_API_KEY,
   } = process.env;
-
+  const calendarRef = useRef();
+  const [popupEvent, setPopupEvent] = useState(null);
+  const [openEvent, setOpenEvent] = useState(false);
+  const [calendarInfo, setCalendarInfo] = useState(null);
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -45,10 +48,18 @@ function Calendar({ profile }) {
     setOpen(false);
   };
 
-  const calendarRef = useRef();
+  const closeEvent = () => {
+    setOpenEvent(false);
+  };
 
+  console.log(calendarRef);
   const handleEventClick = (eventInfo) => {
     eventInfo.jsEvent.preventDefault();
+    setOpenEvent(true);
+    const { event } = eventInfo;
+    const calId = event.source.internalEventSource.meta.googleCalendarId;
+    event.calId = calId;
+    setPopupEvent(event);
   };
 
   const dropEvent = (info) => {
@@ -75,17 +86,17 @@ function Calendar({ profile }) {
         {
           googleCalendarId: constants.calIdFOTC,
           className: 'fotc-events',
-          color: 'rgba(0, 170, 238, 0.2)',
+          color: constants.calFOTCColor,
         },
         {
           googleCalendarId: constants.calIdAV,
           className: 'av-events',
-          color: 'rgba(238, 187, 17, 0.2)',
+          color: constants.calAVColor,
         },
         {
           googleCalendarId: constants.calIdMS,
           className: 'ms-events',
-          color: 'rgba(255, 85, 34, 0.2)',
+          color: constants.calMSColor,
         },
       ];
     }
@@ -93,35 +104,37 @@ function Calendar({ profile }) {
       return [{
         googleCalendarId: constants.calIdAV,
         className: 'av-events',
-        color: 'rgba(238, 187, 17, 0.2)',
+        color: constants.calAVColor,
       }];
     } if (serviceArea.toLowerCase() === 'ms') {
       return [{
         googleCalendarId: constants.calIdMS,
         className: 'ms-events',
-        color: 'rgba(255, 85, 34, 0.2)',
+        color: constants.calMSColor,
       }];
     }
     return [{
       googleCalendarId: constants.calIdFOTC,
       className: 'fotc-events',
-      color: 'rgba(0, 170, 238, 0.2)',
+      color: constants.calFOTCColor,
     }];
   };
-  const calendarInfo = getCalendarByRole();
+
+  useEffect(() => {
+    setCalendarInfo(getCalendarByRole());
+  }, []);
 
   return (
     <div className={styles.calendar_container}>
-      <h1 className={styles.title}>Calendar</h1>
-      <img className={styles.blobs} alt="color blobs" src={ColorBlobs} />
       <div className={styles.container}>
-        {currRole === 'admin' && (
         <div className={styles.buttonBox}>
+          <h1 className={styles.title}>Calendar</h1>
+          {currRole === 'admin' && (
           <button className={styles.addEventButton} type="button" onClick={handleClickOpen}>
             + Add Event
           </button>
+          )}
         </div>
-        )}
         <div className={styles.contentContainer}>
           <div className={styles.calendar}>
             <FullCalendar
@@ -133,20 +146,23 @@ function Calendar({ profile }) {
               eventDrop={currRole === 'admin' ? dropEvent : null}
               selectMirror
               dayMaxEvents
-              eventColor="rgba(0, 170, 238, 0.2)"
+              eventColor={constants.calFOTCColor}
               eventTextColor="black"
               fixedWeekCount={false}
-              googleCalendarApiKey={REACT_APP_FIREBASE_CALENDAR_ID}
+              googleCalendarApiKey={REACT_APP_GOOGLE_CALENDAR_API_KEY}
               eventSources={calendarInfo}
               eventClick={handleEventClick}
             />
           </div>
-          <div className={styles.upcomingEvents}>
-            <UpcomingEvents profile={profile} getCalendarRef={() => calendarRef} />
-          </div>
+          {/* FIX CALENDAR ID  */}
+          {calendarInfo && <UpcomingEvents profile={profile} calendars={calendarInfo} />}
         </div>
       </div>
       <CalendarEventForm profile={profile} getCalendarRef={() => calendarRef} open={open} handleClose={handleClose} />
+
+      {popupEvent && (
+        <EventPopup openEvent={openEvent} closeEvent={closeEvent} popupEvent={popupEvent} />
+      )}
     </div>
   );
 }

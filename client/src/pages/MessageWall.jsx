@@ -171,7 +171,7 @@ function MessageWall({ profile }) {
   // to service area and target
   return (
     role.toLowerCase() === 'admin' ? (
-      <div>
+      <div className={styles.wallWrapper}>
         <h1 className={styles.announcement}>Announcements</h1>
 
         {/* actions panel */}
@@ -326,7 +326,7 @@ function MessageWall({ profile }) {
       </div>
     ) : (
       // for non-admin roles (no create button)
-      <div>
+      <div className={styles.wallWrapper}>
         <h1 className={styles.announcement}>Announcements</h1>
         {/* actions panel */}
         <div className={styles.actionsContainer}>
