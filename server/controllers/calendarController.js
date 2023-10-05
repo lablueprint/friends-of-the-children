@@ -84,6 +84,7 @@ const createEvent = async (req, res) => {
     // promise chain to send response back to client
     res.status(202).json(response.data);
   } catch (error) {
+    console.error(error);
     res.status(400).json(error);
   }
 };
