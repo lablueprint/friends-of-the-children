@@ -19,6 +19,7 @@ import vidIcon from '../assets/icons/file_vid.svg';
 import pdfIcon from '../assets/icons/file_pdf.svg';
 import wordIcon from '../assets/icons/file_microsoft_word.svg';
 import excelIcon from '../assets/icons/file_microsoft_excel.svg';
+import powerpointIcon from '../assets/icons/file_microsoft_powerpoint.svg';
 import editIcon from '../assets/icons/editicon.svg';
 import moduleStyles from '../styles/Modules.module.css';
 import NewModulePopup from '../components/NewModulePopup';
@@ -439,9 +440,9 @@ function ExpandedModule({ profile }) {
               )}
               {(file.fileType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) && (
               <div>
-                <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                  {/* <embed className={moduleStyles.displayImg} src={`${file.url}`} alt={file.fileName} /> */}
-                </div>
+                <a href={`${file.url}`}>
+                  <div className={moduleStyles.preview} />
+                </a>
                 <div className={moduleStyles.descriptionContainer}>
                   <div
                     key={file.fileLink}
@@ -463,9 +464,9 @@ function ExpandedModule({ profile }) {
               )}
               {(file.fileType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) && (
               <div>
-                <div className={moduleStyles.preview} onClick={() => (handleClickOpenFilePopup(file))} role="presentation">
-                  {/* <embed className={moduleStyles.displayImg} src={`${file.url}`} alt={file.fileName} /> */}
-                </div>
+                <a href={`${file.url}`}>
+                  <div className={moduleStyles.preview} />
+                </a>
                 <div className={moduleStyles.descriptionContainer}>
                   <div
                     key={file.fileLink}
@@ -480,6 +481,30 @@ function ExpandedModule({ profile }) {
                         className={moduleStyles.checkbox}
                       />
                     ) : (<img src={excelIcon} width="24" alt="excel icon" />)}
+                  </div>
+                  <div className={moduleStyles.fileName}>{file.fileName}</div>
+                </div>
+              </div>
+              )}
+              {(file.fileType.includes('application/vnd.openxmlformats-officedocument.presentationml.presentation')) && (
+              <div>
+                <a href={`${file.url}`}>
+                  <div className={moduleStyles.preview} />
+                </a>
+                <div className={moduleStyles.descriptionContainer}>
+                  <div
+                    key={file.fileLink}
+                    onMouseEnter={() => handleMouseEnter(file.fileLink)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <img src={file.imageSrc} alt={file.name} />
+                    {(checked.length > 0) || (hoveredFile === file.fileLink) || (checked.includes(file.fileLink)) ? (
+                      <Checkbox
+                        checked={checked.includes(file.fileLink)}
+                        onChange={(event) => handleCheckboxChange(event, file.fileLink)}
+                        className={moduleStyles.checkbox}
+                      />
+                    ) : (<img src={powerpointIcon} width="24" alt="powerpoint icon" />)}
                   </div>
                   <div className={moduleStyles.fileName}>{file.fileName}</div>
                 </div>
